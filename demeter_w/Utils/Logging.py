@@ -13,7 +13,9 @@ print command will write to screen and a logging file
 """
 import sys
 
+
 class Logger(object):
+
     def __init__(self):
         self.terminal = sys.stdout
         self.log = None

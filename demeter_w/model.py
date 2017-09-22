@@ -14,18 +14,18 @@ import time
 import sys
 import os
 
-import DataReader.IniReader as IniReader
-from Utils.Logging import Logger
-from DataWriter.OUTWriter import OutWriter
-from run_disaggregation import run_disaggregation as Disaggregation
+import demeter_w.DataReader.IniReader as IniReader
+from demeter_w.Utils.Logging import Logger
+from demeter_w.DataWriter.OUTWriter import OutWriter
+from demeter_w.run_disaggregation import run_disaggregation as disagg
+
 
 class DemeterW:
 
-    def __init__(self, IniReader, Disaggregation, Logger, OutWriter,
-                config='config.ini'):
+    def __init__(self, config='config.ini'):
 
         # instantiate functions
-        self.Disaggregation = Disaggregation
+        self.Disaggregation = disagg
         self.OutWriter = OutWriter
 
         # compile config file
@@ -57,6 +57,8 @@ class DemeterW:
         """
         # Check if outputFolder exist or not
         if not os.path.exists(self.settings.InputFolder):
+
+            print self.settings.InputFolder
             print("Error: Please specify Input Folder!")
             sys.exit(1)
 

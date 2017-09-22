@@ -14,7 +14,7 @@ Livestock, Mining and Manufacturing Sectors are uniformly downscaled, thus diagn
 """
 
 import numpy as np
-from Utils.NumpyParser import GetArrayCSV
+from demeter_w.Utils.NumpyParser import GetArrayCSV
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.ticker import FormatStrFormatter

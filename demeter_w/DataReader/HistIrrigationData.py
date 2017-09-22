@@ -11,8 +11,8 @@ Update the irrigation maps to include a unique map for each historical time peri
 """
 
 import numpy as np
-from Utils.TXTParser import getContentArray as ArrayTXTRead
-from Utils.CSVParser import getContentArray as ArrayCSVReader
+from demeter_w.Utils.TXTParser import getContentArray as ArrayTXTRead
+from demeter_w.Utils.CSVParser import getContentArray as ArrayCSVReader
 
 def getYearData(settings):
     

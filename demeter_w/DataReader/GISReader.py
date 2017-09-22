@@ -22,8 +22,8 @@ import os, sys
 import numpy as np
 from scipy import io as spio
 #from netCDF4 import Dataset
-from Utils.NumpyParser import GetArrayCSV, GetArrayTXT
-from Utils.CSVParser import getContentArray as ArrayCSVRead
+from demeter_w.Utils.NumpyParser import GetArrayCSV, GetArrayTXT
+from demeter_w.Utils.CSVParser import getContentArray as ArrayCSVRead
 #from Utils.TXTParser import getContentArray as ArrayTXTRead
 from HistPopulationData import getYearData as GetPopData
 from HistIrrigationData import getYearData as GetIrrData

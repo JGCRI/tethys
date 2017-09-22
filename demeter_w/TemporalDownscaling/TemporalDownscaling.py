@@ -25,9 +25,10 @@ Irrigation: Monthly Irrigation Data from other models as the weighting factor to
 """
 
 import scipy.io as spio
+import os
 import numpy as np
 from netCDF4 import Dataset
-from Utils.CSVParser import getContentArray as ArrayCSVRead
+from demeter_w.Utils.CSVParser import getContentArray as ArrayCSVRead
 from NeighborBasin import NeighborBasin
 
 
@@ -327,7 +328,8 @@ def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basins):
                 W_basin[basins[index] - 1, y] += W[index, y]   
                 
     # Downscale the W data
-    Neigbor = NeighborBasin('./TemporalDownscaling/dist.csv') # dist.csv is in the same folder         
+    dist_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'reference/dist.csv')
+    Neigbor = NeighborBasin(dist_file) # dist.csv is in the reference folder
     for i in range(NM):
         for j in years:
             N = years.index(j)

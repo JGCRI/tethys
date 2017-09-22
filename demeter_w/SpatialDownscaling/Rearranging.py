@@ -9,8 +9,8 @@ Copyright (c) 2017, Battelle Memorial Institute
 """
 
 import numpy as np
-from Utils.Math import sub2ind
-from Utils.Math import SizeR
+from demeter_w.Utils.Math import sub2ind
+from demeter_w.Utils.Math import SizeR
 
 def Rearranging(mapsize, GISData, rgnmapData):
     

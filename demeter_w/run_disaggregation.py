@@ -9,15 +9,17 @@ Copyright (c) 2017, Battelle Memorial Institute
 """
 
 import time
-from DataReader import GCAMReader
-from DataReader import GISReader
-from DataWriter.OUTSettings import OUTSettings
-from SpatialDownscaling.Rearranging import Rearranging
-import SpatialDownscaling.ProxyMaps as ProxyMaps
-import SpatialDownscaling.TotalWaterUse as TotalWaterUse
-import Diagnostics.Spatial as DiagnosticsSD
-import Diagnostics.Temporal as DiagnosticsTD
-import TemporalDownscaling.TemporalDownscaling as TemporalDownscaling
+
+from demeter_w.DataReader import GCAMReader
+from demeter_w.DataReader import GISReader
+from demeter_w.DataWriter.OUTSettings import OUTSettings
+from demeter_w.SpatialDownscaling.Rearranging import Rearranging
+import demeter_w.SpatialDownscaling.ProxyMaps as ProxyMaps
+import demeter_w.SpatialDownscaling.TotalWaterUse as TotalWaterUse
+import demeter_w.Diagnostics.Spatial as DiagnosticsSD
+import demeter_w.Diagnostics.Temporal as DiagnosticsTD
+import demeter_w.TemporalDownscaling.TemporalDownscaling as TemporalDownscaling
+
 
 def run_disaggregation(settings):
     '''

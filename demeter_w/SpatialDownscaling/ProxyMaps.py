@@ -19,9 +19,9 @@ This is the core of Water Disaggregation
 """
 
 import numpy as np
-from Utils.Math import SizeR, SizeC
-from Utils.Math import ind2sub
-from Utils.Math import sub2ind
+from demeter_w.Utils.Math import SizeR, SizeC
+from demeter_w.Utils.Math import ind2sub
+from demeter_w.Utils.Math import sub2ind
 
     
 def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):

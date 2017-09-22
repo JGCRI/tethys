@@ -7,7 +7,7 @@ License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 '''
 
-import Utils.Folder as Folder 
+import demeter_w.Utils.Folder as Folder
 import GCAMOutputs
 import GCAMutil
 

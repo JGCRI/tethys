@@ -19,6 +19,8 @@ import pandas as pd
 #import tempfile
 #import random
 
+#import gcam_reader
+
 ## utility functions used in other gcam python code
 
 def gcam_query(batchqfiles, dbxmlfiles, inputdir, outfiles):
@@ -246,7 +248,6 @@ def rd_rgn_table(filename,skip=1,fltconv=True):
 
 
 # Added new method of query GCAM database
-import gcam_reader
 
 def gcam_reader_query_database(settings, outfiles):
     dbpath = settings.GCAM_DBpath

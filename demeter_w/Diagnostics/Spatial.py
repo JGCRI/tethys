@@ -12,7 +12,7 @@ Perform diagnostics to ensure that the spatial downscaled results and initial ag
 """
 
 import numpy as np
-from DataWriter.OUTSettings import OUTSettings
+from demeter_w.DataWriter.OUTSettings import OUTSettings
     
 def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
     

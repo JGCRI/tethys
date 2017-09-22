@@ -16,7 +16,7 @@ import GCAMutil
 import re
 import os.path
 import sys
-from sys import stderr,stdout
+from sys import stderr, stdout
 
 ## Canonical ordering of the regions for outputs
 _regions_ordered = []

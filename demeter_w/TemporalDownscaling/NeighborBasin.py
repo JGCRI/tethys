@@ -55,7 +55,7 @@ class NeighborBasin(object):
                 f, t, dst, vl = line.strip().split(',')  # target basin ID, neighbor basin ID, distance, index in the table    
                 dist = float(dst)              
                 # skip self match or basins with no values
-                if (f == t):
+                if f == t:
                     continue              
                 else:                    
                     # if a t and dist are not in dict

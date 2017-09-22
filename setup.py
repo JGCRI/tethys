@@ -12,7 +12,7 @@ def get_requirements():
 
 
 setup(
-    name='demeterw',
+    name='demeter-w',
     version='1.0.0',
     packages=find_packages(),
     url='',

@@ -22,7 +22,7 @@ Copyright (c) 2017, Battelle Memorial Institute
 % that never appear in a region mapping together (e.g., China and its provinces).
 """
 
-from Utils.CSVParser import getContentArray as ArrayCSVReader
+from demeter_w.Utils.CSVParser import getContentArray as ArrayCSVReader
 from shutil import copyfile
 
 def getGCAMData(settings):
