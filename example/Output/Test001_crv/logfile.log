@@ -1,0 +1,152 @@
+Project Name        :  Test001
+Input Folder        :  Input/
+Output Folder       :  Output/Test001_crv/
+GCAM CSV Folder     :  Input/GCAM/CSV/Case001/
+Region Info Folder  :  Input/rgn32/
+Start disaggregation... 
+---Read in the GCAM data (csv format)---
+------Time Cost: 0.0383789539337 seconds ---
+---Number of years: 5
+------ [2005, 2010, 2015, 2020, 2025]
+---Read in the GIS data (asc/txt/csv format) and the Region map data (csv format)---
+------Use GPW 2005 Population Data for 2005
+------Use GPW 2010 Population Data for 2010
+------Use GPW 2015 Population Data for 2015
+------Use GPW 2015 Population Data for 2020
+------Use GPW 2015 Population Data for 2025
+------Use FAO-GMIA 2005 Irrigation Area Data for 2005
+------Use FAO-GMIA 2005 Irrigation Area Data for 2010
+------Use FAO-GMIA 2005 Irrigation Area Data for 2015
+------Use FAO-GMIA 2005 Irrigation Area Data for 2020
+------Use FAO-GMIA 2005 Irrigation Area Data for 2025
+------Time Cost: 4.77242302895 seconds ---
+---Mapsize: [360, 720]
+---Rearranging data and map indices
+------Time Cost: 0.179214954376 seconds ---
+---Create a Population Map as proxy of non-Agricultural Water withdrawals
+2005
+------[Adjusting map_rgn_nonag with population]: Cells with pop/irr data but no region:  1
+------[Adjusting map_rgn_nonag with population]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_nonag with population]: Cells not adjusted:  1
+------[Adjusting map_rgn_ag with population]: Cells with pop/irr data but no region:  1
+------[Adjusting map_rgn_ag with population]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_ag with population]: Cells not adjusted:  1
+2010
+------[Adjusting map_rgn_nonag with population]: Cells with pop/irr data but no region:  1
+------[Adjusting map_rgn_nonag with population]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_nonag with population]: Cells not adjusted:  1
+------[Adjusting map_rgn_ag with population]: Cells with pop/irr data but no region:  1
+------[Adjusting map_rgn_ag with population]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_ag with population]: Cells not adjusted:  1
+2015
+------[Adjusting map_rgn_nonag with population]: Cells with pop/irr data but no region:  1
+------[Adjusting map_rgn_nonag with population]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_nonag with population]: Cells not adjusted:  1
+------[Adjusting map_rgn_ag with population]: Cells with pop/irr data but no region:  1
+------[Adjusting map_rgn_ag with population]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_ag with population]: Cells not adjusted:  1
+2020
+------[Adjusting map_rgn_nonag with population]: Cells with pop/irr data but no region:  1
+------[Adjusting map_rgn_nonag with population]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_nonag with population]: Cells not adjusted:  1
+------[Adjusting map_rgn_ag with population]: Cells with pop/irr data but no region:  1
+------[Adjusting map_rgn_ag with population]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_ag with population]: Cells not adjusted:  1
+2025
+------[Adjusting map_rgn_nonag with population]: Cells with pop/irr data but no region:  1
+------[Adjusting map_rgn_nonag with population]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_nonag with population]: Cells not adjusted:  1
+------[Adjusting map_rgn_ag with population]: Cells with pop/irr data but no region:  1
+------[Adjusting map_rgn_ag with population]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_ag with population]: Cells not adjusted:  1
+------Time Cost: 0.486837148666 seconds ---
+---Create an livestock Map as proxy of livestock Water withdrawal
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 1 2 2.32e-07
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 1 7 0.004366553
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 1 9 4.29e-05
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 1 25 2.66e-06
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 2 2 2.55e-07
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 2 7 0.004794266
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 2 9 4.96e-05
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 2 25 3.45e-06
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 3 2 3.15e-07
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 3 7 0.005065432
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 3 9 5.31e-05
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 3 25 4.05e-06
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 4 2 3.42e-07
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 4 7 0.005329963
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 4 9 5.64e-05
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 4 25 4.37e-06
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 5 2 3.68e-07
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 5 7 0.005561491
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 5 9 5.93e-05
+[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 5 25 4.69e-06
+------Time Cost: 6.76807785034 seconds ---
+---Create an Irrigation Map as proxy of Agricultural Water withdrawal
+2005
+------[Adjusting map_rgn_ag with irr]: Cells with pop/irr data but no region:  0
+------[Adjusting map_rgn_ag with irr]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_ag with irr]: Cells not adjusted:  0
+------[Adjusting mapAEZ with irr]: Cells with pop/irr data but no region:  0
+------[Adjusting mapAEZ with irr]: Cells adjusted to an adjacent region:  0
+------[Adjusting mapAEZ with irr]: Cells not adjusted:  0
+2010
+------[Adjusting map_rgn_ag with irr]: Cells with pop/irr data but no region:  0
+------[Adjusting map_rgn_ag with irr]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_ag with irr]: Cells not adjusted:  0
+------[Adjusting mapAEZ with irr]: Cells with pop/irr data but no region:  0
+------[Adjusting mapAEZ with irr]: Cells adjusted to an adjacent region:  0
+------[Adjusting mapAEZ with irr]: Cells not adjusted:  0
+2015
+------[Adjusting map_rgn_ag with irr]: Cells with pop/irr data but no region:  0
+------[Adjusting map_rgn_ag with irr]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_ag with irr]: Cells not adjusted:  0
+------[Adjusting mapAEZ with irr]: Cells with pop/irr data but no region:  0
+------[Adjusting mapAEZ with irr]: Cells adjusted to an adjacent region:  0
+------[Adjusting mapAEZ with irr]: Cells not adjusted:  0
+2020
+------[Adjusting map_rgn_ag with irr]: Cells with pop/irr data but no region:  0
+------[Adjusting map_rgn_ag with irr]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_ag with irr]: Cells not adjusted:  0
+------[Adjusting mapAEZ with irr]: Cells with pop/irr data but no region:  0
+------[Adjusting mapAEZ with irr]: Cells adjusted to an adjacent region:  0
+------[Adjusting mapAEZ with irr]: Cells not adjusted:  0
+2025
+------[Adjusting map_rgn_ag with irr]: Cells with pop/irr data but no region:  0
+------[Adjusting map_rgn_ag with irr]: Cells adjusted to an adjacent region:  0
+------[Adjusting map_rgn_ag with irr]: Cells not adjusted:  0
+------[Adjusting mapAEZ with irr]: Cells with pop/irr data but no region:  0
+------[Adjusting mapAEZ with irr]: Cells adjusted to an adjacent region:  0
+------[Adjusting mapAEZ with irr]: Cells not adjusted:  0
+------Time Cost: 9.39011716843 seconds ---
+---Aggregate to compute total water withdrawal at grid scale
+------Time Cost: 4.79630994797 seconds ---
+---Spatial Downscaling Diagnostics (Global): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)
+      Year  2005 :    3019.53988001       3019.55000639      Diff=  -0.0101263749998
+      Year  2010 :    3253.31261669       3253.32433411      Diff=  -0.0117174209968
+      Year  2015 :    3446.70647763       3446.71935673      Diff=  -0.0128790969998
+      Year  2020 :    3563.76181958       3563.77567633      Diff=  -0.0138567450035
+      Year  2025 :    3730.10510977       3730.12000467      Diff=  -0.014894899004
+------Diagnostics information is saved to: Output/Test001_crv/Diagnostics_Spatial_Downscaling.csv
+---Temporal downscaling for Domestic, Electricity, Irrigation, Livestock, Mining and Manufacturing
+------Temporal downscaling is available for Year: [2005, 2006, 2007, 2008, 2009, 2010]
+------ Domestic Sector Finished
+------ Electricity Generation Sector Finished
+------ Irrigation Sector Finished
+------ Livestock, Mining and Manufacturing Sectors Finished
+------Time Cost: 71.9407839775 seconds ---
+---Temporal Downscaling Diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)
+------Irrigation------
+                Year  2005 :      1611.86438331       1611.86438331      Diff=  1.54614099301e-11
+                Year  2006 :      1642.38442693       1642.38442693      Diff=  -4.50199877378e-11
+                Year  2007 :      1672.90447055       1672.90447055      Diff=  4.32009983342e-12
+                Year  2008 :      1703.42451417       1703.42451417      Diff=  -1.84172677109e-11
+                Year  2009 :      1733.94455779       1733.94455779      Diff=  9.09494701773e-13
+                Year  2010 :      1764.46460142       1764.46460142      Diff=  -1.68256519828e-11
+------Domestic------
+                Year  2005 :      456.71       456.71      Diff=  1.70530256582e-12
+                Year  2006 :      460.118       460.118      Diff=  1.15960574476e-11
+                Year  2007 :      463.526       463.526      Diff=  1.01749719761e-11
+                Year  2008 :      466.934       466.934      Diff=  4.14956957684e-12
+                Year  2009 :      470.342       470.342      Diff=  2.31921148952e-11
+                Year  2010 :      473.75       473.75      Diff=  -4.2064129957e-12
