@@ -1,0 +1,5 @@
+numpy>=1.13.1
+scipy>=0.18.1
+pandas>=0.19.2
+matplotlib>=2.0.2
+configobj>=5.0.6
