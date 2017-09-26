@@ -1,11 +1,11 @@
 Project Name        :  Test001
-Input Folder        :  ../../Input/
-Output Folder       :  ../../Output/Test001/
-GCAM CSV Folder     :  ../../Input/GCAM/CSV/Case001/
-Region Info Folder  :  ../../Input/rgn32/
-Start run_disaggregation... 
+Input Folder        :  Input/
+Output Folder       :  Output/Test001/
+GCAM CSV Folder     :  Input/GCAM/CSV/Case001/
+Region Info Folder  :  Input/rgn32/
+Start disaggregation... 
 ---Read in the GCAM data (csv format)---
-------Time Cost: 0.0439999103546 seconds ---
+------Time Cost: 0.15499997139 seconds ---
 ---Number of years: 5
 ------ [2005, 2010, 2015, 2020, 2025]
 ---Read in the GIS data (asc/txt/csv format) and the Region map data (csv format)---
@@ -19,10 +19,10 @@ Start run_disaggregation...
 ------Use FAO-GMIA 2005 Irrigation Area Data for 2015
 ------Use FAO-GMIA 2005 Irrigation Area Data for 2020
 ------Use FAO-GMIA 2005 Irrigation Area Data for 2025
-------Time Cost: 6.1930000782 seconds ---
+------Time Cost: 7.59599995613 seconds ---
 ---Mapsize: [360, 720]
 ---Rearranging data and map indices
-------Time Cost: 0.148000001907 seconds ---
+------Time Cost: 0.236000061035 seconds ---
 ---Create a Population Map as proxy of non-Agricultural Water withdrawals
 2005
 ------[Adjusting map_rgn_nonag with population]: Cells with pop/irr data but no region:  1
@@ -59,7 +59,7 @@ Start run_disaggregation...
 ------[Adjusting map_rgn_ag with population]: Cells with pop/irr data but no region:  1
 ------[Adjusting map_rgn_ag with population]: Cells adjusted to an adjacent region:  0
 ------[Adjusting map_rgn_ag with population]: Cells not adjusted:  1
-------Time Cost: 0.200999975204 seconds ---
+------Time Cost: 1.01800012589 seconds ---
 ---Create an livestock Map as proxy of livestock Water withdrawal
 [Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 1 2 2.32e-07
 [Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 1 7 0.004366553
@@ -81,7 +81,7 @@ Start run_disaggregation...
 [Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 5 7 0.005561491
 [Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 5 9 5.93e-05
 [Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 5 25 4.69e-06
-------Time Cost: 3.55800008774 seconds ---
+------Time Cost: 3.85299992561 seconds ---
 ---Create an Irrigation Map as proxy of Agricultural Water withdrawal
 2005
 ------[Adjusting map_rgn_ag with irr]: Cells with pop/irr data but no region:  0
@@ -118,23 +118,23 @@ Start run_disaggregation...
 ------[Adjusting mapAEZ with irr]: Cells with pop/irr data but no region:  0
 ------[Adjusting mapAEZ with irr]: Cells adjusted to an adjacent region:  0
 ------[Adjusting mapAEZ with irr]: Cells not adjusted:  0
-------Time Cost: 6.28299999237 seconds ---
+------Time Cost: 8.33100008965 seconds ---
 ---Aggregate to compute total water withdrawal at grid scale
-------Time Cost: 2.70299983025 seconds ---
+------Time Cost: 3.03899979591 seconds ---
 ---Spatial Downscaling Diagnostics (Global): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)
       Year  2005 :    3019.53988001       3019.55000639      Diff=  -0.0101263749998
       Year  2010 :    3253.31261669       3253.32433411      Diff=  -0.0117174209977
       Year  2015 :    3446.70647763       3446.71935673      Diff=  -0.0128790970007
       Year  2020 :    3563.76181958       3563.77567633      Diff=  -0.0138567450035
       Year  2025 :    3730.10510977       3730.12000467      Diff=  -0.014894899004
-------Diagnostics information is saved to: ../../Output/Test001/Diagnostics_Spatial_Downscaling.csv
+------Diagnostics information is saved to: Output/Test001/Diagnostics_Spatial_Downscaling.csv
 ---Temporal downscaling for Domestic, Electricity, Irrigation, Livestock, Mining and Manufacturing
 ------Temporal downscaling is available for Year: [2005, 2006, 2007, 2008, 2009, 2010]
 ------ Domestic Sector Finished
 ------ Electricity Generation Sector Finished
 ------ Irrigation Sector Finished
 ------ Livestock, Mining and Manufacturing Sectors Finished
-------Time Cost: 53.0799999237 seconds ---
+------Time Cost: 67.4259998798 seconds ---
 ---Temporal Downscaling Diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)
 ------Irrigation------
                 Year  2005 :      1611.86438331       1611.86438331      Diff=  2.27373675443e-13
@@ -157,9 +157,10 @@ Start run_disaggregation...
                 Year  2008 :      553.577307938       553.577307957      Diff=  -1.83796373676e-08
                 Year  2009 :      557.977701031       557.977701272      Diff=  -2.40958343056e-07
                 Year  2010 :      562.378094473       562.378094588      Diff=  -1.15136913337e-07
-End run_disaggregation... 
----Disaggregation: 88.6619999409 seconds ---
+End disaggregation... 
+---Disaggregation: 111.095999956 seconds ---
+Saving outputs... 
 Save the gridded water usage results for each withdrawal category in NetCDF format (Unit: km3/yr)
 Save the monthly water usage results for each withdrawal category (Unit: km3/month)
----Output: 6.08100008965 seconds ---
-End Project:    Test001
+---Output: 1.66400003433 seconds ---
+('End Project:   ', 'Test001')

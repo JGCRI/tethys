@@ -33,7 +33,8 @@ def run_disaggregation(settings):
     2. Read in the GIS data
     3. Rearranging data and map indices
     4. Create proxy maps for population, livestock and irrigation
-       and downscale non-Agriculture (domestic, electricity, manufacturing and mining), livestock and irrigation water withdrawals to grid scale
+       and downscale non-Agriculture (domestic, electricity, manufacturing and mining), 
+       livestock and irrigation water withdrawals to grid scale
     5. Compute Total Water withdrawal
     6. Diagnostics of Spatial Downscaling
     7. Temporal Downscaling (annually -> monthly)
@@ -78,7 +79,7 @@ def run_disaggregation(settings):
     # c.    Population maps
     # d.    irrigation maps
     # e.    livestock maps
-    # f.    mask shapefiles of GCAM regions, river basins, countries, states, etc.
+    # f.    mask shape files of GCAM regions, river basins, countries, states, etc.
 
     print '---Read in the GIS data (asc/txt/csv format) and the Region map data (csv format)---'
     GISData    = GISReader.getGISData(settings)
@@ -113,7 +114,7 @@ def run_disaggregation(settings):
     endtime6 = time.time()
     print("------Time Cost: %s seconds ---" % (endtime6 - endtime5))
 
-    # 5. Total Waterwithdrawal
+    # 5. Total Water Withdrawal
     print '---Aggregate to compute total water withdrawal at grid scale'
     TotalWaterUse.TotalWaterUse(settings, GISData, rgnmapData, OUT)
     endtime7 = time.time()

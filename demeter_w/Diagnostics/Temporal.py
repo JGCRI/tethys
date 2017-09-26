@@ -12,7 +12,7 @@ Perform diagnostics to ensure that the temporal downscaled results of electricit
 Livestock, Mining and Manufacturing Sectors are uniformly downscaled, thus diagnostics are not needed.
 
 """
-
+import os
 import numpy as np
 from demeter_w.Utils.NumpyParser import GetArrayCSV
 import matplotlib.pyplot as plt
@@ -92,7 +92,7 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
     Electricity_TD__Diagnostics_Plot(OUT.twdelec, GISData, Settings.OutputFolder)
     
 def Electricity_TD__Diagnostics_Plot(data, GISData, OutputFolder):
-    # Aggregate data into country scale and get the mean for each month of 12 monthes
+    # Aggregate data into country scale and get the mean for each month of 12 months
     CountryIDs = GISData['CountryIDs']
     NC = np.max(GISData['CountryIDs'])
     NG = np.shape(data)[0]
@@ -103,7 +103,8 @@ def Electricity_TD__Diagnostics_Plot(data, GISData, OutputFolder):
             if CountryIDs[index] > 0:
                 new_data[CountryIDs[index] - 1, m] += np.mean(data[index, range(m,NM,12)])
     
-    Ele_gen_data_file = './TemporalDownscaling/IEA_9_Countries_Monthly_AvgElectricity_2000_2015.csv'
+	# IEA_9_Countries_Monthly_AvgElectricity_2000_2015.csv is in the reference folder
+    Ele_gen_data_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'reference/IEA_9_Countries_Monthly_AvgElectricity_2000_2015.csv')
     Ele_gen_data      = GetArrayCSV(Ele_gen_data_file, 1)
                     
     CountryID   = Ele_gen_data[0,1:].astype(int)
@@ -196,8 +197,9 @@ def Electricity_TD__Diagnostics_Plot(data, GISData, OutputFolder):
     plt.close(fig)
     
 def Domestic_TD__Diagnostics_Plot(data, GISData, OutputFolder):
-    
-    obv_dom_data_file = './TemporalDownscaling/obv_dom.csv'
+    # obv_dom.csv is in the reference folder
+    obv_dom_data_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'reference/obv_dom.csv')
+
     with open(obv_dom_data_file, 'r') as f:
         Alllines = f.read().splitlines()
     obv_dom_data = [Alllines[l].split(',') for l in range(1,len(Alllines))]

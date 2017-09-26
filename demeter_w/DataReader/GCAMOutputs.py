@@ -29,7 +29,7 @@ def GCAMData(settings):
     tempdirprep   = get_dir_prepender(settings.GCAM_CSV)
     outfiles      = map(tempdirprep, outfiles)
 
-    util.gcam_reader_query_database(settings, outfiles)
+    #util.gcam_reader_query_database(settings, outfiles)
     
     #initialize global parameter in GCAMSupoort
     Support.init_rgn_tables(settings, outfiles[3]) # used outfiles[1]

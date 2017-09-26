@@ -16,7 +16,7 @@ Copyright (c) 2017, Battelle Memorial Institute
 % wdliv          -
 % irrArea        -
 % irrV           -
-% irrShare       - data of irrigation share
+% irrShare       - 
 
 % Note that pop_tot should have data for all regions, even ones
 % that never appear in a region mapping together (e.g., China and its provinces).
@@ -45,9 +45,6 @@ def getGCAMData(settings):
     else:
     # GCAM has already calculated irrigated (vice total) area.  
     # Setting irrShare to a scalar will signal the disaggregation function to ignore this factor.    
-        GCAMData['irrShare'] = 1        
-    
-    # copy the pop_tot file to output folder
-    copyfile(settings.pop_tot, settings.OutputFolder + 'GCAM_pop_tot.csv')
+        GCAMData['irrShare'] = 1
     
     return GCAMData

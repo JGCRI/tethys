@@ -27,7 +27,7 @@ Irrigation: Monthly Irrigation Data from other models as the weighting factor to
 import scipy.io as spio
 import os
 import numpy as np
-from netCDF4 import Dataset
+#from netCDF4 import Dataset
 from demeter_w.Utils.CSVParser import getContentArray as ArrayCSVRead
 from NeighborBasin import NeighborBasin
 
@@ -182,16 +182,16 @@ def get_monthly_data(data, M):
 
 def GetMonthlyIrrigationData(filename, monthindex, coords):
 
-    datagrp = Dataset(filename, 'r', format='NETCDF4')
-#    datagrp = spio.netcdf.netcdf_file(filename, 'r')
+#    datagrp = Dataset(filename, 'r', format='NETCDF4')
+    datagrp = spio.netcdf.netcdf_file(filename, 'r')
     
     # Obtain the corresponding 67420 index from the original dimensions
-    lon = datagrp['lon'][:]
-    lat = datagrp['lat'][:]
-    nm  = int(len(datagrp['time'][:]))
-#    lon = datagrp.variables['lon'][:].copy()
-#    lat = datagrp.variables['lat'][:].copy()
-#    nm  = int(len(datagrp.variables['time'][:].copy()))
+#     lon = datagrp['lon'][:]
+#     lat = datagrp['lat'][:]
+#     nm  = int(len(datagrp['time'][:]))
+    lon = datagrp.variables['lon'][:].copy()
+    lat = datagrp.variables['lat'][:].copy()
+    nm  = int(len(datagrp.variables['time'][:].copy()))
     index = np.zeros((coords.shape[0],2),dtype = int)    
     for i in range(coords.shape[0]):
         index[i,0] = np.where(lon == coords[i,1])[0][0]
@@ -199,8 +199,8 @@ def GetMonthlyIrrigationData(filename, monthindex, coords):
     
     irrdataall = np.zeros((coords.shape[0],nm),dtype = float)
     for j in range(nm):
-        temp = datagrp['pirrww'][j,:,:].T
-#        temp = datagrp.variables['pirrww'][j,:,:].copy().T
+#        temp = datagrp['pirrww'][j,:,:].T
+        temp = datagrp.variables['pirrww'][j,:,:].copy().T
         np.ma.set_fill_value(temp, 0.0)  # Original filling value is 1e+20
         temp = temp.filled()
         irrdataall[:,j] = temp[index[:,0],index[:,1]]

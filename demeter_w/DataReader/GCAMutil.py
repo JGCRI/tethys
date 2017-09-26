@@ -15,7 +15,7 @@ import os.path
 import re
 import string
 import subprocess
-import pandas as pd
+#import pandas as pd
 #import tempfile
 #import random
 
@@ -247,21 +247,21 @@ def rd_rgn_table(filename,skip=1,fltconv=True):
     return (table, order)
 
 
-# Added new method of query GCAM database
-
-def gcam_reader_query_database(settings, outfiles):
-    dbpath = settings.GCAM_DBpath
-    dbfile = settings.GCAM_DBfile
-    conn = gcam_reader.LocalDBConn(dbpath, dbfile)
-
-    queries = gcam_reader.parse_batch_query(settings.GCAM_query)
-    n  = 0
-    for q in queries:
-        print q.title
-        qp = conn.runQuery(q)
-        create_csv(qp, outfiles[n],q.title)
-        n +=1
-        
-def create_csv(qd,outfile, title):
-    df = pd.DataFrame(qd)
-    df.to_csv(outfile, header=title)
+# # Added new method of query GCAM database
+# 
+# def gcam_reader_query_database(settings, outfiles):
+#     dbpath = settings.GCAM_DBpath
+#     dbfile = settings.GCAM_DBfile
+#     conn = gcam_reader.LocalDBConn(dbpath, dbfile)
+# 
+#     queries = gcam_reader.parse_batch_query(settings.GCAM_query)
+#     n  = 0
+#     for q in queries:
+#         print q.title
+#         qp = conn.runQuery(q)
+#         create_csv(qp, outfiles[n],q.title)
+#         n +=1
+#         
+# def create_csv(qd,outfile, title):
+#     df = pd.DataFrame(qd)
+#     df.to_csv(outfile, header=title)
