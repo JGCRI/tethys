@@ -182,30 +182,14 @@ def get_monthly_data(data, M):
 
 def GetMonthlyIrrigationData(filename, monthindex, coords):
 
-#    datagrp = Dataset(filename, 'r', format='NETCDF4')
+
     datagrp = spio.netcdf.netcdf_file(filename, 'r')
     
-    # Obtain the corresponding 67420 index from the original dimensions
-#     lon = datagrp['lon'][:]
-#     lat = datagrp['lat'][:]
-#     nm  = int(len(datagrp['time'][:]))
-    lon = datagrp.variables['lon'][:].copy()
-    lat = datagrp.variables['lat'][:].copy()
-    nm  = int(len(datagrp.variables['time'][:].copy()))
-    index = np.zeros((coords.shape[0],2),dtype = int)    
-    for i in range(coords.shape[0]):
-        index[i,0] = np.where(lon == coords[i,1])[0][0]
-        index[i,1] = np.where(lat == coords[i,2])[0][0]
+    nm  = int(len(datagrp.variables['months'][:].copy()))
+    irrdataall = datagrp.variables['pirrww'][:,:].copy()
+    irrdata    = irrdataall[:,monthindex]
     
-    irrdataall = np.zeros((coords.shape[0],nm),dtype = float)
-    for j in range(nm):
-#        temp = datagrp['pirrww'][j,:,:].T
-        temp = datagrp.variables['pirrww'][j,:,:].copy().T
-        np.ma.set_fill_value(temp, 0.0)  # Original filling value is 1e+20
-        temp = temp.filled()
-        irrdataall[:,j] = temp[index[:,0],index[:,1]]
-    
-    irrdata = irrdataall[:,monthindex]
+    datagrp.close()
     
     # Calculate the irr profile (Averaged monthly irrigation from historical data
     irrprofile = np.zeros((coords.shape[0],12),dtype = float)
@@ -213,7 +197,7 @@ def GetMonthlyIrrigationData(filename, monthindex, coords):
         mi = range(m,nm,12)       
         irrprofile[:, m] = np.mean(irrdataall[:,mi],1)
     
-    datagrp.close()
+    
     
     return irrdata, irrprofile
 
