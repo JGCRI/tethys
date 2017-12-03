@@ -8,11 +8,11 @@ Copyright (c) 2017, Battelle Memorial Institute
 
 
 
-Perform diagnostics to ensure that the spatial downscaled results and initial aggregate results from GCAM are Consistent
+Perform diagnostics to ensure that the spatially downscaled results and initial aggregate results from GCAM are Consistent
 """
 
 import numpy as np
-from demeter_w.DataWriter.OUTSettings import OUTSettings
+from demeter_w.DataWriter.OUTWriter import OUTSettings
     
 def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
     

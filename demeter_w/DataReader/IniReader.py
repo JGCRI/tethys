@@ -9,6 +9,7 @@ Copyright (c) 2017, Battelle Memorial Institute
 Get the simulator settings from configuration(*.ini) file
 '''
 
+import os, sys
 from configobj import ConfigObj
 from ConfigSettings import ConfigSettings
 
@@ -25,6 +26,12 @@ def getSimulatorSettings(iniFile):
     settings.OutputUnit         = int(config['Project']['OutputUnit'])
     settings.PerformDiagnostics = int(config['Project']['PerformDiagnostics'])
     settings.PerformTemporal    = int(config['Project']['PerformTemporal'])
+    
+    try:
+        settings.SpatialResolution = float(config['Project']['SpatialResolution'])
+    except:
+        settings.SpatialResolution = 0.5
+    settings.mapsize = [int(180/settings.SpatialResolution), int(360/settings.SpatialResolution)]
     
     settings.UseGCAMDatabase    = int(config['GCAM']['UseGCAMDatabase'])
     if settings.UseGCAMDatabase:
@@ -70,6 +77,8 @@ def getSimulatorSettings(iniFile):
         settings.Irr_MonthlyData       = config['TemporalDownscaling']['Irr_MonthlyData']
         settings.TemporalInterpolation = int(config['TemporalDownscaling']['TemporalInterpolation'])
     
+    CheckExistence(settings)
+    
     return settings
 
 def PrintInfo(settings):
@@ -88,6 +97,61 @@ def AddSlashToDir(string):
     string = string.rstrip('/') + '/'
     
     return string
+
+def CheckExistence(settings):
+    
+    ierr = 0
+    errmsg = ""
+    
+    # Check for input and create output directories if not exists.
+    if not os.path.exists(settings.InputFolder):
+        errmsg += "Error: Incorrect Pathname for Input Folder ! \n"
+        ierr += 1
+
+    if not os.path.exists(settings.OutputFolder):
+        os.makedirs(settings.OutputFolder)
+    
+    if not os.path.exists(settings.rgnmapdir):
+        errmsg += "Error: Incorrect Pathname for Region Map Folder (rgnmapdir) ! \n"
+        ierr += 1
+    
+    if not settings.UseGCAMDatabase and not os.path.exists(settings.rgnmapdir):
+        errmsg += "Error: Incorrect Pathname for GCAM CSV Folder (GCAM_CSV) ! \n"
+        ierr += 1
+        
+    # Check the existence of input files
+    strlist = ['Area', 'Coord', 'aez', 'InputBasinFile', 'BasinNames', 'InputRegionFile', 'RegionNames', 'InputCountryFile', \
+               'CountryNames', 'Population_GPW', 'Population_HYDE', 'Irrigation_GMIA', 'Irrigation_HYDE', \
+               'Livestock_Buffalo', 'Livestock_Cattle', 'Livestock_Goat', 'Livestock_Sheep', 'Livestock_Poultry', 'Livestock_Pig']
+    
+    ifn = 0
+    for s in strlist:
+        exec("ifn = IsFile(settings." + s + ")")
+        if ifn:
+            errmsg += "Error! File does not exist: " + eval("settings." + s) + "\n"
+            ierr += 1
+               
+    if settings.PerformTemporal:
+        strlist = ['TempMonthlyFile', 'HDDCDDMonthlyFile', 'Domestic_R', 'Irr_MonthlyData', 'Elec_Building', 'Elec_Industry', \
+                   'Elec_Building_heat', 'Elec_Building_cool', 'Elec_Building_others']
+        for s in strlist:
+            exec("ifn = IsFile(settings." + s + ")")
+            if ifn:
+                errmsg += "Error! File does not exist: " + eval("settings." + s) + "\n"
+                ierr += 1
+             
+         
+    if ierr > 0:
+        print errmsg
+        sys.exit(1)
+
+
+def IsFile(fn):
+    ifn = 0
+    if not os.path.isfile(fn):
+        ifn = 1
+    
+    return ifn 
 
 def help():
     

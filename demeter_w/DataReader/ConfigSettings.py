@@ -7,7 +7,7 @@ License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 '''
 
-import demeter_w.Utils.Folder as Folder
+from demeter_w.Utils.Logging import clearfolder
 import GCAMOutputs
 import GCAMutil
 
@@ -37,11 +37,12 @@ class ConfigSettings():
         if not self.UseGCAMDatabase:
             (_, self.regions_ordered) = GCAMutil.rd_rgn_table(self.RegionNames)
         else:
-            Folder.clearfolder(self.GCAM_CSV) 
+            clearfolder(self.GCAM_CSV) 
             GCAMOutputs.GCAMData(self) # Query GCAM database
         
         pathname = self.GCAM_CSV
-                        
+        
+        # All the following files are csv files and no header line                
         self.pop_tot           = pathname + 'pop_tot.csv'
         self.rgn_wddom         = pathname + 'withd_dom.csv'
         self.rgn_wdelec        = pathname + 'withd_elec.csv'

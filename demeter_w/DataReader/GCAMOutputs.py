@@ -11,6 +11,8 @@ Copyright (c) 2017, Battelle Memorial Institute
 import os
 import GCAMutil as util
 import GCAMSupport as Support
+from demeter_w.Utils.DataParser import getContentArray as ArrayCSVReader
+from shutil import copyfile
 
  
 def get_dir_prepender(dir):
@@ -67,3 +69,30 @@ def GCAMData(settings):
             settings.read_irrS = 1
     else:
             settings.read_irrS = 0
+            
+
+
+
+def getGCAMData(settings):
+    
+    '''dictionary GISData{} saves the data related to GCAM data'''
+    GCAMData = {}
+    #GCAMData['pop_fac']      = ArrayCSVReader(settings.pop_fac,0)
+    GCAMData['pop_tot']      = ArrayCSVReader(settings.pop_tot,0)
+    GCAMData['rgn_wddom']    = ArrayCSVReader(settings.rgn_wddom,0)
+    GCAMData['rgn_wdelec']   = ArrayCSVReader(settings.rgn_wdelec,0)
+    GCAMData['rgn_wdmfg']    = ArrayCSVReader(settings.rgn_wdmfg,0)
+    GCAMData['rgn_wdmining'] = ArrayCSVReader(settings.rgn_wdmining,0)
+    GCAMData['wdliv']        = ArrayCSVReader(settings.wdliv,0)
+    GCAMData['irrArea']      = ArrayCSVReader(settings.irrArea,0)
+    GCAMData['irrV']         = ArrayCSVReader(settings.irrV,0)
+
+    if settings.read_irrS:
+        GCAMData['irrShare'] = ArrayCSVReader(settings.irrShare,0)
+        print '------Used pre-calculated irrigation shares---'
+    else:
+    # GCAM has already calculated irrigated (vice total) area.  
+    # Setting irrShare to a scalar will signal the disaggregation function to ignore this factor.    
+        GCAMData['irrShare'] = 1
+    
+    return GCAMData

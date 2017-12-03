@@ -13,15 +13,15 @@ Modified from class NearDistValue @author: ladmin
 
 class NeighborBasin(object):
     '''
-    This is a class to define the neighbor basin for a certain basin (235 basins) in Temporal Downscaling.
+    This is a class to define the neighbor basin for a certain basin (in 235 basins) in Temporal Downscaling.
     
     The three studies (H08, LPJml, PCR-globwb) from year 1971-2010 were investigated for the following situation: 
-    The aggregated basin-level spatial downscaled irrigation results have values, but no values in the three data sets.
-    The monthly data profile from neighbor basin is borrowed to temporal downscale the grids related to this basin.
+    1. The aggregated basin-level spatially downscaled irrigation results have values, but no values in the three data sets.
+    2. The monthly data profile from neighbor basin is borrowed to temporally downscale the grids related to this basin.
     
     The neighbor basin is chosen from the neighbor basins with the shortest distance to the target basin.
     
-    dist.csv file in the same package includes the information of the distances of the surrounding basins to the target basin.
+    dist.csv file in "reference" package includes the information of the distances of the surrounding basins to the target basin.
 
     '''
 

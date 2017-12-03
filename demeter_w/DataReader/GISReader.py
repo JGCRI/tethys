@@ -22,11 +22,10 @@ import os, sys
 import numpy as np
 from scipy import io as spio
 #from netCDF4 import Dataset
-from demeter_w.Utils.NumpyParser import GetArrayCSV, GetArrayTXT
-from demeter_w.Utils.CSVParser import getContentArray as ArrayCSVRead
-#from Utils.TXTParser import getContentArray as ArrayTXTRead
-from HistPopulationData import getYearData as GetPopData
-from HistIrrigationData import getYearData as GetIrrData
+from demeter_w.Utils.DataParser import GetArrayCSV, GetArrayTXT
+from demeter_w.Utils.DataParser import getContentArray as ArrayCSVRead
+from HistPopIrrData import getPopYearData as GetPopData
+from HistPopIrrData import getIrrYearData as GetIrrData
 
 
 def getGISData(settings):
@@ -86,7 +85,7 @@ def load_mat_var(fn, varname):
 
     if not os.path.isfile(fn):
         print "Error! File does not exist:", fn
-        sys.exit()
+        sys.exit(1)
 
     temp = spio.loadmat(fn)
     data = temp[varname]
@@ -102,7 +101,7 @@ def load_const_griddata(fn, headerNum=0, key=" "):
     elif fn.endswith('.txt'):
         if not os.path.isfile(fn):
             print "Error! File does not exist:", fn
-            sys.exit()
+            sys.exit(1)
 
         try:
             data = GetArrayTXT(fn, headerNum)
@@ -113,14 +112,14 @@ def load_const_griddata(fn, headerNum=0, key=" "):
     elif fn.endswith('.csv'):
         if not os.path.isfile(fn):
             print "Error! File does not exist:", fn
-            sys.exit()
+            sys.exit(1)
 
         data = GetArrayCSV(fn, headerNum)
 
     elif fn.endswith('.nc'):
         if not os.path.isfile(fn):
             print "Error! File does not exist:", fn
-            sys.exit()
+            sys.exit(1)
 
 #        datagrp = Dataset(fn, 'r', format='NETCDF4')
         datagrp = spio.netcdf.netcdf_file(fn, 'r')

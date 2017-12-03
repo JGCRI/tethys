@@ -8,13 +8,13 @@ Copyright (c) 2017, Battelle Memorial Institute
 
 
 
-Perform diagnostics to ensure that the temporal downscaled results of electricity, domestic and irrigation are reasonable
+Perform diagnostics to ensure that the temporally downscaled results of electricity, domestic and irrigation are reasonable
 Livestock, Mining and Manufacturing Sectors are uniformly downscaled, thus diagnostics are not needed.
 
 """
 import os
 import numpy as np
-from demeter_w.Utils.NumpyParser import GetArrayCSV
+from demeter_w.Utils.DataParser import GetArrayCSV
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.ticker import FormatStrFormatter

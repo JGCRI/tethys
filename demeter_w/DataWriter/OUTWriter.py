@@ -9,8 +9,32 @@ Copyright (c) 2017, Battelle Memorial Institute
 
 import numpy as np
 from scipy import io as spio
-#from netCDF4 import Dataset
 
+class OUTSettings():
+# Output file names
+
+    def __init__(self):
+        
+        '''gridded results, 2D array, size: (360*720, NY)'''
+        self.wdtotal  = None
+        self.wdnonag  = None
+        self.wddom    = None
+        self.wdelec   = None
+        self.wdmfg    = None
+        self.wdmin    = None
+        self.wdirr    = None
+        self.wdliv    = None
+        
+        '''regional aggregates, 2D array, size: (NRegion, NY)'''       
+        self.rtotal   = None
+        self.rnonag   = None
+        self.rdom     = None
+        self.relec    = None
+        self.rmfg     = None
+        self.rmin     = None
+        self.rirr     = None
+        self.rliv     = None
+        
 def OutWriter(Settings, OUT, GISData):
      
     if Settings.OutputUnit:
@@ -114,7 +138,7 @@ def writeNETCDF(filename, data, GISData, unit, yearstrs):
     map_index = datagrp.createVariable('mapindex', 'i4', ('index',))
     griddata  = datagrp.createVariable('data', 'f4', ('index', 'year'))
     griddata.units = unit + '/yr'
-    griddata.description = 'Downscaled Results: 67420 rows, Number of Years columns'
+    griddata.description = 'Downscaled Results: ' + str(nrows) + ' rows, ' + str(ncols) + ' columns (years)'
     
         
     # data
@@ -166,7 +190,8 @@ def writeNETCDFmonthly(filename, data, GISData, unit, monthstrs):
     map_index = datagrp.createVariable('mapindex', 'i4', ('index',))
     griddata  = datagrp.createVariable('data', 'f4', ('index', 'month'))
     griddata.units = unit + '/month'
-    griddata.description = 'Downscaled Results: 67420 rows, Number of Months columns'
+    griddata.description = 'Downscaled Results: ' + str(nrows) + ' rows, ' + str(ncols) + ' columns (months)'
+    
     
         
     # data

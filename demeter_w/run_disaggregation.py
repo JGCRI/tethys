@@ -9,11 +9,10 @@ Copyright (c) 2017, Battelle Memorial Institute
 """
 
 import time
-
-from demeter_w.DataReader import GCAMReader
+from demeter_w.DataReader.GCAMOutputs import getGCAMData
 from demeter_w.DataReader import GISReader
-from demeter_w.DataWriter.OUTSettings import OUTSettings
-from demeter_w.SpatialDownscaling.Rearranging import Rearranging
+from demeter_w.DataWriter.OUTWriter import OUTSettings
+from demeter_w.SpatialDownscaling.ProxyMaps import Rearranging
 import demeter_w.SpatialDownscaling.ProxyMaps as ProxyMaps
 import demeter_w.SpatialDownscaling.TotalWaterUse as TotalWaterUse
 import demeter_w.Diagnostics.Spatial as DiagnosticsSD
@@ -28,7 +27,7 @@ def run_disaggregation(settings):
 
     Module: run_disaggregation
 
-    Main Function of Demeter-WD: Steps for water disaggregation
+    Main Function of Demeter-W: Steps for water disaggregation
     1. Read in the GCAM Data and Get the number of years
     2. Read in the GIS data
     3. Rearranging data and map indices
@@ -44,7 +43,7 @@ def run_disaggregation(settings):
     - settings    class DataReader.ConfigSettings, required input and control parameters
 
     # Output:
-    - OUT         class DataWriter.OUTSettings, data for output, gridded results for each withdrawal category
+    - OUT         class DataWriter.OUTWritter, data for output, gridded results for each withdrawal category
     '''
 
     # initialize output parameters
@@ -58,7 +57,7 @@ def run_disaggregation(settings):
     starttime1 = time.time() # Set-up timer
     print '---Read in the GCAM data (csv format)---'
     settings.setGCAMDataFiles() # set the GCAM data files
-    GCAMData = GCAMReader.getGCAMData(settings)
+    GCAMData = getGCAMData(settings)
     endtime1 = time.time()
     print("------Time Cost: %s seconds ---" % (endtime1 - starttime1))
 
@@ -81,7 +80,7 @@ def run_disaggregation(settings):
     # e.    livestock maps
     # f.    mask shape files of GCAM regions, river basins, countries, states, etc.
 
-    print '---Read in the GIS data (asc/txt/csv format) and the Region map data (csv format)---'
+    print '---Read in the GIS data (asc/txt/csv format) and the region map data (csv format)---'
     GISData    = GISReader.getGISData(settings)
     rgnmapData = GISReader.getRegionMapData(settings.InputRegionFile)
     endtime2 = time.time()
@@ -97,19 +96,19 @@ def run_disaggregation(settings):
 
     # 4. Create proxy maps and downscale non-Agriculture (domestic, electricity, manufacturing and mining) water withdrawals to grid scale
     # a.    Create a population proxy map
-    print '---Create a Population Map as proxy of non-Agricultural Water withdrawals'
+    print '---Create a population map as proxy of non-agricultural water withdrawals'
     ProxyMaps.PopulationMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings, OUT)
     endtime4 = time.time()
     print("------Time Cost: %s seconds ---" % (endtime4 - endtime3))
 
     # b.    Create a livestock proxy map and downscale livestock water withdrawal to grid scale
-    print '---Create an livestock Map as proxy of livestock Water withdrawal'
+    print '---Create an livestock map as proxy of livestock water withdrawal'
     ProxyMaps.LivestockMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT)
     endtime5 = time.time()
     print("------Time Cost: %s seconds ---" % (endtime5 - endtime4))
 
     # c.    Create an irrigation proxy map and downscale irrigation water withdrawal to grid scale
-    print '---Create an Irrigation Map as proxy of Agricultural Water withdrawal'
+    print '---Create an irrigation map as proxy of agricultural water withdrawal'
     ProxyMaps.IrrigationMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT)
     endtime6 = time.time()
     print("------Time Cost: %s seconds ---" % (endtime6 - endtime5))

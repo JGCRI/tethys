@@ -1,19 +1,16 @@
 """
 @Date: 09/09/2017
-@author: Xinya Li (xinya.li@pnl.gov)
+@author: Xinya Li (xinya.li@pnl.gov); Chris R. Vernon (chris.vernon@pnnl.gov)
 @Project: Demeter-W V1.0
 
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 
-This is the an example program of showing how to evaluate the input settings and
+This is the DemeterW class of showing how to evaluate the input settings and
 call the function running water disaggregation
 """
 
-import time
-import sys
-import os
-
+import os, sys, time
 import demeter_w.DataReader.IniReader as IniReader
 from demeter_w.Utils.Logging import Logger
 from demeter_w.DataWriter.OUTWriter import OutWriter
@@ -23,16 +20,15 @@ from demeter_w.run_disaggregation import run_disaggregation as disagg
 class DemeterW:
 
     def __init__(self, config='config.ini'):
-
+        
+        print "Demeter-W starts..."
+        
         # instantiate functions
         self.Disaggregation = disagg
         self.OutWriter = OutWriter
 
         # compile config file
         self.settings = IniReader.getSimulatorSettings(config)
-
-        # check input and output directories
-        self.make_dirs()
 
         # instantiate logger and log file
         sys.stdout = Logger()
@@ -50,30 +46,19 @@ class DemeterW:
 
         # clean up log
         sys.stdout.log.close()
-
-    def make_dirs(self):
-        """
-        Check for input and create output directories if not exists.
-        """
-        # Check if outputFolder exist or not
-        if not os.path.exists(self.settings.InputFolder):
-
-            print self.settings.InputFolder
-            print("Error: Please specify Input Folder!")
-            sys.exit(1)
-
-        if not os.path.exists(self.settings.OutputFolder):
-            os.makedirs(self.settings.OutputFolder)
+        
+        sys.stdout = sys.__stdout__
+        print "Demeter-W ends."
 
     def run_model(self):
         """
         Execute the model and save the outputs.
         """
-        print('Start disaggregation... ')
+        print('Start Disaggregation... ')
         s1 = time.time()
         self.gridded_data, self.gis_data = self.Disaggregation(self.settings)
         e1= time.time()
-        print('End disaggregation... ')
+        print('End Disaggregation... ')
         print("---Disaggregation: %s seconds ---" % (e1 - s1))
 
         print('Saving outputs... ')

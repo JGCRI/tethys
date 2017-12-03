@@ -24,48 +24,21 @@ def TotalWaterUse(Settings, GISData, rgnmapData, OUT):
     # 1.
     OUT.wdtotal = OUT.wdnonag + OUT.wdirr + OUT.wdliv
     
+    sectorstrs = ['total', 'nonag', 'irr', 'liv', 'dom', 'elec', 'mfg', 'min']
     # 2.
-    GCAM_withd_total = np.zeros((rgnmapData['nrgnNONAG'], OUT.wdnonag.shape[1]), dtype=float)    
-    GCAM_withd_nonAG = np.zeros((rgnmapData['nrgnNONAG'], OUT.wdnonag.shape[1]), dtype=float)
-    GCAM_withd_irr   = np.zeros((rgnmapData['nrgnNONAG'], OUT.wdnonag.shape[1]), dtype=float)
-    GCAM_withd_liv   = np.zeros((rgnmapData['nrgnNONAG'], OUT.wdnonag.shape[1]), dtype=float)
-    GCAM_withd_dom   = np.zeros((rgnmapData['nrgnNONAG'], OUT.wdnonag.shape[1]), dtype=float)    
-    GCAM_withd_elec  = np.zeros((rgnmapData['nrgnNONAG'], OUT.wdnonag.shape[1]), dtype=float)
-    GCAM_withd_mfg   = np.zeros((rgnmapData['nrgnNONAG'], OUT.wdnonag.shape[1]), dtype=float)
-    GCAM_withd_min   = np.zeros((rgnmapData['nrgnNONAG'], OUT.wdnonag.shape[1]), dtype=float)
+    for item in sectorstrs:
+        exec("OUT.r" + item + "= np.zeros((rgnmapData['nrgnNONAG'], OUT.wdnonag.shape[1]), dtype=float)")
     
     ls = np.where(rgnmapData['map_rgn_nonag'] > 0)[0]    
     for y in range(0,OUT.wdnonag.shape[1]):
-        for index in ls:                                    
-            GCAM_withd_total[rgnmapData['map_rgn_nonag'][index]-1,y] += OUT.wdtotal[index,y]
-            GCAM_withd_nonAG[rgnmapData['map_rgn_nonag'][index]-1,y] += OUT.wdnonag[index,y]
-            GCAM_withd_irr[rgnmapData['map_rgn_nonag'][index]-1,y]   += OUT.wdirr[index,y]
-            GCAM_withd_liv[rgnmapData['map_rgn_nonag'][index]-1,y]   += OUT.wdliv[index,y]
-            GCAM_withd_dom[rgnmapData['map_rgn_nonag'][index]-1,y]   += OUT.wddom[index,y]
-            GCAM_withd_elec[rgnmapData['map_rgn_nonag'][index]-1,y]  += OUT.wdelec[index,y]
-            GCAM_withd_mfg[rgnmapData['map_rgn_nonag'][index]-1,y]   += OUT.wdmfg[index,y]
-            GCAM_withd_min[rgnmapData['map_rgn_nonag'][index]-1,y]   += OUT.wdmin[index,y]
-                        
-                        
-    OUT.rtotal     = GCAM_withd_total
-    OUT.rnonag     = GCAM_withd_nonAG
-    OUT.rirr       = GCAM_withd_irr
-    OUT.rliv       = GCAM_withd_liv
-    OUT.rdom       = GCAM_withd_dom
-    OUT.relec      = GCAM_withd_elec
-    OUT.rmfg       = GCAM_withd_mfg
-    OUT.rmin       = GCAM_withd_min
+        for index in ls:
+            for item in sectorstrs:
+                exec("OUT.r" + item + "[rgnmapData['map_rgn_nonag'][index]-1,y] += OUT.wd"+ item +"[index,y]")                                  
     
     if Settings.OutputUnit: # convert the original unit km3/yr to new unit mm
         mapindex    = GISData['mapindex']
         area        = GISData['mapAreaExt'][mapindex]
         conversion  = 1e6 # km -> mm
-
-        OUT.wdtotal[mapindex,:]  = np.transpose(np.divide(np.transpose(OUT.wdtotal[mapindex,:]), area)*conversion)
-        OUT.wdnonag[mapindex,:]  = np.transpose(np.divide(np.transpose(OUT.wdnonag[mapindex,:]), area)*conversion)
-        OUT.wddom[mapindex,:]    = np.transpose(np.divide(np.transpose(OUT.wddom[mapindex,:]), area)*conversion)
-        OUT.wdelec[mapindex,:]   = np.transpose(np.divide(np.transpose(OUT.wdelec[mapindex,:]), area)*conversion)
-        OUT.wdmfg[mapindex,:]    = np.transpose(np.divide(np.transpose(OUT.wdmfg[mapindex,:]), area)*conversion)
-        OUT.wdmin[mapindex,:]    = np.transpose(np.divide(np.transpose(OUT.wdmin[mapindex,:]), area)*conversion)
-        OUT.wdirr[mapindex,:]    = np.transpose(np.divide(np.transpose(OUT.wdirr[mapindex,:]), area)*conversion)
-        OUT.wdliv[mapindex,:]    = np.transpose(np.divide(np.transpose(OUT.wdliv[mapindex,:]), area)*conversion)
+        
+        for item in sectorstrs:
+            exec("OUT.wd" + item + "[mapindex,:]  = np.transpose(np.divide(np.transpose(OUT.wd" + item + "[mapindex,:]), area)*conversion)")

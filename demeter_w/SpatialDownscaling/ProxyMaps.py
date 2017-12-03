@@ -11,7 +11,7 @@ This is the core of Water Disaggregation
 
     - mapsize     [360,720]
     - settings    class ConfigSettings(), required input and controlling parameters
-    - OUT         class OUTSettings(), data for output, grided results for each withdrawal category
+    - OUT         class OUTSettings(), data for output, gridded results for each withdrawal category
     - GISData     structure GISData{}, GIS data on grid map of 360*720
     - GCAMData    structure GCAMData{}, GCAM outputs with dimension: NRegions X NYears
     - rgnmapData  structure rgnmapData{}, region names, region ID for each valid cell on grid map
@@ -23,6 +23,37 @@ from demeter_w.Utils.Math import SizeR, SizeC
 from demeter_w.Utils.Math import ind2sub
 from demeter_w.Utils.Math import sub2ind
 
+def Rearranging(mapsize, GISData, rgnmapData):
+    
+    '''mapsize: [360,720]'''
+    
+    row0      = SizeR(GISData['area']) # row  = 67420
+    # Create a matrix with all data 1. area 2 region #
+    data      = np.zeros((row0,2), dtype=float)
+    data[:,0] = GISData['area'] #1. Area of each grid
+    data[:,1] = rgnmapData['rgnmapNONAG'][:] #GCAM 'primary' region
+    
+    nrow      = mapsize[0]
+    ncol      = mapsize[1]
+        
+    # create various map structures: 1D
+    mapAreaExt     = np.zeros((nrow*ncol,), dtype=float)
+    # maps of the various GCAM region mappings: 1D
+    map_rgn_nonag  = np.zeros((nrow*ncol,), dtype=int)
+    map_rgn_ag     = np.zeros((nrow*ncol,), dtype=int)
+    # linear index of map cell for each grid cell with coordinates (67420 cells)
+    mapindex       = sub2ind(mapsize,GISData['coord'][:,4].astype(int)-1, GISData['coord'][:,3].astype(int)-1)
+    # unit in km2 (conversion was applied earlier, 1 ha = 0.01 km2)
+    mapAreaExt[mapindex]    = GISData['area']
+    map_rgn_nonag[mapindex] = rgnmapData['rgnmapNONAG'][:]
+    map_rgn_ag[mapindex]    = rgnmapData['rgnmapAG'][:]
+    
+    # Update classes GISData and rgnmapData
+    GISData['mapAreaExt']       = mapAreaExt
+    GISData['mapindex']         = mapindex # mapindex is the most needed output variable
+    rgnmapData['map_rgn_nonag'] = map_rgn_nonag
+    rgnmapData['map_rgn_ag']    = map_rgn_ag
+
     
 def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
 # Total Non-Agricultural Water withdrawal in 1990, 2005, ... 2050, and 2010
@@ -30,7 +61,7 @@ def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
     
     NY = settings.NY
     
-# non-agricultural (industry, energy, dome stic) total water withdrawals in (km3/yr) for each of the GCAM regions
+# non-agricultural (dom, elec, mfg, mining) total water withdrawals in (km3/yr) for each of the GCAM regions
 # population map for all years 1990, 2005:2095
     ms      = (mapsize[0]*mapsize[1],NY)
 #    withd_nonAg_map   = np.full(ms, np.NaN, dtype=float)
@@ -128,12 +159,12 @@ def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
         tot_livestock[IN-1,4] += poultry[index]
         tot_livestock[IN-1,5] += pig[index]
   
-#  now create a spatial dist for each GCAM region
+#  now create a spatial distribution for each GCAM region
 #  withd_liv: these are the GCAM results of total volume of livestock water withdrawal in
 #  km3 in each GCAM region per animal type in the years 1990, 2005:5:2095
 #  variables are nrgn GCAM regions x 6 animals (1:Buffalo, 2:Cattle, 3-Goat, 4-Sheep, 5-Poultry, 6-Pig)
 # 
-#  Next, we distribute those volumes using the spatial dist of the gis maps
+#  Next, we distribute those volumes using the spatial distribution of the gis maps
 # these will be the GIS downscaled matrices
 
     livestock      = np.zeros((mapsize[0]*mapsize[1],6), dtype = float) 
@@ -174,7 +205,7 @@ def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
 def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
 
 # Need to downscale the agricultural water withdrawal data for GCAM years
-# using the existing map of areas equipped with irrigation as a proxy for disaggregating from
+# using the existing map of areas equipped with irrigation as a proxy for disaggregation from
 # AEZ to grid scale CHALLENGE: where to add new agricultural lands
     
     mapAreaExt = GISData['mapAreaExt'] # float, unit is km2
@@ -213,9 +244,9 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
             tempA_all[GCAMData['irrArea'][i,0].astype(int)-1,GCAMData['irrArea'][i,1].astype(int)-1,GCAMData['irrArea'][i,2].astype(int)-1,y] = GCAMData['irrArea'][i,y+3]*1000 
             # convert from thousands of km2 to km2
             
-# if irrShare was read in, then reorg the same way we did with irrArea.
+# if irrShare was read in, then reorganize the same way we did with irrArea.
 # Otherwise, set all irrigation shares to one (indicating that irrArea really is irrigated area, 
-# as calculated in GCAM, not total planted area, as in older versions of gcam.)
+# as calculated in GCAM, not total planted area, as in older versions of GCAM.)
     if r2 > 1 or  q2 > 1:
         for i in range(0,r2):
             for y in range (0,NY):
@@ -240,7 +271,6 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
                     irr_A[i,j,y] += tempA_all[i,j,k,y]*tempS_all[i,j,k,y]
                     irr_V[i,j,y] += tempV_all[i,j,k,y]
                     
-    
     
     ms            = (mapsize[0]*mapsize[1],NY)
     irrA_grid     = np.full(ms, np.NaN, dtype = float)
@@ -275,7 +305,8 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
                 if irr[index] > 0:
                     irrAx[map_rgn_ag[index]-1,mapAEZ[index]-1] += mapAreaExt[index]                                                          
             else:
-                irr[index] = 0  
+                irr[index] = 0
+            
             
         # STEP 6:        
         #print 'Year:', y  

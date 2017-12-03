@@ -62,22 +62,22 @@ def init_rgn_tables(settings, filename):
         print "[Warning!]: Selected Region Map Directory has different number of regions as GCAM outputs!"
     
         # find another directory according to number of regions
-        if settings.rgnmapdir[-1]=='/':
-            pathname = os.path.dirname(settings.rgnmapdir[:-1])
-        else:
-            pathname = os.path.dirname(settings.rgnmapdir)
-        
-        n = 0
-        for the_file in os.listdir(pathname):
-            if str(num_lines) in the_file:
-                settings.rgnmapdir = pathname + '/' + the_file + '/'
-                print "Find another Region Map Directory has the same number of regions:", settings.rgnmapdir
-                (_, _regions_ordered) = GCAMutil.rd_rgn_table(settings.RegionNames)  
-                n = 1
-                break
-        if n == 0:
-            print "[Error]: Can not find substitute Region Map Directory!"
-            sys.exit()
+#         if settings.rgnmapdir[-1]=='/':
+#             pathname = os.path.dirname(settings.rgnmapdir[:-1])
+#         else:
+#             pathname = os.path.dirname(settings.rgnmapdir)
+#         
+#         n = 0
+#         for the_file in os.listdir(pathname):
+#             if str(num_lines) in the_file:
+#                 settings.rgnmapdir = pathname + '/' + the_file + '/'
+#                 print "Find another Region Map Directory has the same number of regions:", settings.rgnmapdir
+#                 (_, _regions_ordered) = GCAMutil.rd_rgn_table(settings.RegionNames)  
+#                 n = 1
+#                 break
+#         if n == 0:
+#             print "[Error]: Can not find substitute Region Map Directory!"
+#             sys.exit(1)
         
     nr = 1
     for region in _regions_ordered:
@@ -609,7 +609,124 @@ def read_gcam_ag_area(infilename):
             cropno  = find_cropno(croptxt) 
             table[(rgnno,aezno,cropno,irrstat)] = data
 
-        return table 
+        return table
+
+def proc_irr_area(infilename, outfilename):
+    """Read in the agricultural area data, reformat, and write out.
+
+    The output needed by the matlab disaggregation code is:
+      region-number, aez-number, crop-number, 1990, 2005, 2010, ..., 2095
+
+    Furthermore, if GCAM produced separate totals for irrigated and
+    rain-fed crops, we want to include only the irrigated.  So, we
+    skip any allocations for the rain-fed versions of a crop.  Earlier
+    versions of GCAM did not make the distinction, so if we are
+    running on one of those output files we have to correct the total
+    planted area with a precalculated irrigation fraction in a later
+    step.
+
+    Arguments:
+      infilename  - Name of the input file
+      outfilename - Name of the output file
+
+    return value: Flag indicating whether the GCAM run produced an
+                   endogeneous allocation between irrigated and rain-fed
+                   crops.
+
+    """
+
+    ## Flag indicating whether we are using GCAM's irrigation.  We
+    ## won't know for sure until we read the first line of data.
+    ## Start by assuming it is.
+    gcam_irr = True
+    
+    irr_area = read_gcam_irr_area(infilename)
+
+    with open(outfilename,"w") as outfile: 
+        for (key,data) in irr_area.items():
+            (rgnno, bsnno, cropno, irr) = key
+            if irr == 'TOT':
+                ## indicate that GCAM is providing total area
+                gcam_irr = False
+            elif irr == 'RFD':
+                ## do not include rain-fed crops in the result
+                continue
+
+            ## prepend the region, aez, and crop numbers to the data
+            data.insert(0,cropno)
+            data.insert(0,bsnno)
+            data.insert(0,rgnno)
+
+            ## No requirement to sort this table by region, so just
+            ## output in the order used by the dictionary
+            outfile.write(','.join(map(str,data)))
+            outfile.write('\n')
+
+    stdout.write('[proc_irr_area]: gcam_irr = %s\n' % gcam_irr)
+    return gcam_irr
+  
+def read_gcam_irr_area(infilename):
+    table = {}
+    with open(infilename,"r") as infile:
+        ## discard comment line
+        infile.readline()
+
+        ## Check the header line
+        fields = GCAMutil.rm_trailing_comma(infile.readline()).split(',')
+        lstfld = -1     # i.e., data = fields[3:-1], dropping only the last column
+
+        for line in infile:
+            line = GCAMutil.rm_trailing_comma(GCAMutil.scenariofix(line))
+            fields    = line.split(',')
+            rgntxt    = fields[1]
+            latxt     = fields[2]           # land area text
+            bsnid     = fields[3]           # basinID
+            datastr   = fields[4:lstfld]    # chop off units column
+            data      = map(lambda s:float(s), datastr)
+
+            ## translate region abbreviations and drop unwanted regions
+            #if rgntxt in _gcam_rgn_translation:
+            #    rgntxt = _gcam_rgn_translation[rgntxt]
+            #if rgntxt in _gcam_drop_regions:
+            #    continue
+            
+            ## split land area text to get crop, aez, and possibly irrigation status
+            lasplit = latxt.split("_")
+            croptxt = lasplit[0]
+            bsnno   = int(bsnid)
+            irrstat = lasplit[-1]
+            if irrstat is None:
+                irrstat = 'TOT' 
+
+            ## convert region and crop to index numbers
+            rgnno   = _regions_ordered.index(rgntxt)+1
+            cropno  = find_cropno1(croptxt) 
+            table[(rgnno,bsnno,cropno,irrstat)] = data
+
+        return table
+    
+croplist1 = ["Corn", "biomass", "FiberCrop", "MiscCrop", "OilCrop", "OtherGrain",
+            "Rice", "Root", "SugarCrop", "Wheat", "FodderHerb", "FodderGrass",
+            "PalmFruit"]
+def find_cropno1(crop):
+    """Find the crop number corresponding to the input crop name.
+
+    For the most part, the result of this function is just the
+    unit-offset index of the crop in the crop list; however, certain
+    crops are mapped to "biomass".  For these, the index of the
+    biomass entry in the crop list is returned.
+    
+    """
+    
+    try:
+        cropno = croplist1.index(crop) + 1
+    except ValueError as e:
+        if crop in _biomasslist:
+            cropno = croplist1.index("biomass") + 1
+        else:
+            raise
+    return cropno
+
 
 def proc_ag_vol(infilename, outfilename):
     """Read in volume of water used by agriculture, reformat, and write out.  
@@ -669,6 +786,38 @@ def proc_ag_vol(infilename, outfilename):
                 outfile.write('\n')
 ## end of proc_ag_vol
 
+def proc_irr_vol(infilename, outfilename):
+    
+    with open(outfilename,"w") as outfile:
+        with open(infilename,"r") as infile:
+            ## 2 header lines to discard
+            infile.readline()
+            infile.readline()
+
+            for line in infile:
+                line    = GCAMutil.rm_trailing_comma(GCAMutil.scenariofix(line))
+                fields  = line.split(',')
+                rgntxt  = fields[1]
+                bsnid   = fields[3]
+                data    = fields[4:-1]
+
+                ## translate region abbreviations and drop unwanted regions
+                #if rgntxt in _gcam_rgn_translation:
+                #    rgntxt = _gcam_rgn_translation[rgntxt]
+                #if rgntxt in _gcam_drop_regions:
+                #    continue
+                
+                rgnno    = _regions_ordered.index(rgntxt) + 1
+                bsnno    = int(bsnid)
+
+                ## prepend the region, aez, and crop numbers to the data
+                data.insert(0, 1)
+                data.insert(0, bsnno)
+                data.insert(0, rgnno)
+
+                outfile.write(','.join(map(str,data)))
+                outfile.write('\n')
+## end of proc_ag_vol
 
 def find_cropno(crop):
     """Find the crop number corresponding to the input crop name.
