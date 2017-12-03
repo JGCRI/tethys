@@ -1,6 +1,6 @@
 """
 @Date: 09/09/2017
-@author: Xinya Li (xinya.li@pnl.gov)
+@author: Xinya Li (xinya.li@pnl.gov); Chris R. Vernon (chris.vernon@pnnl.gov)
 @Project: Demeter-W V1.0
 
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
@@ -11,7 +11,6 @@ This is an example program showing how to run the model.
 """
 
 import os
-
 from demeter_w.model import DemeterW
 
 

@@ -3,12 +3,12 @@ Input Folder        :  Input/
 Output Folder       :  Output/Test001/
 GCAM CSV Folder     :  Input/GCAM/CSV/Case001/
 Region Info Folder  :  Input/rgn32/
-Start disaggregation... 
+Start Disaggregation... 
 ---Read in the GCAM data (csv format)---
-------Time Cost: 0.15499997139 seconds ---
+------Time Cost: 0.0640001296997 seconds ---
 ---Number of years: 5
 ------ [2005, 2010, 2015, 2020, 2025]
----Read in the GIS data (asc/txt/csv format) and the Region map data (csv format)---
+---Read in the GIS data (asc/txt/csv format) and the region map data (csv format)---
 ------Use GPW 2005 Population Data for 2005
 ------Use GPW 2010 Population Data for 2010
 ------Use GPW 2015 Population Data for 2015
@@ -19,11 +19,11 @@ Start disaggregation...
 ------Use FAO-GMIA 2005 Irrigation Area Data for 2015
 ------Use FAO-GMIA 2005 Irrigation Area Data for 2020
 ------Use FAO-GMIA 2005 Irrigation Area Data for 2025
-------Time Cost: 7.59599995613 seconds ---
+------Time Cost: 7.56399989128 seconds ---
 ---Mapsize: [360, 720]
 ---Rearranging data and map indices
-------Time Cost: 0.236000061035 seconds ---
----Create a Population Map as proxy of non-Agricultural Water withdrawals
+------Time Cost: 0.200999975204 seconds ---
+---Create a population map as proxy of non-agricultural water withdrawals
 2005
 ------[Adjusting map_rgn_nonag with population]: Cells with pop/irr data but no region:  1
 ------[Adjusting map_rgn_nonag with population]: Cells adjusted to an adjacent region:  0
@@ -59,8 +59,8 @@ Start disaggregation...
 ------[Adjusting map_rgn_ag with population]: Cells with pop/irr data but no region:  1
 ------[Adjusting map_rgn_ag with population]: Cells adjusted to an adjacent region:  0
 ------[Adjusting map_rgn_ag with population]: Cells not adjusted:  1
-------Time Cost: 1.01800012589 seconds ---
----Create an livestock Map as proxy of livestock Water withdrawal
+------Time Cost: 0.266000032425 seconds ---
+---Create an livestock map as proxy of livestock water withdrawal
 [Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 1 2 2.32e-07
 [Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 1 7 0.004366553
 [Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 1 9 4.29e-05
@@ -81,8 +81,8 @@ Start disaggregation...
 [Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 5 7 0.005561491
 [Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 5 9 5.93e-05
 [Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]: 5 25 4.69e-06
-------Time Cost: 3.85299992561 seconds ---
----Create an Irrigation Map as proxy of Agricultural Water withdrawal
+------Time Cost: 3.90599989891 seconds ---
+---Create an irrigation map as proxy of agricultural water withdrawal
 2005
 ------[Adjusting map_rgn_ag with irr]: Cells with pop/irr data but no region:  0
 ------[Adjusting map_rgn_ag with irr]: Cells adjusted to an adjacent region:  0
@@ -118,9 +118,9 @@ Start disaggregation...
 ------[Adjusting mapAEZ with irr]: Cells with pop/irr data but no region:  0
 ------[Adjusting mapAEZ with irr]: Cells adjusted to an adjacent region:  0
 ------[Adjusting mapAEZ with irr]: Cells not adjusted:  0
-------Time Cost: 8.33100008965 seconds ---
+------Time Cost: 7.02700018883 seconds ---
 ---Aggregate to compute total water withdrawal at grid scale
-------Time Cost: 3.03899979591 seconds ---
+------Time Cost: 79.1729998589 seconds ---
 ---Spatial Downscaling Diagnostics (Global): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)
       Year  2005 :    3019.53988001       3019.55000639      Diff=  -0.0101263749998
       Year  2010 :    3253.31261669       3253.32433411      Diff=  -0.0117174209977
@@ -134,15 +134,15 @@ Start disaggregation...
 ------ Electricity Generation Sector Finished
 ------ Irrigation Sector Finished
 ------ Livestock, Mining and Manufacturing Sectors Finished
-------Time Cost: 67.4259998798 seconds ---
+------Time Cost: 58.3880000114 seconds ---
 ---Temporal Downscaling Diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)
 ------Irrigation------
                 Year  2005 :      1611.86438331       1611.86438331      Diff=  2.27373675443e-13
-                Year  2006 :      1642.38442693       1642.38442693      Diff=  -4.54747350886e-13
+                Year  2006 :      1642.38442693       1642.38442693      Diff=  -6.8212102633e-13
                 Year  2007 :      1672.90447055       1672.90447055      Diff=  -4.54747350886e-13
-                Year  2008 :      1703.42451417       1703.42451417      Diff=  2.27373675443e-13
-                Year  2009 :      1733.94455779       1733.94455779      Diff=  0.0
-                Year  2010 :      1764.46460142       1764.46460142      Diff=  -6.8212102633e-13
+                Year  2008 :      1703.42451417       1703.42451417      Diff=  -2.27373675443e-13
+                Year  2009 :      1733.94455779       1733.94455779      Diff=  2.27373675443e-13
+                Year  2010 :      1764.46460142       1764.46460142      Diff=  -4.54747350886e-13
 ------Domestic------
                 Year  2005 :      456.71       456.71      Diff=  0.0
                 Year  2006 :      460.118       460.118      Diff=  -1.70530256582e-13
@@ -157,10 +157,10 @@ Start disaggregation...
                 Year  2008 :      553.577307938       553.577307957      Diff=  -1.83796373676e-08
                 Year  2009 :      557.977701031       557.977701272      Diff=  -2.40958343056e-07
                 Year  2010 :      562.378094473       562.378094588      Diff=  -1.15136913337e-07
-End disaggregation... 
----Disaggregation: 111.095999956 seconds ---
+End Disaggregation... 
+---Disaggregation: 174.000999928 seconds ---
 Saving outputs... 
 Save the gridded water usage results for each withdrawal category in NetCDF format (Unit: km3/yr)
 Save the monthly water usage results for each withdrawal category (Unit: km3/month)
----Output: 1.66400003433 seconds ---
+---Output: 1.49300003052 seconds ---
 ('End Project:   ', 'Test001')
