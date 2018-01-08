@@ -220,7 +220,7 @@ def proc_pop(infile, outfile_tot):
     pop_tot = {}
 
     for region in poptbl.keys():
-        stderr.write('[proc_pop]: processing region: %s\n' % region)
+        #stderr.write('[proc_pop]: processing region: %s\n' % region)
         popvals   = poptbl[region].split(',')
         #benchmark = _gis2000[region]
         #fpop      = map(lambda x: str(1000*float(x)/benchmark), popvals)
@@ -273,8 +273,8 @@ def proc_wdlivestock(infilename, outfilename, rgnTotalFilename):
         ## read header line
         fields = GCAMutil.rm_trailing_comma(infile.readline()).split(',')
         nyear = len(fields) - 5
-        stdout.write('[proc_wdlivestock]: years:  %s\n'%str(fields[4:-1]))
-        stdout.write('[proc_wdlivestock]: nyear:  %d\n'%nyear)
+        #stdout.write('[proc_wdlivestock]: years:  %s\n'%str(fields[4:-1]))
+        #stdout.write('[proc_wdlivestock]: nyear:  %d\n'%nyear)
 
         for line in infile:
             line = GCAMutil.rm_trailing_comma(GCAMutil.scenariofix(line))
@@ -346,11 +346,16 @@ def proc_wdlivestock(infilename, outfilename, rgnTotalFilename):
         try:
             total_wd[region] = map(lambda tb,sh,pt,pg: tb+sh+pt+pg, total_bovine, sheepgoat, poultry[region], pig[region])
         except TypeError:
-            stderr.write('[proc_wdlivestock]: bad table data for region = %s.\n' % region)
-            stderr.write('\ttotal_bovine: %s\n' % str(total_bovine))
-            stderr.write('\tsheepgoat:    %s\n' % str(sheepgoat))
-            stderr.write('\tpoultry:      %s\n' % str(poultry[region]))
-            stderr.write('\tpig:          %s\n' % str(pig[region]))
+#             stderr.write('[proc_wdlivestock]: bad table data for region = %s.\n' % region)
+#             stderr.write('\ttotal_bovine: %s\n' % str(total_bovine))
+#             stderr.write('\tsheepgoat:    %s\n' % str(sheepgoat))
+#             stderr.write('\tpoultry:      %s\n' % str(poultry[region]))
+#             stderr.write('\tpig:          %s\n' % str(pig[region]))
+            print('[proc_wdlivestock]: bad table data for region = %s.\n' % region)
+            print('\ttotal_bovine: %s\n' % str(total_bovine))
+            print('\tsheepgoat:    %s\n' % str(sheepgoat))
+            print('\tpoultry:      %s\n' % str(poultry[region]))
+            print('\tpig:          %s\n' % str(pig[region]))
             raise
         
         ## end of loop over regions
@@ -470,7 +475,7 @@ def proc_irr_share(infilename, outfile):
     ## end of file read
 
     ## We need to output this data, as well as using it for other calculations
-    stdout.write('irr share outfile:  %s\n' % outfile)
+    #stdout.write('irr share outfile:  %s\n' % outfile)
     with open(outfile,"w") as outfile:
         for region in _regions_ordered:
             for aez in range(1,19):
@@ -533,7 +538,7 @@ def proc_ag_area(infilename, outfilename):
             outfile.write(','.join(map(str,data)))
             outfile.write('\n')
 
-    stdout.write('[proc_ag_area]: gcam_irr = %s\n' % gcam_irr)
+    #stdout.write('[proc_ag_area]: gcam_irr = %s\n' % gcam_irr)
     return gcam_irr
 ## done with proc_ag_area
 
@@ -662,7 +667,7 @@ def proc_irr_area(infilename, outfilename):
             outfile.write(','.join(map(str,data)))
             outfile.write('\n')
 
-    stdout.write('[proc_irr_area]: gcam_irr = %s\n' % gcam_irr)
+    #stdout.write('[proc_irr_area]: gcam_irr = %s\n' % gcam_irr)
     return gcam_irr
   
 def read_gcam_irr_area(infilename):

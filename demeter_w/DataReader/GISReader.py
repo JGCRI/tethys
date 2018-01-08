@@ -115,6 +115,14 @@ def load_const_griddata(fn, headerNum=0, key=" "):
             sys.exit(1)
 
         data = GetArrayCSV(fn, headerNum)
+        all_zeros = not np.any(data)
+        if all_zeros:
+            try:
+                with open(fn, 'r') as f:
+                    data = np.array(f.read().splitlines())
+            except:
+                pass
+            
 
     elif fn.endswith('.nc'):
         if not os.path.isfile(fn):
