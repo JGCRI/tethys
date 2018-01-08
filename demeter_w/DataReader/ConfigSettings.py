@@ -37,7 +37,7 @@ class ConfigSettings():
         if not self.UseGCAMDatabase:
             (_, self.regions_ordered) = GCAMutil.rd_rgn_table(self.RegionNames)
         else:
-            clearfolder(self.GCAM_CSV) 
+            # clearfolder(self.GCAM_CSV)
             GCAMOutputs.GCAMData(self) # Query GCAM database
         
         pathname = self.GCAM_CSV
