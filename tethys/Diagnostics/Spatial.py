@@ -1,7 +1,7 @@
 """
 @Date: 09/09/2017
 @author: Xinya Li (xinya.li@pnl.gov)
-@Project: Demeter-W V1.0
+@Project: Tethys V1.0
 
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
@@ -12,7 +12,7 @@ Perform diagnostics to ensure that the spatially downscaled results and initial 
 """
 
 import numpy as np
-from demeter_w.DataWriter.OUTWriter import OUTSettings
+from tethys.DataWriter.OUTWriter import OUTSettings
     
 def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
     

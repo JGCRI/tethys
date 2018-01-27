@@ -1,7 +1,7 @@
 """
 @Date: 09/09/2017
 @author: Xinya Li (xinya.li@pnl.gov)
-@Project: Demeter-W V1.0
+@Project: Tethys V1.0
 
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
@@ -19,9 +19,9 @@ This is the core of Water Disaggregation
 """
 
 import numpy as np
-from demeter_w.Utils.Math import SizeR, SizeC
-from demeter_w.Utils.Math import ind2sub
-from demeter_w.Utils.Math import sub2ind
+from tethys.Utils.Math import SizeR, SizeC
+from tethys.Utils.Math import ind2sub
+from tethys.Utils.Math import sub2ind
 
 def Rearranging(mapsize, GISData, rgnmapData):
     

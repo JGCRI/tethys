@@ -1,7 +1,7 @@
 """
 @Date: 09/09/2017
 @author: Xinya Li (xinya.li@pnl.gov)
-@Project: Demeter-W V1.0
+@Project: Tethys V1.0
 
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
@@ -11,7 +11,7 @@ Copyright (c) 2017, Battelle Memorial Institute
 import os
 import GCAMutil as util
 import GCAMSupport as Support
-from demeter_w.Utils.DataParser import getContentArray as ArrayCSVReader
+from tethys.Utils.DataParser import getContentArray as ArrayCSVReader
 from shutil import copyfile
 
  

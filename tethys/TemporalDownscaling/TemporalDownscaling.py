@@ -1,7 +1,7 @@
 """
 @Date: 09/09/2017
 @author: Xinya Li (xinya.li@pnl.gov)
-@Project: Demeter-W V1.0
+@Project: Tethys V1.0
 
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
@@ -27,7 +27,7 @@ Irrigation: Monthly Irrigation Data from other models as the weighting factor to
 import scipy.io as spio
 import os, calendar
 import numpy as np
-from demeter_w.Utils.DataParser import getContentArray as ArrayCSVRead
+from tethys.Utils.DataParser import getContentArray as ArrayCSVRead
 from NeighborBasin import NeighborBasin
 
 

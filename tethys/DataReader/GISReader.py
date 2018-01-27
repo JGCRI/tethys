@@ -1,7 +1,7 @@
 """
 @Date: 09/09/2017
 @author: Xinya Li (xinya.li@pnl.gov)
-@Project: Demeter-W V1.0
+@Project: Tethys V1.0
 
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
@@ -22,8 +22,8 @@ import os, sys
 import numpy as np
 from scipy import io as spio
 #from netCDF4 import Dataset
-from demeter_w.Utils.DataParser import GetArrayCSV, GetArrayTXT
-from demeter_w.Utils.DataParser import getContentArray as ArrayCSVRead
+from tethys.Utils.DataParser import GetArrayCSV, GetArrayTXT
+from tethys.Utils.DataParser import getContentArray as ArrayCSVRead
 from HistPopIrrData import getPopYearData as GetPopData
 from HistPopIrrData import getIrrYearData as GetIrrData
 

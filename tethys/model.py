@@ -1,27 +1,29 @@
 """
 @Date: 09/09/2017
 @author: Xinya Li (xinya.li@pnl.gov); Chris R. Vernon (chris.vernon@pnnl.gov)
-@Project: Demeter-W V1.0
+@Project: Tethys V1.0
 
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 
-This is the DemeterW class of showing how to evaluate the input settings and
+This is the Tethys class of showing how to evaluate the input settings and
 call the function running water disaggregation
 """
 
-import os, sys, time
-import demeter_w.DataReader.IniReader as IniReader
-from demeter_w.Utils.Logging import Logger
-from demeter_w.DataWriter.OUTWriter import OutWriter
-from demeter_w.run_disaggregation import run_disaggregation as disagg
+import os
+import sys
+import time
+import tethys.DataReader.IniReader as IniReader
+from tethys.Utils.Logging import Logger
+from tethys.DataWriter.OUTWriter import OutWriter
+from tethys.run_disaggregation import run_disaggregation as disagg
 
 
-class DemeterW:
+class Tethys:
 
     def __init__(self, config='config.ini'):
         
-        print "Demeter-W starts..."
+        print "Tethys starts..."
         
         # instantiate functions
         self.Disaggregation = disagg
@@ -48,7 +50,7 @@ class DemeterW:
         sys.stdout.log.close()
         
         sys.stdout = sys.__stdout__
-        print "Demeter-W ends."
+        print "Tethys ends."
 
     def run_model(self):
         """

@@ -1,7 +1,7 @@
 """
 @Date: 09/09/2017
 @author: Xinya Li (xinya.li@pnl.gov)
-@Project: Demeter-W V1.0
+@Project: Tethys V1.0
 
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
@@ -9,15 +9,15 @@ Copyright (c) 2017, Battelle Memorial Institute
 """
 
 import time
-from demeter_w.DataReader.GCAMOutputs import getGCAMData
-from demeter_w.DataReader import GISReader
-from demeter_w.DataWriter.OUTWriter import OUTSettings
-from demeter_w.SpatialDownscaling.ProxyMaps import Rearranging
-import demeter_w.SpatialDownscaling.ProxyMaps as ProxyMaps
-import demeter_w.SpatialDownscaling.TotalWaterUse as TotalWaterUse
-import demeter_w.Diagnostics.Spatial as DiagnosticsSD
-import demeter_w.Diagnostics.Temporal as DiagnosticsTD
-import demeter_w.TemporalDownscaling.TemporalDownscaling as TemporalDownscaling
+from tethys.DataReader.GCAMOutputs import getGCAMData
+from tethys.DataReader import GISReader
+from tethys.DataWriter.OUTWriter import OUTSettings
+from tethys.SpatialDownscaling.ProxyMaps import Rearranging
+import tethys.SpatialDownscaling.ProxyMaps as ProxyMaps
+import tethys.SpatialDownscaling.TotalWaterUse as TotalWaterUse
+import tethys.Diagnostics.Spatial as DiagnosticsSD
+import tethys.Diagnostics.Temporal as DiagnosticsTD
+import tethys.TemporalDownscaling.TemporalDownscaling as TemporalDownscaling
 
 
 def run_disaggregation(settings):
@@ -27,7 +27,7 @@ def run_disaggregation(settings):
 
     Module: run_disaggregation
 
-    Main Function of Demeter-W: Steps for water disaggregation
+    Main Function of Tethys Steps for water disaggregation
     1. Read in the GCAM Data and Get the number of years
     2. Read in the GIS data
     3. Rearranging data and map indices
