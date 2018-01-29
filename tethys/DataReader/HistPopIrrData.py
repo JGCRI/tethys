@@ -1,7 +1,7 @@
 """
 @Date: 09/09/2017
 @author: Xinya Li (xinya.li@pnl.gov)
-@Project: Demeter-WD V1.0
+@Project: Tethys V1.0
 
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
@@ -9,8 +9,8 @@ Copyright (c) 2017, Battelle Memorial Institute
 """
 
 import numpy as np
-from demeter_w.Utils.DataParser import getTXTContentArray as ArrayTXTRead
-from demeter_w.Utils.DataParser import getContentArray as ArrayCSVReader
+from tethys.Utils.DataParser import getTXTContentArray as ArrayTXTRead
+from tethys.Utils.DataParser import getContentArray as ArrayCSVReader
 
 def getIrrYearData(settings):
     

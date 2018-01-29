@@ -1,7 +1,7 @@
 """
 @Date: 09/09/2017
 @author: Xinya Li (xinya.li@pnl.gov)
-@Project: Demeter-W V1.0
+@Project: Tethys V1.0
 
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
@@ -14,7 +14,7 @@ Livestock, Mining and Manufacturing Sectors are uniformly downscaled, thus diagn
 """
 import os
 import numpy as np
-from demeter_w.Utils.DataParser import GetArrayCSV
+from tethys.Utils.DataParser import GetArrayCSV
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.ticker import FormatStrFormatter

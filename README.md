@@ -1,4 +1,4 @@
-# demeter-w
+# tethys
 Spatiotemporal downscaling model for global water withdrawal
 
 # Contact Us
@@ -19,14 +19,14 @@ This repository uses the Git Large File Storage (LFS) extension (see https://git
 
 # Introduction 
 
-Demeter-W was constructed at the Joint Global Change Research Institute of the Pacific Northwest National Laboratory (http://www.globalchange.umd.edu). It served as a critical step to link Xanthos (a global hydrologic model) [1] and the Global Change Assessment Model (GCAM) [2-3]. The spatial resolution of GCAM is geopolitical regional scale for energy and economy systems (32 regions), and river basins for the land, agriculture, and water systems (235 water basins [21]). GCAM is often used as a boundary condition and coupled to sectoral models, such as the Community Land Model and Xanthos, which typically operate at finer spatial and temporal scales than GCAM [19, 20]. For example, Xanthos is a globally gridded hydrology model that operates at monthly scale. Resolving such a mismatch in spatial and temporal scales facilitated  coupling these models together. It is also helpful for understanding seasonal patterns of water use and acquiring high resolution water use data [5]. The main objective of Demeter-W is to reconstruct global monthly gridded (0.5 geographic degree) water withdrawal datasets by spatial and temporal downscaling water withdrawal estimates at region/basin and annual scale (Figure 1). As an open-access software, Demeter-W applies statistical downscaling algorithms, to spatially and temporally downscale water withdrawal data from annual region/basin scale into monthly grid scale. In our study, the water withdrawals are separated into six sectors: irrigation, livestock, domestic, electricity (generation), manufacturing and mining.
+Tethys was constructed at the Joint Global Change Research Institute of the Pacific Northwest National Laboratory (http://www.globalchange.umd.edu). It served as a critical step to link Xanthos (a global hydrologic model) [1] and the Global Change Assessment Model (GCAM) [2-3]. The spatial resolution of GCAM is geopolitical regional scale for energy and economy systems (32 regions), and river basins for the land, agriculture, and water systems (235 water basins [21]). GCAM is often used as a boundary condition and coupled to sectoral models, such as the Community Land Model and Xanthos, which typically operate at finer spatial and temporal scales than GCAM [19, 20]. For example, Xanthos is a globally gridded hydrology model that operates at monthly scale. Resolving such a mismatch in spatial and temporal scales facilitated  coupling these models together. It is also helpful for understanding seasonal patterns of water use and acquiring high resolution water use data [5]. The main objective of Tethys is to reconstruct global monthly gridded (0.5 geographic degree) water withdrawal datasets by spatial and temporal downscaling water withdrawal estimates at region/basin and annual scale (Figure 1). As an open-access software, Tethys applies statistical downscaling algorithms, to spatially and temporally downscale water withdrawal data from annual region/basin scale into monthly grid scale. In our study, the water withdrawals are separated into six sectors: irrigation, livestock, domestic, electricity (generation), manufacturing and mining.
 
-![alt-text](https://github.com/JGCRI/demeter-w/blob/master/docs/workflow.png)
-**Figure 1**: Major inputs and outputs of Demeter-W by six sectors
+![alt-text](https://github.com/JGCRI/tethys/blob/master/docs/workflow.png)
+**Figure 1**: Major inputs and outputs of Tethys by six sectors
 
 The algorithms for spatial downscaling were derived from research by Edmonds and Reilly [2]. Non-agriculture (domestic, electricity, manufacturing and mining) sectors are downscaled based on global gridded population density maps [6]. Irrigation water withdrawal is downscaled using global coverage of gridded cropland areas equipped with irrigation [7, 8]. The gridded population maps (combined Historical Database of the Global Environment (HYDE) [9] and Gridded Population of the World (GPW) [10] data products) and gridded crop irrigation area maps (combined HYDE [9] and Food and Agriculture Organization (FAO) [11] data products) are updated in the algorithms over time by using historical datasets (the most recent available historical map is applied for future years). The gridded global maps of livestock in six types (cattle, buffalo, sheep, goats, pigs and poultry) [12] are used as proxy to downscale livestock water withdrawal [6, 13, 14].
 
-![alt-text](https://github.com/JGCRI/demeter-w/blob/master/docs/TDExample.png)
+![alt-text](https://github.com/JGCRI/tethys/blob/master/docs/TDExample.png)
 **Figure 2**: Downscaled sectoral (domestic, electricity generation and irrigation) monthly distributions of water withdrawals in USA from annual estimates in 2010
 
 Different temporal downscaling algorithms to downscale annual water withdrawal estimates to monthly were applied to the different water withdrawal sectors [5]:
@@ -36,38 +36,38 @@ Different temporal downscaling algorithms to downscale annual water withdrawal e
 4.	Livestock, manufacturing and mining: A uniform distribution was applied; i.e., the same water withdrawal amount was applied to each month within a year.
 An example of data products from temporal downscaling was illustrated in Figure 2. Monthly profiles were estimated from annual water withdrawal estimates of USA in 2010 for domestic, electricity generation and irrigation sectors.
 
-Demeter-W is written in Python (version 2.7) with related scientific libraries. Besides the modules, it also provides collected and consolidated data from various sources as inputs. Each of the datasets used by Demeter-W has clear sources and references that will be beneficial for the users to update and create their own datasets.
+Tethys is written in Python (version 2.7) with related scientific libraries. Besides the modules, it also provides collected and consolidated data from various sources as inputs. Each of the datasets used by Tethys has clear sources and references that will be beneficial for the users to update and create their own datasets.
 
 # Implementation and architecture
 
-Demeter-W as a downscaling tool follows a sequential flowchart (Figure 3):
+Tethys as a downscaling tool follows a sequential flowchart (Figure 3):
 
-Step 1:  Import needed data files (module package “demeter_w\DataReader”)
+Step 1:  Import needed data files (module package “tethys\DataReader”)
 
-Step 2:  Spatial downscaling (module package “demeter_w\SpatialDownscaling”)
+Step 2:  Spatial downscaling (module package “tethys\SpatialDownscaling”)
 
-Step 3:  Temporal downscaling (module package “demeter_w\TemporalDownscaling”)
+Step 3:  Temporal downscaling (module package “tethys\TemporalDownscaling”)
 
-Step 4:  Diagnostics of spatial and temporal downscaling (module package “demeter_w\Diagnostics”)
+Step 4:  Diagnostics of spatial and temporal downscaling (module package “tethys\Diagnostics”)
 
-Step 5:  Output all the results of Step 2-5 (module package “demeter_w\DataWriter”)
+Step 5:  Output all the results of Step 2-5 (module package “tethys\DataWriter”)
 
-For each step, the corresponding module package is also listed. Spatial downscaling (Step 2) is the core of computation flow in Demeter-W while temporal downscaling (Step 3) is an additional step. The outputs of Step 2, global gridded annual water withdrawal data by sectors, are the inputs of Step 3. 
+For each step, the corresponding module package is also listed. Spatial downscaling (Step 2) is the core of computation flow in Tethys while temporal downscaling (Step 3) is an additional step. The outputs of Step 2, global gridded annual water withdrawal data by sectors, are the inputs of Step 3. 
 
-![alt-text](https://github.com/JGCRI/demeter-w/blob/master/docs/flowchart.png)
-**Figure 3**: Flowchart of Demeter-W
+![alt-text](https://github.com/JGCRI/tethys/blob/master/docs/flowchart.png)
+**Figure 3**: Flowchart of Tethys
 
-The term “grid” is used to describe the spatial resolution of 0.5 geographic degrees. A global full data map contains a total of 259,200 grid cells (360 x 720) of which 67,420 grid cells are categorized as “land grids” and are considered valid for simulation purposes. In this study, the land grid cells are used to define a “gridded” map according to the coordinates and the indexes of the 67,420 cells on the 360x720 grid. To aggregate the gridded data into basin/country/region scale for outputs and diagnostics, certain commonly used global data maps such as IDs of basins/countries/regions are harmonized into the gridded format required by Demeter-W. The inputs converted using the 67,420 grid cells according to the coordinate data file are called harmonized inputs.
-The input interface of Demeter-W is controlled by the user through the configuration file (e.g. “*.ini” file). Each downscaling simulation is initiated by importing a single configuration file into Demeter-W. There are four sections included in the configuration file:
+The term “grid” is used to describe the spatial resolution of 0.5 geographic degrees. A global full data map contains a total of 259,200 grid cells (360 x 720) of which 67,420 grid cells are categorized as “land grids” and are considered valid for simulation purposes. In this study, the land grid cells are used to define a “gridded” map according to the coordinates and the indexes of the 67,420 cells on the 360x720 grid. To aggregate the gridded data into basin/country/region scale for outputs and diagnostics, certain commonly used global data maps such as IDs of basins/countries/regions are harmonized into the gridded format required by Tethys. The inputs converted using the 67,420 grid cells according to the coordinate data file are called harmonized inputs.
+The input interface of Tethys is controlled by the user through the configuration file (e.g. “*.ini” file). Each downscaling simulation is initiated by importing a single configuration file into Tethys. There are four sections included in the configuration file:
 1.	Project (Required): This section defines the paths of input and output folders, the output formatting, along with two important options 1) “PerformDiagnostics” determines if diagnostics will be performed; 2) “PerformTemporal” determines if temporal downscaling will be performed.
 2.	GCAM (Required): As described previously, two formats are allowed 1) GCAM database format; 2) GCAM csv format. The related parameters need to be defined when switching between options for “UseGCAMDatabase”.
 3.	GriddedMap (Required): This section defines the required global data maps, such as population, irrigation area, and livestock counts for each grid.
-4.	TemporaDownscaling (Optional, required only if “PerformTemproal = 1” in “Project” section): All the required data files for temporal downscaling are defined in this section. The time period of the data files should be uniformed (e.g. 1971-2010). When “TemporalInterpolation = 1”, Demeter-W will linearly interpolate the downscaling results when the input data sets are not annual.
+4.	TemporaDownscaling (Optional, required only if “PerformTemproal = 1” in “Project” section): All the required data files for temporal downscaling are defined in this section. The time period of the data files should be uniformed (e.g. 1971-2010). When “TemporalInterpolation = 1”, Tethys will linearly interpolate the downscaling results when the input data sets are not annual.
 The example data files for inputs are all included in the “example\Input” folder while they are divided by subfolders according to the sections described above. The metadata (data source, format, related pre-processing, etc.) of all the input files are described in a document called “ReadMe_IO_Data.pdf”, and included in the document folder “docs”.
 
-As we described previously, data files of water withdrawal by sectors and region are imported in Demeter-W, representing the datasets to be downscaled. Since Demeter-W was originally designed to link to GCAM, a GCAM reader was developed to query information from GCAM database (BaseX format).  To extend the usability of Demeter-W to the wider community, a series of csv files can be prepared following the GCAM csv format as inputs (Table 1). The user is required to provide the data files for each sector. The format for each file and how to prepare them are introduced in “ReadMe_IO_Data.pdf”.
+As we described previously, data files of water withdrawal by sectors and region are imported in Tethys, representing the datasets to be downscaled. Since Tethys was originally designed to link to GCAM, a GCAM reader was developed to query information from GCAM database (BaseX format).  To extend the usability of Tethys to the wider community, a series of csv files can be prepared following the GCAM csv format as inputs (Table 1). The user is required to provide the data files for each sector. The format for each file and how to prepare them are introduced in “ReadMe_IO_Data.pdf”.
 
-The results after the spatial downscaling step (Figure 3), i.e., global annual gridded water withdrawal by sectors, are the default outputs of Demeter-W. If temporal downscaling step is selected, the results of global monthly gridded water withdrawals by sectors will be additionally outputted (Table 2). The outputs can be formatted as classic NetCDF [22] file. The alternative output format is CSV (comma-separated values). The default option generates results in both formats.  The default unit is billion m3 and another optional unit is mm. Tables and plots from the diagnostics step will also be stored in the output folder if the diagnostics option is selected.
+The results after the spatial downscaling step (Figure 3), i.e., global annual gridded water withdrawal by sectors, are the default outputs of Tethys. If temporal downscaling step is selected, the results of global monthly gridded water withdrawals by sectors will be additionally outputted (Table 2). The outputs can be formatted as classic NetCDF [22] file. The alternative output format is CSV (comma-separated values). The default option generates results in both formats.  The default unit is billion m3 and another optional unit is mm. Tables and plots from the diagnostics step will also be stored in the output folder if the diagnostics option is selected.
 
 **Table 1**: Input file names and their corresponding sectors
 
@@ -141,7 +141,7 @@ Since the temporal downscaling step was performed using different algorithms amo
 ```
  
 The comparison details for irrigation can be found in a csv file in the output folder (“Diagnostics_Temporal_Downscaling_Irrigation.csv”). Two figures adopted from [5] are plotted to monitor domestic and electricity generation sectors.  The simulated mean monthly domestic water withdrawals were displayed in Figure 4, with reasonable agreement with observations in some listed urban centres and countries. Figure 5 shows the comparison between simulated and observed monthly water withdrawals for electricity generation during 2000-2012 in 9 OECD countries. It is found that the simulations agree well with observations in most of the countries. Perfect matches in Figure 4 and Figure 5 are not expected considering the inherent uncertainties [5] in estimating monthly profiles of water withdrawals. 
-The user is able to get familiar with the features and I/O interface of Demeter-W by a comprehensive example case. This case teaches how to spatially and temporally downscale a datasets of 32 regions and 5 years in 2005, 2010, 2015, 2020 and 2025. The available input data for temporal downscaling is in the period of 1971-2010. Thus, the interpolated temporal downscaling results will be saved for 72 months (2005/01, 2005/02 … 2010/11, 2010/12). The name of the configuration file is “config.ini” and the outputs are saved in the folder of “example\Output\Test001”. The example will print the following messages at the beginning and at the end into the log file when it runs successfully:
+The user is able to get familiar with the features and I/O interface of Tethys by a comprehensive example case. This case teaches how to spatially and temporally downscale a datasets of 32 regions and 5 years in 2005, 2010, 2015, 2020 and 2025. The available input data for temporal downscaling is in the period of 1971-2010. Thus, the interpolated temporal downscaling results will be saved for 72 months (2005/01, 2005/02 … 2010/11, 2010/12). The name of the configuration file is “config.ini” and the outputs are saved in the folder of “example\Output\Test001”. The example will print the following messages at the beginning and at the end into the log file when it runs successfully:
 
 ```
 Project Name        :  Test001
@@ -170,33 +170,33 @@ An automatically created log file will be saved in the output folder, that lists
 8)	warnings and errors if applicable. 
 
  
-![alt-text](https://github.com/JGCRI/demeter-w/blob/master/example/Output/Test001/Diagnostics_Temporal_Downscaling_Domestic.png)
+![alt-text](https://github.com/JGCRI/tethys/blob/master/example/Output/Test001/Diagnostics_Temporal_Downscaling_Domestic.png)
 **Figure 4**: Example of diagnostics plot for comparison between observed and simulated monthly averaged domestic water withdrawal (normalized) in five cities.
  
-![alt-text](https://github.com/JGCRI/demeter-w/blob/master/example/Output/Test001//Diagnostics_Temporal_Downscaling_Electricity.png)
+![alt-text](https://github.com/JGCRI/tethys/blob/master/example/Output/Test001//Diagnostics_Temporal_Downscaling_Electricity.png)
 **Figure 5**: Example of diagnostics plot for comparison between observed and simulated monthly averaged electricity generation (normalized) in nine countries.
 
 # Reuse potential 
 
-The Python language and the dependent library packages used are all open-source. Demeter-W is highly modularized and designed for easy installation. The modules can be used independently by the user, which also allows the future development and feasibility of user contribution with least effort. Modification of a certain step could be restricted to the corresponding module. Extension of the model is achievable by adding a new module to an existing sub-folder or a new sub-folder. 
-All the source codes are in “demeter-w”. “example” folder contains inputs, outputs and configuration file of example cases. The documents are included in “docs”. The user is able to install Demeter-W as a Python package by running “setup.py” from terminal or command line:
+The Python language and the dependent library packages used are all open-source. Tethys is highly modularized and designed for easy installation. The modules can be used independently by the user, which also allows the future development and feasibility of user contribution with least effort. Modification of a certain step could be restricted to the corresponding module. Extension of the model is achievable by adding a new module to an existing sub-folder or a new sub-folder. 
+All the source codes are in “tethys”. “example” folder contains inputs, outputs and configuration file of example cases. The documents are included in “docs”. The user is able to install Tethys as a Python package by running “setup.py” from terminal or command line:
 
 `$ python setup.py install`
 
-After installation, Demeter-W is able to be imported through “model” class as follows in a Python script:
+After installation, Tethys is able to be imported through “model” class as follows in a Python script:
 
-`from demeter_w.model import DemeterW`
+`from tethys.model import Tethys`
 
-And the user is able to run the Demeter-W model and obtain the outputs as simple  as follows in a Python script:
+And the user is able to run the Tethys model and obtain the outputs as simple  as follows in a Python script:
 
-`dmw = DemeterW('config.ini')`
+`dmw = Tethys('config.ini')`
 
-Another way to run the downscaling model is by calling different modules. In the source code package of Demeter-W, “demeter_w\run_disaggregation.py” contains the main function that executes the model steps described in “Implementation and architecture” section. A simple example script of calling the main function directly is as follows:
+Another way to run the downscaling model is by calling different modules. In the source code package of Tethys, “tethys\run_disaggregation.py” contains the main function that executes the model steps described in “Implementation and architecture” section. A simple example script of calling the main function directly is as follows:
 
 ```
-import demeter_w.DataReader.IniReader as IniReader
-from demeter_w.DataWriter.OUTWriter import OutWriter
-from demeter_w.Run_Disaggregation import run_disaggregation as Disaggregation
+import tethys.DataReader.IniReader as IniReader
+from tethys.DataWriter.OUTWriter import OutWriter
+from tethys.Run_Disaggregation import run_disaggregation as Disaggregation
 
 # Read simulator settings from ini file.
 settingFile = 'config.ini'
@@ -208,10 +208,10 @@ OutWriter(settings, OUT, GISData)
 ```
 
 
-Documentation is organized through intensive comments inside the python code and the example configuration file. Execution will also produce a detailed log file lists model settings, the processing steps, CPU cost and warnings if applicable. The users can get support by contacting the authors when issues/bugs are found. The users may also contact the authors for contributions to the code base. The following guidance documents will help the users to get familiar with Demeter-W in applications:
+Documentation is organized through intensive comments inside the python code and the example configuration file. Execution will also produce a detailed log file lists model settings, the processing steps, CPU cost and warnings if applicable. The users can get support by contacting the authors when issues/bugs are found. The users may also contact the authors for contributions to the code base. The following guidance documents will help the users to get familiar with Tethys in applications:
 1.	The installation requirements can be referred in the pdf file “InstallationRequirements.pdf” in the “docs” folder on the repository. 
 2.	Inside the “docs” folder, an introduction file (“ReadMe_IO_Data.pdf”) is included helping the user to get familiar with the data source and format of each input data file.
-Demeter-W is founded as a member of an integrated modelling software for global water withdrawal, supply, and scarcity, which the authors’ team is continuing to develop. 
+Tethys is founded as a member of an integrated modelling software for global water withdrawal, supply, and scarcity, which the authors’ team is continuing to develop. 
 
 
 # Programming Language
