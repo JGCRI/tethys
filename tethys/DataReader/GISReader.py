@@ -18,7 +18,7 @@ This reader will reading the following three types of input files:
 """
 
 
-import os, sys
+import os
 import numpy as np
 from scipy import io as spio
 #from netCDF4 import Dataset
@@ -26,6 +26,7 @@ from tethys.Utils.DataParser import GetArrayCSV, GetArrayTXT
 from tethys.Utils.DataParser import getContentArray as ArrayCSVRead
 from HistPopIrrData import getPopYearData as GetPopData
 from HistPopIrrData import getIrrYearData as GetIrrData
+from tethys.Utils.exceptions import FileNotFoundError
 
 
 def getGISData(settings):
@@ -84,8 +85,7 @@ def getGISData(settings):
 def load_mat_var(fn, varname):
 
     if not os.path.isfile(fn):
-        print "Error! File does not exist:", fn
-        sys.exit(1)
+        raise FileNotFoundError(fn)
 
     temp = spio.loadmat(fn)
     data = temp[varname]
@@ -95,14 +95,13 @@ def load_mat_var(fn, varname):
 def load_const_griddata(fn, headerNum=0, key=" "):
     """ Load constant grid data stored in files defined in GRID_CONSTANTS."""
 
+    if not os.path.isfile(fn):
+        raise FileNotFoundError(fn)
+    
     if fn.endswith('.mat'):
         data = load_mat_var(fn, key)
 
     elif fn.endswith('.txt'):
-        if not os.path.isfile(fn):
-            print "Error! File does not exist:", fn
-            sys.exit(1)
-
         try:
             data = GetArrayTXT(fn, headerNum)
         except:
@@ -110,10 +109,6 @@ def load_const_griddata(fn, headerNum=0, key=" "):
                 data = np.array(f.read().splitlines())
 
     elif fn.endswith('.csv'):
-        if not os.path.isfile(fn):
-            print "Error! File does not exist:", fn
-            sys.exit(1)
-
         data = GetArrayCSV(fn, headerNum)
         all_zeros = not np.any(data)
         if all_zeros:
@@ -122,13 +117,8 @@ def load_const_griddata(fn, headerNum=0, key=" "):
                     data = np.array(f.read().splitlines())
             except:
                 pass
-            
 
     elif fn.endswith('.nc'):
-        if not os.path.isfile(fn):
-            print "Error! File does not exist:", fn
-            sys.exit(1)
-
 #        datagrp = Dataset(fn, 'r', format='NETCDF4')
         datagrp = spio.netcdf.netcdf_file(fn, 'r')
 
