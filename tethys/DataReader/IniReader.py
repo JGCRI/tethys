@@ -127,26 +127,18 @@ def CheckExistence(settings):
     
     ifn = 0
     for s in strlist:
-        exec("ifn = IsFile(settings." + s + ")")
-        if ifn:
+        fn = getattr(settings, s)
+        if not os.path.isfile(fn):
             raise FileNotFoundError(getattr(settings, s))
                
     if settings.PerformTemporal:
         strlist = ['TempMonthlyFile', 'HDDCDDMonthlyFile', 'Domestic_R', 'Irr_MonthlyData', 'Elec_Building', 'Elec_Industry', \
                    'Elec_Building_heat', 'Elec_Building_cool', 'Elec_Building_others']
         for s in strlist:
-            exec("ifn = IsFile(settings." + s + ")")
-            if ifn:
-                raise FileNotFoundError(getattr(settings, s))
+            fn = getattr(settings, s)
+            if not os.path.isfile(fn):
+                raise FileNotFoundError(fn)
 
-
-
-def IsFile(fn):
-    ifn = 0
-    if not os.path.isfile(fn):
-        ifn = 1
-    
-    return ifn 
 
 def help():
     
