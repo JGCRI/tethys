@@ -9,9 +9,10 @@ Copyright (c) 2017, Battelle Memorial Institute
 Get the simulator settings from configuration(*.ini) file
 '''
 
-import os, sys
+import os
 from configobj import ConfigObj
 from ConfigSettings import ConfigSettings
+from tethys.Utils.exceptions import FileNotFoundError, DirectoryNotFoundError
 
 def getSimulatorSettings(iniFile):
     
@@ -98,26 +99,26 @@ def AddSlashToDir(string):
     
     return string
 
-def CheckExistence(settings):
-    
-    ierr = 0
-    errmsg = ""
-    
-    # Check for input and create output directories if not exists.
-    if not os.path.exists(settings.InputFolder):
-        errmsg += "Error: Incorrect Pathname for Input Folder ! \n"
-        ierr += 1
+def CheckExistence(settings): 
+    """
+    Check existence of input files and directories, and create output directory if necessary.
+    """
+    if not (os.path.exists(settings.InputFolder) and os.path.isdir(settings.InputFolder)):
+        raise DirectoryNotFoundError(settings.InputFolder)
 
     if not os.path.exists(settings.OutputFolder):
-        os.makedirs(settings.OutputFolder)
+        os.makedirs(settings.OutputFolder) # this will raise an exception if it fails to create the directory
     
-    if not os.path.exists(settings.rgnmapdir):
-        errmsg += "Error: Incorrect Pathname for Region Map Folder (rgnmapdir) ! \n"
-        ierr += 1
-    
-    if not settings.UseGCAMDatabase and not os.path.exists(settings.rgnmapdir):
-        errmsg += "Error: Incorrect Pathname for GCAM CSV Folder (GCAM_CSV) ! \n"
-        ierr += 1
+    if not (os.path.exists(settings.rgnmapdir) and os.path.isdir(settings.rgnmapdir)):
+        raise DirectoryNotFoundError(settings.rgnmapdir)
+
+    ## XXX I believe the sense of this test was wrong in the previous version (as well as the object being tested).
+    ##     as I understand it, if settings.UseGCAMDatabase is TRUE, then we are going to look for CSV files (*not*
+    ##     a GCAM database) in the GCAM_CSV directory.  Otherwise, we don't use settings.GCAM_CSV.  Can someone
+    ##     confirm that this is the intended behavior.
+    ##     -rpl
+    if settings.UseGCAMDatabase and not (os.path.exists(settings.GCAM_CSV) and os.path.isdir(settings.GCAM_CSV)):
+        raise DirectoryNotFoundError(settings.GCAM_CSV)
         
     # Check the existence of input files
     strlist = ['Area', 'Coord', 'aez', 'InputBasinFile', 'BasinNames', 'InputRegionFile', 'RegionNames', 'InputCountryFile', \
@@ -128,8 +129,7 @@ def CheckExistence(settings):
     for s in strlist:
         exec("ifn = IsFile(settings." + s + ")")
         if ifn:
-            errmsg += "Error! File does not exist: " + eval("settings." + s) + "\n"
-            ierr += 1
+            raise FileNotFoundError(getattr(settings, s))
                
     if settings.PerformTemporal:
         strlist = ['TempMonthlyFile', 'HDDCDDMonthlyFile', 'Domestic_R', 'Irr_MonthlyData', 'Elec_Building', 'Elec_Industry', \
@@ -137,13 +137,8 @@ def CheckExistence(settings):
         for s in strlist:
             exec("ifn = IsFile(settings." + s + ")")
             if ifn:
-                errmsg += "Error! File does not exist: " + eval("settings." + s) + "\n"
-                ierr += 1
-             
-         
-    if ierr > 0:
-        print errmsg
-        sys.exit(1)
+                raise FileNotFoundError(getattr(settings, s))
+
 
 
 def IsFile(fn):

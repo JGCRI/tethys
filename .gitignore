@@ -6,3 +6,9 @@
 
 # exclude .idea dir
 .idea
+
+# Emacs backup files
+*~
+
+# python notebooks (probably used for testing)
+*.ipynb
