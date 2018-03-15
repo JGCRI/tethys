@@ -24,16 +24,20 @@ def TotalWaterUse(Settings, GISData, rgnmapData, OUT):
     # 1.
     OUT.wdtotal = OUT.wdnonag + OUT.wdirr + OUT.wdliv
     
+    outvars = vars(OUT)
     sectorstrs = ['total', 'nonag', 'irr', 'liv', 'dom', 'elec', 'mfg', 'min']
     # 2.
     for item in sectorstrs:
-        exec("OUT.r" + item + "= np.zeros((rgnmapData['nrgnNONAG'], OUT.wdnonag.shape[1]), dtype=float)")
+        outvars['r'+item] = np.zeros((rgnmapData['nrgnNONAG'], OUT.wdnonag.shape[1]), dtype=float)
     
     ls = np.where(rgnmapData['map_rgn_nonag'] > 0)[0]    
     for y in range(0,OUT.wdnonag.shape[1]):
         for index in ls:
             for item in sectorstrs:
-                exec("OUT.r" + item + "[rgnmapData['map_rgn_nonag'][index]-1,y] += OUT.wd"+ item +"[index,y]")                                  
+                outwd = outvars['wd'+item]
+                outrr = outvars['r'+item]
+
+                outrr[rgnmapData['map_rgn_nonag'][index]-1,y] += outwd[index,y]
     
     if Settings.OutputUnit: # convert the original unit km3/yr to new unit mm
         mapindex    = GISData['mapindex']
@@ -41,4 +45,5 @@ def TotalWaterUse(Settings, GISData, rgnmapData, OUT):
         conversion  = 1e6 # km -> mm
         
         for item in sectorstrs:
-            exec("OUT.wd" + item + "[mapindex,:]  = np.transpose(np.divide(np.transpose(OUT.wd" + item + "[mapindex,:]), area)*conversion)")
+            outwd = outvars['wd'+item]
+            outwd[mapindex,:] = np.transpose(np.divide(np.transpose(outwd[mapindex,:]), area)*conversion)
