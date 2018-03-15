@@ -112,11 +112,6 @@ def CheckExistence(settings):
     if not (os.path.exists(settings.rgnmapdir) and os.path.isdir(settings.rgnmapdir)):
         raise DirectoryNotFoundError(settings.rgnmapdir)
 
-    ## XXX I believe the sense of this test was wrong in the previous version (as well as the object being tested).
-    ##     as I understand it, if settings.UseGCAMDatabase is TRUE, then we are going to look for CSV files (*not*
-    ##     a GCAM database) in the GCAM_CSV directory.  Otherwise, we don't use settings.GCAM_CSV.  Can someone
-    ##     confirm that this is the intended behavior.
-    ##     -rpl
     if settings.UseGCAMDatabase and not (os.path.exists(settings.GCAM_CSV) and os.path.isdir(settings.GCAM_CSV)):
         raise DirectoryNotFoundError(settings.GCAM_CSV)
         
