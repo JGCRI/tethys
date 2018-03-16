@@ -13,6 +13,7 @@ import GCAMutil as util
 import GCAMSupport as Support
 from tethys.Utils.DataParser import getContentArray as ArrayCSVReader
 from shutil import copyfile
+from tethys.Utils.Logging import Logger
 
  
 def get_dir_prepender(dir):
@@ -87,12 +88,15 @@ def getGCAMData(settings):
     GCAMData['irrArea']      = ArrayCSVReader(settings.irrArea,0)
     GCAMData['irrV']         = ArrayCSVReader(settings.irrV,0)
 
+    log = Logger.getlogger()
+
     if settings.read_irrS:
         GCAMData['irrShare'] = ArrayCSVReader(settings.irrShare,0)
-        print '------Used pre-calculated irrigation shares---'
+        log.write('------Used pre-calculated irrigation shares---\n', Logger.INFO)
     else:
     # GCAM has already calculated irrigated (vice total) area.  
     # Setting irrShare to a scalar will signal the disaggregation function to ignore this factor.    
         GCAMData['irrShare'] = 1
+        log.write('------Used GCAM-calculated irrigation shares---\n', Logger.INFO)
     
     return GCAMData

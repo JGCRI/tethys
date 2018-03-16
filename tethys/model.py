@@ -58,16 +58,18 @@ class Tethys:
         """
         Execute the model and save the outputs.
         """
-        print('Start Disaggregation... ')
+        Logger = Logging.Logger
+        mainlog = Logger.getlogger()
+        mainlog.write('Start Disaggregation... \n', Logger.INFO)
         s1 = time.time()
         self.gridded_data, self.gis_data = self.Disaggregation(self.settings)
         e1= time.time()
-        print('End Disaggregation... ')
-        print("---Disaggregation: %s seconds ---" % (e1 - s1))
+        mainlog.write('End Disaggregation... \n', Logger.INFO)
+        mainlog.write("---Disaggregation: %s seconds ---\n" % (e1 - s1), Logger.INFO)
 
-        print('Saving outputs... ')
+        mainlog.write('Saving outputs...\n', Logger.INFO)
         self.OutWriter(self.settings, self.gridded_data, self.gis_data)
         e2 = time.time()
-        print("---Output: %s seconds ---" % (e2 - e1))
+        mainlog.write("---Output: %s seconds ---\n" % (e2 - e1), Logger.INFO)
 
-        print('End Project:   ', self.settings.ProjectName)
+        mainlog.write('End Project: %s\n'%self.settings.ProjectName, Logger.INFO)

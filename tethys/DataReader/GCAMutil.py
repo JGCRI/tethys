@@ -21,6 +21,8 @@ import subprocess
 
 #import gcam_reader
 
+from tethys.Utils.Logging import Logger
+
 ## utility functions used in other gcam python code
 
 def gcam_query(batchqfiles, dbxmlfiles, inputdir, outfiles):
@@ -43,6 +45,7 @@ def gcam_query(batchqfiles, dbxmlfiles, inputdir, outfiles):
                     the query list.
 
     """
+    mainlog = Logger.getlogger()
 
     if hasattr(batchqfiles,'__iter__') and not isinstance(batchqfiles, str):
         qlist = batchqfiles
@@ -69,7 +72,7 @@ def gcam_query(batchqfiles, dbxmlfiles, inputdir, outfiles):
     ModelInterface = './DataReader/QueryGCAMDataBase/ModelInterface/ModelInterface.jar'
 
     for (query, dbxml, output) in zip(qlist,dbxmllist,outlist):
-        print query, output
+        mainlog.write('{}  {}\n'.format(query, output), Logger.DEBUG)
         ## make a temporary file
         #try:
         tempquery = rewrite_query(query, dbxml, inputdir, output)

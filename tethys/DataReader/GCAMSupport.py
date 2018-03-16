@@ -17,6 +17,7 @@ import re
 import os.path
 import sys
 from sys import stderr, stdout
+from tethys.Utils.Logging import Logger
 
 ## Canonical ordering of the regions for outputs
 _regions_ordered = []
@@ -45,7 +46,9 @@ def init_rgn_tables(settings, filename):
     global _bfracFAO2005
     global _gfracFAO2005
     global _years
-    
+
+    mainlog = Logger.getlogger()
+    oldlvl = mainlog.setlevel(Logger.DEBUG)
 
     (_, _regions_ordered) = GCAMutil.rd_rgn_table(settings.RegionNames)
     
@@ -56,10 +59,11 @@ def init_rgn_tables(settings, filename):
         _years = fields[4:-1]  # Wdom file
     
     num_lines = sum(1 for line in open(filename)) - 2
-    print 'Number of Regions:', str(num_lines)
+    mainlog.write('Number of Regions:  {}\n'.format(str(num_lines)))
         
     if len(_regions_ordered) != num_lines:
-        print "[Warning!]: Selected Region Map Directory has different number of regions as GCAM outputs!"
+        mainlog.write("Selected Region Map Directory has different number of regions as GCAM outputs!",
+                  Logger.WARNING) # XXX Should be error?
     
         # find another directory according to number of regions
 #         if settings.rgnmapdir[-1]=='/':
@@ -81,12 +85,14 @@ def init_rgn_tables(settings, filename):
         
     nr = 1
     for region in _regions_ordered:
-        print 'Region ID ', nr, ' ', region
+        mainlog.write('Region ID {}  {}\n'.format(nr, region))
         nr +=1
 
     #(_gis2000, _) = GCAMutil.rd_rgn_table(settings.rgnmapdir + 'gis2000.csv')
     (_bfracFAO2005, _) = GCAMutil.rd_rgn_table(settings.rgnmapdir + 'bfracFAO2005.csv')
     (_gfracFAO2005, _) = GCAMutil.rd_rgn_table(settings.rgnmapdir + 'gfracFAO2005.csv')
+
+    mainlog.setlevel(oldlvl)
 
 def rd_gcam_table(filename, njunk=0):
     """Read the data from a csv file generated as gcam output.  
@@ -263,6 +269,9 @@ def proc_wdlivestock(infilename, outfilename, rgnTotalFilename):
     and are assumed to be fixed over time.
 
     """
+
+    mainlog = Logger.getlogger()
+    oldlvl = mainlog.setlevel(Logger.DEBUG)
     
     wdliv_table = {}
     with open(infilename,"r") as infile:
@@ -346,16 +355,11 @@ def proc_wdlivestock(infilename, outfilename, rgnTotalFilename):
         try:
             total_wd[region] = map(lambda tb,sh,pt,pg: tb+sh+pt+pg, total_bovine, sheepgoat, poultry[region], pig[region])
         except TypeError:
-#             stderr.write('[proc_wdlivestock]: bad table data for region = %s.\n' % region)
-#             stderr.write('\ttotal_bovine: %s\n' % str(total_bovine))
-#             stderr.write('\tsheepgoat:    %s\n' % str(sheepgoat))
-#             stderr.write('\tpoultry:      %s\n' % str(poultry[region]))
-#             stderr.write('\tpig:          %s\n' % str(pig[region]))
-            print('[proc_wdlivestock]: bad table data for region = %s.\n' % region)
-            print('\ttotal_bovine: %s\n' % str(total_bovine))
-            print('\tsheepgoat:    %s\n' % str(sheepgoat))
-            print('\tpoultry:      %s\n' % str(poultry[region]))
-            print('\tpig:          %s\n' % str(pig[region]))
+            log.write('[proc_wdlivestock]: bad table data for region = %s.\n' % region)
+            log.write('\ttotal_bovine: %s\n' % str(total_bovine))
+            log.write('\tsheepgoat:    %s\n' % str(sheepgoat))
+            log.write('\tpoultry:      %s\n' % str(poultry[region]))
+            log.write('\tpig:          %s\n' % str(pig[region]))
             raise
         
         ## end of loop over regions
@@ -440,7 +444,8 @@ def proc_irr_share(infilename, outfile):
     """
     ## initialize table with zeros.  Any combination not contained in
     ## the table will default to 0.
-    print 'irr share infile: %s' % infilename
+    mainlog = Logger.getlogger()
+    mainlog.write('irr share infile: %s\n' % infilename, Logger.DEBUG)
     irr_share = {}
     for region in _regions_ordered:
         rgnno   = _regions_ordered.index(region)+1 

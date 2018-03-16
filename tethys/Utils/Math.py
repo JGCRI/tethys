@@ -9,6 +9,8 @@ Copyright (c) 2017, Battelle Memorial Institute
 """
 import numpy as np
 
+from tethys.Utils.Logging import Logger
+
 #__all__ = ['sub2ind', 'ind2sub']
 
 # get the size of a 2D array
@@ -35,7 +37,12 @@ def SizeC(l):
 def sub2ind(arraySize,rowSub,colSub):
     linearInd  = []
     if len(rowSub) != len(colSub):
-        print 'def sub2ind at Rearranging: length of rowSub is not equal to length of colSub!'
+        ## We are logging this as a warning and ofrging ahead, but this is arguably an
+        ## error and should cause an immediate exception.
+        mainlog = logger.getlogger()
+        mainlog.write(
+            'def sub2ind at Rearranging: length of rowSub is not equal to length of colSub!\n',
+            Logger.WARNING)
     else:
         arr = tuple(arraySize)
         for i in range(0, len(rowSub)):
