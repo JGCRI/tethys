@@ -34,3 +34,15 @@ class DirectoryNotFoundError(Error):
 
     def __str__(self):
         return "Invalid directory or directory does not exist:  " + self.dn
+
+
+class LoggerError(Error):
+    """
+    Exception indicating an error in the Logger subsystem.
+    """
+
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg

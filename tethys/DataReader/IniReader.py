@@ -13,11 +13,14 @@ import os
 from configobj import ConfigObj
 from ConfigSettings import ConfigSettings
 from tethys.Utils.exceptions import FileNotFoundError, DirectoryNotFoundError
+from tethys.Utils.Logging import Logger
 
 def getSimulatorSettings(iniFile):
     
     config = ConfigObj(iniFile)
     settings = ConfigSettings()
+
+    settings.Logger = config['Logger']
     
     settings.ProjectName        = config['Project']['ProjectName']
     settings.InputFolder        = AddSlashToDir(config['Project']['InputFolder'])
@@ -82,16 +85,19 @@ def getSimulatorSettings(iniFile):
     
     return settings
 
-def PrintInfo(settings):
+def PrintInfo(settings): 
+
+    log = Logger.getlogger()
+    oldlvl = log.setlevel(Logger.INFO)
     
-    print 'Project Name        : ', settings.ProjectName 
-    print 'Input Folder        : ', settings.InputFolder
-    print 'Output Folder       : ', settings.OutputFolder
+    log.write('Project Name        : {}\n'.format(settings.ProjectName))
+    log.write('Input Folder        : {}\n'.format(settings.InputFolder))
+    log.write('Output Folder       : {}\n'.format(settings.OutputFolder))
     if settings.UseGCAMDatabase:
-        print 'GCAM Database Folder: ', settings.GCAM_DBpath + settings.GCAM_DBfile
+        log.write('GCAM Database Folder: {}\n'.format(settings.GCAM_DBpath + settings.GCAM_DBfile))
     else:
-        print 'GCAM CSV Folder     : ', settings.GCAM_CSV
-    print 'Region Info Folder  : ', settings.rgnmapdir
+        log.write('GCAM CSV Folder     : {}\n'.format(settings.GCAM_CSV))
+    log.write('Region Info Folder  : {}\n'.format(settings.rgnmapdir))
 
 def AddSlashToDir(string): 
     

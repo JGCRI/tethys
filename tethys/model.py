@@ -13,8 +13,9 @@ call the function running water disaggregation
 import os
 import sys
 import time
+from datetime import datetime
 import tethys.DataReader.IniReader as IniReader
-from tethys.Utils.Logging import Logger
+import tethys.Utils.Logging as Logging
 from tethys.DataWriter.OUTWriter import OutWriter
 from tethys.run_disaggregation import run_disaggregation as disagg
 
@@ -33,8 +34,10 @@ class Tethys:
         self.settings = IniReader.getSimulatorSettings(config)
 
         # instantiate logger and log file
-        sys.stdout = Logger()
-        sys.stdout.log = open(self.settings.OutputFolder + "logfile.log", "w")
+        Logging._setmainlog(Logging.Logger(self.settings.Logger))
+        mainlog = Logging.Logger.getlogger()
+        mainlog.write('Log start\n',Logging.Logger.INFO)
+        mainlog.write(str(datetime.now())+'\n' , Logging.Logger.INFO)
 
         # write settings to log
         IniReader.PrintInfo(self.settings)
@@ -47,9 +50,8 @@ class Tethys:
         self.run_model()
 
         # clean up log
-        sys.stdout.log.close()
+        Logging._shutdown()
         
-        sys.stdout = sys.__stdout__
         print "Tethys ends."
 
     def run_model(self):

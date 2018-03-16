@@ -7,9 +7,24 @@ License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 '''
 
-from tethys.Utils.Logging import clearfolder
 import GCAMOutputs
 import GCAMutil
+
+
+def clearfolder(pathname):
+    """
+    if the folder not exists, create the folder
+    if the folder exists, clean the files inside
+    """
+
+    if not os.path.exists(pathname):
+        os.makedirs(pathname)
+    else:
+        for the_file in os.listdir(pathname):
+            file_path = os.path.join(pathname, the_file)
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+
 
 class ConfigSettings():
     
