@@ -20,7 +20,13 @@ def getSimulatorSettings(iniFile):
     config = ConfigObj(iniFile)
     settings = ConfigSettings()
 
-    settings.Logger = config['Logger']
+    try:
+        settings.Logger = config['Logger']
+    except KeyError:
+        ## No logger configuration.  Supply a default one for backward
+        ## compatibility with old config files.
+        settings.Logger = {'logdir':'logs',
+                           'filename':'mainlog.txt'} 
     
     settings.ProjectName        = config['Project']['ProjectName']
     settings.InputFolder        = AddSlashToDir(config['Project']['InputFolder'])
