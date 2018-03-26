@@ -18,6 +18,7 @@ import os.path
 import sys
 from sys import stderr, stdout
 from tethys.Utils.Logging import Logger
+from tethys.Utils.exceptions import DataError
 
 ## Canonical ordering of the regions for outputs
 _regions_ordered = []
@@ -59,11 +60,12 @@ def init_rgn_tables(settings, filename):
         _years = fields[4:-1]  # Wdom file
     
     num_lines = sum(1 for line in open(filename)) - 2
-    mainlog.write('Number of Regions:  {}\n'.format(str(num_lines)))
+    mainlog.write('Number of Regions:  {}\n'.format(num_lines))
         
     if len(_regions_ordered) != num_lines:
-        mainlog.write("Selected Region Map Directory has different number of regions as GCAM outputs!",
-                  Logger.WARNING) # XXX Should be error?
+        msg = "Selected Region Map Directory has different number of regions as GCAM outputs!"
+        mainlog.write(msg+'\n', Logger.ERROR)
+        raise DataError(msg)
     
         # find another directory according to number of regions
 #         if settings.rgnmapdir[-1]=='/':

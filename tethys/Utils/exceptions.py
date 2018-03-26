@@ -3,10 +3,7 @@ Exception classes for the Tethys model.
 """
 
 ################################################################
-#### Tethys exceptions:
-####
-#### Right now the only error we report seems to be file not found.  Add
-#### additional exceptions as required.
+#### Tethys exceptions
 ################################################################
 
 class Error(Exception):
@@ -42,6 +39,17 @@ class LoggerError(Error):
     """
 
     def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
+
+
+class DataError(Error):
+    """
+    Exception indicating that input data is malformed or inconsistent.
+    """
+    def __init__(self,msg):
         self.msg = msg
 
     def __str__(self):

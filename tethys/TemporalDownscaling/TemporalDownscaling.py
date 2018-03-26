@@ -82,7 +82,7 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
         Temp_TDMonths_Index[N*12:(N+1)*12] = np.arange(i*12, (i+1)*12)
     
 
-    mainlog.write('------ Temporal downscaling is available for Year: {}\n'.format(str(TDYears)),
+    mainlog.write('------ Temporal downscaling is available for Year: {}\n'.format(TDYears),
                   Logger.DEBUG)
     
     """Read input files"""

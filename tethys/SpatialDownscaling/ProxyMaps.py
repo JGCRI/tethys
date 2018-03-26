@@ -76,7 +76,7 @@ def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
 # use historical population maps
     for y in range (0,NY):
         # population map
-        mainlog.write('{}\n'.format(str(GISData['pop']['years'][y])),
+        mainlog.write('{}\n'.format(GISData['pop']['years'][y]),
                       Logger.DEBUG)
         yearstr = str(GISData['pop']['years_new'][y])
         pop     = np.zeros(rgnmapData['map_rgn_nonag'].shape, dtype=float)
@@ -294,7 +294,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
 # use historical irrigation area maps
     # STEP 4: read a grid map of the irrigated area in km2 in a certain year
     for y in range (0,NY):
-        mainlog.write('{}\n'.format(str(GISData['irr']['years'][y])), Logger.DEBUG)
+        mainlog.write('{}\n'.format(GISData['irr']['years'][y]), Logger.DEBUG)
         yearstr = str(GISData['irr']['years_new'][y])
         irr     = np.zeros(rgnmapData['map_rgn_ag'].shape, dtype=float)
         irr[GISData['mapindex']] = GISData['irr'][yearstr]
