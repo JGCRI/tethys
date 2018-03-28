@@ -9,6 +9,8 @@ Copyright (c) 2017, Battelle Memorial Institute
 """
 import numpy as np
 
+from tethys.Utils.Logging import Logger
+
 #__all__ = ['sub2ind', 'ind2sub']
 
 # get the size of a 2D array
@@ -35,12 +37,18 @@ def SizeC(l):
 def sub2ind(arraySize,rowSub,colSub):
     linearInd  = []
     if len(rowSub) != len(colSub):
-        print 'def sub2ind at Rearranging: length of rowSub is not equal to length of colSub!'
-    else:
-        arr = tuple(arraySize)
-        for i in range(0, len(rowSub)):
-            temp = np.ravel_multi_index((rowSub[i],colSub[i]), arr, order='F')
-            linearInd.append(temp)
+        mainlog = logger.getlogger()
+        msg = 'sub2ind: rowSub and colSub must have equal lengths.  len(rowSub) = {}  len(colSub) = {}'.format(
+            len(rowSub), len(colSub))
+        mainlog.write(msg + '\n',
+                      Logger.ERROR)
+        raise DataError(msg)
+
+    arr = tuple(arraySize)
+    for i in range(0, len(rowSub)):
+        temp = np.ravel_multi_index((rowSub[i],colSub[i]), arr, order='F')
+        linearInd.append(temp)
+        
     return np.array(linearInd)
 
 # Convert linear indices to subscripts

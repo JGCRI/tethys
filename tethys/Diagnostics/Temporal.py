@@ -18,8 +18,17 @@ from tethys.Utils.DataParser import GetArrayCSV
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.ticker import FormatStrFormatter
+from tethys.Utils.Logging import Logger
     
 def compare_temporal_downscaled(Settings, OUT, GISData):
+
+    mainlog = Logger.getlogger()
+
+    ## The outputs produced in this function are an extension of the debugging
+    ## logs; therefore, if the logging level is set above DEBUG, we skip the
+    ## calculations and the output
+    if mainlog.minlvl > Logger.DEBUG:
+        return
     
     mapindex   = GISData['mapindex']
     BasinIDs   = GISData['BasinIDs']
@@ -28,18 +37,23 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
     years      = Settings.TDYears
     NY         = len(years)
     NM         = len(mapindex)
-    print '---Temporal Downscaling Diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)'
+    mainlog.write(
+        '---Temporal Downscaling Diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)\n',
+        Logger.DEBUG)
     
     
-    print '------Irrigation------'
+    mainlog.write('------Irrigation------\n')
     W = OUT.WIrr[:,:]
     value   = np.zeros((NY,3), dtype=float)
     for j in years: 
         N = years.index(j)
         value[N,0]  = np.sum(OUT.twdirr[:,N*12:(N+1)*12])
         value[N,1]  = np.sum(W[:,N])
-        value[N,2]  = value[N,0] - value[N,1]         
-        print '                Year ', j, ':     ', value[N,0], '     ', value[N,1], '     Diff= ', value[N,2]
+        value[N,2]  = value[N,0] - value[N,1]
+        mainlog.write(
+            '                Year {}:    {}    {}    Diff= {}\n'.format(j, value[N,0],
+                                                                        value[N,1], value[N,2]),
+            Logger.DEBUG)
     
     # Print out the basin level comparison
     Sector   = ['Year', 'Basin ID', 'Basin Name', 'After Spatial Downscaling', 'After Temporal Downscaling', 'Diff']
@@ -66,20 +80,23 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
         
         
         
-    print '------Domestic------'
+    mainlog.write('------Domestic------\n', Logger.DEBUG)
     W = OUT.WDom[:,:]
     value   = np.zeros((NY,3), dtype=float)
     for j in years: 
         N = years.index(j)
         value[N,0]  = np.sum(OUT.twddom[:,N*12:(N+1)*12])
         value[N,1]  = np.sum(W[:,N])
-        value[N,2]  = value[N,0] - value[N,1]         
-        print '                Year ', j, ':     ', value[N,0], '     ', value[N,1], '     Diff= ', value[N,2]
-    #
+        value[N,2]  = value[N,0] - value[N,1]
+        mainlog.write(
+            '                Year {}:    {}    {}    Diff= {}\n'.format(j, value[N,0],
+                                                                        value[N,1], value[N,2]),
+            Logger.DEBUG)
+
     Domestic_TD__Diagnostics_Plot(OUT.twddom, GISData, Settings.OutputFolder)
         
         
-    print '------Electricity Generation------'
+    mainlog.write('------Electricity Generation------\n')
     W = OUT.WEle[:,:]
     value   = np.zeros((NY,3), dtype=float)
     for j in years: 
@@ -87,8 +104,11 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
         value[N,0]  = np.sum(OUT.twdelec[:,N*12:(N+1)*12])
         value[N,1]  = np.sum(W[:,N])
         value[N,2]  = value[N,0] - value[N,1]         
-        print '                Year ', j, ':     ', value[N,0], '     ', value[N,1], '     Diff= ', value[N,2]
-    #
+        mainlog.write(
+            '                Year {}:    {}    {}    Diff= {}\n'.format(j, value[N,0],
+                                                                        value[N,1], value[N,2]),
+            Logger.DEBUG)
+
     Electricity_TD__Diagnostics_Plot(OUT.twdelec, GISData, Settings.OutputFolder)
     
 def Electricity_TD__Diagnostics_Plot(data, GISData, OutputFolder):

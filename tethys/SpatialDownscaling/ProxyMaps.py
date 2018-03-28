@@ -22,6 +22,7 @@ import numpy as np
 from tethys.Utils.Math import SizeR, SizeC
 from tethys.Utils.Math import ind2sub
 from tethys.Utils.Math import sub2ind
+from tethys.Utils.Logging import Logger
 
 def Rearranging(mapsize, GISData, rgnmapData):
     
@@ -58,6 +59,8 @@ def Rearranging(mapsize, GISData, rgnmapData):
 def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
 # Total Non-Agricultural Water withdrawal in 1990, 2005, ... 2050, and 2010
 # population in millions in year 2000
+
+    mainlog = Logger.getlogger()
     
     NY = settings.NY
     
@@ -73,7 +76,8 @@ def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
 # use historical population maps
     for y in range (0,NY):
         # population map
-        print str(GISData['pop']['years'][y])
+        mainlog.write('{}\n'.format(GISData['pop']['years'][y]),
+                      Logger.DEBUG)
         yearstr = str(GISData['pop']['years_new'][y])
         pop     = np.zeros(rgnmapData['map_rgn_nonag'].shape, dtype=float)
         pop[GISData['mapindex']] = GISData['pop'][yearstr]
@@ -127,7 +131,10 @@ def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
 
 
 def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):     
-                
+
+    mainlog = Logger.getlogger()
+    oldlvl = mainlog.setlevel(Logger.DEBUG)
+    
 # count how many animals live in each GCAM region first    
     map_rgn_ag = rgnmapData['map_rgn_ag']
     nrgnAG     = rgnmapData['nrgnAG']
@@ -183,27 +190,34 @@ def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
         withd_liv_map[:,y] = np.sum(livestock,axis = 1)        
 
     OUT.wdliv    = withd_liv_map
-    
+
+
+    fmtstr = '[Year Index, Region ID, {:7s} from GCAM not assigned (no GIS data)]:  {}  {}  {}\n'
+    dat = GCAMData['wdliv']
     for y in range(0,NY):
         for IN in range(0,nrgnAG):
-            if GCAMData['wdliv'][0*nrgnAG+IN,y] > 0 and tot_livestock[IN,0] == 0:            
-                print "[Year Index, Region ID, bufflo  from GCAM not assigned (no GIS data)]:", y+1, IN+1, GCAMData['wdliv'][0*nrgnAG+IN,y] 
+            if GCAMData['wdliv'][0*nrgnAG+IN,y] > 0 and tot_livestock[IN,0] == 0:
+                mainlog.write(fmtstr.format('buffalo', y+1, IN+1, dat[0*nrgnAG+IN,y]))
             if GCAMData['wdliv'][1*nrgnAG+IN,y] > 0 and tot_livestock[IN,1] == 0:
-                print "[Year Index, Region ID, cattle  from GCAM not assigned (no GIS data)]:", y+1, IN+1, GCAMData['wdliv'][1*nrgnAG+IN,y] 
+                mainlog.write(fmtstr.format('cattle', y+1, IN+1, dat[1*nrgnAG+IN,y]))
             if GCAMData['wdliv'][2*nrgnAG+IN,y] > 0 and tot_livestock[IN,2] == 0:
-                print "[Year Index, Region ID, goat    from GCAM not assigned (no GIS data)]:", y+1, IN+1, GCAMData['wdliv'][2*nrgnAG+IN,y] 
+                mainlog.write(fmtstr.format('goat', y+1, IN+1, dat[2*nrgnAG+IN,y]))
             if GCAMData['wdliv'][3*nrgnAG+IN,y] > 0 and tot_livestock[IN,3] == 0:
-                print "[Year Index, Region ID, sheep   from GCAM not assigned (no GIS data)]:", y+1, IN+1, GCAMData['wdliv'][3*nrgnAG+IN,y] 
+                mainlog.write(fmtstr.format('sheep', y+1, IN+1, dat[3*nrgnAG+IN,y]))
             if GCAMData['wdliv'][4*nrgnAG+IN,y] > 0 and tot_livestock[IN,4] == 0:
-                print "[Year Index, Region ID, poultry from GCAM not assigned (no GIS data)]:", y+1, IN+1, GCAMData['wdliv'][4*nrgnAG+IN,y] 
+                mainlog.write(fmtstr.format('poultry', y+1, IN+1, dat[4*nrgnAG+IN,y]))
             if GCAMData['wdliv'][5*nrgnAG+IN,y] > 0 and tot_livestock[IN,5] == 0:
-                print "[Year Index, Region ID, pig     from GCAM not assigned (no GIS data)]:", y+1, IN+1, GCAMData['wdliv'][5*nrgnAG+IN,y]            
+                mainlog.write(fmtstr.format('pig', y+1, IN+1, dat[5*nrgnAG+IN,y]))
+
+    mainlog.setlevel(oldlvl)
     return withd_liv_map
 
 
     
 def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
 
+    mainlog = Logger.getlogger()
+    
 # Need to downscale the agricultural water withdrawal data for GCAM years
 # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
 # AEZ to grid scale CHALLENGE: where to add new agricultural lands
@@ -280,7 +294,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
 # use historical irrigation area maps
     # STEP 4: read a grid map of the irrigated area in km2 in a certain year
     for y in range (0,NY):
-        print str(GISData['irr']['years'][y])
+        mainlog.write('{}\n'.format(GISData['irr']['years'][y]), Logger.DEBUG)
         yearstr = str(GISData['irr']['years_new'][y])
         irr     = np.zeros(rgnmapData['map_rgn_ag'].shape, dtype=float)
         irr[GISData['mapindex']] = GISData['irr'][yearstr]
@@ -309,7 +323,6 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
             
             
         # STEP 6:        
-        #print 'Year:', y  
         for i in range(0,nrgnAG):
             for j in range(0,naez):
                 # To be efficient, the most important step in the loop is to identify the valid irr cell(index in 360*720 grid) for each region and each aez
@@ -378,9 +391,14 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
                                             cum_diff0 += z - mapAreaExt[index]                                            
                                         cum_area = cum_area1 + irrA_grid[index, y]
                                     if cum_diff0 > 0:
-                                        print '[Year Index, Region ID, ' + GISData['AEZstring'] + ' ID, irr from GCAM not assigned (km3) (condition 0)]:', y+1, i+1, j+1, cum_diff0*irr_V[i,j,y]/irr_A[i,j,y]                                       
-                                                                                                                           
-                            else: # if (num == 0 and counter2 == 0)  or num > 0                                                  
+                                        mainlog.write('{}  {}  {}  {} {} {} {}'.format(
+                                            '[Year Index, Region ID,',
+                                            GISData['AEZstring'],
+                                            ' ID, irr from GCAM not assigned (km3) (condition 0)]:',
+                                            y+1, i+1, j+1,
+                                            cum_diff0*irr_V[i,j,y]/irr_A[i,j,y]),
+                                                      Logger.WARNING)
+                            else: # if (num == 0 and counter2 == 0)  or num > 0 
                                 for index in ls1:
                                     irrA_grid[index, y] = np.NaN
                                     #irrA_frac[index, y] = np.NaN
@@ -401,7 +419,13 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
                                         counter3 += 1                                                                       
                                 num = num_new
                                 if cum_diff == 0 and counter3 == len(ls2):
-                                    print '[Year Index, Region ID, ' + GISData['AEZstring'] + ' ID, irr from GCAM not assigned (km3) (condition 1)]:', y+1, i+1, j+1, diff*irr_V[i,j,y]/irr_A[i,j,y]
+                                    mainlog.write('{}  {}  {}  {} {} {} {}'.format(
+                                        '[Year Index, Region ID,',
+                                        GISData['AEZstring'],
+                                        ' ID, irr from GCAM not assigned (km3) (condition 1)]:',
+                                        y+1, i+1, j+1,
+                                        diff*irr_V[i,j,y]/irr_A[i,j,y]),
+                                                  Logger.WARNING)
                             counter += 1
                             diff    = cum_diff
        
@@ -459,6 +483,8 @@ def rgnmapadjust(mapsize, map_pop, map_rgn, label):
     Return value:  adjusted region map.
     '''
 
+    mainlog = Logger.getlogger()
+    
     new_map_rgn = np.copy(map_rgn)
     #map_pop     = map_pop.reshape(map_rgn.shape, order='F')
     map_pop[np.isnan(map_pop)]       = 0
@@ -500,18 +526,13 @@ def rgnmapadjust(mapsize, map_pop, map_rgn, label):
     
     fixedcells = np.where((map_pop > 0) & (map_rgn == 0) & (new_map_rgn > 0))[0]
     
-#print out diagnostics
-    print label +   'Cells with pop/irr data but no region: ', len(adjust)
-    print label +   'Cells adjusted to an adjacent region: ', len(fixedcells)
+    ## log diagnostics 
+    mainlog.write(label +   'Cells with pop/irr data but no region: {}\n'.format(len(adjust)),
+                  Logger.DEBUG)
+    mainlog.write(label +   'Cells adjusted to an adjacent region: {}\n'.format(len(fixedcells)),
+                  Logger.DEBUG)
     
-    #for n in range(0, len(fixedcells)):
-    #    #print fixedcells[n]
-    #    print new_map_rgn[fixedcells[n]]
-        
-    print label +   'Cells not adjusted: ', len(adjust) - len(fixedcells)
+    mainlog.write(label +   'Cells not adjusted: {}\n'.format(len(adjust) - len(fixedcells)),
+                  Logger.DEBUG)
     
-    #nfcells    = np.where((map_pop > 0) & (map_rgn == 0) & (new_map_rgn == 0))[0]
-    #for n in range(0, len(nfcells)):
-    #    print nfcells[n]
-
     return new_map_rgn

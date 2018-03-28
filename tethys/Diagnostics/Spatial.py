@@ -13,10 +13,18 @@ Perform diagnostics to ensure that the spatially downscaled results and initial 
 
 import numpy as np
 from tethys.DataWriter.OUTWriter import OUTSettings
+from tethys.Utils.Logging import Logger
     
 def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
-    
-    print '---Spatial Downscaling Diagnostics (Global): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)'
+    mainlog = Logger.getlogger()
+    ## These calculations will be performed ONLY if we are logging debug-level output.
+    ## Otherwise, we skip the output and the calculations
+    if mainlog.minlvl > Logger.DEBUG:
+        return
+
+    mainlog.write(
+        '---Spatial Downscaling Diagnostics (Global): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)',
+        Logger.DEBUG)
     
     NY = Settings.NY
     value   = np.zeros((NY,3), dtype=float)
@@ -27,13 +35,16 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
         # Global_GCAM   Global Total [km3/yr] from GCAM inputs
         value[y,1]  = sum(GCAMData['rgn_wddom'][:,y]) + sum(GCAMData['rgn_wdelec'][:,y]) + sum(GCAMData['rgn_wdmfg'][:,y]) + sum(GCAMData['rgn_wdmining'][:,y]) \
                     + sum(GCAMData['irrV'][:,y+3]) + sum(GCAMData['wdliv'][:,y])
-        value[y,2]  = value[y,0] - value[y,1]         
+        value[y,2]  = value[y,0] - value[y,1]
         if Settings.years:
-            print '      Year ', Settings.years[y], ':   ', value[y,0], '     ', value[y,1], '     Diff= ', value[y,2]
+            yrout = Settings.years[y]
         else:
-            print '      Year Index ', y+1, ':   ', value[y,0], '     ', value[y,1], '     Diff= ', value[y,2]
+            yrout = y+1
             
- 
+        mainlog.write(
+            '      Year {}:   {}    {}    Diff= {}\n'.format(yrout, value[y,0],
+                                                             value[y,1], value[y,2]),
+                Logger.DEBUG)
     
     # Comprehensive Diagnostics information to file:
     
@@ -108,4 +119,5 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
     with open(OutputFilename, 'w') as outfile:   
         np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s')
             
-    print '------Diagnostics information is saved to:', OutputFilename
+    mainlog.write('------Diagnostics information is saved to: {}\n'.format(OutputFilename),
+                  Logger.DEBUG)

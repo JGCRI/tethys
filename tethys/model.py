@@ -13,8 +13,9 @@ call the function running water disaggregation
 import os
 import sys
 import time
+from datetime import datetime
 import tethys.DataReader.IniReader as IniReader
-from tethys.Utils.Logging import Logger
+import tethys.Utils.Logging as Logging
 from tethys.DataWriter.OUTWriter import OutWriter
 from tethys.run_disaggregation import run_disaggregation as disagg
 
@@ -33,8 +34,10 @@ class Tethys:
         self.settings = IniReader.getSimulatorSettings(config)
 
         # instantiate logger and log file
-        sys.stdout = Logger()
-        sys.stdout.log = open(self.settings.OutputFolder + "logfile.log", "w")
+        Logging._setmainlog(Logging.Logger(self.settings.Logger))
+        mainlog = Logging.Logger.getlogger()
+        mainlog.write('Log start\n',Logging.Logger.INFO)
+        mainlog.write(str(datetime.now())+'\n' , Logging.Logger.INFO)
 
         # write settings to log
         IniReader.PrintInfo(self.settings)
@@ -47,25 +50,26 @@ class Tethys:
         self.run_model()
 
         # clean up log
-        sys.stdout.log.close()
+        Logging._shutdown()
         
-        sys.stdout = sys.__stdout__
         print "Tethys ends."
 
     def run_model(self):
         """
         Execute the model and save the outputs.
         """
-        print('Start Disaggregation... ')
+        Logger = Logging.Logger
+        mainlog = Logger.getlogger()
+        mainlog.write('Start Disaggregation... \n', Logger.INFO)
         s1 = time.time()
         self.gridded_data, self.gis_data = self.Disaggregation(self.settings)
         e1= time.time()
-        print('End Disaggregation... ')
-        print("---Disaggregation: %s seconds ---" % (e1 - s1))
+        mainlog.write('End Disaggregation... \n', Logger.INFO)
+        mainlog.write("---Disaggregation: %s seconds ---\n" % (e1 - s1), Logger.INFO)
 
-        print('Saving outputs... ')
+        mainlog.write('Saving outputs...\n', Logger.INFO)
         self.OutWriter(self.settings, self.gridded_data, self.gis_data)
         e2 = time.time()
-        print("---Output: %s seconds ---" % (e2 - e1))
+        mainlog.write("---Output: %s seconds ---\n" % (e2 - e1), Logger.INFO)
 
-        print('End Project:   ', self.settings.ProjectName)
+        mainlog.write('End Project: %s\n'%self.settings.ProjectName, Logger.INFO)

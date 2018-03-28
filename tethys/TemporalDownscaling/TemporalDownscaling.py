@@ -29,12 +29,14 @@ import os, calendar
 import numpy as np
 from tethys.Utils.DataParser import getContentArray as ArrayCSVRead
 from NeighborBasin import NeighborBasin
+from tethys.Utils.Logging import Logger
 
 
 def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):    
-        
-    
     """Determine the temporal downscaling years"""
+
+    mainlog = Logger.getlogger()
+    
     startyear  = int(settings.TempMonthlyFile.split("_")[-2][:4])
     endyear    = int(settings.TempMonthlyFile.split("_")[-1][:4])
     TempYears  = range(startyear,endyear+1)
@@ -79,8 +81,9 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
         N = Temp_TDYears_Index.index(i)
         Temp_TDMonths_Index[N*12:(N+1)*12] = np.arange(i*12, (i+1)*12)
     
-    
-    print '------Temporal downscaling is available for Year:', TDYears
+
+    mainlog.write('------ Temporal downscaling is available for Year: {}\n'.format(TDYears),
+                  Logger.DEBUG)
     
     """Read input files"""
     dom              = {}
@@ -115,26 +118,18 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
     """Domestic"""
     OUT.twddom = Domestic_Temporal_Downscaling(dom, OUT.WDom, settings.TDYears)
     
-    print '------ Domestic Sector Finished'
-
     """Electricity"""
     OUT.twdelec = Electricity_Temporal_Downscaling(ele, OUT.WEle, settings.TDYears)
-    
-    print '------ Electricity Generation Sector Finished'
     
     """Irrigation"""
     OUT.twdirr = Irrigation_Temporal_Downscaling(irr, irrprofile, OUT.WIrr, settings.TDYears, basinID)
     
-    print '------ Irrigation Sector Finished'
-        
     """Livestock, Mining and Manufacturing"""
     
     OUT.twdliv = AnnualtoMontlyUniform(OUT.WLiv, TDYears)
     OUT.twdmin = AnnualtoMontlyUniform(OUT.WMin, TDYears)
     OUT.twdmfg = AnnualtoMontlyUniform(OUT.WMfg, TDYears)
     
-    print '------ Livestock, Mining and Manufacturing Sectors Finished'
-        
 
 def AnnualtoMontlyUniform(WD, years):
     """

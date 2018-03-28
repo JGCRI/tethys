@@ -11,6 +11,7 @@ Copyright (c) 2017, Battelle Memorial Institute
 import numpy as np
 from tethys.Utils.DataParser import getTXTContentArray as ArrayTXTRead
 from tethys.Utils.DataParser import getContentArray as ArrayCSVReader
+from tethys.Utils.Logging import Logger
 
 def getIrrYearData(settings):
     
@@ -23,6 +24,9 @@ def getIrrYearData(settings):
     G_years  = [2005]
     years    = [int(x) for x in settings.years]
     years_new= years[:]
+
+    mainlog = Logger.getlogger()
+    oldlvl = mainlog.setlevel(Logger.DEBUG)
     
     for i in range(0, len(years)):
         if years[i] < 2005:
@@ -36,7 +40,8 @@ def getIrrYearData(settings):
             if not str(years_new[i]) in irr:      
                 irr[str(years_new[i])] = HYDE_irr[:,H_years.index(years_new[i])]       
                 #irr[str(years_new[i])] = importHYDE(settings.irr1 + "HYDE/crop" + str(years_new[i]) + "AD.asc", settings.mapsize)
-            print '------Use HYDE ' + str(years_new[i]) + ' Irrigation Area Data for ' + str(years[i])       
+            mainlog.write('------Use HYDE ' + str(years_new[i]) + ' Irrigation Area Data for ' +
+                          str(years[i]) + '\n')
                                                               
         elif years[i] >= 2005:
             if years[i] >= max(G_years):
@@ -49,10 +54,13 @@ def getIrrYearData(settings):
             if not str(years_new[i]) in irr:
                 irr[str(years_new[i])] = GMIA_irr[:]        
                 #irr[str(years_new[i])] = importGMIA(settings.irr1 + "GMIA/gmia_v5_aei_ha.asc", settings.mapsize)
-            print '------Use FAO-GMIA ' + str(years_new[i]) + ' Irrigation Area Data for ' + str(years[i])  
+            mainlog.write('------Use FAO-GMIA ' + str(years_new[i]) + ' Irrigation Area Data for ' +
+                          str(years[i]) + '\n')
                 
     irr['years'] = years # years (integer) from settings
     irr['years_new'] = years_new # years to import irrigation data (integer) corresponding to years  
+
+    mainlog.setlevel(oldlvl)
     
     return irr
 
@@ -102,6 +110,9 @@ def getPopYearData(settings):
     years    = [int(x) for x in settings.years]
     years_new= years[:]
 
+    mainlog = Logger.getlogger()
+    oldlvl = mainlog.setlevel(Logger.DEBUG)
+
     for i in range(0, len(years)):
         if years[i] < 1990:
             if years[i] >= max(H_years):
@@ -114,7 +125,8 @@ def getPopYearData(settings):
             if not str(years_new[i]) in pop:
                 pop[str(years_new[i])] = HYDE_pop[:,H_years.index(years_new[i])]         
                 #pop[str(years_new[i])] = importHYDE(settings.pop + "HYDE/popc_" + str(years_new[i]) + "AD.asc", settings.mapsize, settings.mapIndex)
-            print '------Use HYDE ' + str(years_new[i]) + ' Population Data for ' + str(years[i])       
+            mainlog.write('------Use HYDE ' + str(years_new[i]) + ' Population Data for ' +
+                          str(years[i]) + '\n')
                                                               
         elif years[i] >= 1990:
             if years[i] >= max(G_years):
@@ -127,10 +139,13 @@ def getPopYearData(settings):
             if not str(years_new[i]) in pop: 
                 pop[str(years_new[i])] = GPW_pop[:,G_years.index(years_new[i])]             
                 #pop[str(years_new[i])] = importGPW(settings.pop + "GPW/popc_v3_" + str(years_new[i]) + ".asc", settings.mapsize, settings.mapIndex)
-            print '------Use GPW ' + str(years_new[i]) + ' Population Data for ' + str(years[i])  
+            mainlog.write('------Use GPW ' + str(years_new[i]) + ' Population Data for ' +
+                          str(years[i]) + '\n') 
                 
     pop['years'] = years # years (integer) from settings
-    pop['years_new'] = years_new # years to import population data (integer) corresponding to years                
+    pop['years_new'] = years_new # years to import population data (integer) corresponding to years
+
+    mainlog.setlevel(oldlvl)
                    
     return pop
 

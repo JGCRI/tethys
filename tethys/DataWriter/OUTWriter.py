@@ -9,6 +9,7 @@ Copyright (c) 2017, Battelle Memorial Institute
 
 import numpy as np
 from scipy import io as spio
+from tethys.Utils.Logging import Logger
 
 class OUTSettings():
 # Output file names
@@ -36,27 +37,37 @@ class OUTSettings():
         self.rliv     = None
         
 def OutWriter(Settings, OUT, GISData):
-     
+
+    mainlog = Logger.getlogger()
+    
     if Settings.OutputUnit:
         temp = 'mm'
     else:
         temp = 'km3'
     
     if Settings.OutputFormat == 1:
-        print 'Save the gridded water usage results for each withdrawal category in CSV format (Unit: '  + temp + '/yr)'
+        mainlog.write(
+            'Save the gridded water usage results for each withdrawal category in CSV format (Unit: '  +
+            temp + '/yr)\n', Logger.INFO)
            
     elif Settings.OutputFormat == 2:
-        print 'Save the gridded water usage results for each withdrawal category in NetCDF format (Unit: '  + temp + '/yr)'
+        mainlog.write(
+            'Save the gridded water usage results for each withdrawal category in NetCDF format (Unit: '  +
+            temp + '/yr)\n', Logger.INFO)
         
     else:
-        print 'Save the gridded water usage results for each withdrawal category in CSV and NetCDF format (Unit: '  + temp + '/yr)'
+        mainlog.write(
+            'Save the gridded water usage results for each withdrawal category in CSV and NetCDF format (Unit: '  +
+            temp + '/yr)\n', Logger.INFO)
     
     if Settings.PerformTemporal:
         TDMonthStr = np.chararray((len(Settings.TDYears)*12,), itemsize=6)
         for y in Settings.TDYears:
             N = Settings.TDYears.index(y)
             TDMonthStr[N*12:(N+1)*12] = [str(y) + str(i).zfill(2) for i in range(1,13)]
-        print 'Save the monthly water usage results for each withdrawal category (Unit: '  + temp + '/month)'
+        mainlog.write(
+            'Save the monthly water usage results for each withdrawal category (Unit: '  +
+            temp + '/month)\n', Logger.INFO)
         
           
     for attr, value in OUT.__dict__.iteritems():

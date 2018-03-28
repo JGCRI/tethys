@@ -18,7 +18,7 @@ import tethys.SpatialDownscaling.TotalWaterUse as TotalWaterUse
 import tethys.Diagnostics.Spatial as DiagnosticsSD
 import tethys.Diagnostics.Temporal as DiagnosticsTD
 import tethys.TemporalDownscaling.TemporalDownscaling as TemporalDownscaling
-
+from tethys.Utils.Logging import Logger
 
 def run_disaggregation(settings):
     '''
@@ -46,6 +46,9 @@ def run_disaggregation(settings):
     - OUT         class DataWriter.OUTWritter, data for output, gridded results for each withdrawal category
     '''
 
+    mainlog = Logger.getlogger()
+    oldlvl = mainlog.setlevel(Logger.INFO)
+    
     # initialize output parameters
     OUT = OUTSettings()
 
@@ -55,22 +58,22 @@ def run_disaggregation(settings):
     # c.    livestock tables
     # d.    Results of water withdrawals from GCAM by sectors and regions
     starttime1 = time.time() # Set-up timer
-    print '---Read in the GCAM data (csv format)---'
+    mainlog.write('---Read in the GCAM data (csv format)---\n')
     settings.setGCAMDataFiles() # set the GCAM data files
     GCAMData = getGCAMData(settings)
     endtime1 = time.time()
-    print("------Time Cost: %s seconds ---" % (endtime1 - starttime1))
+    mainlog.write("------Time Cost: %s seconds ---\n" % (endtime1 - starttime1))
 
     # e. Get the number of years
     settings.years = map(int, settings.years)
     if settings.years:
         settings.NY = len(settings.years)
-        print '---Number of years:', settings.NY
-        print '------', settings.years
+        mainlog.write('---Number of years: {}\n'.format(settings.NY))
+        mainlog.write('------ {}\n'.format(str(settings.years)))
     else:
         (_, size) = GCAMData['pop_tot'].shape
         settings.NY = size
-        print '---Number of years:', settings.NY
+        mainlog.write('---Number of years: {}\n'.format(settings.NY))
 
     # 2. Read in the GIS data
     # a.    Coordinates of grids
@@ -80,44 +83,45 @@ def run_disaggregation(settings):
     # e.    livestock maps
     # f.    mask shape files of GCAM regions, river basins, countries, states, etc.
 
-    print '---Read in the GIS data (asc/txt/csv format) and the region map data (csv format)---'
+    mainlog.write(
+        '---Read in the GIS data (asc/txt/csv format) and the region map data (csv format)---\n')
     GISData    = GISReader.getGISData(settings)
     rgnmapData = GISReader.getRegionMapData(settings.InputRegionFile)
     endtime2 = time.time()
-    print("------Time Cost: %s seconds ---" % (endtime2 - endtime1))
-    print '---Mapsize:', settings.mapsize
+    mainlog.write("------Time Cost: %s seconds ---\n" % (endtime2 - endtime1))
+    mainlog.write('---Mapsize: {}\n'.format(settings.mapsize))
 
     # 3. Rearranging data and map indices
     #    Rearrange all the input data into a common framework (from 2D to 1D)
-    print '---Rearranging data and map indices'
+    mainlog.write('---Rearranging data and map indices\n')
     Rearranging(settings.mapsize,GISData,rgnmapData)
     endtime3 = time.time()
-    print("------Time Cost: %s seconds ---" % (endtime3 - endtime2))
+    mainlog.write("------Time Cost: %s seconds ---\n" % (endtime3 - endtime2))
 
     # 4. Create proxy maps and downscale non-Agriculture (domestic, electricity, manufacturing and mining) water withdrawals to grid scale
     # a.    Create a population proxy map
-    print '---Create a population map as proxy of non-agricultural water withdrawals'
+    mainlog.write('---Create a population map as proxy of non-agricultural water withdrawals\n')
     ProxyMaps.PopulationMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings, OUT)
     endtime4 = time.time()
-    print("------Time Cost: %s seconds ---" % (endtime4 - endtime3))
+    mainlog.write("------Time Cost: %s seconds ---\n" % (endtime4 - endtime3))
 
     # b.    Create a livestock proxy map and downscale livestock water withdrawal to grid scale
-    print '---Create an livestock map as proxy of livestock water withdrawal'
+    mainlog.write('---Create an livestock map as proxy of livestock water withdrawal\n')
     ProxyMaps.LivestockMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT)
     endtime5 = time.time()
-    print("------Time Cost: %s seconds ---" % (endtime5 - endtime4))
+    mainlog.write("------Time Cost: %s seconds ---\n" % (endtime5 - endtime4))
 
     # c.    Create an irrigation proxy map and downscale irrigation water withdrawal to grid scale
-    print '---Create an irrigation map as proxy of agricultural water withdrawal'
+    mainlog.write('---Create an irrigation map as proxy of agricultural water withdrawal\n')
     ProxyMaps.IrrigationMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT)
     endtime6 = time.time()
-    print("------Time Cost: %s seconds ---" % (endtime6 - endtime5))
+    mainlog.write("------Time Cost: %s seconds ---\n" % (endtime6 - endtime5))
 
     # 5. Total Water Withdrawal
-    print '---Aggregate to compute total water withdrawal at grid scale'
+    mainlog.write('---Aggregate to compute total water withdrawal at grid scale\n')
     TotalWaterUse.TotalWaterUse(settings, GISData, rgnmapData, OUT)
     endtime7 = time.time()
-    print("------Time Cost: %s seconds ---" % (endtime7 - endtime6))
+    mainlog.write("------Time Cost: %s seconds ---\n" % (endtime7 - endtime6))
 
     # 6. Diagnostics of Spatial Downscaling
     if settings.PerformDiagnostics:
@@ -126,11 +130,12 @@ def run_disaggregation(settings):
 
     # 7. Temporal Downscaling
     if settings.PerformTemporal:
-        print '---Temporal downscaling for Domestic, Electricity, Irrigation, Livestock, Mining and Manufacturing'
+        mainlog.write(
+            '---Temporal downscaling for Domestic, Electricity, Irrigation, Livestock, Mining and Manufacturing\n')
         endtime6 = time.time()
         TemporalDownscaling.GetDownscaledResults(settings, OUT, GISData['mapindex'], rgnmapData['rgnmapNONAG'], GISData['BasinIDs'])
         endtime7 = time.time()
-        print("------Time Cost: %s seconds ---" % (endtime7 - endtime6))
+        mainlog.write("------Time Cost: %s seconds ---\n" % (endtime7 - endtime6))
 
     # 8. Diagnostics of Temporal Downscaling
     if settings.PerformDiagnostics and settings.PerformTemporal:
