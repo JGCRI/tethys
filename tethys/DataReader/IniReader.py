@@ -1,19 +1,19 @@
-'''
-@Date: 09/09/2017
-@author: Xinya Li (xinya.li@pnl.gov)
-@Project: Tethys V1.0
-
+"""
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 
 Get the simulator settings from configuration(*.ini) file
-'''
+
+@author: Xinya Li (xinya.li@pnl.gov)
+@Project: Tethys V1.0
+"""
 
 import os
 from configobj import ConfigObj
 from ConfigSettings import ConfigSettings
 from tethys.Utils.exceptions import FileNotFoundError, DirectoryNotFoundError
 from tethys.Utils.Logging import Logger
+
 
 def getSimulatorSettings(iniFile):
     
@@ -23,58 +23,64 @@ def getSimulatorSettings(iniFile):
     try:
         settings.Logger = config['Logger']
     except KeyError:
-        ## No logger configuration.  Supply a default one for backward
-        ## compatibility with old config files.
+        # No logger configuration.  Supply a default one for backward compatibility with old config files.
         settings.Logger = {'logdir':'logs',
                            'filename':'mainlog.txt'} 
-    
+
+    # project level params
     settings.ProjectName        = config['Project']['ProjectName']
-    settings.InputFolder        = AddSlashToDir(config['Project']['InputFolder'])
-    settings.OutputFolder       = AddSlashToDir(config['Project']['OutputFolder'])
-    settings.rgnmapdir          = AddSlashToDir(config['Project']['rgnmapdir'])
+    settings.InputFolder        = config['Project']['InputFolder']
+    settings.OutputFolder       = os.path.join(config['Project']['OutputFolder'], settings.ProjectName)
+    settings.rgnmapdir          = os.path.join(settings.InputFolder, config['Project']['rgnmapdir'])
     settings.OutputFormat       = int(config['Project']['OutputFormat'])
     settings.OutputUnit         = int(config['Project']['OutputUnit'])
     settings.PerformDiagnostics = int(config['Project']['PerformDiagnostics'])
     settings.PerformTemporal    = int(config['Project']['PerformTemporal'])
-    
+
+    # spatial params
     try:
         settings.SpatialResolution = float(config['Project']['SpatialResolution'])
     except:
         settings.SpatialResolution = 0.5
     settings.mapsize = [int(180/settings.SpatialResolution), int(360/settings.SpatialResolution)]
-    
-    settings.UseGCAMDatabase    = int(config['GCAM']['UseGCAMDatabase'])
+
+    # GCAM access settings
+    settings.UseGCAMDatabase         = int(config['GCAM']['UseGCAMDatabase'])
     if settings.UseGCAMDatabase:
-        settings.GCAM_DBpath         = AddSlashToDir(config['GCAM']['GCAM_DBpath'])
-        settings.GCAM_DBfile         = config['GCAM']['GCAM_DBfile']
-        settings.GCAM_query          = config['GCAM']['GCAM_query']
+        settings.GCAM_DBpath         = os.path.join(settings.InputFolder, config['GCAM']['GCAM_DBpath'])
+        settings.GCAM_DBfile         = os.path.join(settings.GCAM_DBpath, config['GCAM']['GCAM_DBfile'])
+        settings.GCAM_query          = os.path.join(settings.GCAM_DBpath, config['GCAM']['GCAM_query'])
         
     else:
         settings.read_irrS          = int(config['GCAM']['Read_irrS'])
         settings.years              = map(str, config['GCAM']['GCAM_Years'])
-    settings.GCAM_CSV          = AddSlashToDir(config['GCAM']['GCAM_CSV'])
-        
-    
-    settings.Area               = settings.InputFolder + config['GriddedMap']['Area']
-    settings.Coord              = settings.InputFolder + config['GriddedMap']['Coord']
-    settings.aez                = settings.InputFolder + config['GriddedMap']['AEZ']
-    settings.InputBasinFile     = settings.InputFolder + config['GriddedMap']['BasinIDs']
-    settings.BasinNames         = settings.InputFolder + config['GriddedMap']['BasinNames']
-    settings.InputRegionFile    = settings.InputFolder + config['GriddedMap']['RegionIDs']
-    settings.RegionNames        = settings.InputFolder + config['GriddedMap']['RegionNames']
-    settings.InputCountryFile   = settings.InputFolder + config['GriddedMap']['CountryIDs']
-    settings.CountryNames       = settings.InputFolder + config['GriddedMap']['CountryNames']
-    settings.Population_GPW     = settings.InputFolder + config['GriddedMap']['Population_GPW']
-    settings.Population_HYDE    = settings.InputFolder + config['GriddedMap']['Population_HYDE']
-    settings.Irrigation_GMIA    = settings.InputFolder + config['GriddedMap']['Irrigation_GMIA']
-    settings.Irrigation_HYDE    = settings.InputFolder + config['GriddedMap']['Irrigation_HYDE']
-    settings.Livestock_Buffalo  = settings.InputFolder + config['GriddedMap']['Livestock_Buffalo']
-    settings.Livestock_Cattle   = settings.InputFolder + config['GriddedMap']['Livestock_Cattle']
-    settings.Livestock_Goat     = settings.InputFolder + config['GriddedMap']['Livestock_Goat']
-    settings.Livestock_Sheep    = settings.InputFolder + config['GriddedMap']['Livestock_Sheep']
-    settings.Livestock_Poultry  = settings.InputFolder + config['GriddedMap']['Livestock_Poultry']
-    settings.Livestock_Pig      = settings.InputFolder + config['GriddedMap']['Livestock_Pig']
-    
+    settings.GCAM_CSV               = config['GCAM']['GCAM_CSV']
+
+    # reference data
+    settings.Area               = os.path.join(settings.InputFolder, config['GriddedMap']['Area'])
+    settings.Coord              = os.path.join(settings.InputFolder, config['GriddedMap']['Coord'])
+    settings.aez                = os.path.join(settings.InputFolder, config['GriddedMap']['AEZ'])
+    settings.InputBasinFile     = os.path.join(settings.InputFolder, config['GriddedMap']['BasinIDs'])
+    settings.BasinNames         = os.path.join(settings.InputFolder, config['GriddedMap']['BasinNames'])
+    settings.gcam_basin_lu      = os.path.join(settings.InputFolder, config['GriddedMap']['GCAM_Basin_Key'])
+    settings.InputRegionFile    = os.path.join(settings.InputFolder, config['GriddedMap']['RegionIDs'])
+    settings.RegionNames        = os.path.join(settings.InputFolder, config['GriddedMap']['RegionNames'])
+    settings.InputCountryFile   = os.path.join(settings.InputFolder, config['GriddedMap']['CountryIDs'])
+    settings.CountryNames       = os.path.join(settings.InputFolder, config['GriddedMap']['CountryNames'])
+    settings.Population_GPW     = os.path.join(settings.InputFolder, config['GriddedMap']['Population_GPW'])
+    settings.Population_HYDE    = os.path.join(settings.InputFolder, config['GriddedMap']['Population_HYDE'])
+    settings.Irrigation_GMIA    = os.path.join(settings.InputFolder, config['GriddedMap']['Irrigation_GMIA'])
+    settings.Irrigation_HYDE    = os.path.join(settings.InputFolder, config['GriddedMap']['Irrigation_HYDE'])
+    settings.Livestock_Buffalo  = os.path.join(settings.InputFolder, config['GriddedMap']['Livestock_Buffalo'])
+    settings.Livestock_Cattle   = os.path.join(settings.InputFolder, config['GriddedMap']['Livestock_Cattle'])
+    settings.Livestock_Goat     = os.path.join(settings.InputFolder, config['GriddedMap']['Livestock_Goat'])
+    settings.Livestock_Sheep    = os.path.join(settings.InputFolder, config['GriddedMap']['Livestock_Sheep'])
+    settings.Livestock_Poultry  = os.path.join(settings.InputFolder, config['GriddedMap']['Livestock_Poultry'])
+    settings.Livestock_Pig      = os.path.join(settings.InputFolder, config['GriddedMap']['Livestock_Pig'])
+    settings.buff_fract         = os.path.join(settings.InputFolder, config['GriddedMap']['Buffalo_Fraction'])
+    settings.goat_fract         = os.path.join(settings.InputFolder, config['GriddedMap']['Goat_Fraction'])
+    settings.irrigated_fract    = os.path.join(settings.InputFolder, config['GriddedMap']['Irrigated_Fract'])
+
     if settings.PerformTemporal:
         settings.TempMonthlyFile       = config['TemporalDownscaling']['Temp_Monthly']
         settings.HDDCDDMonthlyFile     = config['TemporalDownscaling']['HDD_CDD_Monthly']
@@ -91,6 +97,7 @@ def getSimulatorSettings(iniFile):
     
     return settings
 
+
 def PrintInfo(settings): 
 
     log = Logger.getlogger()
@@ -105,11 +112,6 @@ def PrintInfo(settings):
         log.write('GCAM CSV Folder     : {}\n'.format(settings.GCAM_CSV))
     log.write('Region Info Folder  : {}\n'.format(settings.rgnmapdir))
 
-def AddSlashToDir(string): 
-    
-    string = string.rstrip('/') + '/'
-    
-    return string
 
 def CheckExistence(settings): 
     """
@@ -157,5 +159,4 @@ def help():
     Module: DataReader.IniReader
     
     Read in configuration file (*.ini)
-     
     '''   
