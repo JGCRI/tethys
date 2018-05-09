@@ -127,7 +127,7 @@ def getColumn(filename, headerNum, column):
         finally:
             f.close()
     except IOError:
-        print "Fail to open file: ",filename
+        print("Fail to open file: {}".format(filename))
         pass
 
 def getColumnNum(filename, headerNum, column):

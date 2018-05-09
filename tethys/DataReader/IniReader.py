@@ -4,7 +4,7 @@ Copyright (c) 2017, Battelle Memorial Institute
 
 Get the simulator settings from configuration(*.ini) file
 
-@author: Xinya Li (xinya.li@pnl.gov)
+@author: Xinya Li (xinya.li@pnl.gov), Chris Vernon (chris.vernon@pnnl.gov)
 @Project: Tethys V1.0
 """
 

@@ -66,7 +66,7 @@ def run_disaggregation(settings):
     mainlog.write("------Time Cost: %s seconds ---\n" % (endtime1 - starttime1))
 
     # e. Get the number of years
-    settings.years = [int(i) for i in settings.years] 
+    settings.years = [int(i) for i in settings.years]
     if settings.years:
         settings.NY = len(settings.years)
         mainlog.write('---Number of years: {}\n'.format(settings.NY))
