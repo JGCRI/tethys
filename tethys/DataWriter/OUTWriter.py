@@ -79,7 +79,7 @@ def OutWriter(Settings, OUT, GISData):
 
         if value is not None:
             OutputFilename = os.path.join(Settings.OutputFolder, attr)
-            
+
             if attr[0] == "r": # regional output
                 newvalue   = value[:,:]
                 #with open(OutputFilename + '.csv', 'w') as outfile:
@@ -118,7 +118,7 @@ def writecsv(filename, data, Settings, unit, GISData):
 
     with open(filename + '.csv', 'w') as outfile: 
         newdata = np.append(GISData['coord'][:, :], data, axis=1)
-        np.savetxt(outfile, newdata, delimiter=',', header=headerline)
+        np.savetxt(outfile, newdata, delimiter=',', header=headerline, comments='')
 
 
 def writecsvMonthly(filename, data, MonthStr, unit, GISData):
@@ -128,7 +128,7 @@ def writecsvMonthly(filename, data, MonthStr, unit, GISData):
 
     with open(filename + '.csv', 'w') as outfile: 
         newdata = np.append(GISData['coord'][:, :], data, axis=1)
-        np.savetxt(outfile, newdata, delimiter=',', header=headerline)
+        np.savetxt(outfile, newdata, delimiter=',', header=headerline, comments='')
 
 
 def writeNETCDF(filename, data, GISData, unit, yearstrs):
