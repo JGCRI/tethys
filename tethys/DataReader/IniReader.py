@@ -10,7 +10,7 @@ Get the simulator settings from configuration(*.ini) file
 
 import os
 from configobj import ConfigObj
-from ConfigSettings import ConfigSettings
+from tethys.DataReader.ConfigSettings import ConfigSettings
 from tethys.Utils.exceptions import FileNotFoundError, DirectoryNotFoundError
 from tethys.Utils.Logging import Logger
 
@@ -31,11 +31,12 @@ def getSimulatorSettings(iniFile):
     settings.ProjectName        = config['Project']['ProjectName']
     settings.InputFolder        = config['Project']['InputFolder']
     settings.OutputFolder       = os.path.join(config['Project']['OutputFolder'], settings.ProjectName)
-    settings.rgnmapdir          = os.path.join(settings.InputFolder, config['Project']['rgnmapdir'])
+    settings.rgnmapdir          = config['Project']['rgnmapdir']
     settings.OutputFormat       = int(config['Project']['OutputFormat'])
     settings.OutputUnit         = int(config['Project']['OutputUnit'])
     settings.PerformDiagnostics = int(config['Project']['PerformDiagnostics'])
     settings.PerformTemporal    = int(config['Project']['PerformTemporal'])
+    settings.subreg             = int(config['Project']['subreg'])
 
     # spatial params
     try:
@@ -48,13 +49,14 @@ def getSimulatorSettings(iniFile):
     settings.UseGCAMDatabase         = int(config['GCAM']['UseGCAMDatabase'])
     if settings.UseGCAMDatabase:
         settings.GCAM_DBpath         = os.path.join(settings.InputFolder, config['GCAM']['GCAM_DBpath'])
-        settings.GCAM_DBfile         = os.path.join(settings.GCAM_DBpath, config['GCAM']['GCAM_DBfile'])
+        settings.GCAM_DBfile         = config['GCAM']['GCAM_DBfile']
         settings.GCAM_query          = os.path.join(settings.GCAM_DBpath, config['GCAM']['GCAM_query'])
         
     else:
         settings.read_irrS          = int(config['GCAM']['Read_irrS'])
-        settings.years              = map(str, config['GCAM']['GCAM_Years'])
-    settings.GCAM_CSV               = config['GCAM']['GCAM_CSV']
+        settings.GCAM_CSV = config['GCAM']['GCAM_CSV']
+
+    settings.years              = config['GCAM']['GCAM_Years'] 
 
     # reference data
     settings.Area               = os.path.join(settings.InputFolder, config['GriddedMap']['Area'])
@@ -126,8 +128,8 @@ def CheckExistence(settings):
     if not (os.path.exists(settings.rgnmapdir) and os.path.isdir(settings.rgnmapdir)):
         raise DirectoryNotFoundError(settings.rgnmapdir)
 
-    if settings.UseGCAMDatabase and not (os.path.exists(settings.GCAM_CSV) and os.path.isdir(settings.GCAM_CSV)):
-        raise DirectoryNotFoundError(settings.GCAM_CSV)
+    # if settings.UseGCAMDatabase and not (os.path.exists(settings.GCAM_CSV) and os.path.isdir(settings.GCAM_CSV)):
+    #     raise DirectoryNotFoundError(settings.GCAM_CSV)
         
     # Check the existence of input files
     strlist = ['Area', 'Coord', 'aez', 'InputBasinFile', 'BasinNames', 'InputRegionFile', 'RegionNames', 'InputCountryFile', \
