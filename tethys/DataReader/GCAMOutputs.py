@@ -69,7 +69,7 @@ def get_basin_info(f):
     return pd.read_csv(f, usecols=['glu_name', 'basin_id'], index_col='glu_name').to_dict()['basin_id']
 
 
-def get_gcam_queries(db_path, db_file, f_queries):
+def get_gcam_queries(db_path, db_file, f_queries, subreg):
     """
     Return available queries from GCAM database.
 
@@ -78,9 +78,16 @@ def get_gcam_queries(db_path, db_file, f_queries):
     :param f_queries:       full path to the XML query file
     :return:                gcam_reader db and queries objects
     """
+    # set basex version
+    if subreg == 0:
+        vx = '8.5.3'
+    elif subreg == 1:
+        vx = '8.6.7'
+    else:
+        vx = '8.5.3'
 
     # instantiate GCAM db
-    c = gcam_reader.LocalDBConn(db_path, db_file, suppress_gabble=False)
+    c = gcam_reader.LocalDBConn(db_path, db_file, version=vx, suppress_gabble=False)
 
     # get queries
     q = gcam_reader.parse_batch_query(f_queries)
