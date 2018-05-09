@@ -11,7 +11,9 @@ Copyright (c) 2017, Battelle Memorial Institute
 Perform diagnostics to ensure that the spatially downscaled results and initial aggregate results from GCAM are Consistent
 """
 
+import os
 import numpy as np
+import pandas as pd
 from tethys.DataWriter.OUTWriter import OUTSettings
 from tethys.Utils.Logging import Logger
     
@@ -55,11 +57,13 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
     
     headerline = ",".join(Sector) + "," + ",".join([prefix + s + Unit for prefix in group for s in category ])
     extension = '.csv'  
-    OutputFilename = Settings.OutputFolder + 'Diagnostics_Spatial_Downscaling' + extension   
-    
-    Regions    = Settings.regions_ordered
+    OutputFilename = os.path.join(Settings.OutputFolder, 'Diagnostics_Spatial_Downscaling{}'.format(extension))
+
+    Regions    = pd.read_csv(Settings.RegionNames, index_col=' region_id').to_dict()['region']
     NR         = len(Regions)
-    Regions.insert(0,'Global') # Add "Global" to regions
+
+    # Regions.insert(0, 'Global') # Add "Global" to regions
+    Regions[0] = 'Global'
     Years      = Settings.years    
     Population = GCAMData['pop_tot']/1e6
     # Add Global data to all
@@ -76,6 +80,7 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
     GCAMOUT    = OUTSettings()
     wdliv      = np.zeros((NR,NY), dtype=float)
     irrV       = np.zeros((NR,NY), dtype=float)
+
     for IN in range(0, NR):
         wdliv[IN,:] = GCAMData['wdliv'][0*NR+IN,:] + GCAMData['wdliv'][1*NR+IN,:] + GCAMData['wdliv'][2*NR+IN,:] + \
                       GCAMData['wdliv'][3*NR+IN,:] + GCAMData['wdliv'][4*NR+IN,:] + GCAMData['wdliv'][5*NR+IN,:]
@@ -94,10 +99,9 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
     GCAMOUT.rmin   = np.vstack([sum(GCAMData['rgn_wdmining']), GCAMData['rgn_wdmining']])
     GCAMOUT.rirr   = np.vstack([sum(irrV), irrV])
     GCAMOUT.rliv   = np.vstack([sum(wdliv), wdliv])
-    
-    
+
     values   = [] # 'Year', 'Region ID', 'Region Name', 'GCAM Population (millions)' and all the category*group
-    for j in range(0,NY):
+    for j in range(0, NY):
         for i in range(0, NR+1):            
             
             DS   = np.array([OUT.rdom[i,j], OUT.relec[i,j], OUT.rmfg[i,j], OUT.rmin[i,j], OUT.rliv[i,j], OUT.rirr[i,j], 
@@ -117,7 +121,6 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
     values = np.array(values)
 
     with open(OutputFilename, 'w') as outfile:   
-        np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s')
+        np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s', comments='')
             
-    mainlog.write('------Diagnostics information is saved to: {}\n'.format(OutputFilename),
-                  Logger.DEBUG)
+    mainlog.write('------Diagnostics information is saved to: {}\n'.format(OutputFilename), Logger.DEBUG)
