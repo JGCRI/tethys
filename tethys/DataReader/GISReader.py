@@ -24,8 +24,8 @@ from scipy import io as spio
 #from netCDF4 import Dataset
 from tethys.Utils.DataParser import GetArrayCSV, GetArrayTXT
 from tethys.Utils.DataParser import getContentArray as ArrayCSVRead
-from HistPopIrrData import getPopYearData as GetPopData
-from HistPopIrrData import getIrrYearData as GetIrrData
+from tethys.DataReader.HistPopIrrData import getPopYearData as GetPopData
+from tethys.DataReader.HistPopIrrData import getIrrYearData as GetIrrData
 from tethys.Utils.exceptions import FileNotFoundError
 
 
