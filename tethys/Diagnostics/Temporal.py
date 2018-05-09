@@ -41,7 +41,6 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
         '---Temporal Downscaling Diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)\n',
         Logger.DEBUG)
     
-    
     mainlog.write('------Irrigation------\n')
     W = OUT.WIrr[:,:]
     value   = np.zeros((NY,3), dtype=float)
@@ -75,13 +74,13 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
             data = [str(j), str(i+1), BasinNames[i]] + ["%.3f" % W_basin[i,N]] + ["%.3f" % Wtd_basin[i,N]] + ["%.3f" % (W_basin[i,N] - Wtd_basin[i,N])]
             values.append(data) 
                 
-    with open(Settings.OutputFolder + 'Diagnostics_Temporal_Downscaling_Irrigation.csv', 'w') as outfile:   
-        np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s')
+    with open(os.path.join(Settings.OutputFolder, 'Diagnostics_Temporal_Downscaling_Irrigation.csv'), 'w') as outfile:
+        np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s', comments='')
         
         
         
     mainlog.write('------Domestic------\n', Logger.DEBUG)
-    W = OUT.WDom[:,:]
+    W = OUT.WDom[:, :]
     value   = np.zeros((NY,3), dtype=float)
     for j in years: 
         N = years.index(j)
@@ -110,7 +109,8 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
             Logger.DEBUG)
 
     Electricity_TD__Diagnostics_Plot(OUT.twdelec, GISData, Settings.OutputFolder)
-    
+
+
 def Electricity_TD__Diagnostics_Plot(data, GISData, OutputFolder):
     # Aggregate data into country scale and get the mean for each month of 12 months
     CountryIDs = GISData['CountryIDs']
@@ -213,9 +213,10 @@ def Electricity_TD__Diagnostics_Plot(data, GISData, OutputFolder):
     # Add legend
     ax8.legend(['Simulated', 'Observed'],loc='lower center', bbox_to_anchor=(0.5, -0.05),fontsize = 6, frameon=False)
     plt.tight_layout()
-    fig.savefig(OutputFolder + 'Diagnostics_Temporal_Downscaling_Electricity' + '.png', dpi=300)
+    fig.savefig(os.path.join(OutputFolder, 'Diagnostics_Temporal_Downscaling_Electricity.png'), dpi=300)
     plt.close(fig)
-    
+
+
 def Domestic_TD__Diagnostics_Plot(data, GISData, OutputFolder):
     # obv_dom.csv is in the reference folder
     obv_dom_data_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'reference/obv_dom.csv')
@@ -296,5 +297,5 @@ def Domestic_TD__Diagnostics_Plot(data, GISData, OutputFolder):
     #Add legend
     ax4.legend(['Simulated', 'Observed'],loc='lower center', bbox_to_anchor=(0.5, -1.0),fontsize = 6, frameon=False)
     plt.tight_layout()
-    fig.savefig(OutputFolder + 'Diagnostics_Temporal_Downscaling_Domestic' + '.png', dpi=300)
+    fig.savefig(os.path.join(OutputFolder, 'Diagnostics_Temporal_Downscaling_Domestic.png'), dpi=300)
     plt.close(fig)
