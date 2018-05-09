@@ -11,6 +11,7 @@ import numpy as np
 from scipy import io as spio
 from tethys.Utils.Logging import Logger
 
+
 class OUTSettings():
 # Output file names
 
@@ -35,7 +36,8 @@ class OUTSettings():
         self.rmin     = None
         self.rirr     = None
         self.rliv     = None
-        
+
+
 def OutWriter(Settings, OUT, GISData):
 
     mainlog = Logger.getlogger()
@@ -68,9 +70,10 @@ def OutWriter(Settings, OUT, GISData):
         mainlog.write(
             'Save the monthly water usage results for each withdrawal category (Unit: '  +
             temp + '/month)\n', Logger.INFO)
-        
-          
-    for attr, value in OUT.__dict__.iteritems():
+
+    for attr in OUT.__dict__.keys():
+        value = OUT.__dict__[attr]
+
         if value is not None:
             OutputFilename = Settings.OutputFolder + attr
             if attr[0] == "r": # regional output
@@ -92,27 +95,35 @@ def OutWriter(Settings, OUT, GISData):
             elif attr[0] == "t": # temporal downscaling output
                 if Settings.OutputFormat == 1:
                     writecsvMonthly(OutputFilename, value, TDMonthStr, temp, GISData)
+
                 elif Settings.OutputFormat == 2:
                     writeNETCDFmonthly(OutputFilename + '.nc', value, GISData, temp, TDMonthStr)
+
                 else:
                     writecsvMonthly(OutputFilename, value, TDMonthStr, temp, GISData)    
                     writeNETCDFmonthly(OutputFilename + '.nc', value, GISData, temp, TDMonthStr)
-                    
+
+
 def writecsv(filename, data, Settings, unit, GISData):
-    unit       = "Unit(" + unit + "/yr)"
+    unit = "Unit(" + unit + "/yr)"
+
     if Settings.years:
         headerline = "ID,lon,lat,ilon,ilat," + ",".join([str(year) for year in Settings.years]) + "," + unit
     else:
         headerline = "ID,lon,lat,ilon,ilat," + ",".join(["Year Index " + str(y+1) for y in range(0, data.shape[1])]) + "," + unit
+
     with open(filename + '.csv', 'w') as outfile: 
-        newdata = np.append(GISData['coord'][:,:],data, axis = 1)
+        newdata = np.append(GISData['coord'][:, :], data, axis=1)
         np.savetxt(outfile, newdata, delimiter=',', header=headerline)
 
+
 def writecsvMonthly(filename, data, MonthStr, unit, GISData):
-    unit       = "Unit(" + unit + "/month)"
-    headerline = "ID,lon,lat,ilon,ilat," + ",".join([k for k in MonthStr]) + "," + unit
+    unit = 'Unit({}/month)'.format(unit)
+    mth_str = ','.join(map(bytes.decode, MonthStr))
+    headerline = "ID,lon,lat,ilon,ilat," + mth_str + "," + unit
+
     with open(filename + '.csv', 'w') as outfile: 
-        newdata = np.append(GISData['coord'][:,:],data, axis = 1)
+        newdata = np.append(GISData['coord'][:, :], data, axis=1)
         np.savetxt(outfile, newdata, delimiter=',', header=headerline)
 
 
@@ -132,7 +143,7 @@ def writeNETCDF(filename, data, GISData, unit, yearstrs):
 
     #Attributes
     #datagrp.description = ''
-    
+
     # dimensions
     datagrp.createDimension('index', nrows)
     datagrp.createDimension('year', ncols)    
@@ -166,7 +177,8 @@ def writeNETCDF(filename, data, GISData, unit, yearstrs):
     
     # close
     datagrp.close()
-    
+
+
 def writeNETCDFmonthly(filename, data, GISData, unit, monthstrs):
     '''
     # Input:
