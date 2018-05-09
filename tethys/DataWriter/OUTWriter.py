@@ -109,24 +109,23 @@ def OutWriter(Settings, OUT, GISData):
 
 
 def writecsv(filename, data, Settings, unit, GISData):
-    unit = "Unit(" + unit + "/yr)"
 
     if Settings.years:
-        headerline = "ID,lon,lat,ilon,ilat," + ",".join([str(year) for year in Settings.years]) + "," + unit
+        headerline = "ID,lon,lat,ilon,ilat," + ",".join([str(year) for year in Settings.years])
     else:
-        headerline = "ID,lon,lat,ilon,ilat," + ",".join(["Year Index " + str(y+1) for y in range(0, data.shape[1])]) + "," + unit
+        headerline = "ID,lon,lat,ilon,ilat," + ",".join(["Year Index " + str(y+1) for y in range(0, data.shape[1])])
 
-    with open(filename + '.csv', 'w') as outfile: 
+    with open('{}_{}peryr.csv'.format(filename, unit), 'w') as outfile:
         newdata = np.append(GISData['coord'][:, :], data, axis=1)
         np.savetxt(outfile, newdata, delimiter=',', header=headerline, comments='')
 
 
 def writecsvMonthly(filename, data, MonthStr, unit, GISData):
-    unit = 'Unit({}/month)'.format(unit)
-    mth_str = ','.join(map(bytes.decode, MonthStr))
-    headerline = "ID,lon,lat,ilon,ilat," + mth_str + "," + unit
 
-    with open(filename + '.csv', 'w') as outfile: 
+    mth_str = ','.join(map(bytes.decode, MonthStr))
+    headerline = "ID,lon,lat,ilon,ilat," + mth_str
+
+    with open('{}_{}permonth.csv'.format(filename, unit), 'w') as outfile:
         newdata = np.append(GISData['coord'][:, :], data, axis=1)
         np.savetxt(outfile, newdata, delimiter=',', header=headerline, comments='')
 
