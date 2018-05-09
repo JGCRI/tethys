@@ -7,13 +7,16 @@ License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 """
 
+import os
 import numpy as np
 from scipy import io as spio
 from tethys.Utils.Logging import Logger
 
 
 class OUTSettings():
-# Output file names
+    """
+    Output file names
+    """
 
     def __init__(self):
         
@@ -49,17 +52,17 @@ def OutWriter(Settings, OUT, GISData):
     
     if Settings.OutputFormat == 1:
         mainlog.write(
-            'Save the gridded water usage results for each withdrawal category in CSV format (Unit: '  +
+            'Save the gridded water usage results for each withdrawal category in CSV format (Unit: ' +
             temp + '/yr)\n', Logger.INFO)
            
     elif Settings.OutputFormat == 2:
         mainlog.write(
-            'Save the gridded water usage results for each withdrawal category in NetCDF format (Unit: '  +
+            'Save the gridded water usage results for each withdrawal category in NetCDF format (Unit: ' +
             temp + '/yr)\n', Logger.INFO)
         
     else:
         mainlog.write(
-            'Save the gridded water usage results for each withdrawal category in CSV and NetCDF format (Unit: '  +
+            'Save the gridded water usage results for each withdrawal category in CSV and NetCDF format (Unit: ' +
             temp + '/yr)\n', Logger.INFO)
     
     if Settings.PerformTemporal:
@@ -68,14 +71,15 @@ def OutWriter(Settings, OUT, GISData):
             N = Settings.TDYears.index(y)
             TDMonthStr[N*12:(N+1)*12] = [str(y) + str(i).zfill(2) for i in range(1,13)]
         mainlog.write(
-            'Save the monthly water usage results for each withdrawal category (Unit: '  +
+            'Save the monthly water usage results for each withdrawal category (Unit: ' +
             temp + '/month)\n', Logger.INFO)
 
     for attr in OUT.__dict__.keys():
         value = OUT.__dict__[attr]
 
         if value is not None:
-            OutputFilename = Settings.OutputFolder + attr
+            OutputFilename = os.path.join(Settings.OutputFolder, attr)
+            
             if attr[0] == "r": # regional output
                 newvalue   = value[:,:]
                 #with open(OutputFilename + '.csv', 'w') as outfile:
