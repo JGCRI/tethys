@@ -8,10 +8,9 @@ Copyright (c) 2017, Battelle Memorial Institute
 
 """
 
-import numpy as np
-from tethys.Utils.DataParser import getTXTContentArray as ArrayTXTRead
 from tethys.Utils.DataParser import getContentArray as ArrayCSVReader
 from tethys.Utils.Logging import Logger
+
 
 def getIrrYearData(settings):
     
@@ -64,38 +63,6 @@ def getIrrYearData(settings):
     
     return irr
 
-# def importHYDE(filename, mapsize):
-#     
-#     orig = ArrayTXTRead(filename,6)
-#     orig[orig == -9999] = 0
-#     new  = np.zeros(mapsize, dtype=float)
-#     for i in range(0, mapsize[0]):
-#         for j in range(0, mapsize[1]):
-#             new[mapsize[0]-1-i,j] = np.sum(orig[i*6:i*6+6,j*6:j*6+6])
-#     
-#     return new
-#     
-#     
-# def importGMIA(filename, mapsize):
-#     
-#     orig = ArrayTXTRead(filename,6)
-#     orig[orig == -9] = 0
-#     new  = np.zeros(mapsize, dtype=float)
-#     for i in range(0, mapsize[0]):
-#         for j in range(0, mapsize[1]):
-#             new[mapsize[0]-1-i,j] = np.sum(orig[i*6:i*6+6,j*6:j*6+6])*0.01 # ha to km2
-#             
-#     return new
-# 
-# 
-# def import2000(filename, mapsize):
-#     
-#     orig = ArrayTXTRead(filename,0)
-#     new  = np.zeros(mapsize, dtype=float)
-#     for i in range(0, orig.shape[0]):
-#         new[i,:] = orig[orig.shape[0]-1-i,:]
-#             
-#     return new
 
 def getPopYearData(settings):
     
@@ -148,32 +115,3 @@ def getPopYearData(settings):
     mainlog.setlevel(oldlvl)
                    
     return pop
-
-# def importHYDE(filename, mapsize):
-#     
-#     orig = ArrayTXTRead(filename,6)
-#     orig[orig == -9999] = 0
-#     new  = np.zeros(mapsize, dtype=float)
-#     for i in range(0, mapsize[0]):
-#         for j in range(0, mapsize[1]):
-#             new[mapsize[0]-1-i,j] = np.sum(orig[i*6:i*6+6,j*6:j*6+6])
-#     
-#     return new
-#     
-# def importGPW(filename, mapsize):
-#     
-#     orig = ArrayTXTRead(filename,6) 
-#     new  = np.zeros(mapsize, dtype=float)
-#     for i in range(0, orig.shape[0]):
-#         new[i+64,:] = orig[orig.shape[0]-1-i,:]
-#             
-#     return new
-# 
-# def importWRI2000(filename, mapsize):
-#     
-#     orig = ArrayTXTRead(filename,6) 
-#     new  = np.zeros(mapsize, dtype=float)
-#     for i in range(0, orig.shape[0]):
-#         new[i+69,:] = orig[orig.shape[0]-1-i,:]
-#             
-#     return new   

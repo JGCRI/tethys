@@ -9,7 +9,7 @@ Copyright (c) 2017, Battelle Memorial Institute
 """
 
 import time
-from tethys.DataReader.GCAMOutputs import getGCAMData
+from tethys.DataReader.GCAMOutputs import get_gcam_data
 from tethys.DataReader import GISReader
 from tethys.DataWriter.OUTWriter import OUTSettings
 from tethys.SpatialDownscaling.ProxyMaps import Rearranging
@@ -19,6 +19,7 @@ import tethys.Diagnostics.Spatial as DiagnosticsSD
 import tethys.Diagnostics.Temporal as DiagnosticsTD
 import tethys.TemporalDownscaling.TemporalDownscaling as TemporalDownscaling
 from tethys.Utils.Logging import Logger
+
 
 def run_disaggregation(settings):
     '''
@@ -58,14 +59,14 @@ def run_disaggregation(settings):
     # c.    livestock tables
     # d.    Results of water withdrawals from GCAM by sectors and regions
     starttime1 = time.time() # Set-up timer
-    mainlog.write('---Read in the GCAM data (csv format)---\n')
-    settings.setGCAMDataFiles() # set the GCAM data files
-    GCAMData = getGCAMData(settings)
+    mainlog.write('---Read in and format GCAM data---\n')
+
+    GCAMData = get_gcam_data(settings)
     endtime1 = time.time()
     mainlog.write("------Time Cost: %s seconds ---\n" % (endtime1 - starttime1))
 
     # e. Get the number of years
-    settings.years = map(int, settings.years)
+    settings.years = [int(i) for i in settings.years]
     if settings.years:
         settings.NY = len(settings.years)
         mainlog.write('---Number of years: {}\n'.format(settings.NY))
@@ -98,7 +99,8 @@ def run_disaggregation(settings):
     endtime3 = time.time()
     mainlog.write("------Time Cost: %s seconds ---\n" % (endtime3 - endtime2))
 
-    # 4. Create proxy maps and downscale non-Agriculture (domestic, electricity, manufacturing and mining) water withdrawals to grid scale
+    # 4. Create proxy maps and downscale non-Agriculture (domestic, electricity, manufacturing and mining) water
+    #    withdrawals to grid scale
     # a.    Create a population proxy map
     mainlog.write('---Create a population map as proxy of non-agricultural water withdrawals\n')
     ProxyMaps.PopulationMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings, OUT)
@@ -127,7 +129,6 @@ def run_disaggregation(settings):
     if settings.PerformDiagnostics:
         DiagnosticsSD.compare_downscaled_GCAMinput(settings, GCAMData, OUT)
 
-
     # 7. Temporal Downscaling
     if settings.PerformTemporal:
         mainlog.write(
@@ -140,6 +141,5 @@ def run_disaggregation(settings):
     # 8. Diagnostics of Temporal Downscaling
     if settings.PerformDiagnostics and settings.PerformTemporal:
         DiagnosticsTD.compare_temporal_downscaled(settings, OUT, GISData)
-
 
     return OUT, GISData

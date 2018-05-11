@@ -10,12 +10,11 @@ This is the Tethys class of showing how to evaluate the input settings and
 call the function running water disaggregation
 """
 
-import os
-import sys
 import time
 from datetime import datetime
-import tethys.DataReader.IniReader as IniReader
 import tethys.Utils.Logging as Logging
+
+from tethys.DataReader.IniReader import Settings
 from tethys.DataWriter.OUTWriter import OutWriter
 from tethys.run_disaggregation import run_disaggregation as disagg
 
@@ -23,24 +22,22 @@ from tethys.run_disaggregation import run_disaggregation as disagg
 class Tethys:
 
     def __init__(self, config='config.ini'):
-        
-        print "Tethys starts..."
-        
+
         # instantiate functions
         self.Disaggregation = disagg
         self.OutWriter = OutWriter
 
         # compile config file
-        self.settings = IniReader.getSimulatorSettings(config)
+        self.settings = Settings(config)
 
         # instantiate logger and log file
         Logging._setmainlog(Logging.Logger(self.settings.Logger))
         mainlog = Logging.Logger.getlogger()
-        mainlog.write('Log start\n',Logging.Logger.INFO)
-        mainlog.write(str(datetime.now())+'\n' , Logging.Logger.INFO)
+        mainlog.write('Log start\n', Logging.Logger.INFO)
+        mainlog.write(str(datetime.now()) + '\n', Logging.Logger.INFO)
 
         # write settings to log
-        IniReader.PrintInfo(self.settings)
+        self.settings.print_info()
 
         # instantiate output variables for model run
         self.gridded_data = None
@@ -51,8 +48,6 @@ class Tethys:
 
         # clean up log
         Logging._shutdown()
-        
-        print "Tethys ends."
 
     def run_model(self):
         """
