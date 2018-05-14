@@ -124,7 +124,7 @@ def population_to_array(conn, query, d_reg_name, years):
     return piv.as_matrix() * 1000
 
 
-def irr_water_demand_to_array(conn, query, subreg, d_basin_name, d_crops, years):
+def irr_water_demand_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years):
     """
     Query GCAM database for irrigated water demand (billion m3).  Place
     in format required by Tethys.
@@ -490,7 +490,7 @@ def get_gcam_data(s):
     d_goat_frac = get_goat_frac(s.goat_fract)
 
     # get GCAM database connection and queries objects
-    conn, queries = get_gcam_queries(s.GCAM_DBpath, s.GCAM_DBfile, s.GCAM_query)
+    conn, queries = get_gcam_queries(s.GCAM_DBpath, s.GCAM_DBfile, s.GCAM_query, s.subreg)
 
     d = {}
     d['pop_tot']      = population_to_array(conn, queries[1], d_reg_name, years)
@@ -500,6 +500,6 @@ def get_gcam_data(s):
     d['rgn_wdmining'] = mining_water_demand_to_array(conn, queries[7], d_reg_name, years)
     d['wdliv']        = livestock_water_demand_to_array(conn, queries[5], d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years)
     d['irrArea']      = land_to_array(conn, queries[0], s.subreg, d_reg_name, d_basin_name, d_crops, years)
-    d['irrV']         = irr_water_demand_to_array(conn, queries[2], s.subreg, d_basin_name, d_crops, years)
+    d['irrV']         = irr_water_demand_to_array(conn, queries[2], s.subreg, d_reg_name, d_basin_name, d_crops, years)
 
     return d
