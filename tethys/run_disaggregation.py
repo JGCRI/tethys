@@ -115,7 +115,7 @@ def run_disaggregation(settings):
 
     # c.    Create an irrigation proxy map and downscale irrigation water withdrawal to grid scale
     mainlog.write('---Create an irrigation map as proxy of agricultural water withdrawal\n')
-    ProxyMaps.IrrigationMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT)
+    ProxyMaps.IrrigationMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT, settings.subreg)
     endtime6 = time.time()
     mainlog.write("------Time Cost: %s seconds ---\n" % (endtime6 - endtime5))
 
