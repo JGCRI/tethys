@@ -212,35 +212,37 @@ def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
     mainlog.setlevel(oldlvl)
     return withd_liv_map
 
-
     
-def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
+def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
 
     mainlog = Logger.getlogger()
     
-# Need to downscale the agricultural water withdrawal data for GCAM years
-# using the existing map of areas equipped with irrigation as a proxy for disaggregation from
-# AEZ to grid scale CHALLENGE: where to add new agricultural lands
+    # Need to downscale the agricultural water withdrawal data for GCAM years
+    # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
+    # AEZ to grid scale CHALLENGE: where to add new agricultural lands
     
     mapAreaExt = GISData['mapAreaExt'] # float, unit is km2
 
-# STEP 1: read in AEZ grid map AEZ map to match the aggregate withdrawal by GCAM, this loop reads
-# the ascii data and rearranges in right format and omits missing data -9999
-    
-    mapAEZ     = np.zeros(mapAreaExt.shape, dtype = int)
-    mapAEZ[GISData['mapindex']] = GISData['aez']
-    naez    = np.amax(mapAEZ)
+    # STEP 1: read in AEZ grid map AEZ map to match the aggregate withdrawal by GCAM, this loop reads
+    # the ascii data and rearranges in right format and omits missing data -9999
+    mapAEZ = np.zeros(mapAreaExt.shape, dtype=int)
 
-# STEP 2: calculate the total amount of irrigated lands in each GCAM region from the GCAM output files.
-# The irrArea file from GCAM has the format:      
-# 1: GCAM regions 1-nrgn
-# 2: AEZs 1-18
-# 3: crops 1-17
-# 4 .. nyear+3: values for GCAM output years
-# We are going to reorganize this into irrArea(rgn,aez,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
+    if subreg == 0:
+        mapAEZ[GISData['mapindex']] = GISData['aez']
+    elif subreg == 1:
+        mapAEZ[GISData['mapindex']] = GISData['BasinIDs']
 
-    nrgnAG  = rgnmapData['nrgnAG']
-    r1        = SizeR(GCAMData['irrArea'])
+    naez = np.amax(mapAEZ)
+
+    # STEP 2: calculate the total amount of irrigated lands in each GCAM region from the GCAM output files.
+    # The irrArea file from GCAM has the format:
+    # 1: GCAM regions 1-nrgn
+    # 2: AEZs 1-18
+    # 3: crops 1-17
+    # 4 .. nyear+3: values for GCAM output years
+    # We are going to reorganize this into irrArea(rgn,aez,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
+    nrgnAG = rgnmapData['nrgnAG']
+    r1 = SizeR(GCAMData['irrArea'])
     try:
         r2    = SizeR(GCAMData['irrShare'])
         q2    = SizeC(GCAMData['irrShare'])
@@ -251,16 +253,16 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
     ncrops    = max(max(GCAMData['irrArea'][:,2].astype(int)),max(GCAMData['irrV'][:,2].astype(int)))
     tempA_all = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float)
     tempS_all = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float) 
-    tempV_all = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float) 
+    tempV_all = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float)
     
-    for i in range(0,r1):
-        for y in range(0,NY):
-            tempA_all[GCAMData['irrArea'][i,0].astype(int)-1,GCAMData['irrArea'][i,1].astype(int)-1,GCAMData['irrArea'][i,2].astype(int)-1,y] = GCAMData['irrArea'][i,y+3]*1000 
+    for i in range(0, r1):
+        for y in range(0, NY):
+            tempA_all[GCAMData['irrArea'][i, 0].astype(int)-1, GCAMData['irrArea'][i, 1].astype(int)-1, GCAMData['irrArea'][i, 2].astype(int)-1, y] = GCAMData['irrArea'][i, y+3]*1000
             # convert from thousands of km2 to km2
             
-# if irrShare was read in, then reorganize the same way we did with irrArea.
-# Otherwise, set all irrigation shares to one (indicating that irrArea really is irrigated area, 
-# as calculated in GCAM, not total planted area, as in older versions of GCAM.)
+    # if irrShare was read in, then reorganize the same way we did with irrArea.
+    # Otherwise, set all irrigation shares to one (indicating that irrArea really is irrigated area,
+    # as calculated in GCAM, not total planted area, as in older versions of GCAM.)
     if r2 > 1 or  q2 > 1:
         for i in range(0,r2):
             for y in range (0,NY):
@@ -268,13 +270,13 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
     else:
         tempS_all = np.ones((nrgnAG,naez,ncrops,NY), dtype = float)  
 
-# Same reorganization for irrVolume. Result goes to tempV_all
+    # Same reorganization for irrVolume. Result goes to tempV_all
     for i in range(0,r3):
         for y in range(0,NY):
             tempV_all[GCAMData['irrV'][i,0].astype(int)-1,GCAMData['irrV'][i,1].astype(int)-1,GCAMData['irrV'][i,2].astype(int)-1,y] = GCAMData['irrV'][i,y+3]
                
-# STEP 3: now that we have computed the total irrigated lands, we can aggregate all
-# the numbers for all the crops; we only keep the value per gcam region and aez               
+    # STEP 3: now that we have computed the total irrigated lands, we can aggregate all
+    # the numbers for all the crops; we only keep the value per gcam region and aez
     irr_A = np.zeros((nrgnAG,naez,NY), dtype = float)
     irr_V = np.zeros((nrgnAG,naez,NY), dtype = float)
     
@@ -291,7 +293,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
     #irrA_frac     = np.full(ms, np.NaN, dtype = float)
     withd_irr_map = np.full(ms, np.NaN, dtype = float) # GIS results
     
-# use historical irrigation area maps
+    # use historical irrigation area maps
     # STEP 4: read a grid map of the irrigated area in km2 in a certain year
     for y in range (0,NY):
         mainlog.write('{}\n'.format(GISData['irr']['years'][y]), Logger.DEBUG)
