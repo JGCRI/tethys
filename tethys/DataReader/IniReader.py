@@ -35,7 +35,6 @@ class Settings:
         self.OutputUnit         = int(config['Project']['OutputUnit'])
         self.PerformDiagnostics = int(config['Project']['PerformDiagnostics'])
         self.PerformTemporal    = int(config['Project']['PerformTemporal'])
-        self.subreg             = int(config['Project']['subreg'])
 
         # spatial params
         try:
@@ -45,16 +44,10 @@ class Settings:
             self.mapsize = [int(180 / self.SpatialResolution), int(360 / self.SpatialResolution)]
 
         # GCAM access settings
-        self.UseGCAMDatabase = int(config['GCAM']['UseGCAMDatabase'])
-        if self.UseGCAMDatabase:
-            self.GCAM_DBpath = os.path.join(self.InputFolder, config['GCAM']['GCAM_DBpath'])
-            self.GCAM_DBfile = config['GCAM']['GCAM_DBfile']
-            self.GCAM_query = os.path.join(self.GCAM_DBpath, config['GCAM']['GCAM_query'])
-
-        else:
-            self.read_irrS = int(config['GCAM']['Read_irrS'])
-            self.GCAM_CSV = config['GCAM']['GCAM_CSV']
-
+        self.GCAM_DBpath = os.path.join(self.InputFolder, config['GCAM']['GCAM_DBpath'])
+        self.GCAM_DBfile = config['GCAM']['GCAM_DBfile']
+        self.GCAM_query = os.path.join(self.GCAM_DBpath, config['GCAM']['GCAM_query'])
+        self.subreg = int(config['GCAM']['GCAM_subreg'])
         self.years = config['GCAM']['GCAM_Years']
 
         # reference data
@@ -142,8 +135,5 @@ class Settings:
         log.write('Project Name        : {}\n'.format(self.ProjectName))
         log.write('Input Folder        : {}\n'.format(self.InputFolder))
         log.write('Output Folder       : {}\n'.format(self.OutputFolder))
-        if self.UseGCAMDatabase:
-            log.write('GCAM Database Folder: {}\n'.format(self.GCAM_DBpath + self.GCAM_DBfile))
-        else:
-            log.write('GCAM CSV Folder     : {}\n'.format(self.GCAM_CSV))
+        log.write('GCAM Database Folder: {}\n'.format(self.GCAM_DBpath + self.GCAM_DBfile))
         log.write('Region Info Folder  : {}\n'.format(self.rgnmapdir))
