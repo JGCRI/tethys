@@ -20,12 +20,6 @@ class Settings:
 
         config = ConfigObj(ini)
 
-        try:
-            self.Logger = config['Logger']
-        except KeyError:
-            # No logger configuration.  Supply a default one for backward compatibility with old config files.
-            self.Logger = {'logdir': 'logs', 'filename': 'mainlog.txt'}
-
         # project level params
         self.ProjectName        = config['Project']['ProjectName']
         self.InputFolder        = config['Project']['InputFolder']
@@ -35,6 +29,13 @@ class Settings:
         self.OutputUnit         = int(config['Project']['OutputUnit'])
         self.PerformDiagnostics = int(config['Project']['PerformDiagnostics'])
         self.PerformTemporal    = int(config['Project']['PerformTemporal'])
+        
+        try:
+            self.Logger           = config['Logger']
+            self.Logger['logdir'] = self.OutputFolder 
+        except KeyError:
+            # No logger configuration.  Supply a default one for backward compatibility with old config files.
+            self.Logger = {'logdir': 'logs', 'filename': 'mainlog.txt'}
 
         # spatial params
         try:
@@ -129,11 +130,11 @@ class Settings:
 
     def print_info(self):
 
-        log = Logger.getlogger()
+        log    = Logger.getlogger()
         oldlvl = log.setlevel(Logger.INFO)
 
         log.write('Project Name        : {}\n'.format(self.ProjectName))
         log.write('Input Folder        : {}\n'.format(self.InputFolder))
         log.write('Output Folder       : {}\n'.format(self.OutputFolder))
-        log.write('GCAM Database Folder: {}\n'.format(self.GCAM_DBpath + self.GCAM_DBfile))
+        log.write('GCAM Database Folder: {}\n'.format(os.path.join(self.GCAM_DBpath, self.GCAM_DBfile)))
         log.write('Region Info Folder  : {}\n'.format(self.rgnmapdir))

@@ -25,7 +25,7 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
         return
 
     mainlog.write(
-        '---Spatial Downscaling Diagnostics (Global): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)',
+        '---Spatial Downscaling Diagnostics (Global): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)\n',
         Logger.DEBUG)
     
     NY = Settings.NY
@@ -44,8 +44,8 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
             yrout = y+1
             
         mainlog.write(
-            '      Year {}:   {}    {}    Diff= {}\n'.format(yrout, value[y,0],
-                                                             value[y,1], value[y,2]),
+            '      Year {0[0]:4d}:   {0[1]:.6f}    {0[2]:.6f}    Diff= {0[3]:.6f}\n'.format([yrout, value[y,0],
+                                                             value[y,1], value[y,2]]),
                 Logger.DEBUG)
     
     # Comprehensive Diagnostics information to file:
@@ -59,7 +59,7 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
     extension = '.csv'  
     OutputFilename = os.path.join(Settings.OutputFolder, 'Diagnostics_Spatial_Downscaling{}'.format(extension))
 
-    Regions    = pd.read_csv(Settings.RegionNames, index_col=' region_id').to_dict()['region']
+    Regions    = pd.read_csv(Settings.RegionNames, index_col='region_id').to_dict()['region']
     NR         = len(Regions)
 
     # Regions.insert(0, 'Global') # Add "Global" to regions
