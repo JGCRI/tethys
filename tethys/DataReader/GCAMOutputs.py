@@ -466,7 +466,7 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
     grp['crop'] = grp['crop'].map(d_crops)
 
     # convert shape for use in Tethys
-    piv = pd.pivot_table(grp, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0)
+    piv = pd.pivot_table(grp, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0, aggfunc=np.sum)
     piv.reset_index(inplace=True)
 
     return piv.as_matrix()
@@ -479,6 +479,10 @@ def get_gcam_data(s):
     :param s:               Settings object
     :return:                dictionary, {metric: numpy array, ...}
     """
+    
+    if type(s.years) is str: # a single year string, multiple years will be list
+        s.years = [s.years]
+
     years = [int(i) for i in s.years]
 
     # get region info as dict

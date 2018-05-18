@@ -1,5 +1,5 @@
 Log start
-2018-05-16 22:52:50.840000
+2018-05-17 22:24:10.727000
 Project Name        : Test002
 Input Folder        : ./example/Input
 Output Folder       : ./example/Output\Test002
@@ -7,7 +7,7 @@ GCAM Database Folder: ./example/Input\GCAM\database_basexdbGCAM44_REF
 Region Info Folder  : ./example/Input/rgn32/
 Start Disaggregation... 
 ---Read in and format GCAM data---
-------Time Cost: 42.989000082 seconds ---
+------Time Cost: 77.8459999561 seconds ---
 ---Number of years: 5
 ------ [2005, 2010, 2015, 2020, 2025]
 ---Read in the GIS data (asc/txt/csv format) and the region map data (csv format)---
@@ -21,10 +21,10 @@ Start Disaggregation...
 ------Use FAO-GMIA 2005 Irrigation Area Data for 2015
 ------Use FAO-GMIA 2005 Irrigation Area Data for 2020
 ------Use FAO-GMIA 2005 Irrigation Area Data for 2025
-------Time Cost: 6.10500001907 seconds ---
+------Time Cost: 6.00800013542 seconds ---
 ---Mapsize: [360, 720]
 ---Rearranging data and map indices
-------Time Cost: 0.141999959946 seconds ---
+------Time Cost: 0.194999933243 seconds ---
 ---Create a population map as proxy of non-agricultural water withdrawals
 2005
 ------[Adjusting map_rgn_nonag with population]: Cells with pop/irr data but no region: 1
@@ -61,7 +61,7 @@ Start Disaggregation...
 ------[Adjusting map_rgn_ag with population]: Cells with pop/irr data but no region: 1
 ------[Adjusting map_rgn_ag with population]: Cells adjusted to an adjacent region: 0
 ------[Adjusting map_rgn_ag with population]: Cells not adjusted: 1
-------Time Cost: 0.233999967575 seconds ---
+------Time Cost: 0.240000009537 seconds ---
 ---Create an livestock map as proxy of livestock water withdrawal
 [Year Index, Region ID, buffalo from GCAM not assigned (no GIS data)]:  1  2  9.43577384304e-07
 [Year Index, Region ID, buffalo from GCAM not assigned (no GIS data)]:  1  7  0.0175218929975
@@ -83,46 +83,76 @@ Start Disaggregation...
 [Year Index, Region ID, buffalo from GCAM not assigned (no GIS data)]:  5  7  0.0216347515119
 [Year Index, Region ID, buffalo from GCAM not assigned (no GIS data)]:  5  9  0.000133712871632
 [Year Index, Region ID, buffalo from GCAM not assigned (no GIS data)]:  5  25  1.31243383735e-05
-------Time Cost: 3.67900013924 seconds ---
+------Time Cost: 3.39400005341 seconds ---
 ---Create an irrigation map as proxy of agricultural water withdrawal
 2005
 ------[Adjusting map_rgn_ag with irr]: Cells with pop/irr data but no region: 0
 ------[Adjusting map_rgn_ag with irr]: Cells adjusted to an adjacent region: 0
 ------[Adjusting map_rgn_ag with irr]: Cells not adjusted: 0
-------[Adjusting mapAEZ with irr]: Cells with pop/irr data but no region: 0
-------[Adjusting mapAEZ with irr]: Cells adjusted to an adjacent region: 0
-------[Adjusting mapAEZ with irr]: Cells not adjusted: 0
+------[Adjusting mapBasin with irr]: Cells with pop/irr data but no region: 0
+------[Adjusting mapBasin with irr]: Cells adjusted to an adjacent region: 0
+------[Adjusting mapBasin with irr]: Cells not adjusted: 0
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  1 1 27 0.000640421704 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  1 12 21 1.2747349e-05 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  1 12 49 2.51277e-09 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  1 15 99 0.00691962822 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  1 23 72 0.002633221113 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  1 25 166 0.000899009594 
 2010
 ------[Adjusting map_rgn_ag with irr]: Cells with pop/irr data but no region: 0
 ------[Adjusting map_rgn_ag with irr]: Cells adjusted to an adjacent region: 0
 ------[Adjusting map_rgn_ag with irr]: Cells not adjusted: 0
-------[Adjusting mapAEZ with irr]: Cells with pop/irr data but no region: 0
-------[Adjusting mapAEZ with irr]: Cells adjusted to an adjacent region: 0
-------[Adjusting mapAEZ with irr]: Cells not adjusted: 0
+------[Adjusting mapBasin with irr]: Cells with pop/irr data but no region: 0
+------[Adjusting mapBasin with irr]: Cells adjusted to an adjacent region: 0
+------[Adjusting mapBasin with irr]: Cells not adjusted: 0
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  2 1 27 0.000635369099 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  2 12 21 1.2177984e-05 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  2 12 49 2.70062e-09 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  2 15 99 0.00654148314 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  2 23 72 0.003770650446 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  2 25 166 0.000904672763 
 2015
 ------[Adjusting map_rgn_ag with irr]: Cells with pop/irr data but no region: 0
 ------[Adjusting map_rgn_ag with irr]: Cells adjusted to an adjacent region: 0
 ------[Adjusting map_rgn_ag with irr]: Cells not adjusted: 0
-------[Adjusting mapAEZ with irr]: Cells with pop/irr data but no region: 0
-------[Adjusting mapAEZ with irr]: Cells adjusted to an adjacent region: 0
-------[Adjusting mapAEZ with irr]: Cells not adjusted: 0
+------[Adjusting mapBasin with irr]: Cells with pop/irr data but no region: 0
+------[Adjusting mapBasin with irr]: Cells adjusted to an adjacent region: 0
+------[Adjusting mapBasin with irr]: Cells not adjusted: 0
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  3 1 27 0.000666061509 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  3 12 21 1.2799106e-05 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  3 12 49 2.74546e-09 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  3 15 99 0.00682438285 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  3 23 72 0.003910858084 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  3 25 166 0.000947092275 
 2020
 ------[Adjusting map_rgn_ag with irr]: Cells with pop/irr data but no region: 0
 ------[Adjusting map_rgn_ag with irr]: Cells adjusted to an adjacent region: 0
 ------[Adjusting map_rgn_ag with irr]: Cells not adjusted: 0
-------[Adjusting mapAEZ with irr]: Cells with pop/irr data but no region: 0
-------[Adjusting mapAEZ with irr]: Cells adjusted to an adjacent region: 0
-------[Adjusting mapAEZ with irr]: Cells not adjusted: 0
+------[Adjusting mapBasin with irr]: Cells with pop/irr data but no region: 0
+------[Adjusting mapBasin with irr]: Cells adjusted to an adjacent region: 0
+------[Adjusting mapBasin with irr]: Cells not adjusted: 0
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  4 1 27 0.000811475207 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  4 12 21 1.355268535e-05 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  4 12 49 4.909424e-09 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  4 15 99 0.00721256159 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  4 23 72 0.004207855264 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  4 25 166 0.00108972736 
 2025
 ------[Adjusting map_rgn_ag with irr]: Cells with pop/irr data but no region: 0
 ------[Adjusting map_rgn_ag with irr]: Cells adjusted to an adjacent region: 0
 ------[Adjusting map_rgn_ag with irr]: Cells not adjusted: 0
-------[Adjusting mapAEZ with irr]: Cells with pop/irr data but no region: 0
-------[Adjusting mapAEZ with irr]: Cells adjusted to an adjacent region: 0
-------[Adjusting mapAEZ with irr]: Cells not adjusted: 0
-------Time Cost: 60.5609998703 seconds ---
+------[Adjusting mapBasin with irr]: Cells with pop/irr data but no region: 0
+------[Adjusting mapBasin with irr]: Cells adjusted to an adjacent region: 0
+------[Adjusting mapBasin with irr]: Cells not adjusted: 0
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  5 1 27 0.000965271219 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  5 12 21 1.43475591e-05 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  5 12 49 6.89349e-09 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  5 15 99 0.00759246639 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  5 23 72 0.004533405187 
+WARNING:  [Year Index, Region ID,  Basin  ID, irr from GCAM not assigned (km3) (No overlapping cells)]:  5 25 166 0.001213173556 
+------Time Cost: 55.3339998722 seconds ---
 ---Aggregate to compute total water withdrawal at grid scale
-------Time Cost: 3.33299994469 seconds ---
+------Time Cost: 3.60100007057 seconds ---
 ---Spatial Downscaling Diagnostics (Global): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)
       Year 2005:   2998.571348    2998.600076    Diff= -0.028728
       Year 2010:   3213.885885    3213.916877    Diff= -0.030992
@@ -132,7 +162,7 @@ Start Disaggregation...
 ------Diagnostics information is saved to: ./example/Output\Test002\Diagnostics_Spatial_Downscaling.csv
 ---Temporal downscaling for Domestic, Electricity, Irrigation, Livestock, Mining and Manufacturing
 ------ Temporal downscaling is available for Year: [2005, 2006, 2007, 2008, 2009, 2010]
-------Time Cost: 52.4680001736 seconds ---
+------Time Cost: 55.8269999027 seconds ---
 ---Temporal Downscaling Diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)
 ------Irrigation------
                 Year 2005:   1715.524376    1715.524376    Diff= 0.000000e+00
@@ -156,9 +186,9 @@ Start Disaggregation...
                 Year 2009:   558.042843    558.042843    Diff= -2.409815e-07
                 Year 2010:   562.418004    562.418004    Diff= -1.151486e-07
 End Disaggregation... 
----Disaggregation: 185.730000019 seconds ---
+---Disaggregation: 221.030999899 seconds ---
 Saving outputs...
 Save the gridded water usage results for each withdrawal category in CSV format (Unit: km3/yr)
 Save the monthly water usage results for each withdrawal category (Unit: km3/month)
----Output: 55.1930000782 seconds ---
+---Output: 55.8220000267 seconds ---
 End Project: Test002

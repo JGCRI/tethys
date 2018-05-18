@@ -393,7 +393,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                             cum_diff0 += z - mapAreaExt[index]                                            
                                         cum_area = cum_area1 + irrA_grid[index, y]
                                     if cum_diff0 > 0:
-                                        mainlog.write('{}  {}  {}  {} {} {} {}'.format(
+                                        mainlog.write('{}  {}  {}  {} {} {} {} \n'.format(
                                             '[Year Index, Region ID,',
                                             GISData['AEZstring'],
                                             ' ID, irr from GCAM not assigned (km3) (condition 0)]:',
@@ -421,7 +421,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                         counter3 += 1                                                                       
                                 num = num_new
                                 if cum_diff == 0 and counter3 == len(ls2):
-                                    mainlog.write('{}  {}  {}  {} {} {} {}'.format(
+                                    mainlog.write('{}  {}  {}  {} {} {} {} \n'.format(
                                         '[Year Index, Region ID,',
                                         GISData['AEZstring'],
                                         ' ID, irr from GCAM not assigned (km3) (condition 1)]:',
@@ -433,8 +433,17 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
        
                     for index in ls:
                         if not np.isnan(irrA_grid[index, y]):                                      
-                            withd_irr_map[index, y] = irrA_grid[index, y]*irr_V[i,j,y]/irr_A[i,j,y]                           
-
+                            withd_irr_map[index, y] = irrA_grid[index, y]*irr_V[i,j,y]/irr_A[i,j,y] 
+                                                      
+                elif len(ls) == 0 and irr_A[i,j,y] > 0 and irr_V[i,j,y] > 0:
+                    # GCAM has irrigation data for a region and a AEZ/basin.
+                    # But from region map and AEZ/basin map, there are no cells belong to both.
+                    # Thus, GCAM data will not be included for downscaling.
+                    # It will cause the difference in Spatial Downscaling Diagnostics
+                    mainlog.write('{}  {}  {}  {} {} {} {} \n'.format('[Year Index, Region ID,',
+                                        GISData['AEZstring'],'ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
+                                        y+1, i+1, j+1, irr_V[i,j,y]), Logger.WARNING)
+                                        
     # this loop will replace all the nan values with zeros to be able to take sums, if we want to keep the nans (for plotting), comment following 2 lines
     irrA_grid[np.isnan(irrA_grid)]         = 0
     withd_irr_map[np.isnan(withd_irr_map)] = 0
