@@ -17,6 +17,9 @@ d_crops = {'biomass': 1, 'Corn': 2, 'FiberCrop': 3, 'FodderGrass': 4, 'FodderHer
            'MiscCrop': 6, 'OilCrop': 7, 'OtherGrain': 8, 'PalmFruit': 9, 'Rice': 10,
            'Root_Tuber': 11, 'SugarCrop': 12, 'Wheat': 13}
 
+# list of functional types to be combined into biomass category
+l_biomass = ["eucalyptus", "Jatropha", "miscanthus", "willow", "biomassOil"]
+    
 # set ordering of livestock
 d_liv_order = {'Buffalo': 0, 'Cattle': 1, 'Goat': 2, 'Sheep': 3, 'Poultry': 4, 'Pork': 5}
 
@@ -56,7 +59,7 @@ def get_region_info(f):
     :param f:           full path to CSV file of GCAM region names and ids
     :return:            dictionary, {region_name: region_id, ...}
     """
-    return pd.read_csv(f).groupby('region').sum().to_dict()[' region_id']
+    return pd.read_csv(f).groupby('region').sum().to_dict()['region_id']
 
 
 def get_basin_info(f):
@@ -149,17 +152,21 @@ def irr_water_demand_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_c
         df['subreg'] = df['sector'].apply(lambda x: int(x.split('AEZ')[1]))
 
         # break out crop and map the id to it
-        df['crop'] = df['sector'].apply(lambda x: x.split('AEZ')[0].split(',')[0]).map(d_crops)
+        df['crop'] = df['sector'].apply(lambda x: x.split('AEZ')[0].split(',')[0])
+        df['crop'] = df['crop'].apply(lambda x: 'biomass' if x in l_biomass else x)
+        df['crop'] = df['crop'].map(d_crops)
 
     elif subreg == 1:
         df['subreg'] = df['sector'].apply(lambda x: x.split('_')[-1]).map(d_basin_name)
-        df['crop'] = df['sector'].apply(lambda x: x.split(',')[0]).map(d_crops)
+        df['crop'] = df['sector'].apply(lambda x: x.split(',')[0])
+        df['crop'] = df['crop'].apply(lambda x: 'biomass' if x in l_biomass else x)
+        df['crop'] = df['crop'].map(d_crops)
 
     # drop sector
     df.drop('sector', axis=1, inplace=True)
 
     # convert shape for use in Tethys
-    piv = pd.pivot_table(df, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0)
+    piv = pd.pivot_table(df, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0,aggfunc=np.sum)
     piv.reset_index(inplace=True)
 
     return piv.as_matrix()
@@ -187,7 +194,7 @@ def dom_water_demand_to_array(conn, query, d_reg_name, years):
     df['region'] = df['region'].map(d_reg_name)
 
     # convert shape for use in Tethys
-    piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0)
+    piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
 
     return piv.as_matrix()
 
@@ -241,7 +248,7 @@ def manuf_water_demand_to_array(conn, query, d_reg_name, years):
     df['region'] = df['region'].map(d_reg_name)
 
     # convert shape for use in Tethys
-    piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0)
+    piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0,aggfunc=np.sum)
 
     return piv.as_matrix()
 
@@ -268,7 +275,7 @@ def mining_water_demand_to_array(conn, query, d_reg_name, years):
     df['region'] = df['region'].map(d_reg_name)
 
     # convert shape for use in Tethys
-    piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', aggfunc=np.sum, fill_value=0)
+    piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
 
     return piv.as_matrix()
 
@@ -397,10 +404,7 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
     df = conn.runQuery(query)
 
     # get only target years
-    df = df.loc[df['Year'].isin(years)].copy()
-
-    # list of functional types to be combined into biomass category
-    l_biomass = ["eucalyptus", "Jatropha", "miscanthus", "willow", "biomassOil"]
+    df = df.loc[df['Year'].isin(years)].copy()    
 
     # keep types
     allpft = [k for k in d_crops.keys()] + l_biomass
@@ -428,21 +432,29 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
         df.drop('land-allocation', axis=1, inplace=True)
 
     elif subreg == 1:
-        # create management type column
-        df['mgmt'] = df['land-allocation'].apply(lambda x: x.split('_')[-1])
-
-        df['crop'] = df['land-allocation'].apply(lambda x: x.split('_')[:-3][0])
-        df['subreg'] = df['land-allocation'].apply(lambda x: x.split('_')[-3]).map(d_basin_name)
-        df['use'] = df['land-allocation'].apply(lambda x: x.split('_')[-2])
-        df = df.loc[df['use'] == 'IRR'].copy()
-        df.drop('land-allocation', axis=1, inplace=True)
-
-        # sum hi and lo management allocation
-        df = df.groupby(['region', 'subreg', 'crop', 'use', 'Year']).sum(axis=1)
-        df.reset_index(inplace=True)
-        df.drop('mgmt', axis=1, inplace=True)
+        temp = df['land-allocation'].apply(lambda x: x.split('_')[-1])
+        if 'IRR' in temp.unique():
+            df['crop'] = df['land-allocation'].apply(lambda x: x.split('_')[:-2][0]) # 'Root_Tuber' will be 'Root'
+            df['subreg'] = df['land-allocation'].apply(lambda x: x.split('_')[-2]).map(d_basin_name)
+            df['use'] = df['land-allocation'].apply(lambda x: x.split('_')[-1])
+            df = df.loc[df['use'] == 'IRR'].copy()
+            df.drop('land-allocation', axis=1, inplace=True)
+        else:
+            # create management type column
+            df['mgmt'] = df['land-allocation'].apply(lambda x: x.split('_')[-1])
+            df['crop'] = df['land-allocation'].apply(lambda x: x.split('_')[:-3][0]) # 'Root_Tuber' will be 'Root'
+            df['subreg'] = df['land-allocation'].apply(lambda x: x.split('_')[-3]).map(d_basin_name)
+            df['use'] = df['land-allocation'].apply(lambda x: x.split('_')[-2])
+            df = df.loc[df['use'] == 'IRR'].copy()
+            df.drop('land-allocation', axis=1, inplace=True)
+    
+            # sum hi and lo management allocation
+            df = df.groupby(['region', 'subreg', 'crop', 'use', 'Year']).sum(axis=1)
+            df.reset_index(inplace=True)
+            df.drop('mgmt', axis=1, inplace=True)
 
     # only keep crops in target list
+    df['crop'] = df['crop'].apply(lambda x: 'Root_Tuber' if x == 'Root' else x)  # Correct "Root" back to crop name
     df = df.loc[df['crop'].isin(allpft)].copy()
 
     # aggregate all biomass crops
@@ -454,7 +466,7 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
     grp['crop'] = grp['crop'].map(d_crops)
 
     # convert shape for use in Tethys
-    piv = pd.pivot_table(grp, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0)
+    piv = pd.pivot_table(grp, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0, aggfunc=np.sum)
     piv.reset_index(inplace=True)
 
     return piv.as_matrix()
@@ -467,6 +479,10 @@ def get_gcam_data(s):
     :param s:               Settings object
     :return:                dictionary, {metric: numpy array, ...}
     """
+    
+    if type(s.years) is str: # a single year string, multiple years will be list
+        s.years = [s.years]
+
     years = [int(i) for i in s.years]
 
     # get region info as dict
@@ -483,6 +499,10 @@ def get_gcam_data(s):
 
     # get GCAM database connection and queries objects
     conn, queries = get_gcam_queries(s.GCAM_DBpath, s.GCAM_DBfile, s.GCAM_query)
+    
+#     for q in queries:
+#         df = conn.runQuery(q)
+#         df.to_csv(q.title + ".csv", sep=',')
 
     d = {}
     d['pop_tot']      = population_to_array(conn, queries[1], d_reg_name, years)
@@ -493,5 +513,8 @@ def get_gcam_data(s):
     d['wdliv']        = livestock_water_demand_to_array(conn, queries[5], d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years)
     d['irrArea']      = land_to_array(conn, queries[0], s.subreg, d_reg_name, d_basin_name, d_crops, years)
     d['irrV']         = irr_water_demand_to_array(conn, queries[2], s.subreg, d_reg_name, d_basin_name, d_crops, years)
+    
+#    for key, value in d.iteritems():
+#        np.savetxt(key + '.csv', d[key], delimiter=',')
 
     return d

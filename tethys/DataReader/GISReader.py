@@ -37,9 +37,9 @@ def getGISData(settings):
     GISData['aez']          = ArrayCSVRead(settings.aez,1).astype(int)
     
     # judge if use basin for aez
-    if "aez" in os.path.basename(settings.aez).lower():
+    if settings.subreg == 0:
         GISData['AEZstring'] = 'AEZ'
-    elif "basin" in os.path.basename(settings.aez).lower():
+    elif settings.subreg == 1:
         GISData['AEZstring'] = 'Basin'
       
     ''' using finer resolution gridded population map (from HYDE or GPW) according to year availability '''

@@ -17,7 +17,6 @@ import numpy as np
 from tethys.Utils.DataParser import GetArrayCSV
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from matplotlib.ticker import FormatStrFormatter
 from tethys.Utils.Logging import Logger
     
 def compare_temporal_downscaled(Settings, OUT, GISData):
@@ -50,8 +49,8 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
         value[N,1]  = np.sum(W[:,N])
         value[N,2]  = value[N,0] - value[N,1]
         mainlog.write(
-            '                Year {}:    {}    {}    Diff= {}\n'.format(j, value[N,0],
-                                                                        value[N,1], value[N,2]),
+            '                Year {0[0]:4d}:   {0[1]:.6f}    {0[2]:.6f}    Diff= {0[3]:.6e}\n'.format([j, value[N,0],
+                                                                        value[N,1], value[N,2]]),
             Logger.DEBUG)
     
     # Print out the basin level comparison
@@ -88,8 +87,8 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
         value[N,1]  = np.sum(W[:,N])
         value[N,2]  = value[N,0] - value[N,1]
         mainlog.write(
-            '                Year {}:    {}    {}    Diff= {}\n'.format(j, value[N,0],
-                                                                        value[N,1], value[N,2]),
+            '                Year {0[0]:4d}:   {0[1]:.6f}    {0[2]:.6f}    Diff= {0[3]:.6e}\n'.format([j, value[N,0],
+                                                                        value[N,1], value[N,2]]),
             Logger.DEBUG)
 
     Domestic_TD__Diagnostics_Plot(OUT.twddom, GISData, Settings.OutputFolder)
@@ -104,8 +103,8 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
         value[N,1]  = np.sum(W[:,N])
         value[N,2]  = value[N,0] - value[N,1]         
         mainlog.write(
-            '                Year {}:    {}    {}    Diff= {}\n'.format(j, value[N,0],
-                                                                        value[N,1], value[N,2]),
+            '                Year {0[0]:4d}:   {0[1]:.6f}    {0[2]:.6f}    Diff= {0[3]:.6e}\n'.format([j, value[N,0],
+                                                                        value[N,1], value[N,2]]),
             Logger.DEBUG)
 
     Electricity_TD__Diagnostics_Plot(OUT.twdelec, GISData, Settings.OutputFolder)
@@ -123,7 +122,7 @@ def Electricity_TD__Diagnostics_Plot(data, GISData, OutputFolder):
             if CountryIDs[index] > 0:
                 new_data[CountryIDs[index] - 1, m] += np.mean(data[index, range(m,NM,12)])
     
-	# IEA_9_Countries_Monthly_AvgElectricity_2000_2015.csv is in the reference folder
+    # IEA_9_Countries_Monthly_AvgElectricity_2000_2015.csv is in the reference folder
     Ele_gen_data_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'reference/IEA_9_Countries_Monthly_AvgElectricity_2000_2015.csv')
     Ele_gen_data      = GetArrayCSV(Ele_gen_data_file, 1)
                     
