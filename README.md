@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/104476654.svg)](https://zenodo.org/badge/latestdoi/104476654)
+
+
 # tethys
 Spatiotemporal downscaling model for global water withdrawal
 
