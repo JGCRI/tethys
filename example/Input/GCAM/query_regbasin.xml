@@ -27,7 +27,7 @@
     <aQuery>
       <all-regions/>
       <supplyDemandQuery title="Water Withdrawals (Agriculture by subsector) ">
-         <axis1 name="sector">subsector</axis1>
+         <axis1 name="subsector">subsector</axis1>
          <axis2 name="Year">demand-physical[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="false">AgSupplySector[@type='sector']//*[@type='input' and contains(@name, 'water_td') and ends-with(@name, '_W')]/demand-physical/node()</xPath>
          <comments>Supply sectors only.</comments>

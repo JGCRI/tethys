@@ -74,7 +74,7 @@ def OutWriter(Settings, OUT, GISData):
             'Save the monthly water usage results for each withdrawal category (Unit: ' +
             temp + '/month)\n', Logger.INFO)
 
-    for attr in OUT.__dict__.keys():
+    for attr in list(OUT.__dict__.keys()):
         value = OUT.__dict__[attr]
 
         if value is not None:
