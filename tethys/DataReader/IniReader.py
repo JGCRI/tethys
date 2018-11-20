@@ -77,8 +77,7 @@ class Settings:
         self.irrigated_fract    = os.path.join(self.InputFolder, config['GriddedMap']['Irrigated_Fract'])
 
         if self.PerformTemporal:
-            self.TempMonthlyFile       = config['TemporalDownscaling']['Temp_Monthly']
-            self.HDDCDDMonthlyFile     = config['TemporalDownscaling']['HDD_CDD_Monthly']
+            self.temporal_climate = config['TemporalDownscaling']['temporal_climate']
             self.Domestic_R            = config['TemporalDownscaling']['Domestic_R']
             self.Elec_Building         = config['TemporalDownscaling']['Elec_Building']
             self.Elec_Industry         = config['TemporalDownscaling']['Elec_Industry']
@@ -108,10 +107,9 @@ class Settings:
 
         # Check the existence of input files
         strlist = ['Area', 'Coord', 'aez', 'InputBasinFile', 'BasinNames', 'InputRegionFile', 'RegionNames',
-                   'InputCountryFile', \
-                   'CountryNames', 'Population_GPW', 'Population_HYDE', 'Irrigation_GMIA', 'Irrigation_HYDE', \
-                   'Livestock_Buffalo', 'Livestock_Cattle', 'Livestock_Goat', 'Livestock_Sheep', 'Livestock_Poultry',
-                   'Livestock_Pig']
+                   'InputCountryFile', 'CountryNames', 'Population_GPW', 'Population_HYDE', 'Irrigation_GMIA',
+                   'Irrigation_HYDE', 'Livestock_Buffalo', 'Livestock_Cattle', 'Livestock_Goat', 'Livestock_Sheep',
+                   'Livestock_Poultry', 'Livestock_Pig']
 
         ifn = 0
         for s in strlist:
@@ -120,9 +118,9 @@ class Settings:
                 raise FileNotFoundError(getattr(self, s))
 
         if self.PerformTemporal:
-            strlist = ['TempMonthlyFile', 'HDDCDDMonthlyFile', 'Domestic_R', 'Irr_MonthlyData', 'Elec_Building',
-                       'Elec_Industry', \
+            strlist = ['temporal_climate', 'Domestic_R', 'Irr_MonthlyData', 'Elec_Building', 'Elec_Industry',
                        'Elec_Building_heat', 'Elec_Building_cool', 'Elec_Building_others']
+
             for s in strlist:
                 fn = getattr(self, s)
                 if not os.path.isfile(fn):
