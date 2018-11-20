@@ -25,8 +25,10 @@ Irrigation: Monthly Irrigation Data from other models as the weighting factor to
 """
 
 import scipy.io as spio
-import os, calendar
+import calendar
+import os
 import numpy as np
+
 from tethys.Utils.DataParser import getContentArray as ArrayCSVRead
 from tethys.TemporalDownscaling.NeighborBasin import NeighborBasin
 from tethys.Utils.Logging import Logger
@@ -85,16 +87,18 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
     mainlog.write('------ Temporal downscaling is available for Year: {}\n'.format(TDYears),
                   Logger.DEBUG)
     
-    """Read input files"""
-    dom              = {}
-    tmp              = spio.loadmat(settings.TempMonthlyFile)['tas']
-    dom['tas']       = tmp[:,Temp_TDMonths_Index]
-    dom['DomesticR'] = ArrayCSVRead(settings.Domestic_R,1)
+    # load climate data
+    tclim = np.load(settings.temporal_climate)
     
-    ele              = {}
-    tmp              = spio.loadmat(settings.HDDCDDMonthlyFile)
-    ele['hdd']       = tmp['hdd'][:,Temp_TDMonths_Index]
-    ele['cdd']       = tmp['cdd'][:,Temp_TDMonths_Index]
+    dom = {}
+
+    dom['tas'] = tclim['tas'][:, Temp_TDMonths_Index]
+    dom['DomesticR'] = ArrayCSVRead(settings.Domestic_R, 1)
+    
+    ele = {}
+    ele['hdd'] = tclim['hdd'][:, Temp_TDMonths_Index]
+    ele['cdd'] = tclim['cdd'][:, Temp_TDMonths_Index]
+    
     # The parameters pb, ph, pc, pu, pit are all obtained from GCAM.
     ele['building']  = ArrayCSVRead(settings.Elec_Building,0)[:,Temp_TDYears_Index]
     ele['industry']  = ArrayCSVRead(settings.Elec_Industry,0)[:,Temp_TDYears_Index]
