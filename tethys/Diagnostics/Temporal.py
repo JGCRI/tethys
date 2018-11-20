@@ -120,7 +120,7 @@ def Electricity_TD__Diagnostics_Plot(data, GISData, OutputFolder):
     for index in range(NG): 
         for m in range(12):
             if CountryIDs[index] > 0:
-                new_data[CountryIDs[index] - 1, m] += np.mean(data[index, range(m,NM,12)])
+                new_data[CountryIDs[index] - 1, m] += np.mean(data[index, range(m, NM, 12)])
     
     # IEA_9_Countries_Monthly_AvgElectricity_2000_2015.csv is in the reference folder
     Ele_gen_data_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'reference/IEA_9_Countries_Monthly_AvgElectricity_2000_2015.csv')
@@ -158,7 +158,7 @@ def Electricity_TD__Diagnostics_Plot(data, GISData, OutputFolder):
     ax6.plot(range(1,13), sim_data[5,:], 'r-')
     ax7.plot(range(1,13), sim_data[6,:], 'r-')
     ax8.plot(range(1,13), sim_data[7,:], 'r-')
-    ax9.plot(range(1,13), sim_data[8,:], 'r-')     
+    ax9.plot(range(1,13), sim_data[8,:], 'r-')
     
     ax1.plot(range(1,13),obv_data[0,:],'b-')
     ax2.plot(range(1,13),obv_data[1,:],'b-')
@@ -229,7 +229,7 @@ def Domestic_TD__Diagnostics_Plot(data, GISData, OutputFolder):
     new_data = np.zeros((len(Alllines)-1,12),dtype = float)
     for index in range(len(Alllines)-1): 
         for m in range(12):
-            new_data[index, m] = np.mean(data[int(obv_dom_data[index][3]), range(m,NM,12)])
+            new_data[index, m] = np.mean(data[int(obv_dom_data[index][3]), range(m, NM, 12)])
             
     # Normalize the simulated
     obv_data = np.zeros((5,12),dtype = float)

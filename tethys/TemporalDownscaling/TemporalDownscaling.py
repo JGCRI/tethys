@@ -39,7 +39,7 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
     
     startyear  = int(settings.TempMonthlyFile.split("_")[-2][:4])
     endyear    = int(settings.TempMonthlyFile.split("_")[-1][:4])
-    TempYears  = range(startyear,endyear+1)
+    TempYears  = list(range(startyear, endyear + 1))
     TDYears    = sorted(list(set(TempYears).intersection(settings.years)))
     TDYearsD   = np.diff(TDYears) # Interval of TD Years
     GCAM_TDYears_Index  = [settings.years.index(i) for i in TDYears]
@@ -57,7 +57,7 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
         W    = OUT.wdmfg[mapindex,:]
         OUT.WMfg = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)        
         # Update the TDYears to new values
-        TDYears = list(np.interp(range(min(TDYears),max(TDYears)+1), TDYears, TDYears).astype(int))
+        TDYears = list(np.interp(np.arange(min(TDYears), max(TDYears) + 1), TDYears, TDYears).astype(int))
     else:
         W    = OUT.wddom[mapindex,:]
         OUT.WDom = W[:,GCAM_TDYears_Index]
@@ -106,7 +106,7 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
     # Monthly Irrigation Data from other models only available during 1971-2010
     endyear    = int(settings.Irr_MonthlyData.split("_")[-1][:4])
     if endyear < TDYears[-1]:
-        TempYears_irr  = range(startyear,endyear+1)
+        TempYears_irr  = list(range(startyear,endyear+1))
         TDYears_irr    = sorted(list(set(TempYears_irr).intersection(settings.years)))
         Temp_TDYears_Index  = [TempYears_irr.index(i) for i in TDYears_irr]
         Temp_TDMonths_Index = np.zeros((len(TDYears)*12,), dtype = int)
@@ -186,8 +186,8 @@ def GetMonthlyIrrigationData(filename, monthindex, coords):
     # Calculate the irr profile (Averaged monthly irrigation from historical data
     irrprofile = np.zeros((coords.shape[0],12),dtype = float)
     for m in range(12):
-        mi = range(m,nm,12)       
-        irrprofile[:, m] = np.mean(irrdataall[:,mi],1)
+        mi = range(m, nm, 12)
+        irrprofile[:, m] = np.mean(irrdataall[:, mi], 1)
     
     
     return irrdata, irrprofile
@@ -341,10 +341,10 @@ def LinearInterpolationAnnually(data,years):
     # years: the list of years, length is NY, for example: [1990, 2005, 2010]
     # Interpolate values linearly between years to create annual results
     # Out: dimension is [67420, NNY], for example, NNY is 21
-    Nyears = np.interp(range(min(years),max(years)+1), years, years)
+    Nyears = np.interp(np.arange(min(years), max(years) + 1), years, years)
     NM     = np.shape(data)[0]
     out    = np.zeros((NM,len(Nyears)),dtype = float)
     for i in range(NM):
-        out[i,:] = np.interp(range(min(years),max(years)+1), years, data[i,:])
+        out[i, :] = np.interp(np.arange(min(years), max(years) + 1), years, data[i, :])
     
     return out
