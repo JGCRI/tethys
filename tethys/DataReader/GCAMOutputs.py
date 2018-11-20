@@ -116,7 +116,7 @@ def population_to_array(conn, query, d_reg_name, years):
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0)
 
-    return piv.as_matrix() * 1000
+    return piv.values * 1000
 
 
 def irr_water_demand_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years):
@@ -149,18 +149,14 @@ def irr_water_demand_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_c
 
     if subreg == 0:
         # break out subregion number
-        df['subreg'] = df['sector'].apply(lambda x: int(x.split('AEZ')[1]))
-
-        # break out crop and map the id to it
-        df['crop'] = df['sector'].apply(lambda x: x.split('AEZ')[0].split(',')[0])
-        df['crop'] = df['crop'].apply(lambda x: 'biomass' if x in l_biomass else x)
-        df['crop'] = df['crop'].map(d_crops)
+        df['subreg'] = df['subsector'].apply(lambda x: int(x.split('AEZ')[1]))
 
     elif subreg == 1:
-        df['subreg'] = df['sector'].apply(lambda x: x.split('_')[-1]).map(d_basin_name)
-        df['crop'] = df['sector'].apply(lambda x: x.split(',')[0])
-        df['crop'] = df['crop'].apply(lambda x: 'biomass' if x in l_biomass else x)
-        df['crop'] = df['crop'].map(d_crops)
+        df['subreg'] = df['subsector'].apply(lambda x: x.split('_')[-1]).map(d_basin_name)
+
+    # break out crop and map the id to it
+    df['crop'] = df['sector'].apply(lambda x: 'biomass' if x in l_biomass else x)
+    df['crop'] = df['crop'].map(d_crops)
 
     # drop sector
     df.drop('sector', axis=1, inplace=True)
@@ -169,7 +165,7 @@ def irr_water_demand_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_c
     piv = pd.pivot_table(df, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0,aggfunc=np.sum)
     piv.reset_index(inplace=True)
 
-    return piv.as_matrix()
+    return piv.values
 
 
 def dom_water_demand_to_array(conn, query, d_reg_name, years):
@@ -196,7 +192,7 @@ def dom_water_demand_to_array(conn, query, d_reg_name, years):
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
 
-    return piv.as_matrix()
+    return piv.values
 
 
 def elec_water_demand_to_array(conn, query, d_reg_name, years):
@@ -223,7 +219,7 @@ def elec_water_demand_to_array(conn, query, d_reg_name, years):
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
 
-    return piv.as_matrix()
+    return piv.values
 
 
 def manuf_water_demand_to_array(conn, query, d_reg_name, years):
@@ -250,7 +246,7 @@ def manuf_water_demand_to_array(conn, query, d_reg_name, years):
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0,aggfunc=np.sum)
 
-    return piv.as_matrix()
+    return piv.values
 
 
 def mining_water_demand_to_array(conn, query, d_reg_name, years):
@@ -277,7 +273,7 @@ def mining_water_demand_to_array(conn, query, d_reg_name, years):
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
 
-    return piv.as_matrix()
+    return piv.values
 
 
 def livestock_water_demand_to_array(conn, query, d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years):
@@ -320,14 +316,14 @@ def livestock_water_demand_to_array(conn, query, d_reg_name, d_buf_frac, d_goat_
     buffalo['sector'] = 'Buffalo'
     buffalo[years] = buffalo[years].multiply(buffalo['b_frac'], axis='index')
     buffalo.drop('b_frac', axis=1, inplace=True)
-    piv = pd.concat([piv, buffalo])
+    piv = pd.concat([piv, buffalo])#, sort=True)
 
     # break out fraction of cattle
     cattle = bovine.copy()
     cattle['sector'] = 'Cattle'
     cattle[years] = cattle[years].multiply((1 - cattle['b_frac']), axis='index')
     cattle.drop('b_frac', axis=1, inplace=True)
-    piv = pd.concat([piv, cattle])
+    piv = pd.concat([piv, cattle])#, sort=True)
 
     # extract sheepgoat and add goat fraction
     sheepgoat = piv.loc[piv['sector'] == 'SheepGoat'].copy()
@@ -379,7 +375,7 @@ def livestock_water_demand_to_array(conn, query, d_reg_name, d_buf_frac, d_goat_
 
     piv.set_index(['sector', 'region'], inplace=True)
 
-    return piv.as_matrix()
+    return piv.values
 
 
 def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years):
@@ -407,7 +403,7 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
     df = df.loc[df['Year'].isin(years)].copy()    
 
     # keep types
-    allpft = [k for k in d_crops.keys()] + l_biomass
+    allpft = list(d_crops.keys()) + l_biomass
 
     # drop unused columns
     df.drop(['Units', 'scenario'], axis=1, inplace=True)
@@ -469,7 +465,7 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
     piv = pd.pivot_table(grp, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0, aggfunc=np.sum)
     piv.reset_index(inplace=True)
 
-    return piv.as_matrix()
+    return piv.values
 
 
 def get_gcam_data(s):
