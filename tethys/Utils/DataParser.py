@@ -46,7 +46,7 @@ def getHeader(filename):
         f = open(filename, "rU")
         reader = csv.reader(f, delimiter=",")
         try:
-            header = reader.next()
+            header = next(reader)
             if len(header) < 2:
                 header = None
             return header
@@ -62,7 +62,7 @@ def getContent(filename, headerNum):
         data = []
         try:
             for i in range(0,headerNum):
-                reader.next() # skip header
+                next(reader) # skip header
 
             # Skip the empty line
             for row in reader:
@@ -92,7 +92,7 @@ def getContentNum(filename, headerNum, row0, nrow):
         data = []
         try:
             for i in range(0,headerNum + row0):
-                reader.next() # skip header
+                next(reader) # skip header
 
             # Skip the empty line
             for row in reader:
@@ -116,7 +116,7 @@ def getColumn(filename, headerNum, column):
         data = []
         try:
             for i in range(0,headerNum):
-                reader.next() # skip header
+                next(reader) # skip header
 
             # Skip the empty line
             for row in reader:
@@ -155,7 +155,7 @@ def getTXTContent(filename, headerNum):
         data = []
         try:
             for i in range(0,headerNum):
-                reader.next() # skip header
+                next(reader) # skip header
 
             # Skip the empty line
             for row in reader:
@@ -192,7 +192,7 @@ def getTXTContentlivestock(filename, headerNum):
         data = []
         try:
             for i in range(0,headerNum):
-                reader.next() # skip header
+                next(reader) # skip header
 
             # Skip the empty line
             for row in reader:
@@ -200,7 +200,7 @@ def getTXTContentlivestock(filename, headerNum):
                     row = row
                     if not row[-1]:
                         del row[-1]
-                    row = map(float, row)
+                    row = list(map(float, row))
                     temp = []
                     for i in range(0,len(row),10):
                         temp.append(sum(row[i:i+10]))    
