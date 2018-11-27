@@ -1,12 +1,13 @@
 from setuptools import setup, find_packages
 
+
 def get_requirements():
     with open('requirements.txt') as f:
         return f.read().split()
 
 setup(
     name='tethys',
-    version='1.0.0',
+    version='1.1.0',
     description='Spatial and Temporal Downscaling of Global Water Demands',
     url='https://github.com/JGCRI/tethys',
     packages=find_packages(),

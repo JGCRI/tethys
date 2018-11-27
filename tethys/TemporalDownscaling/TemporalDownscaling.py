@@ -37,12 +37,16 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
 
     mainlog = Logger.getlogger()
     
-    startyear  = int(settings.TempMonthlyFile.split("_")[-2][:4])
-    endyear    = int(settings.TempMonthlyFile.split("_")[-1][:4])
+    startyear  = int(settings.temporal_climate.split("_")[-2][:4])
+    endyear    = int(settings.temporal_climate.split("_")[-1][:4])
+
     TempYears  = list(range(startyear, endyear + 1))
     TDYears    = sorted(list(set(TempYears).intersection(settings.years)))
+
     TDYearsD   = np.diff(TDYears) # Interval of TD Years
+
     GCAM_TDYears_Index  = [settings.years.index(i) for i in TDYears]
+
     if settings.TemporalInterpolation and all(item > 1 for item in TDYearsD): # Linear interpolation to GCAM time periods
         W    = OUT.wddom[mapindex,:]
         OUT.WDom = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)
@@ -58,6 +62,7 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
         OUT.WMfg = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)        
         # Update the TDYears to new values
         TDYears = list(np.interp(np.arange(min(TDYears), max(TDYears) + 1), TDYears, TDYears).astype(int))
+
     else:
         W    = OUT.wddom[mapindex,:]
         OUT.WDom = W[:,GCAM_TDYears_Index]
@@ -80,21 +85,21 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
     for i in Temp_TDYears_Index:
         N = Temp_TDYears_Index.index(i)
         Temp_TDMonths_Index[N*12:(N+1)*12] = np.arange(i*12, (i+1)*12)
-    
 
-    mainlog.write('------ Temporal downscaling is available for Year: {}\n'.format(TDYears),
-                  Logger.DEBUG)
+    mainlog.write('------ Temporal downscaling is available for Year: {}\n'.format(TDYears), Logger.DEBUG)
+
+    # load climate data
+    tclim = np.load(settings.temporal_climate)
     
-    """Read input files"""
-    dom              = {}
-    tmp              = spio.loadmat(settings.TempMonthlyFile)['tas']
-    dom['tas']       = tmp[:,Temp_TDMonths_Index]
-    dom['DomesticR'] = ArrayCSVRead(settings.Domestic_R,1)
+    dom = {}
+
+    dom['tas'] = tclim['tas'][:, Temp_TDMonths_Index]
+    dom['DomesticR'] = ArrayCSVRead(settings.Domestic_R, 1)
     
-    ele              = {}
-    tmp              = spio.loadmat(settings.HDDCDDMonthlyFile)
-    ele['hdd']       = tmp['hdd'][:,Temp_TDMonths_Index]
-    ele['cdd']       = tmp['cdd'][:,Temp_TDMonths_Index]
+    ele = {}
+    ele['hdd'] = tclim['hdd'][:, Temp_TDMonths_Index]
+    ele['cdd'] = tclim['cdd'][:, Temp_TDMonths_Index]
+
     # The parameters pb, ph, pc, pu, pit are all obtained from GCAM.
     ele['building']  = ArrayCSVRead(settings.Elec_Building,0)[:,Temp_TDYears_Index]
     ele['industry']  = ArrayCSVRead(settings.Elec_Industry,0)[:,Temp_TDYears_Index]
