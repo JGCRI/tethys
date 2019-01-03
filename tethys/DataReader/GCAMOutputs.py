@@ -316,14 +316,14 @@ def livestock_water_demand_to_array(conn, query, d_reg_name, d_buf_frac, d_goat_
     buffalo['sector'] = 'Buffalo'
     buffalo[years] = buffalo[years].multiply(buffalo['b_frac'], axis='index')
     buffalo.drop('b_frac', axis=1, inplace=True)
-    piv = pd.concat([piv, buffalo])#, sort=True)
+    piv = pd.concat([piv, buffalo], sort=True)
 
     # break out fraction of cattle
     cattle = bovine.copy()
     cattle['sector'] = 'Cattle'
     cattle[years] = cattle[years].multiply((1 - cattle['b_frac']), axis='index')
     cattle.drop('b_frac', axis=1, inplace=True)
-    piv = pd.concat([piv, cattle])#, sort=True)
+    piv = pd.concat([piv, cattle], sort=True)
 
     # extract sheepgoat and add goat fraction
     sheepgoat = piv.loc[piv['sector'] == 'SheepGoat'].copy()
@@ -334,14 +334,14 @@ def livestock_water_demand_to_array(conn, query, d_reg_name, d_buf_frac, d_goat_
     goat['sector'] = 'Goat'
     goat[years] = goat[years].multiply(goat['g_frac'], axis='index')
     goat.drop('g_frac', axis=1, inplace=True)
-    piv = pd.concat([piv, goat])
+    piv = pd.concat([piv, goat], sort=True)
 
     # break out fraction of sheep
     sheep = sheepgoat.copy()
     sheep['sector'] = 'Sheep'
     sheep[years] = sheep[years].multiply((1 - sheep['g_frac']), axis='index')
     sheep.drop('g_frac', axis=1, inplace=True)
-    piv = pd.concat([piv, sheep])
+    piv = pd.concat([piv, sheep], sort=True)
 
     # drop aggregated sectors
     piv = piv.loc[piv['sector'].isin(tuple(d_liv_order))].copy()
