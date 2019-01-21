@@ -8,8 +8,11 @@ Copyright (c) 2017, Battelle Memorial Institute
 
 """
 
+import os
+import numpy as np
 from tethys.Utils.DataParser import getContentArray as ArrayCSVReader
 from tethys.Utils.Logging import Logger
+from Utils.DataParser import GetArrayCSV		 
 
 
 def getIrrYearData(settings):
@@ -64,6 +67,51 @@ def getIrrYearData(settings):
     return irr
 
 
+def getIrrYearData_Crops(settings):
+    
+    irr = {}
+    folder = settings.DemeterOutputFolder
+    D_years = []
+    D_irr = {}
+    for filename in os.listdir(folder): # Folder contains Demeter outputs in the fraction of a 0.5 degree grid cell
+        if filename.endswith('.csv'):
+            yearstr = filename.split('.')[0].split('_')[-1]
+            D_years.append(int(yearstr))
+            tmp = GetArrayCSV(os.path.join(folder, filename), 1)
+            data = tmp[:,8:20] # irrigation fraction for 12 crops except biomass
+            # 0.5 degree total grid cell square kilometers can be calculated using:  np.cos(np.radians(latitude)) * (111.32 * 110.57) * (0.5**2)
+            latitude = np.cos(np.radians(tmp[:,-1])) * (111.32 * 110.57) * (0.5**2);
+            newdata = data*latitude[:,np.newaxis] # The irrigated cropland area for each type of crop: total_grid_cell_square_kilometers * irrigated_crop_fraction
+            newdata = np.insert(newdata,0,0, axis = 1) # no fraction data from Demeter for biomass, all zeros
+            D_irr[yearstr] = newdata
+    
+    
+    years    = [int(x) for x in settings.years]
+    years_new= years[:]
+    
+    mainlog = Logger.getlogger()
+    oldlvl = mainlog.setlevel(Logger.DEBUG)
+    
+    for i in range(0, len(years)):
+        if years[i] >= 2010:
+            if years[i] >= max(D_years):
+                years_new[i] = max(D_years)
+            else:
+                for j in range (0, len(D_years)-1):
+                    if years[i] >= D_years[j] and years[i] < D_years[j+1]:
+                        years_new[i] = D_years[j] # use previous year
+                        
+            if not str(years_new[i]) in irr:
+                irr[str(years_new[i])] = D_irr[str(years_new[i])][:,:]       
+                #irr[str(years_new[i])] = importGMIA(settings.irr1 + "GMIA/gmia_v5_aei_ha.asc", settings.mapsize)
+            mainlog.write('------Use Demeter ' + str(years_new[i]) + ' Irrigation Area Data for ' +
+                          str(years[i]) + '\n')
+    
+    irr['years'] = years # years (integer) from settings
+    irr['years_new'] = years_new # years to import irrigation data (integer) corresponding to years
+    
+    mainlog.setlevel(oldlvl)
+    return irr
 def getPopYearData(settings):
     
     '''Update the population maps to include a unique map for each historical time period'''

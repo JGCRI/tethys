@@ -106,14 +106,28 @@ def OutWriter(Settings, OUT, GISData):
                 else:
                     writecsvMonthly(OutputFilename, value, TDMonthStr, temp, GISData)    
                     writeNETCDFmonthly(OutputFilename + '.nc', value, GISData, temp, TDMonthStr)
+                    
+            elif attr[:7] == 'crops_w': # divided by crops
+                d_crops = ['biomass', 'Corn', 'FiberCrop', 'FodderGrass', 'FodderHerb', 
+                           'MiscCrop', 'OilCrop', 'OtherGrain', 'PalmFruit', 'Rice',
+                           'Root_Tuber', 'SugarCrop', 'Wheat']
+                for i in range(value.shape[1]):
+                    newvalue   = value[GISData['mapindex'],i,:]
+                    if Settings.OutputFormat == 1:          
+                        writecsv(OutputFilename + '_' + d_crops[i], newvalue, Settings, temp, GISData)
+                    elif Settings.OutputFormat == 2:
+                        writeNETCDF(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, Settings.years)
+                    else:
+                        writecsv(OutputFilename + '_' + d_crops[i], newvalue, Settings, temp, GISData)
+                        writeNETCDF(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, Settings.years)
 
 
 def writecsv(filename, data, Settings, unit, GISData):
 
     if Settings.years:
-        headerline = "ID,lon,lat,ilon,ilat," + ",".join([str(year) for year in Settings.years])
+        headerline = "Grid_ID,lon,lat,ilon,ilat," + ",".join([str(year) for year in Settings.years])
     else:
-        headerline = "ID,lon,lat,ilon,ilat," + ",".join(["Year Index " + str(y+1) for y in range(0, data.shape[1])])
+        headerline = "Grid_ID,lon,lat,ilon,ilat," + ",".join(["Year Index " + str(y+1) for y in range(0, data.shape[1])])
 
     with open('{}_{}peryr.csv'.format(filename, unit), 'w') as outfile:
         newdata = np.append(GISData['coord'][:, :], data, axis=1)
@@ -123,7 +137,7 @@ def writecsv(filename, data, Settings, unit, GISData):
 def writecsvMonthly(filename, data, MonthStr, unit, GISData):
 
     mth_str = ','.join(map(bytes.decode, MonthStr))
-    headerline = "ID,lon,lat,ilon,ilat," + mth_str
+    headerline = "Grid_ID,lon,lat,ilon,ilat," + mth_str
 
     with open('{}_{}permonth.csv'.format(filename, unit), 'w') as outfile:
         newdata = np.append(GISData['coord'][:, :], data, axis=1)

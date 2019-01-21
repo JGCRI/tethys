@@ -29,6 +29,7 @@ class Settings:
         self.OutputUnit         = int(config['Project']['OutputUnit'])
         self.PerformDiagnostics = int(config['Project']['PerformDiagnostics'])
         self.PerformTemporal    = int(config['Project']['PerformTemporal'])
+        self.UseDemeter         = int(config['Project']['UseDemeter'])
         
         try:
             self.Logger           = config['Logger']
@@ -64,8 +65,9 @@ class Settings:
         self.CountryNames       = os.path.join(self.InputFolder, config['GriddedMap']['CountryNames'])
         self.Population_GPW     = os.path.join(self.InputFolder, config['GriddedMap']['Population_GPW'])
         self.Population_HYDE    = os.path.join(self.InputFolder, config['GriddedMap']['Population_HYDE'])
-        self.Irrigation_GMIA    = os.path.join(self.InputFolder, config['GriddedMap']['Irrigation_GMIA'])
-        self.Irrigation_HYDE    = os.path.join(self.InputFolder, config['GriddedMap']['Irrigation_HYDE'])
+        if not self.UseDemeter:
+            self.Irrigation_GMIA    = os.path.join(self.InputFolder, config['GriddedMap']['Irrigation_GMIA'])
+            self.Irrigation_HYDE    = os.path.join(self.InputFolder, config['GriddedMap']['Irrigation_HYDE'])
         self.Livestock_Buffalo  = os.path.join(self.InputFolder, config['GriddedMap']['Livestock_Buffalo'])
         self.Livestock_Cattle   = os.path.join(self.InputFolder, config['GriddedMap']['Livestock_Cattle'])
         self.Livestock_Goat     = os.path.join(self.InputFolder, config['GriddedMap']['Livestock_Goat'])
@@ -77,7 +79,7 @@ class Settings:
         self.irrigated_fract    = os.path.join(self.InputFolder, config['GriddedMap']['Irrigated_Fract'])
 
         if self.PerformTemporal:
-            self.temporal_climate = config['TemporalDownscaling']['temporal_climate']
+            self.temporal_climate      = config['TemporalDownscaling']['temporal_climate']
             self.Domestic_R            = config['TemporalDownscaling']['Domestic_R']
             self.Elec_Building         = config['TemporalDownscaling']['Elec_Building']
             self.Elec_Industry         = config['TemporalDownscaling']['Elec_Industry']
@@ -86,7 +88,10 @@ class Settings:
             self.Elec_Building_others  = config['TemporalDownscaling']['Elec_Building_others']
             self.Irr_MonthlyData       = config['TemporalDownscaling']['Irr_MonthlyData']
             self.TemporalInterpolation = int(config['TemporalDownscaling']['TemporalInterpolation'])
-
+        
+        if self.UseDemeter:
+            self.DemeterOutputFolder = config['Project']['DemeterOutputFolder']
+			
         self.check_existence()
 
     def check_existence(self):
@@ -106,10 +111,16 @@ class Settings:
         #     raise DirectoryNotFoundError(settings.GCAM_CSV)
 
         # Check the existence of input files
-        strlist = ['Area', 'Coord', 'aez', 'InputBasinFile', 'BasinNames', 'InputRegionFile', 'RegionNames',
-                   'InputCountryFile', 'CountryNames', 'Population_GPW', 'Population_HYDE', 'Irrigation_GMIA',
-                   'Irrigation_HYDE', 'Livestock_Buffalo', 'Livestock_Cattle', 'Livestock_Goat', 'Livestock_Sheep',
-                   'Livestock_Poultry', 'Livestock_Pig']
+        if not self.UseDemeter:
+            strlist = ['Area', 'Coord', 'aez', 'InputBasinFile', 'BasinNames', 'InputRegionFile', 'RegionNames',
+                       'InputCountryFile', 'CountryNames', 'Population_GPW', 'Population_HYDE', 'Irrigation_GMIA',
+                       'Irrigation_HYDE', 'Livestock_Buffalo', 'Livestock_Cattle', 'Livestock_Goat', 'Livestock_Sheep',
+                       'Livestock_Poultry', 'Livestock_Pig']
+        else:
+            strlist = ['Area', 'Coord', 'aez', 'InputBasinFile', 'BasinNames', 'InputRegionFile', 'RegionNames',
+                       'InputCountryFile', 'CountryNames', 'Population_GPW', 'Population_HYDE',
+                       'Livestock_Buffalo', 'Livestock_Cattle', 'Livestock_Goat', 'Livestock_Sheep',
+                       'Livestock_Poultry', 'Livestock_Pig']
 
         ifn = 0
         for s in strlist:
@@ -125,7 +136,10 @@ class Settings:
                 fn = getattr(self, s)
                 if not os.path.isfile(fn):
                     raise FileNotFoundError(fn)
-
+                
+        if self.UseDemeter and not os.path.exists(self.DemeterOutputFolder):
+            raise DirectoryNotFoundError(self.DemeterOutputFolder)
+			
     def print_info(self):
 
         log    = Logger.getlogger()

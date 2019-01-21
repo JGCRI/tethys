@@ -114,8 +114,13 @@ def run_disaggregation(settings):
     mainlog.write("------Time Cost: %s seconds ---\n" % (endtime5 - endtime4))
 
     # c.    Create an irrigation proxy map and downscale irrigation water withdrawal to grid scale
-    mainlog.write('---Create an irrigation map as proxy of agricultural water withdrawal\n')
-    ProxyMaps.IrrigationMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT, settings.subreg)
+    if settings.UseDemeter:
+        mainlog.write('---Create an irrigation map as proxy of agricultural water withdrawal using Demeter outputs\n')
+        ProxyMaps.IrrigationMapCrops(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT, settings.subreg)
+    else:
+        mainlog.write('---Create an irrigation map as proxy of agricultural water withdrawal \n')
+        ProxyMaps.IrrigationMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT, settings.subreg)
+		
     endtime6 = time.time()
     mainlog.write("------Time Cost: %s seconds ---\n" % (endtime6 - endtime5))
 
