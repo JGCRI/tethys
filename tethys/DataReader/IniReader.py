@@ -25,12 +25,27 @@ class Settings:
         self.InputFolder        = config['Project']['InputFolder']
         self.OutputFolder       = os.path.join(config['Project']['OutputFolder'], self.ProjectName)
         self.rgnmapdir          = config['Project']['rgnmapdir']
-        self.OutputFormat       = int(config['Project']['OutputFormat'])
-        self.OutputUnit         = int(config['Project']['OutputUnit'])
-        self.PerformDiagnostics = int(config['Project']['PerformDiagnostics'])
-        self.PerformTemporal    = int(config['Project']['PerformTemporal'])
-        self.UseDemeter         = int(config['Project']['UseDemeter'])
-        
+        try: 
+            self.OutputFormat       = int(config['Project']['OutputFormat'])
+        except:
+            self.OutputFormat       = 0
+        try:    
+            self.OutputUnit         = int(config['Project']['OutputUnit'])
+        except:
+            self.OutputUnit         = 0
+        try:
+            self.PerformDiagnostics = int(config['Project']['PerformDiagnostics'])
+        except:
+            self.PerformDiagnostics = 1
+        try:     
+            self.PerformTemporal    = int(config['Project']['PerformTemporal'])
+        except:
+            self.PerformTemporal    = 0
+        try:
+            self.UseDemeter         = int(config['Project']['UseDemeter'])
+        except:
+            self.UseDemeter         = 0
+			
         try:
             self.Logger           = config['Logger']
             self.Logger['logdir'] = self.OutputFolder 

@@ -541,8 +541,8 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
             irr[GISData['mapindex']] = GISData['irr'][yearstr][:,k]
             # add GCAM-AEZ labels to all cells with irrigation values
             # XXX maybe this should be done further up when we do the population adjustments
-            map_rgn_ag = rgnmapadjust(mapsize, irr, rgnmapData['map_rgn_ag'], '------[Adjusting map_rgn_ag with irr crop # ' + str(k) + ']: ')
-            mapAEZ     = rgnmapadjust(mapsize, irr, mapAEZ, '------[Adjusting map' + GISData['AEZstring'] + ' with irr crop # ' + str(k) + ']: ') # if we need to do this step for mapAEZ?
+            map_rgn_ag = rgnmapadjust(mapsize, irr, rgnmapData['map_rgn_ag'], '------[Adjusting map_rgn_ag with irr crop # ' + str(k+1) + ']: ')
+            mapAEZ     = rgnmapadjust(mapsize, irr, mapAEZ, '------[Adjusting map' + GISData['AEZstring'] + ' with irr crop # ' + str(k+1) + ']: ') # if we need to do this step for mapAEZ?
     
             rgnmapData['map_rgn_ag'] = np.copy(map_rgn_ag)
         
