@@ -13,19 +13,23 @@ withd_nonAg_map, OUT.wdirr, OUT.wdliv have no nan
 2. Output downscaled results by region and time
 
 3. Perform the  conversion from km3/yr to the output unit
+
 """
 
 import numpy as np
 
 def TotalWaterUse(Settings, GISData, rgnmapData, OUT):
-       
-# We use the grid-level representations of all the water withdrawal sources to aggregate them all into a total withdrawal. 
-# When we go to re-aggregate them, we use the non-ag region map, since it will typically be the most detailed.
+    """"
+    We use the grid-level representations of all the water withdrawal sources to aggregate them all into a total withdrawal. 
+    When we go to re-aggregate them, we use the non-ag region map, since it will typically be the most detailed.
+    
+    """
+    
     # 1.
     OUT.wdtotal = OUT.wdnonag + OUT.wdirr + OUT.wdliv
-    
     outvars = vars(OUT)
     sectorstrs = ['total', 'nonag', 'irr', 'liv', 'dom', 'elec', 'mfg', 'min']
+    
     # 2.
     for item in sectorstrs:
         outvars['r'+item] = np.zeros((rgnmapData['nrgnNONAG'], OUT.wdnonag.shape[1]), dtype=float)

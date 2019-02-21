@@ -27,25 +27,25 @@ class Settings:
         self.rgnmapdir          = config['Project']['rgnmapdir']
         try: 
             self.OutputFormat       = int(config['Project']['OutputFormat'])
-        except:
+        except KeyError:
             self.OutputFormat       = 0
         try:    
             self.OutputUnit         = int(config['Project']['OutputUnit'])
-        except:
+        except KeyError:
             self.OutputUnit         = 0
         try:
             self.PerformDiagnostics = int(config['Project']['PerformDiagnostics'])
-        except:
+        except KeyError:
             self.PerformDiagnostics = 1
         try:     
             self.PerformTemporal    = int(config['Project']['PerformTemporal'])
-        except:
+        except KeyError:
             self.PerformTemporal    = 0
         try:
             self.UseDemeter         = int(config['Project']['UseDemeter'])
-        except:
+        except KeyError:
             self.UseDemeter         = 0
-			
+        
         try:
             self.Logger           = config['Logger']
             self.Logger['logdir'] = self.OutputFolder 
@@ -56,7 +56,7 @@ class Settings:
         # spatial params
         try:
             self.SpatialResolution = float(config['Project']['SpatialResolution'])
-        except:
+        except KeyError:
             self.SpatialResolution = 0.5
             self.mapsize = [int(180 / self.SpatialResolution), int(360 / self.SpatialResolution)]
 
@@ -66,7 +66,9 @@ class Settings:
         self.GCAM_query = os.path.join(self.GCAM_DBpath, config['GCAM']['GCAM_query'])
         self.subreg = int(config['GCAM']['GCAM_subreg'])
         self.years = config['GCAM']['GCAM_Years']
-
+        if not isinstance(self.years, (list,)): # a single year input will be string not list for self.years
+            self.years = [self.years]
+			
         # reference data
         self.Area               = os.path.join(self.InputFolder, config['GriddedMap']['Area'])
         self.Coord              = os.path.join(self.InputFolder, config['GriddedMap']['Coord'])
@@ -106,7 +108,16 @@ class Settings:
         
         if self.UseDemeter:
             self.DemeterOutputFolder = config['Project']['DemeterOutputFolder']
-			
+            D_years = []
+            for filename in os.listdir(self.DemeterOutputFolder): # Folder contains Demeter outputs
+                if filename.endswith('.csv'):
+                    yearstr = filename.split('.')[0].split('_')[-1]
+                    D_years.append(int(yearstr))
+                           
+            years      = [int(x) for x in self.years]
+            startindex = years.index(D_years[0]) # If we use Demeter outputs, we will start from the beginning year in Demeter.
+            self.years = years[startindex:]
+
         self.check_existence()
 
     def check_existence(self):
@@ -154,7 +165,7 @@ class Settings:
                 
         if self.UseDemeter and not os.path.exists(self.DemeterOutputFolder):
             raise DirectoryNotFoundError(self.DemeterOutputFolder)
-			
+						
     def print_info(self):
 
         log    = Logger.getlogger()

@@ -9,7 +9,7 @@ Copyright (c) 2017, Battelle Memorial Institute
 
 This is the core of Water Disaggregation
 
-    - mapsize     [360,720]
+    - mapsize     [360,720] for 0.5 degree
     - settings    class ConfigSettings(), required input and controlling parameters
     - OUT         class OUTSettings(), data for output, gridded results for each withdrawal category
     - GISData     structure GISData{}, GIS data on grid map of 360*720
@@ -25,9 +25,7 @@ from tethys.Utils.Math import sub2ind
 from tethys.Utils.Logging import Logger
 
 def Rearranging(mapsize, GISData, rgnmapData):
-    
-    '''mapsize: [360,720]'''
-    
+
     row0      = SizeR(GISData['area']) # row  = 67420
     # Create a matrix with all data 1. area 2 region #
     data      = np.zeros((row0,2), dtype=float)
@@ -57,23 +55,24 @@ def Rearranging(mapsize, GISData, rgnmapData):
 
     
 def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
-# Total Non-Agricultural Water withdrawal in 1990, 2005, ... 2050, and 2010
-# population in millions in year 2000
+    """
+    Population density map is used to downscale Non-Agricultural Water withdrawal 
+    """
 
     mainlog = Logger.getlogger()
-    
+	
     NY = settings.NY
     
-# non-agricultural (dom, elec, mfg, mining) total water withdrawals in (km3/yr) for each of the GCAM regions
-# population map for all years 1990, 2005:2095
+    # non-agricultural (dom, elec, mfg, mining) total water withdrawals in (km3/yr) for each of the GCAM regions
+    # population map for all years 1990, 2005:2100
     ms      = (mapsize[0]*mapsize[1],NY)
-#    withd_nonAg_map   = np.full(ms, np.NaN, dtype=float)
+    # withd_nonAg_map   = np.full(ms, np.NaN, dtype=float)
     withd_dom_map     = np.full(ms, np.NaN, dtype=float)
     withd_elec_map    = np.full(ms, np.NaN, dtype=float)
     withd_mfg_map     = np.full(ms, np.NaN, dtype=float)
     withd_mining_map  = np.full(ms, np.NaN, dtype=float)    
     
-# use historical population maps
+    # use historical population maps
     for y in range (0,NY):
         # population map
         mainlog.write('{}\n'.format(GISData['pop']['years'][y]),
@@ -130,16 +129,19 @@ def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
 
 
 def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):     
-
+    """
+    Livestock gridded GIS data maps by six types are used to downscale livestock Water withdrawal 
+    """
+    
     mainlog = Logger.getlogger()
     oldlvl = mainlog.setlevel(Logger.DEBUG)
     
-# count how many animals live in each GCAM region first    
+    # count how many animals live in each GCAM region first    
     map_rgn_ag = rgnmapData['map_rgn_ag']
     nrgnAG     = rgnmapData['nrgnAG']
     tot_livestock = np.zeros((nrgnAG,6), dtype=float) # Livestock totals at GCAM scale in year 2005
     
-# 67420 -> 360*720   
+    # 67420 -> 360*720   
     buffalo  = np.zeros(map_rgn_ag.shape, dtype=float)
     cattle   = np.zeros(map_rgn_ag.shape, dtype=float)
     goat     = np.zeros(map_rgn_ag.shape, dtype=float)
@@ -165,13 +167,13 @@ def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
         tot_livestock[IN-1,4] += poultry[index]
         tot_livestock[IN-1,5] += pig[index]
   
-#  now create a spatial distribution for each GCAM region
-#  withd_liv: these are the GCAM results of total volume of livestock water withdrawal in
-#  km3 in each GCAM region per animal type in the years 1990, 2005:5:2095
-#  variables are nrgn GCAM regions x 6 animals (1:Buffalo, 2:Cattle, 3-Goat, 4-Sheep, 5-Poultry, 6-Pig)
-# 
-#  Next, we distribute those volumes using the spatial distribution of the gis maps
-# these will be the GIS downscaled matrices
+    #  now create a spatial distribution for each GCAM region
+    #  withd_liv: these are the GCAM results of total volume of livestock water withdrawal in
+    #  km3 in each GCAM region per animal type in the years 1990, 2005:5:2095
+    #  variables are nrgn GCAM regions x 6 animals (1:Buffalo, 2:Cattle, 3-Goat, 4-Sheep, 5-Poultry, 6-Pig)
+    # 
+    #  Next, we distribute those volumes using the spatial distribution of the gis maps
+    # these will be the GIS downscaled matrices
 
     livestock      = np.zeros((mapsize[0]*mapsize[1],6), dtype = float) 
     withd_liv_map  = np.zeros((mapsize[0]*mapsize[1],NY), dtype = float)
@@ -189,7 +191,6 @@ def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
         withd_liv_map[:,y] = np.sum(livestock,axis = 1)        
 
     OUT.wdliv    = withd_liv_map
-
 
     fmtstr = '[Year Index, Region ID, {:7s} from GCAM not assigned (no GIS data)]:  {}  {}  {}\n'
     dat = GCAMData['wdliv']
@@ -337,7 +338,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                         else:
                             ls2.append(index)
                              
-                    # if irrigation area appears in GCAM but not in GIS (none of the grids are equipped with irrigation in the selcted year)
+                    # if irrigation area appears in GCAM but not in GIS (none of the grids are equipped with irrigation in the selected year)
                     # uniformly distributed irrigation area based on the total area               
                     if irrA[i,j] == 0 or irrAx[i,j] == 0:
                         for index in ls:                        
@@ -392,10 +393,11 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                             cum_diff0 += z - mapAreaExt[index]                                            
                                         cum_area = cum_area1 + irrA_grid[index, y]
                                     if cum_diff0 > 0:
+                                        # GCAM irr_A is too large, the redistributed ls1 still has grids that irrigated area > total area
                                         mainlog.write('{}  {}  {}  {} {} {} {} \n'.format(
                                             '[Year Index, Region ID,',
                                             GISData['AEZstring'],
-                                            ' ID, irr from GCAM not assigned (km3) (condition 0)]:',
+                                            'ID, irr from GCAM not assigned (km3) (condition 0)]         :',
                                             y+1, i+1, j+1,
                                             cum_diff0*irr_V[i,j,y]/irr_A[i,j,y]),
                                                       Logger.WARNING)
@@ -420,10 +422,11 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                         counter3 += 1                                                                       
                                 num = num_new
                                 if cum_diff == 0 and counter3 == len(ls2):
+                                    # GCAM irr_A is too large, the redistributed ls2 still has grids that irrigated area > total area
                                     mainlog.write('{}  {}  {}  {} {} {} {} \n'.format(
                                         '[Year Index, Region ID,',
                                         GISData['AEZstring'],
-                                        ' ID, irr from GCAM not assigned (km3) (condition 1)]:',
+                                        'ID, irr from GCAM not assigned (km3) (condition 1)]         :',
                                         y+1, i+1, j+1,
                                         diff*irr_V[i,j,y]/irr_A[i,j,y]),
                                                   Logger.WARNING)
@@ -577,7 +580,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                             else:
                                 ls2.append(index)
                                  
-                        # if irrigation area appears in GCAM but not in GIS (none of the grids are equipped with irrigation in the selcted year)
+                        # if irrigation area appears in GCAM but not in GIS (none of the grids are equipped with irrigation in the selected year)
                         # uniformly distributed irrigation area based on the total area               
                         if irrA[i,j] == 0 or irrAx[i,j] == 0:
                             for index in ls:                        
@@ -632,10 +635,11 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                                 cum_diff0 += z - mapAreaExt[index]                                            
                                             cum_area = cum_area1 + irrA_grid[index, k, y]
                                         if cum_diff0 > 0:
+                                            # GCAM irr_A is too large, the redistributed ls1 still has grids that irrigated area > total area
                                             mainlog.write('{}  {}  {}  {} {} {} {} {}\n'.format(
                                                 '[Year Index, Region ID,',
                                                 GISData['AEZstring'],
-                                                ' ID, Crop ID, irr from GCAM not assigned (km3) (condition 0)]:',
+                                                'ID, Crop ID, irr from GCAM not assigned (km3) (condition 0)]         :',
                                                 y+1, i+1, j+1, k+1,
                                                 cum_diff0*tempV_all[i,j,k,y]/irr_A[i,j,k,y]),
                                                           Logger.WARNING)
@@ -660,10 +664,11 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                             counter3 += 1                                                                       
                                     num = num_new
                                     if cum_diff == 0 and counter3 == len(ls2):
+                                        # GCAM irr_A is too large, the redistributed ls2 still has grids that irrigated area > total area
                                         mainlog.write('{}  {}  {}  {} {} {} {} {}\n'.format(
                                             '[Year Index, Region ID,',
                                             GISData['AEZstring'],
-                                            ' ID, Crop ID, irr from GCAM not assigned (km3) (condition 1)]:',
+                                            'ID, Crop ID, irr from GCAM not assigned (km3) (condition 1)]         :',
                                             y+1, i+1, j+1,  k+1,
                                             diff*tempV_all[i,j,k,y]/irr_A[i,j,k,y]),
                                                       Logger.WARNING)
@@ -695,7 +700,8 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
 
 
 def pop_scale_reshape(withd, pop_pro_rata, map_rgn, mapindex):
-    '''
+    
+    """
     scale the total withdrawal values for a region by the pro-rata population in each grid cell.
   
     Arguments:
@@ -708,7 +714,7 @@ def pop_scale_reshape(withd, pop_pro_rata, map_rgn, mapindex):
     Return value:
     2D map of withdrawal scaled by pro-rata population.  Cells in the map that are not
     'live' grid cells (i.e., not referenced by mapindex) will be set to NaN.
-    '''
+    """
     
     #scaled_map = np.full(map_rgn.shape, np.NaN, dtype=float)
     #scaled_map[mapindex] = pop_pro_rata * withd[map_rgn[mapindex]-1]
@@ -719,7 +725,7 @@ def pop_scale_reshape(withd, pop_pro_rata, map_rgn, mapindex):
 
 
 def rgnmapadjust(mapsize, map_pop, map_rgn, label):
-    '''
+    """
     function rgn_map_adjust in matlab code
 
     Find unassigned grid cells with nonzero population and assign them to an
@@ -732,7 +738,7 @@ def rgnmapadjust(mapsize, map_pop, map_rgn, label):
       label - String to prefix to diagnostic output
 
     Return value:  adjusted region map.
-    '''
+    """
 
     mainlog = Logger.getlogger()
     

@@ -22,7 +22,7 @@ from tethys.Utils.Logging import Logger
 
 
 def run_disaggregation(settings):
-    '''
+    """
     License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
     Copyright (c) 2017, Battelle Memorial Institute
 
@@ -45,7 +45,7 @@ def run_disaggregation(settings):
 
     # Output:
     - OUT         class DataWriter.OUTWritter, data for output, gridded results for each withdrawal category
-    '''
+    """
 
     mainlog = Logger.getlogger()
     oldlvl = mainlog.setlevel(Logger.INFO)
@@ -114,13 +114,15 @@ def run_disaggregation(settings):
     mainlog.write("------Time Cost: %s seconds ---\n" % (endtime5 - endtime4))
 
     # c.    Create an irrigation proxy map and downscale irrigation water withdrawal to grid scale
-    if settings.UseDemeter:
+    if settings.UseDemeter: 
+        # Use Demeter outputs (irrigated cropland areas for each type of crops ) to replace the GMIA/HYSE data used in downscaling of irrigation water withdrawal
+        # Additional gridded outputs: irrigation water withdrawal by 13 crop types
         mainlog.write('---Create an irrigation map as proxy of agricultural water withdrawal using Demeter outputs\n')
         ProxyMaps.IrrigationMapCrops(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT, settings.subreg)
     else:
         mainlog.write('---Create an irrigation map as proxy of agricultural water withdrawal \n')
         ProxyMaps.IrrigationMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT, settings.subreg)
-		
+    
     endtime6 = time.time()
     mainlog.write("------Time Cost: %s seconds ---\n" % (endtime6 - endtime5))
 
@@ -133,6 +135,8 @@ def run_disaggregation(settings):
     # 6. Diagnostics of Spatial Downscaling
     if settings.PerformDiagnostics:
         DiagnosticsSD.compare_downscaled_GCAMinput(settings, GCAMData, OUT)
+    if settings.UseDemeter:
+        DiagnosticsSD.compare_downscaled_GCAMinput_irr_by_crops(settings, GCAMData, OUT)
 
     # 7. Temporal Downscaling
     if settings.PerformTemporal:
