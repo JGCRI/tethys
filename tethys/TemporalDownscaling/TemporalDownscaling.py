@@ -7,7 +7,10 @@ License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 
 
-Original Algorithms From Huang, Zhongwei <zhongwei.huang@pnnl.gov>
+Original Algorithms:
+Huang, Z., Hejazi, M., Li, X., Tang, Q., Leng, G., Liu, Y., Döll, P., Eisner, S., Gerten, D., Hanasaki, N. and Wada, Y., 2018. 
+Reconstruction of global gridded monthly sectoral water withdrawals for 1971-2010 and analysis of their spatiotemporal patterns. 
+Hydrology and Earth System Sciences Discussions, 22, pp.2117-2133.
 
 Pre-processed Input Data Files:
 1. Monthly average temperatures of 67420 cells in a period of years (indicated by filename)
