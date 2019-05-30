@@ -7,7 +7,7 @@ def get_requirements():
 
 setup(
     name='tethys',
-    version='1.1.0',
+    version='1.2.0',
     description='Spatial and Temporal Downscaling of Global Water Demands',
     url='https://github.com/JGCRI/tethys',
     packages=find_packages(),
