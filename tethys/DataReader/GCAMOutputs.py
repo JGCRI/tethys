@@ -143,6 +143,18 @@ def population_to_array(conn, query, d_reg_name, years):
     # map region_id to region name
     df['region'] = df['region'].map(d_reg_name)
 
+    # Remove NA's
+    df = df[df['region'].notnull()]
+
+    # Remove USA if using GCAM USA
+    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
+              'IA', 'ID', 'IL', 'IN', 'KS','KY','LA', 'MA', 'MD', 'ME', 'MI', 'MN',
+              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY','OH',
+              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
+              'WA', 'WI', 'WV', 'WY']
+    if any(item in d_reg_name for item in states):
+       df.loc[df.region == 1, 'value'] = 0
+
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0)
 
@@ -171,6 +183,15 @@ def dom_water_demand_to_array(conn, query, d_reg_name, years):
 
    # Add missing regions
     df = add_missing_regions(df,list(d_reg_name.values()))
+
+    # Remove USA if using GCAM USA
+    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
+              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
+              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
+              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
+              'WA', 'WI', 'WV', 'WY']
+    if any(item in d_reg_name for item in states):
+        df.loc[df.region == 1, 'value'] = 0
 
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
@@ -201,6 +222,15 @@ def elec_water_demand_to_array(conn, query, d_reg_name, years):
    # Add missing regions
     df = add_missing_regions(df,list(d_reg_name.values()))
 
+    # Remove USA if using GCAM USA
+    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
+              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
+              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
+              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
+              'WA', 'WI', 'WV', 'WY']
+    if any(item in d_reg_name for item in states):
+        df.loc[df.region == 1, 'value'] = 0
+
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
 
@@ -229,6 +259,15 @@ def manuf_water_demand_to_array(conn, query, d_reg_name, years):
 
    # Add missing regions
     df = add_missing_regions(df,list(d_reg_name.values()))
+
+    # Remove USA if using GCAM USA
+    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
+              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
+              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
+              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
+              'WA', 'WI', 'WV', 'WY']
+    if any(item in d_reg_name for item in states):
+        df.loc[df.region == 1, 'value'] = 0
 
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0,aggfunc=np.sum)
@@ -264,6 +303,15 @@ def mining_water_demand_to_array(conn, query, d_reg_name, years):
 
    # Add missing regions
     df = add_missing_regions(df,list(d_reg_name.values()))
+
+    # Remove USA if using GCAM USA
+    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
+              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
+              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
+              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
+              'WA', 'WI', 'WV', 'WY']
+    if any(item in d_reg_name for item in states):
+        df.loc[df.region == 1, 'value'] = 0
 
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
@@ -319,6 +367,15 @@ def livestock_water_demand_to_array(conn, conn_core, query, query_core, d_reg_na
 
     # map region_id to region name
     df['region'] = df['region'].map(d_reg_name)
+
+    # Remove USA if using GCAM USA
+    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
+              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
+              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
+              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
+              'WA', 'WI', 'WV', 'WY']
+    if any(item in d_reg_name for item in states):
+        df.loc[df.region == 1, 'value'] = 0
 
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region', 'sector'], columns='Year', fill_value=0, aggfunc=np.sum)
@@ -455,7 +512,16 @@ def land_to_array(conn, conn_core, query, query_core, subreg, basin_state_area, 
         #    {'value': 'sum'}).reset_index()
 
     # get only target years
-    df = df.loc[df['Year'].isin(years)].copy()    
+    df = df.loc[df['Year'].isin(years)].copy()
+
+    # Remove USA if using GCAM USA
+    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
+              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
+              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
+              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
+              'WA', 'WI', 'WV', 'WY']
+    if any(item in d_reg_name for item in states):
+        df.loc[df.region == 1, 'value'] = 0
 
     # keep types
     allpft = list(d_crops.keys()) + l_biomass
@@ -595,6 +661,15 @@ def irr_water_demand_to_array(conn, conn_core, query, query_core, subreg, d_reg_
 
     # drop sector
     df.drop('sector', axis=1, inplace=True)
+
+    # Remove USA if using GCAM USA
+    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
+              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
+              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
+              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
+              'WA', 'WI', 'WV', 'WY']
+    if any(item in d_reg_name for item in states):
+        df.loc[df.region == 1, 'value'] = 0
 
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0,aggfunc=np.sum)
