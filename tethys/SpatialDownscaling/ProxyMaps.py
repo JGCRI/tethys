@@ -55,7 +55,6 @@ def Rearranging(mapsize, GISData, rgnmapData):
     rgnmapData['map_rgn_nonag'] = map_rgn_nonag
     rgnmapData['map_rgn_ag']    = map_rgn_ag
 
-    
 def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
 # Total Non-Agricultural Water withdrawal in 1990, 2005, ... 2050, and 2010
 # population in millions in year 2000
@@ -127,8 +126,6 @@ def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
     OUT.wdmin    = withd_mining_map
     
     return withd_nonAg_map
-
-
 
 def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):     
 
@@ -212,7 +209,6 @@ def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
     mainlog.setlevel(oldlvl)
     return withd_liv_map
 
-    
 def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
 
     mainlog = Logger.getlogger()
@@ -475,8 +471,6 @@ def pop_scale_reshape(withd, pop_pro_rata, map_rgn, mapindex):
     scaled_map = pop_pro_rata * withd[map_rgn[mapindex]-1]
     
     return  scaled_map
-
-
 
 def rgnmapadjust(mapsize, map_pop, map_rgn, label):
     '''

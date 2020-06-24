@@ -48,6 +48,11 @@ class Settings:
         self.GCAM_DBpath = os.path.join(self.InputFolder, config['GCAM']['GCAM_DBpath'])
         self.GCAM_DBfile = config['GCAM']['GCAM_DBfile']
         self.GCAM_query = os.path.join(self.GCAM_DBpath, config['GCAM']['GCAM_query'])
+        # Additional details for GCAM USA (Only if present)
+        try:
+            self.GCAM_queryCore = os.path.join(self.GCAM_DBpath, config['GCAM']['GCAM_queryCore'])
+        except:
+            self.GCAM_queryCore = os.path.join(self.GCAM_DBpath, config['GCAM']['GCAM_query'])
         self.subreg = int(config['GCAM']['GCAM_subreg'])
         self.years = config['GCAM']['GCAM_Years']
 
@@ -75,6 +80,11 @@ class Settings:
         self.buff_fract         = os.path.join(self.InputFolder, config['GriddedMap']['Buffalo_Fraction'])
         self.goat_fract         = os.path.join(self.InputFolder, config['GriddedMap']['Goat_Fraction'])
         self.irrigated_fract    = os.path.join(self.InputFolder, config['GriddedMap']['Irrigated_Fract'])
+        # Additional details for GCAM USA (Only if present)
+        try:
+            self.basin_state_area = os.path.join(self.InputFolder, config['GriddedMap']['BasinStateArea'])
+        except:
+            self.basin_state_area = "placeholder string which will not be read"
 
         if self.PerformTemporal:
             self.temporal_climate = config['TemporalDownscaling']['temporal_climate']

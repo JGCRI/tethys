@@ -23,7 +23,6 @@ l_biomass = ["eucalyptus", "Jatropha", "miscanthus", "willow", "biomassOil"]
 # set ordering of livestock
 d_liv_order = {'Buffalo': 0, 'Cattle': 1, 'Goat': 2, 'Sheep': 3, 'Poultry': 4, 'Pork': 5}
 
-
 def get_buffalo_frac(f):
     """
     Create a dictionary of buffalo fraction per region id.
@@ -36,7 +35,6 @@ def get_buffalo_frac(f):
     df.set_index('region_id', inplace=True)
 
     return df.to_dict()['buffalo-fraction']
-
 
 def get_goat_frac(f):
     """
@@ -51,7 +49,6 @@ def get_goat_frac(f):
 
     return df.to_dict()['goat-fraction']
 
-
 def get_region_info(f):
     """
     Get a dictionary of {region_name: region_id, ...}
@@ -61,7 +58,6 @@ def get_region_info(f):
     """
     return pd.read_csv(f).groupby('region').sum().to_dict()['region_id']
 
-
 def get_basin_info(f):
     """
     Get a dictionary of {region_name: region_id, ...}
@@ -70,7 +66,6 @@ def get_basin_info(f):
     :return:            dictionary, {basin_name: basin_id, ...}
     """
     return pd.read_csv(f, usecols=['glu_name', 'basin_id'], index_col='glu_name').to_dict()['basin_id']
-
 
 def get_gcam_queries(db_path, db_file, f_queries):
     """
@@ -89,6 +84,41 @@ def get_gcam_queries(db_path, db_file, f_queries):
 
     return c, q
 
+def add_missing_regions(df, d_reg_name):
+    """
+    Checks a dataframe for missing regions and adds rows with 0 values
+    :df data frame
+    :d_reg_names list with regions names
+    :return dataframe
+    """
+
+    # Add missing regions to dataframe with value 0
+    units = (list(df.Units.unique()))
+    scenarios = (list(df.scenario.unique()))
+    sectors = (list(df.sector.unique()))
+    inputs = (list(df.input.unique()))
+    years = (list(df.Year.unique()))
+    names = list(d_reg_name)
+    df1 = df
+    for region_i in names:
+        if region_i in df1.region.values:
+            continue
+        else:
+            # print("*******Regions not in dataframe")
+            # print(region_i)
+            for units_i in units:
+                for scenario_i in scenarios:
+                    for sector_i in sectors:
+                        for input_i in inputs:
+                            for year_i in years:
+                                df1 = df1.append({'Units': units_i,
+                                                  'scenario': scenario_i,
+                                                  'sector': sector_i,
+                                                  'input': input_i,
+                                                  'Year': year_i,
+                                                  'region': region_i,
+                                                  'value': 0}, ignore_index=True)
+    return (df1)
 
 def population_to_array(conn, query, d_reg_name, years):
     """
@@ -118,56 +148,6 @@ def population_to_array(conn, query, d_reg_name, years):
 
     return piv.values * 1000
 
-
-def irr_water_demand_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years):
-    """
-    Query GCAM database for irrigated water demand (billion m3).  Place
-    in format required by Tethys.
-
-    :param conn:          gcam_reader database object
-    :param query:         XPath Query
-    :param subreg:        Either 0 (AEZ) or 1 (BASIN)
-    :param d_reg_name:    A dictionary of 'region_name': region_id
-    :param d_crops:       A dictionary of 'crop_name': crop_id
-    :param years:         list of years to use
-
-    :return:               NumPy array where col_1: region_id, col_2: subreg_id,
-                           col_3: crop_number, col_n...n: irrigated demand per year in
-                           billion m3
-    """
-    # query content to data frame
-    df = conn.runQuery(query)
-
-    # get only target years
-    df = df.loc[df['Year'].isin(years)].copy()
-
-    # drop unused columns
-    df.drop(['Units', 'scenario', 'input'], axis=1, inplace=True)
-
-    # replace region name with region number
-    df['region'] = df['region'].map(d_reg_name)
-
-    if subreg == 0:
-        # break out subregion number
-        df['subreg'] = df['subsector'].apply(lambda x: int(x.split('AEZ')[1]))
-
-    elif subreg == 1:
-        df['subreg'] = df['subsector'].apply(lambda x: x.split('_')[-1]).map(d_basin_name)
-
-    # break out crop and map the id to it
-    df['crop'] = df['sector'].apply(lambda x: 'biomass' if x in l_biomass else x)
-    df['crop'] = df['crop'].map(d_crops)
-
-    # drop sector
-    df.drop('sector', axis=1, inplace=True)
-
-    # convert shape for use in Tethys
-    piv = pd.pivot_table(df, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0,aggfunc=np.sum)
-    piv.reset_index(inplace=True)
-
-    return piv.values
-
-
 def dom_water_demand_to_array(conn, query, d_reg_name, years):
     """
     Query GCAM database for domestic water demand (billion m3). Place in format
@@ -189,11 +169,13 @@ def dom_water_demand_to_array(conn, query, d_reg_name, years):
     # map region_id to region name
     df['region'] = df['region'].map(d_reg_name)
 
+   # Add missing regions
+    df = add_missing_regions(df,list(d_reg_name.values()))
+
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
 
     return piv.values
-
 
 def elec_water_demand_to_array(conn, query, d_reg_name, years):
     """
@@ -216,11 +198,13 @@ def elec_water_demand_to_array(conn, query, d_reg_name, years):
     # map region_id to region name
     df['region'] = df['region'].map(d_reg_name)
 
+   # Add missing regions
+    df = add_missing_regions(df,list(d_reg_name.values()))
+
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
 
     return piv.values
-
 
 def manuf_water_demand_to_array(conn, query, d_reg_name, years):
     """
@@ -243,11 +227,13 @@ def manuf_water_demand_to_array(conn, query, d_reg_name, years):
     # map region_id to region name
     df['region'] = df['region'].map(d_reg_name)
 
+   # Add missing regions
+    df = add_missing_regions(df,list(d_reg_name.values()))
+
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0,aggfunc=np.sum)
 
     return piv.values
-
 
 def mining_water_demand_to_array(conn, query, d_reg_name, years):
     """
@@ -270,13 +256,21 @@ def mining_water_demand_to_array(conn, query, d_reg_name, years):
     # map region_id to region name
     df['region'] = df['region'].map(d_reg_name)
 
+    # Restructure data (For GCAM USA queries)
+    # Check if column name "input" exists it means that the new GCAM USA queries were used.
+    # Rename this to "output" to conform with original format
+    if 'output' in df.columns:
+        df.rename(columns={"output": "input"}, inplace=True)
+
+   # Add missing regions
+    df = add_missing_regions(df,list(d_reg_name.values()))
+
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
 
     return piv.values
 
-
-def livestock_water_demand_to_array(conn, query, d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years):
+def livestock_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years):
     """
     Query GCAM database for livestock water demand (billion m3).
     Place in format required by Tethys.
@@ -284,7 +278,9 @@ def livestock_water_demand_to_array(conn, query, d_reg_name, d_buf_frac, d_goat_
     Outputs are ordered by region and then by [Buffalo, Cattle, Goat, Sheep, Poultry, Pig]
 
     :param conn:          gcam_reader database object
+    :param conn_core:     gcam_reader database object core gcam
     :param query:         XPath Query
+    :param query_core:    XPath Query for GCAM core
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param years:         list of years to use
 
@@ -292,6 +288,28 @@ def livestock_water_demand_to_array(conn, query, d_reg_name, d_buf_frac, d_goat_
     """
     # query content to data frame
     df = conn.runQuery(query)
+
+    # If using GCAM USA queries
+    # Restructure data (For GCAM USA queries) & also read in core GCAM values to distribute by animal
+    # Check if column name "input" exists it means that the new GCAM USA queries were used.
+    # Rename this to "output" to conform with original format
+    if 'output' in df.columns:
+        df.rename(columns={"output": "input"}, inplace=True)
+        df_core = conn_core.runQuery(query_core)
+        df_core_sum = df_core.groupby(['region','Year','sector','Units','scenario','input']).agg({'value': 'sum'}).reset_index()
+        df_core_non_us = df_core_sum[~df_core_sum['region'].str.contains("USA")]
+        df_core_us = df_core_sum[df_core_sum['region'].str.contains("USA")]
+        df_core_us_ratio = df_core_us.assign(
+            ratio    = lambda x: x['value'] / (x.groupby(['region','Year']).transform('sum')['value'])
+        )
+        d_reg_name_us = dict(filter(lambda elem: elem[1] > 32, d_reg_name.items()))
+        search_list = '|'.join(d_reg_name_us.keys())
+        df_us = df[df['region'].str.contains(search_list)]
+        df_us_new = pd.merge(df_us[['Units', 'scenario', 'region', 'input', 'Year', 'value']],
+                          df_core_us_ratio[['Year','sector', 'ratio']], on=['Year'], how='left')
+        df_us_new['value'] = df_us_new['ratio']*df_us_new['value']
+        df_us_new = df_us_new.drop('ratio', 1)
+        df = df_us_new.append(df_core_non_us)
 
     # get only target years
     df = df.loc[df['Year'].isin(years)].copy()
@@ -377,15 +395,17 @@ def livestock_water_demand_to_array(conn, query, d_reg_name, d_buf_frac, d_goat_
 
     return piv.values
 
-
-def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years):
+def land_to_array(conn, conn_core, query, query_core, subreg, basin_state_area, d_reg_name, d_basin_name, d_crops, years):
     """
     Query GCAM database for irrigated land area per region, subregion,
     and crop type.  Place in format required by Tethys.
 
     :param conn:          gcam_reader database object
+    :param conn_core:     gcam_reader database object core gcam
     :param query:         XPath Query
+    :param query_core:    XPath Query for GCAM core
     :param subreg:        Either 0 (AEZ) or 1 (BASIN)
+    :param basin_state_area:  state basin area ratios for GCAM USA
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param d_basin_name:  A dictionary of 'basin_name' : basin_id
     :param d_crops:       A dictionary of 'crop_name': crop_id
@@ -398,6 +418,41 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
 
     # query content to data frame
     df = conn.runQuery(query)
+
+    # If using GCAM USA queries
+    # Restructure data (For GCAM USA queries) & also read in core GCAM values to distribute by basin
+    # Check if length of d_reg_name are more than 33 which indicates it includes states from GCAM USA
+    # Apply the distribution per basin to state/basin
+    states = ['AK','AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','HI','IA','ID','IL','IN','KS','KY',
+              'LA','MA','MD','ME','MI','MN','MO','MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH',
+              'OK','OR','PA','PR','RI','SC','SD','TN','TX','UT','VA','VT','WA','WI','WV','WY']
+    if any(item in d_reg_name for item in states):
+        # Get US land allocation by basin
+        df_us = df[df['region'].str.contains("USA")].copy()
+        df_us['basin'] = df_us['land-allocation'].str.replace("^.*?_", "")
+        df_us['basin'] = df_us['basin'].str.replace("_IRR.*$", "")
+        df_us['basin'] = df_us['basin'].str.replace("_RFD.*$", "")
+        df_us = df_us.drop('region', axis=1)
+        # Get US states and basins
+        df_core = conn_core.runQuery(query_core)
+        df_core_st_basin = df_core[df_core['region'].str.contains("USA")].copy()
+        df_core_st_basin = df_core_st_basin[['subsector','sector']].drop_duplicates().reset_index(drop=True)
+        df_core_st_basin.rename(columns={"subsector": "region","sector":"basin"}, inplace=True)
+        df_core_st_basin['basin'] = df_core_st_basin['basin'].str.replace("water_td_irr_", "")
+        df_core_st_basin['basin'] = df_core_st_basin['basin'].str.replace("_W", "")
+        # Make a copy of US values for each state by joining by basin
+        df_us_new = pd.merge(df_us,df_core_st_basin, on=['basin'],how='left')
+        df_area = pd.read_csv(basin_state_area) # Get area ratio of each state in basins
+        df_area = df_area[['basin','subRegion_State','area_ratio']]
+        df_area.rename(columns={"subRegion_State": "region"}, inplace=True)
+        df_us_new_area = pd.merge(df_us_new,df_area, on=['basin','region'],how='left')
+        df_us_new_area['valueNew']=df_us_new_area['value']*df_us_new_area['area_ratio']
+        df_us_new_area = df_us_new_area.drop(['basin','value','area_ratio'],axis=1)
+        df_us_new_area.rename(columns={"valueNew": "value"}, inplace=True)
+        df = df.append(df_us_new_area)
+        # Check US Total
+        # df_us_new_check = df_us_new_area.groupby(['Year', 'Units', 'land-allocation','scenario']).agg(
+        #    {'value': 'sum'}).reset_index()
 
     # get only target years
     df = df.loc[df['Year'].isin(years)].copy()    
@@ -445,9 +500,12 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
             df.drop('land-allocation', axis=1, inplace=True)
     
             # sum hi and lo management allocation
-            df = df.groupby(['region', 'subreg', 'crop', 'use', 'Year']).sum(axis=1)
-            df.reset_index(inplace=True)
-            df.drop('mgmt', axis=1, inplace=True)
+            # Original Code (replaced 7 March 2020 by zarrar khan (zarrar.khan@pnnl.gov)
+            # df = df.groupby(['region', 'subreg', 'crop', 'use', 'Year'])['value'].sum()
+            # df.drop('mgmt', axis=1, inplace=True)
+            df = df.drop(['mgmt'],axis=1)
+            df = df.groupby(['region', 'subreg', 'crop', 'use', 'Year']).sum()
+            df = df.reset_index()
 
     # only keep crops in target list
     df['crop'] = df['crop'].apply(lambda x: 'Root_Tuber' if x == 'Root' else x)  # Correct "Root" back to crop name
@@ -467,6 +525,82 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
 
     return piv.values
 
+def irr_water_demand_to_array(conn, conn_core, query, query_core, subreg, d_reg_name, d_basin_name, d_crops, years):
+    """
+    Query GCAM database for irrigated water demand (billion m3).  Place
+    in format required by Tethys.
+
+    :param conn:          gcam_reader database object
+    :param conn_core:     gcam_reader database object core gcam
+    :param query:         XPath Query
+    :param query_core:    XPath Query for GCAM core
+    :param subreg:        Either 0 (AEZ) or 1 (BASIN)
+    :param d_reg_name:    A dictionary of 'region_name': region_id
+    :param d_crops:       A dictionary of 'crop_name': crop_id
+    :param years:         list of years to use
+
+    :return:               NumPy array where col_1: region_id, col_2: subreg_id,
+                           col_3: crop_number, col_n...n: irrigated demand per year in
+                           billion m3
+    """
+    # query content to data frame
+    df = conn.runQuery(query)
+
+    # If using GCAM USA queries
+    # Restructure data (For GCAM USA queries) & also read in core GCAM values to distribute by crop
+    # Check if column name "input" exists it means that the new GCAM USA queries were used.
+    # Rename this to "output" to conform with original format
+    if 'output' in df.columns:
+        df = df.drop(['region','output'],axis=1)
+        df.rename(columns={"sector": "input","subsector":"region"}, inplace=True)
+        df_core = conn_core.runQuery(query_core)
+        df_core_sum = df_core.groupby(['region', 'Year', 'sector','subsector', 'Units', 'scenario', 'input']).agg(
+            {'value': 'sum'}).reset_index()
+        df_core_non_us = df_core_sum[~df_core_sum['region'].str.contains("USA")]
+        df_core_us = df_core_sum[df_core_sum['region'].str.contains("USA")]
+        df_core_us_ratio = df_core_us.assign(
+            ratio=lambda x: x['value'] / (x.groupby(['input', 'Year']).transform('sum')['value'])
+        )
+        d_reg_name_us = dict(filter(lambda elem: elem[1] > 32, d_reg_name.items()))
+        search_list = '|'.join(d_reg_name_us.keys())
+        df_us = df[df['region'].str.contains(search_list)]
+        df_us_new = pd.merge(df_us[['Units', 'scenario', 'region', 'input', 'Year', 'value']],
+                             df_core_us_ratio[['Year', 'sector','subsector','input', 'ratio']], on=['Year','input'], how='left')
+        df_us_new['value'] = df_us_new['ratio'] * df_us_new['value']
+        df_us_new = df_us_new.drop('ratio', 1)
+        df = df_us_new.append(df_core_non_us)
+        # Check US Total
+        # df_us_new_check = df_us_new.groupby(['Year', 'region', 'Units', 'scenario', 'input']).agg(
+        #    {'value': 'sum'}).reset_index()
+
+    # get only target years
+    df = df.loc[df['Year'].isin(years)].copy()
+
+    # drop unused columns
+    df.drop(['Units', 'scenario', 'input'], axis=1, inplace=True)
+
+    # replace region name with region number
+    df['region'] = df['region'].map(d_reg_name)
+
+    if subreg == 0:
+        # break out subregion number
+        df['subreg'] = df['subsector'].apply(lambda x: int(x.split('AEZ')[1]))
+
+    elif subreg == 1:
+        df['subreg'] = df['subsector'].apply(lambda x: x.split('_')[-1]).map(d_basin_name)
+
+    # break out crop and map the id to it
+    df['crop'] = df['sector'].apply(lambda x: 'biomass' if x in l_biomass else x)
+    df['crop'] = df['crop'].map(d_crops)
+
+    # drop sector
+    df.drop('sector', axis=1, inplace=True)
+
+    # convert shape for use in Tethys
+    piv = pd.pivot_table(df, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0,aggfunc=np.sum)
+    piv.reset_index(inplace=True)
+
+    return piv.values
 
 def get_gcam_data(s):
     """
@@ -495,7 +629,8 @@ def get_gcam_data(s):
 
     # get GCAM database connection and queries objects
     conn, queries = get_gcam_queries(s.GCAM_DBpath, s.GCAM_DBfile, s.GCAM_query)
-    
+    conn_core, queries_core = get_gcam_queries(s.GCAM_DBpath, s.GCAM_DBfile, s.GCAM_queryCore)
+
 #     for q in queries:
 #         df = conn.runQuery(q)
 #         df.to_csv(q.title + ".csv", sep=',')
@@ -506,10 +641,10 @@ def get_gcam_data(s):
     d['rgn_wdelec']   = elec_water_demand_to_array(conn, queries[4], d_reg_name, years)
     d['rgn_wdmfg']    = manuf_water_demand_to_array(conn, queries[6], d_reg_name, years)
     d['rgn_wdmining'] = mining_water_demand_to_array(conn, queries[7], d_reg_name, years)
-    d['wdliv']        = livestock_water_demand_to_array(conn, queries[5], d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years)
-    d['irrArea']      = land_to_array(conn, queries[0], s.subreg, d_reg_name, d_basin_name, d_crops, years)
-    d['irrV']         = irr_water_demand_to_array(conn, queries[2], s.subreg, d_reg_name, d_basin_name, d_crops, years)
-    
+    d['wdliv']        = livestock_water_demand_to_array(conn, conn_core, queries[5], queries_core[5],d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years)
+    d['irrArea']      = land_to_array(conn, conn_core, queries[0], queries[2], s.subreg, s.basin_state_area, d_reg_name, d_basin_name, d_crops, years)
+    d['irrV']         = irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], s.subreg, d_reg_name, d_basin_name, d_crops, years)
+
 #    for key, value in d.iteritems():
 #        np.savetxt(key + '.csv', d[key], delimiter=',')
 
