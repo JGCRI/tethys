@@ -6,7 +6,7 @@ Tethys Documentation
    :caption: Contents:
 
    overview
-   ProxyMaps
+   proxymaps
 
 
 Indices and tables
