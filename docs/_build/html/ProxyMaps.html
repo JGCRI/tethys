@@ -181,7 +181,12 @@ Copyright (c) 2017, Battelle Memorial Institute</p>
 <dl class="py function">
 <dt id="tethys.SpatialDownscaling.ProxyMaps.PopulationMap">
 <code class="sig-prename descclassname">tethys.SpatialDownscaling.ProxyMaps.</code><code class="sig-name descname">PopulationMap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mapsize</span></em>, <em class="sig-param"><span class="n">GISData</span></em>, <em class="sig-param"><span class="n">GCAMData</span></em>, <em class="sig-param"><span class="n">rgnmapData</span></em>, <em class="sig-param"><span class="n">settings</span></em>, <em class="sig-param"><span class="n">OUT</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tethys.SpatialDownscaling.ProxyMaps.PopulationMap" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>withd_dom_map</strong> (<em>matrix</em>) – waer withdrawal domestic map</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="tethys.SpatialDownscaling.ProxyMaps.Rearranging">
@@ -194,11 +199,8 @@ Copyright (c) 2017, Battelle Memorial Institute</p>
 <code class="sig-prename descclassname">tethys.SpatialDownscaling.ProxyMaps.</code><code class="sig-name descname">pop_scale_reshape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">withd</span></em>, <em class="sig-param"><span class="n">pop_pro_rata</span></em>, <em class="sig-param"><span class="n">map_rgn</span></em>, <em class="sig-param"><span class="n">mapindex</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tethys.SpatialDownscaling.ProxyMaps.pop_scale_reshape" title="Permalink to this definition">¶</a></dt>
 <dd><p>scale the total withdrawal values for a region by the pro-rata population in each grid cell.</p>
 <p>Arguments:
-withd        - regional total withdrawal for a single time slice.
-pop_pro_rata - pro-rata population for each grid cell.  This is in the “flattened” format;</p>
-<blockquote>
-<div><p>i.e., a single vector of ngrid values</p>
-</div></blockquote>
+withd - regional total withdrawal for a single time slice.
+pop_pro_rata - pro-rata population for each grid cell.  This is in the “flattened” format; i.e., a single vector of ngrid values.</p>
 <p>map_rgn      - the 2-D map of grid cell region assignments
 mapindex     - the mapping from 2-D grid to flattened grid (i.e., output of sub2ind)</p>
 <p>Return value:
@@ -210,15 +212,12 @@ mapindex     - the mapping from 2-D grid to flattened grid (i.e., output of sub2
 <dt id="tethys.SpatialDownscaling.ProxyMaps.rgnmapadjust">
 <code class="sig-prename descclassname">tethys.SpatialDownscaling.ProxyMaps.</code><code class="sig-name descname">rgnmapadjust</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mapsize</span></em>, <em class="sig-param"><span class="n">map_pop</span></em>, <em class="sig-param"><span class="n">map_rgn</span></em>, <em class="sig-param"><span class="n">label</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tethys.SpatialDownscaling.ProxyMaps.rgnmapadjust" title="Permalink to this definition">¶</a></dt>
 <dd><p>function rgn_map_adjust in matlab code</p>
-<p>Find unassigned grid cells with nonzero population and assign them to an
-adjacent region, if possible.</p>
+<p>Find unassigned grid cells with nonzero population and assign them to an adjacent region, if possible.</p>
 <p>Arguments:
 mapsize - Dimensions of the map array (typically [360, 720])
 map_pop - Population map, dimensioned as mapsize
-map_rgn - Region map, dimensioned as mapsize</p>
-<blockquote>
-<div><p>label - String to prefix to diagnostic output</p>
-</div></blockquote>
+map_rgn - Region map, dimensioned as mapsize
+label - String to prefix to diagnostic output</p>
 <p>Return value:  adjusted region map.</p>
 </dd></dl>
 
