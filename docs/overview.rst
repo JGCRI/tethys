@@ -6,9 +6,9 @@ Introduction to the package etc. etc.
 .. image:: flowchart.png
    :width: 600
 
-Model.py Documentation
+model.py Documentation
 **********************
 
 .. automodule:: tethys.model
     :members:
-	:exclude-members: gcam_reader
+	autodoc_mock_imports = ["gcam_reader"]
