@@ -11,4 +11,4 @@ model.py Documentation
 
 .. automodule:: tethys.model
     :members:
-	autodoc_mock_imports = ["gcam_reader"]
+

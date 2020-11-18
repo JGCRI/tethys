@@ -22,6 +22,8 @@ sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys','SpatialDowns
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys','TemporalDownscaling'))
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys','Utils'))
 
+autodoc_mock_imports = ["gcam_reader"]
+
 # -- Project information -----------------------------------------------------
 
 project = 'tethys'
