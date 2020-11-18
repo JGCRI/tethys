@@ -13,6 +13,14 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys'))
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys','DataReader'))
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys','DataWriter'))
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys','Diagnostics'))
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys','reference'))
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys','SpatialDownscaling'))
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys','TemporalDownscaling'))
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys','Utils'))
 
 # -- Project information -----------------------------------------------------
 
