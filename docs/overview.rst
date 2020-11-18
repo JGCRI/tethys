@@ -11,3 +11,4 @@ Model.py Documentation
 
 .. automodule:: tethys.model
     :members:
+	:exclude-members: gcam_reader
