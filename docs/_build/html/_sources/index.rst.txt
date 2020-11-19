@@ -1,14 +1,13 @@
 Tethys Documentation
 ==================================
 
-.. autosummary::
-   :toctree: _autosummary
-   :template: custom-module-template.rst
-   :recursive:
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
 
    overview
    proxymaps
-   tethys
+   modules
 
 
 Indices and tables
