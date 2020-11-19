@@ -22,6 +22,13 @@ sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys','SpatialDowns
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys','TemporalDownscaling'))
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'tethys','Utils'))
 
+
+# -- Autodoc initial settings -------------------------------------------------
+
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary']
+autosummary_generate = True
+templates_path = [ '_templates' ]
+exclude_patterns = ['_build', '_templates']
 autodoc_mock_imports = ["gcam_reader"]
 
 # -- Project information -----------------------------------------------------
