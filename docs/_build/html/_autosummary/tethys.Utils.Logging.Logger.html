@@ -1,0 +1,370 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tethys.Utils.Logging.Logger &mdash; tethys 1.2.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tethys.Utils.Math" href="tethys.Utils.Math.html" />
+    <link rel="prev" title="tethys.Utils.Logging" href="tethys.Utils.Logging.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> tethys
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../proxymaps.html">ProxyMaps</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tethys.html">tethys</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tethys.DataReader.html">tethys.DataReader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tethys.DataWriter.html">tethys.DataWriter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tethys.Diagnostics.html">tethys.Diagnostics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tethys.SpatialDownscaling.html">tethys.SpatialDownscaling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tethys.TemporalDownscaling.html">tethys.TemporalDownscaling</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="tethys.Utils.html">tethys.Utils</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="tethys.Utils.DataParser.html">tethys.Utils.DataParser</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="tethys.Utils.Logging.html">tethys.Utils.Logging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tethys.Utils.Math.html">tethys.Utils.Math</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tethys.Utils.exceptions.html">tethys.Utils.exceptions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tethys.model.html">tethys.model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tethys.reference.html">tethys.reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tethys.run_disaggregation.html">tethys.run_disaggregation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tethys</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../modules.html">Modules</a> &raquo;</li>
+        
+          <li><a href="tethys.html">tethys</a> &raquo;</li>
+        
+          <li><a href="tethys.Utils.html">tethys.Utils</a> &raquo;</li>
+        
+          <li><a href="tethys.Utils.Logging.html">tethys.Utils.Logging</a> &raquo;</li>
+        
+      <li>tethys.Utils.Logging.Logger</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_autosummary/tethys.Utils.Logging.Logger.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tethys-utils-logging-logger">
+<h1>tethys.Utils.Logging.Logger<a class="headerlink" href="#tethys-utils-logging-logger" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="tethys.Utils.Logging.Logger">
+<em class="property">class </em><code class="sig-prename descclassname">tethys.Utils.Logging.</code><code class="sig-name descname">Logger</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tethys.Utils.Logging.Logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Provide logging services.</p>
+<p>There is nothing stopping you from creating your own logs, but the intended
+use is for the model to create a single logger on startup, which other
+classes and functions will access with <cite>getlogger()</cite>.</p>
+<dl class="simple">
+<dt>The logger recognizes the following log levels:</dt><dd><p>DEBUG
+INFO
+WARNING
+ERROR</p>
+</dd>
+</dl>
+<p>Logger configuration is specified in the [Logger] section of the configuration
+input file.  The following keys are currently recognized:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>logdir:  (OPTIONAL) direcotry to put the log file in. (Default is ‘./logs’)</p></li>
+<li><p>filename: (REQUIRED) name of the log file.</p></li>
+<li><dl class="simple">
+<dt>MinLogLevel: (OPTIONAL) minimum logging level to include in logs</dt><dd><p>(Default is DEBUG)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>MinScreenLevel: (OPTIONAL) minimum logging level to print to terminal</dt><dd><p>(Default is INFO)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tethys.Utils.Logging.Logger.close" title="tethys.Utils.Logging.Logger.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code></a></p></td>
+<td><p>Close the file associated with a logger.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">flush</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tethys.Utils.Logging.Logger.getlogger" title="tethys.Utils.Logging.Logger.getlogger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getlogger</span></code></a></p></td>
+<td><p>Get the main logger object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tethys.Utils.Logging.Logger.setlevel" title="tethys.Utils.Logging.Logger.setlevel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setlevel</span></code></a></p></td>
+<td><p>Set the default logging level.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tethys.Utils.Logging.Logger.write" title="tethys.Utils.Logging.Logger.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a></p></td>
+<td><p>Write a message to the log.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEBUG</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ERROR</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">INFO</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">WARNING</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="tethys.Utils.Logging.Logger.close">
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tethys.Utils.Logging.Logger.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the file associated with a logger.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tethys.Utils.Logging.Logger.getlogger">
+<em class="property">static </em><code class="sig-name descname">getlogger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tethys.Utils.Logging.Logger.getlogger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the main logger object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tethys.Utils.Logging.Logger.setlevel">
+<code class="sig-name descname">setlevel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">newlvl</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tethys.Utils.Logging.Logger.setlevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the default logging level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>newlvl</strong> – The new default logging level.  This should be one of the log
+level constants defined in the Logger class.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The old default logging level.</p>
+</dd>
+</dl>
+<p>The logging level for write() calls with no logging level explicitly specified
+will be set to <cite>newlvl</cite>.  The old level is returned so that it can be reset
+to its original value if desired.  Note that explicitly specifying a logging
+level in write() will override this setting.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tethys.Utils.Logging.Logger.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">lvl</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tethys.Utils.Logging.Logger.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a message to the log.</p>
+<p>Each message has a “log level” that indicates the urgency of the message.
+If the log level of the message is higher than the minimum specified in the
+configuration, then the message will be written to the log; otherwise it will
+be silently ignored.  If the log level is higher than the screen level
+specified in the configuration, the message will be additionally be written
+to the terminal.  Finally, warning and error messages will have “WARNING” and
+“ERROR”, respectively, prefixed to them.</p>
+<p>By default, a message will have its log level set to the logger’s current
+log level (settable with the setlevel() method).  Specifying the level explicitly
+allows the level to be set on a one-off basis without resetting the default.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tethys.Utils.Math.html" class="btn btn-neutral float-right" title="tethys.Utils.Math" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tethys.Utils.Logging.html" class="btn btn-neutral float-left" title="tethys.Utils.Logging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Zarrar Khan
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
