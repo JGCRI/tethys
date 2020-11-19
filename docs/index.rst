@@ -6,6 +6,8 @@ Tethys Documentation
    :template: custom-module-template.rst
    :recursive:
 
+   overview
+   proxymaps
    tethys
 
 
