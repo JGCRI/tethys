@@ -1,13 +1,11 @@
 Tethys Documentation
 ==================================
 
-.. toctree::
-  
 .. autosummary::
    :toctree: _autosummary
+   :recursive:
 
-   overview
-   proxymaps
+   tethys
 
 
 Indices and tables
