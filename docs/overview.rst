@@ -11,6 +11,4 @@ model.py Documentation
 
 .. automodule:: tethys.model
     :members:
-	:undoc-members:
-    :show-inheritance:
 
