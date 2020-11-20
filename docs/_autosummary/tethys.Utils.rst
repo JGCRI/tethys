@@ -21,9 +21,10 @@ tethys.Utils
 
 
 
+.. rubric:: Modules
+
 .. autosummary::
    :toctree:
-   :template: custom-module-template.rst
    :recursive:
 
    tethys.Utils.DataParser

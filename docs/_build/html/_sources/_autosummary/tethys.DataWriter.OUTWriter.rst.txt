@@ -12,8 +12,6 @@ tethys.DataWriter.OUTWriter
    .. rubric:: Functions
 
    .. autosummary::
-      :toctree:
-      :nosignatures:
    
       OutWriter
       writeNETCDF
@@ -28,9 +26,6 @@ tethys.DataWriter.OUTWriter
    .. rubric:: Classes
 
    .. autosummary::
-      :toctree:
-      :template: custom-class-template.rst
-      :nosignatures:
    
       OUTSettings
    
