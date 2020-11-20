@@ -12,6 +12,8 @@ tethys.DataReader.GCAMOutputs
    .. rubric:: Functions
 
    .. autosummary::
+      :toctree:
+      :nosignatures:
    
       dom_water_demand_to_array
       elec_water_demand_to_array

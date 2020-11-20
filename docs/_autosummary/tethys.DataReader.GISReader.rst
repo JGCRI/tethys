@@ -12,6 +12,8 @@ tethys.DataReader.GISReader
    .. rubric:: Functions
 
    .. autosummary::
+      :toctree:
+      :nosignatures:
    
       getGISData
       getRegionMapData

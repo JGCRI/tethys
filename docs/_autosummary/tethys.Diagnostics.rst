@@ -21,10 +21,9 @@ tethys.Diagnostics
 
 
 
-.. rubric:: Modules
-
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    tethys.Diagnostics.Spatial

@@ -13,7 +13,7 @@ Modules
 
 Index
 ==================
-* :ref:`modindex`
+* :ref:`genindex`
 
 Search
 ==================

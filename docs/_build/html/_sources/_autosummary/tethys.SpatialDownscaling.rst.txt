@@ -21,10 +21,9 @@ tethys.SpatialDownscaling
 
 
 
-.. rubric:: Modules
-
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 
    tethys.SpatialDownscaling.ProxyMaps

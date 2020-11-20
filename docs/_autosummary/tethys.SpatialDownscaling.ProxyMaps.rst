@@ -12,6 +12,8 @@ tethys.SpatialDownscaling.ProxyMaps
    .. rubric:: Functions
 
    .. autosummary::
+      :toctree:
+      :nosignatures:
    
       IrrigationMap
       LivestockMap

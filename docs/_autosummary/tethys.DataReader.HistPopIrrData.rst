@@ -12,6 +12,8 @@ tethys.DataReader.HistPopIrrData
    .. rubric:: Functions
 
    .. autosummary::
+      :toctree:
+      :nosignatures:
    
       getIrrYearData
       getPopYearData

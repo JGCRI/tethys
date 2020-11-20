@@ -6,12 +6,4 @@ Tethys Documentation
    :caption: Contents:
 
    overview
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   modules

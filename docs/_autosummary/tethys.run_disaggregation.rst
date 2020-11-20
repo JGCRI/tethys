@@ -12,6 +12,8 @@ tethys.run\_disaggregation
    .. rubric:: Functions
 
    .. autosummary::
+      :toctree:
+      :nosignatures:
    
       run_disaggregation
    
