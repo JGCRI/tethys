@@ -12,8 +12,6 @@ tethys.Utils.DataParser
    .. rubric:: Functions
 
    .. autosummary::
-      :toctree:
-      :nosignatures:
    
       GetArrayCSV
       GetArrayTXT

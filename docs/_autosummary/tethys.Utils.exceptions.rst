@@ -20,7 +20,6 @@ tethys.Utils.exceptions
    .. rubric:: Exceptions
 
    .. autosummary::
-      :toctree:
    
       DataError
       DirectoryNotFoundError

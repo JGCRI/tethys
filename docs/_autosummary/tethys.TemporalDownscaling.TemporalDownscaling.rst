@@ -12,8 +12,6 @@ tethys.TemporalDownscaling.TemporalDownscaling
    .. rubric:: Functions
 
    .. autosummary::
-      :toctree:
-      :nosignatures:
    
       AnnualtoMontlyUniform
       Domestic_Temporal_Downscaling

@@ -36,8 +36,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="tethys.DataReader.GISReader.getGISData" href="tethys.DataReader.GISReader.getGISData.html" />
-    <link rel="prev" title="tethys.DataReader.GCAMOutputs.population_to_array" href="tethys.DataReader.GCAMOutputs.population_to_array.html" /> 
+    <link rel="next" title="tethys.DataReader.HistPopIrrData" href="tethys.DataReader.HistPopIrrData.html" />
+    <link rel="prev" title="tethys.DataReader.GCAMOutputs" href="tethys.DataReader.GCAMOutputs.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -180,6 +180,16 @@
             
   <div class="section" id="module-tethys.DataReader.GISReader">
 <span id="tethys-datareader-gisreader"></span><h1>tethys.DataReader.GISReader<a class="headerlink" href="#module-tethys.DataReader.GISReader" title="Permalink to this headline">¶</a></h1>
+<p>&#64;Date: 09/09/2017
+&#64;author: Xinya Li (<a class="reference external" href="mailto:xinya&#46;li&#37;&#52;&#48;pnl&#46;gov">xinya<span>&#46;</span>li<span>&#64;</span>pnl<span>&#46;</span>gov</a>)
+&#64;Project: Tethys V1.0</p>
+<p>License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
+Copyright (c) 2017, Battelle Memorial Institute</p>
+<p>This reader will reading the following three types of input files:
+1. asc input files that were generated in GIS for baseyear disaggregation of water withdrawals.
+2. other input files that were generated in GIS
+3. region map files. All of these are two-column comma-separated tables.</p>
+<p>Note we allow for (and in fact require) a single header line. The assumption is that there are two region mappings in play. The first is the ‘ag’ mapping, which covers agriculture (including land use), livestock, and (currently) mining. The second is the ‘nonag’ mapping, which covers everything else.</p>
 <p class="rubric">Functions</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -187,16 +197,16 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="tethys.DataReader.GISReader.getGISData.html#tethys.DataReader.GISReader.getGISData" title="tethys.DataReader.GISReader.getGISData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getGISData</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">getGISData</span></code>(settings)</p></td>
 <td><p>dictionary GISData{} saves the data related to GIS data</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="tethys.DataReader.GISReader.getRegionMapData.html#tethys.DataReader.GISReader.getRegionMapData" title="tethys.DataReader.GISReader.getRegionMapData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getRegionMapData</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">getRegionMapData</span></code>(rgnmapfile)</p></td>
 <td><p>dictionary GISData{} saves the data related to region map data</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="tethys.DataReader.GISReader.load_const_griddata.html#tethys.DataReader.GISReader.load_const_griddata" title="tethys.DataReader.GISReader.load_const_griddata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_const_griddata</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_const_griddata</span></code>(fn[, headerNum, key])</p></td>
 <td><p>Load constant grid data stored in files defined in GRID_CONSTANTS.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="tethys.DataReader.GISReader.load_mat_var.html#tethys.DataReader.GISReader.load_mat_var" title="tethys.DataReader.GISReader.load_mat_var"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_mat_var</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_mat_var</span></code>(fn, varname)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -211,10 +221,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tethys.DataReader.GISReader.getGISData.html" class="btn btn-neutral float-right" title="tethys.DataReader.GISReader.getGISData" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tethys.DataReader.HistPopIrrData.html" class="btn btn-neutral float-right" title="tethys.DataReader.HistPopIrrData" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="tethys.DataReader.GCAMOutputs.population_to_array.html" class="btn btn-neutral float-left" title="tethys.DataReader.GCAMOutputs.population_to_array" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="tethys.DataReader.GCAMOutputs.html" class="btn btn-neutral float-left" title="tethys.DataReader.GCAMOutputs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
