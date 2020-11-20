@@ -6,22 +6,19 @@
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 
-
 Original Algorithms From Huang, Zhongwei <zhongwei.huang@pnnl.gov>
 
 Pre-processed Input Data Files:
 1. Monthly average temperatures of 67420 cells in a period of years (indicated by filename)
 2. Calculated monthly cdd (cooling degree day) and hdd (Heating degree day) data of 67420 cells in a period of years
-3. For electricity water withdrawal, five parameters: 
-    the proportion of building and industry(including transportation) electricity use; 
-    the share of heating, cooling and others in building electricity use.
+3. For electricity water withdrawal, five parameters, the proportion of building and industry(including transportation) electricity use, the share of heating, cooling and others in building electricity use.
 4. Monthly Irrigation Water withdrawal Data from other model
 
 Temporal Downscaling (Year to Month) for water withdrawal of five sectors:
-Domestic: Wada et al. (2011), need input data 1
-Electricity: Voisin et al. (2013), need input data 2&3
-Livestock, Mining and Manufacturing: Uniform distribution (based on days and leap years)
-Irrigation: Monthly Irrigation Data from other models as the weighting factor to downscale gridded annually irrigation water withdrawals, need input data 4
+Domestic - Wada et al. (2011), need input data 1
+Electricity - Voisin et al. (2013), need input data 2&3
+Livestock, Mining and Manufacturing - Uniform distribution (based on days and leap years)
+Irrigation - Monthly Irrigation Data from other models as the weighting factor to downscale gridded annually irrigation water withdrawals, need input data 4
 """
 
 import scipy.io as spio

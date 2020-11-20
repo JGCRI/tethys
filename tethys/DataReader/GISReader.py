@@ -6,15 +6,13 @@
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 
-
 This reader will reading the following three types of input files:
 1. asc input files that were generated in GIS for baseyear disaggregation of water withdrawals.
 2. other input files that were generated in GIS
-3. region map files.  All of these are two-column comma-separated tables. 
-   Note we allow for (and in fact require) a single header line.
-   The assumption is that there are two region mappings in play.  
-   The first is the 'ag' mapping, which covers agriculture (including land use), livestock, and (currently) mining.
-   The second is the 'nonag' mapping, which covers everything else.  
+3. region map files. All of these are two-column comma-separated tables.
+
+Note we allow for (and in fact require) a single header line. The assumption is that there are two region mappings in play. The first is the 'ag' mapping, which covers agriculture (including land use), livestock, and (currently) mining. The second is the 'nonag' mapping, which covers everything else.
+
 """
 
 
