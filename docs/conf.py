@@ -15,7 +15,6 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0,os.path.dirname(sys.path[0]))
 sys.path.insert(0, os.path.abspath('../..'))
-sys.path.insert(0, os.path.abspath("../../"))
 sys.path.insert(0,os.path.join(os.path.dirname(sys.path[0]),'tethys'))
 sys.path.insert(0,os.path.join(os.path.dirname(sys.path[0]),'tethys'))
 sys.path.insert(0,os.path.join(os.path.dirname(sys.path[0]),'tethys','DataReader'))
@@ -36,6 +35,15 @@ sys.path.insert(0,os.path.join(os.path.dirname(os.path.dirname(sys.path[0])),'te
 sys.path.insert(0,os.path.join(os.path.dirname(os.path.dirname(sys.path[0])),'tethys','SpatialDownscaling'))
 sys.path.insert(0,os.path.join(os.path.dirname(os.path.dirname(sys.path[0])),'tethys','TemporalDownscaling'))
 sys.path.insert(0,os.path.join(os.path.dirname(os.path.dirname(sys.path[0])),'tethys','Utils'))
+# Additional tests
+sys.path.insert(0, os.path.abspath('../../tethys'))
+sys.path.insert(0, os.path.abspath('../../tethys/DataReader'))
+sys.path.insert(0, os.path.abspath('../../tethys/DataWriter'))
+sys.path.insert(0, os.path.abspath('../../tethys/DataDiagnostics'))
+sys.path.insert(0, os.path.abspath('../../tethys/reference'))
+sys.path.insert(0, os.path.abspath('../../tethys/SpatialDownscaling'))
+sys.path.insert(0, os.path.abspath('../../tethys/TemporalDownscaling'))
+sys.path.insert(0, os.path.abspath('../../tethys/Utils'))
 
 
 # -- Autodoc initial settings -------------------------------------------------
