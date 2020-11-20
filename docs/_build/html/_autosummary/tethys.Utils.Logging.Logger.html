@@ -190,31 +190,19 @@
 <p>There is nothing stopping you from creating your own logs, but the intended
 use is for the model to create a single logger on startup, which other
 classes and functions will access with <cite>getlogger()</cite>.</p>
-<dl class="simple">
-<dt>The logger recognizes the following log levels:</dt><dd><p>DEBUG
+<p>The logger recognizes the following log levels:
+DEBUG
 INFO
 WARNING
 ERROR</p>
-</dd>
-</dl>
 <p>Logger configuration is specified in the [Logger] section of the configuration
-input file.  The following keys are currently recognized:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>logdir:  (OPTIONAL) direcotry to put the log file in. (Default is ‘./logs’)</p></li>
-<li><p>filename: (REQUIRED) name of the log file.</p></li>
-<li><dl class="simple">
-<dt>MinLogLevel: (OPTIONAL) minimum logging level to include in logs</dt><dd><p>(Default is DEBUG)</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>MinScreenLevel: (OPTIONAL) minimum logging level to print to terminal</dt><dd><p>(Default is INFO)</p>
-</dd>
-</dl>
-</li>
-</ul>
-</div></blockquote>
+input file.  The following keys are currently recognized:
+* logdir:  (OPTIONAL) direcotry to put the log file in. (Default is ‘./logs’)
+* filename: (REQUIRED) name of the log file.
+* MinLogLevel: (OPTIONAL) minimum logging level to include in logs
+(Default is DEBUG)
+* MinScreenLevel: (OPTIONAL) minimum logging level to print to terminal
+(Default is INFO)</p>
 <p class="rubric">Methods</p>
 <table class="longtable docutils align-default">
 <colgroup>

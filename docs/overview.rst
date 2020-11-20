@@ -9,6 +9,4 @@ Introduction to the package etc. etc.
 model.py Documentation
 **********************
 
-.. automodule:: tethys.model
-    :members:
 
