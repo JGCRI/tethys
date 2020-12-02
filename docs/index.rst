@@ -6,4 +6,5 @@ Tethys Documentation
    :caption: Contents:
 
    overview
+   profile
    moduleList
