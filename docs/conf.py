@@ -60,6 +60,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store','_templates']
 #
 # html_theme = 'alabaster'
 html_theme = "sphinx_rtd_theme"
+numfig = True
 
 
 

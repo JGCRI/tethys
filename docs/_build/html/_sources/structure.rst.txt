@@ -8,20 +8,27 @@ Process Flows
 
 The following diagram shows additional details on key processes, inputs and outputs of the tethys model.
 
-.. image:: images/tethys_processFlow.png
-  :width: 800
-  :alt: Process Flows
+.. _fig1:
+
+.. figure:: images/tethys_processFlow.png
+  :width: 100%
+  :alt: tethys_processFlow
+  :align: center
+  :figclass: align-center
+  
+  *Process flows in Tethys*
   
 Key Inputs
 -----------------------------------
 
 .. centered::
-   *Table: Key Inputs*
+   _`Table 1`: Key Inputs
    
 .. csv-table::
    :file: tables/inputs.csv
    :widths: 20,20,20,20,20
    :header-rows: 1
+   :align: center
 
    
 
@@ -30,7 +37,13 @@ Profile
 
 Profile for an example run.
 
-.. image:: images/tethys_profile.png
-  :width: 800
-  :alt: Profile
+.. _fig2:
+
+.. figure:: images/tethys_profile.png
+  :width: 100%
+  :alt: tethys_profile
+  :align: center
+  :figclass: align-center
+  
+  *Code profile from PyCharm*
   

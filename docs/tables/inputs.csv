@@ -1,7 +1,5 @@
 Input,Location,Used in,Source,Description
-BasinNames.csv,example/Input,-,-,"| long description long description long description long description
-| long description long description long description long description 
-| long description long description long description long description long"
+BasinNames.csv,example/Input,-,-,-
 coordinates.csv,example/Input,-,-,-
 country-names.csv,example/Input,-,-,-
 gcam_basin_lookup.csv,example/Input,-,-,-

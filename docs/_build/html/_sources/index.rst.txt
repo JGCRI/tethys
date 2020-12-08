@@ -6,5 +6,6 @@ Tethys Documentation
    :caption: Contents:
 
    overview
+   description
    structure
    moduleList
