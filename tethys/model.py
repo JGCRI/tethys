@@ -1,13 +1,4 @@
-"""
-@Date: 09/09/2017
-@author: Xinya Li (xinya.li@pnl.gov); Chris R. Vernon (chris.vernon@pnnl.gov)
-@Project: Tethys V1.0
-
-License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
-Copyright (c) 2017, Battelle Memorial Institute
-
-This is the Tethys class of showing how to evaluate the input settings and
-call the function running water disaggregation
+"""model.py which defines the Tethys class and calls the run_model() method to run remaining model.
 """
 
 import time
@@ -20,8 +11,16 @@ from tethys.run_disaggregation import run_disaggregation as disagg
 
 
 class Tethys:
+    """Tethys class which evaluates inputs from a configuration input 'config'
+    and calls other methods to disaggregate water use.
+
+    :param config: Configuration file with input settings. Default = 'config.ini'
+    :type config: str
+    """
 
     def __init__(self, config='config.ini'):
+        """Default Constructor Method
+        """
 
         # instantiate functions
         self.Disaggregation = disagg
