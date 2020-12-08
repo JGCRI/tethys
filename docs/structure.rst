@@ -8,7 +8,7 @@ Process Flows
 
 The following diagram shows additional details on key processes, inputs and outputs of the tethys model.
 
-.. _fig1:
+.. _structure_fig1:
 
 .. figure:: images/tethys_processFlow.png
   :width: 100%
@@ -37,7 +37,7 @@ Profile
 
 Profile for an example run.
 
-.. _fig2:
+.. _structure_fig2:
 
 .. figure:: images/tethys_profile.png
   :width: 100%

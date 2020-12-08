@@ -3,9 +3,9 @@ Description
 
 Introduction
 -----------------------------------
-Tethys was constructed at the Joint Global Change Research Institute of the Pacific Northwest National Laboratory (http://www.globalchange.umd.edu). It served as a critical step to link Xanthos (a global hydrologic model) [#Li2017]_ and the Global Change Analysis Model (GCAM) [#Edmonds1985]_ [#Edmonds1997]_. The spatial resolution of GCAM is geopolitical regional scale for energy and economy systems (32 regions), and river basins for the land, agriculture, and water systems (235 water basins [#Kim2016]_). GCAM is often used as a boundary condition and coupled to sectoral models, such as the Community Land Model and Xanthos, which typically operate at finer spatial and temporal scales than GCAM [#Voisin2013]_ [#Hejazi2015]_. For example, Xanthos is a globally gridded hydrology model that operates at monthly scale. Resolving such a mismatch in spatial and temporal scales facilitated coupling these models together. It is also helpful for understanding seasonal patterns of water use and acquiring high resolution water use data [#Huang2017]_. The main objective of Tethys is to reconstruct global monthly gridded (0.5 geographic degree) water withdrawal datasets by spatial and temporal downscaling water withdrawal estimates at region/basin and annual scale (:numref:`fig1`). As an open-access software, Tethys applies statistical downscaling algorithms, to spatially and temporally downscale water withdrawal data from annual region/basin scale into monthly grid scale. In our study, the water withdrawals are separated into six sectors: irrigation, livestock, domestic, electricity (generation), manufacturing and mining.
+Tethys was constructed at the Joint Global Change Research Institute of the Pacific Northwest National Laboratory (http://www.globalchange.umd.edu). It served as a critical step to link Xanthos (a global hydrologic model) [#Li2017]_ and the Global Change Analysis Model (GCAM) [#Edmonds1985]_ [#Edmonds1997]_. The spatial resolution of GCAM is geopolitical regional scale for energy and economy systems (32 regions), and river basins for the land, agriculture, and water systems (235 water basins [#Kim2016]_). GCAM is often used as a boundary condition and coupled to sectoral models, such as the Community Land Model and Xanthos, which typically operate at finer spatial and temporal scales than GCAM [#Voisin2013]_ [#Hejazi2015]_. For example, Xanthos is a globally gridded hydrology model that operates at monthly scale. Resolving such a mismatch in spatial and temporal scales facilitated coupling these models together. It is also helpful for understanding seasonal patterns of water use and acquiring high resolution water use data [#Huang2017]_. The main objective of Tethys is to reconstruct global monthly gridded (0.5 geographic degree) water withdrawal datasets by spatial and temporal downscaling water withdrawal estimates at region/basin and annual scale (:numref:`description_fig1`). As an open-access software, Tethys applies statistical downscaling algorithms, to spatially and temporally downscale water withdrawal data from annual region/basin scale into monthly grid scale. In our study, the water withdrawals are separated into six sectors: irrigation, livestock, domestic, electricity (generation), manufacturing and mining.
 
-.. _fig1:
+.. _description_fig1:
 
 .. figure:: images/workflow.png
   :width: 100%
@@ -17,7 +17,7 @@ Tethys was constructed at the Joint Global Change Research Institute of the Paci
    
 The algorithms for spatial downscaling were derived from research by Edmonds and Reilly [#Edmonds1985]_. Non-agriculture (domestic, electricity, manufacturing and mining) sectors are downscaled based on global gridded population density maps [#Wada2011]_. Irrigation water withdrawal is downscaled using global coverage of gridded cropland areas equipped with irrigation [#Siebert2007]_ [#Portmann2008]_. The gridded population maps (combined Historical Database of the Global Environment (HYDE) [#Klein2011]_ and Gridded Population of the World (GPW) [#CIESIN2016]_ data products) and gridded crop irrigation area maps (combined HYDE [#Klein2011]_ and Food and Agriculture Organization (FAO) [#Siebert2013]_ data products) are updated in the algorithms over time by using historical datasets (the most recent available historical map is applied for future years). The gridded global maps of livestock in six types (cattle, buffalo, sheep, goats, pigs and poultry) [12] are used as proxy to downscale livestock water withdrawal [#Wada2011]_ [#Alcamo2002]_ [#Florke2004]_.
 
-.. _fig2:
+.. _description_fig2:
 
 .. figure:: images/TDExample.png
   :width: 100%
@@ -32,13 +32,13 @@ Different temporal downscaling algorithms to downscale annual water withdrawal e
 1. Irrigation: The monthly gridded irrigation water withdrawal was estimated by relying on monthly irrigation results from several global hydrological models (e.g. H08 [#Hanasaki2008a]_ [#Hanasaki2008b]_, LPJmL [#Rost2008]_, and PCR-GLOBWB [#Wada2011]_ [#VanBeek2011]_) to quantify monthly weighting profiles of how irrigation is spread out within a year in a particular region and per crop type.
 2. Domestic: Temporally downscaling domestic water withdrawal from annual to monthly was based on a formula from [#Wada2011]_ and [#Voisin2013]_ and utilizing monthly temperature data; details of data sources were listed in [#huang2017]_.
 3. Electricity: Temporally downscaling domestic water withdrawal from annual to monthly was based on the assumption that the amount of water withdrawal for electricity generation is proportional to the amount of electricity generated [#Voisin2013]_ [#Hejazi2015]_.
-4. Livestock, manufacturing and mining: A uniform distribution was applied; i.e., the same water withdrawal amount was applied to each month within a year. An example of data products from temporal downscaling was illustrated in (:numref:`fig2`). Monthly profiles were estimated from annual water withdrawal estimates of USA in 2010 for domestic, electricity generation and irrigation sectors.
+4. Livestock, manufacturing and mining: A uniform distribution was applied; i.e., the same water withdrawal amount was applied to each month within a year. An example of data products from temporal downscaling was illustrated in (:numref:`description_fig2`). Monthly profiles were estimated from annual water withdrawal estimates of USA in 2010 for domestic, electricity generation and irrigation sectors.
 
 Tethys is written in Python (version 2.7) with related scientific libraries. Besides the modules, it also provides collected and consolidated data from various sources as inputs. Each of the datasets used by Tethys has clear sources and references that will be beneficial for the users to update and create their own datasets.
 
 Implementation and architecture
 -------------------------------------
-Tethys as a downscaling tool follows a sequential flowchart ((:numref:`fig3`)):
+Tethys as a downscaling tool follows a sequential flowchart ((:numref:`description_fig3`)):
 
 - Step 1: Import needed data files (module package “tethys\DataReader”)
 
@@ -52,7 +52,7 @@ Tethys as a downscaling tool follows a sequential flowchart ((:numref:`fig3`)):
 
 For each step, the corresponding module package is also listed. Spatial downscaling (Step 2) is the core of computation flow in Tethys while temporal downscaling (Step 3) is an additional step. The outputs of Step 2, global gridded annual water withdrawal data by sectors, are the inputs of Step 3.
 
-.. _fig3:
+.. _description_fig3:
 
 .. figure:: images/flowchart.png
   :width: 100%
@@ -71,7 +71,7 @@ The term “grid” is used to describe the spatial resolution of 0.5 geographic
 
 As we described previously, data files of water withdrawal by sectors and region are imported in Tethys, representing the datasets to be downscaled. Since Tethys was originally designed to link to GCAM, a GCAM reader was developed to query information from GCAM database (BaseX format). To extend the usability of Tethys to the wider community, a series of csv files can be prepared following the GCAM csv format as inputs (`Table 1`_). The user is required to provide the data files for each sector. The format for each file and how to prepare them are introduced in “ReadMe_IO_Data.pdf”.
 
-The results after the spatial downscaling step (:numref:`fig3`), i.e., global annual gridded water withdrawal by sectors, are the default outputs of Tethys. If temporal downscaling step is selected, the results of global monthly gridded water withdrawals by sectors will be additionally outputted (`Table 2`_). The outputs can be formatted as classic NetCDF [22] file. The alternative output format is CSV (comma-separated values). The default option generates results in both formats. The default unit is billion m3 and another optional unit is mm. Tables and plots from the diagnostics step will also be stored in the output folder if the diagnostics option is selected.
+The results after the spatial downscaling step (:numref:`description_fig3`), i.e., global annual gridded water withdrawal by sectors, are the default outputs of Tethys. If temporal downscaling step is selected, the results of global monthly gridded water withdrawals by sectors will be additionally outputted (`Table 2`_). The outputs can be formatted as classic NetCDF [22] file. The alternative output format is CSV (comma-separated values). The default option generates results in both formats. The default unit is billion m3 and another optional unit is mm. Tables and plots from the diagnostics step will also be stored in the output folder if the diagnostics option is selected.
 
 .. centered::
   _`Table 1`: Input file names and their corresponding sectors
