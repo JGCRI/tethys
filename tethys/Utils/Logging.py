@@ -7,12 +7,11 @@ License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 
 
-This is the class to define logging process: 
+This is the class to define logging process.
 
 """
 import os, sys
 import tethys.Utils.exceptions
-
 
 _mainlog = None
 
@@ -72,19 +71,17 @@ class Logger(object):
     classes and functions will access with `getlogger()`.
 
     The logger recognizes the following log levels:
-        DEBUG
-        INFO
-        WARNING
-        ERROR
+    DEBUG
+    INFO
+    WARNING
+    ERROR
 
-    Logger configuration is specified in the [Logger] section of the configuration
-    input file.  The following keys are currently recognized:
-        * logdir:  (OPTIONAL) direcotry to put the log file in. (Default is './logs')
-        * filename: (REQUIRED) name of the log file.
-        * MinLogLevel: (OPTIONAL) minimum logging level to include in logs
-              (Default is DEBUG)
-        * MinScreenLevel: (OPTIONAL) minimum logging level to print to terminal
-              (Default is INFO)
+    Logger configuration is specified in the [Logger] section of the configuration input file. The following keys are currently recognized:
+    logdir(OPTIONAL) direcotry to put the log file in. (Default is './logs')
+    filename (REQUIRED) name of the log file.
+    MinLogLevel (OPTIONAL) minimum logging level to include in logs (Default is DEBUG)
+    MinScreenLevel (OPTIONAL) minimum logging level to print to terminal (Default is INFO)
+    
     """
     
     
