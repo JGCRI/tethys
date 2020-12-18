@@ -14,3 +14,4 @@ pytz==2020.1
 scipy==1.5.2
 six==1.15.0
 xmlx==2.0.0
+gcam_reader

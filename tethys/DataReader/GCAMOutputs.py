@@ -445,9 +445,9 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
             df.drop('land-allocation', axis=1, inplace=True)
     
             # sum hi and lo management allocation
-            df = df.groupby(['region', 'subreg', 'crop', 'use', 'Year']).sum(axis=1)
-            df.reset_index(inplace=True)
-            df.drop('mgmt', axis=1, inplace=True)
+            df = df.drop(['mgmt'],axis=1)
+            df = df.groupby(['region', 'subreg', 'crop', 'use', 'Year']).sum()
+            df = df.reset_index()
 
     # only keep crops in target list
     df['crop'] = df['crop'].apply(lambda x: 'Root_Tuber' if x == 'Root' else x)  # Correct "Root" back to crop name

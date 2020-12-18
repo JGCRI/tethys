@@ -15,6 +15,6 @@ setup(
     author='Xinya Li; Chris R. Vernon',
     author_email='xinya.li@pnnl.gov;chris.vernon@pnnl.gov',
     install_requires=get_requirements(),
-    dependency_links=['git+https://github.com/JGCRI/gcam_reader@master#egg=gcam_reader-0.5.0'],
+    dependency_links=['git+https://github.com/JGCRI/gcam_reader.git#egg=gcam_reader'],
     include_package_data=True
 )
