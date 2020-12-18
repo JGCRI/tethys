@@ -1,6 +1,3 @@
-# ignore test outputs
-tethys/tests/outputs
-
 # OS-specific files
 .DS_Store
 
