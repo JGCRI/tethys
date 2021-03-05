@@ -6,9 +6,8 @@
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 
-
-
 Perform diagnostics to ensure that the spatially downscaled results and initial aggregate results from GCAM are Consistent
+
 """
 
 import os
@@ -25,7 +24,7 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
         return
 
     mainlog.write(
-        '---Spatial Downscaling Diagnostics (Global): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)\n',
+        '---Spatial Downscaling Diagnostics (Global Total): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)\n',
         Logger.DEBUG)
     
     NY = Settings.NY
@@ -44,7 +43,7 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
             yrout = y+1
             
         mainlog.write(
-            '      Year {0[0]:4d}:   {0[1]:.6f}    {0[2]:.6f}    Diff= {0[3]:.6f}\n'.format([yrout, value[y,0],
+            '      Year {0[0]:4d}:   {0[1]:12.6f}    {0[2]:12.6f}    Diff= {0[3]:12.6f}\n'.format([yrout, value[y,0],
                                                              value[y,1], value[y,2]]),
                 Logger.DEBUG)
     
@@ -124,3 +123,55 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
         np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s', comments='')
             
     mainlog.write('------Diagnostics information is saved to: {}\n'.format(OutputFilename), Logger.DEBUG)
+    
+
+def compare_downscaled_GCAMinput_irr_by_crops(Settings, GCAMData, OUT):
+    mainlog = Logger.getlogger()
+    ## These calculations will be performed ONLY if we are logging debug-level output.
+    ## Otherwise, we skip the output and the calculations
+    if mainlog.minlvl > Logger.DEBUG:
+        return
+
+    mainlog.write(
+        '---Spatial Downscaling Diagnostics (Irr by Crops): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)\n',
+        Logger.DEBUG)
+    
+    NY = Settings.NY
+    NCrops  = OUT.crops_wdirr.shape[1]
+    d_crops = ['biomass', 'corn', 'fibercrop', 'foddergrass','fodderherb',
+               'misccrop', 'oilcrop', 'othergrain', 'palmfruit',
+               'rice', 'root_tuber', 'sugarcrop', 'wheat']
+    for y in range(NY): 
+        value   = np.zeros((3,), dtype=float)
+        # Irr Total For Each Year in log
+        # Global Total [km3/yr] from downscaled results
+        value[0]  = sum(OUT.wdirr[:,y])
+        # Global Total [km3/yr] from GCAM inputs
+        value[1]  = sum(GCAMData['irrV'][:,y+3])
+        value[2]  = value[0] - value[1]
+        if Settings.years:
+            yrout = Settings.years[y]
+        else:
+            yrout = y+1
+            
+        mainlog.write(
+            '      Year {0[0]:4d}: AllCrops        {0[1]:12.6f}    {0[2]:12.6f}    Diff= {0[3]:12.6f}\n'.format([yrout, value[0],
+            value[1], value[2]]), Logger.DEBUG)
+        
+        for c in range(NCrops):
+            value   = np.zeros((3,), dtype=float)
+            # GLobal Total [km3/yr] from downscaled results
+            value[0]  = sum(OUT.crops_wdirr[:,c,y])
+            # Global Total [km3/yr] from GCAM inputs
+            index     = np.where(GCAMData['irrV'][:,2] == c+1) [0]
+            value[1]  = sum(GCAMData['irrV'][index,y+3])
+            value[2]  = value[0] - value[1]
+            if Settings.years:
+                yrout = Settings.years[y]
+            else:
+                yrout = y+1
+                
+            mainlog.write(
+                '      Year {0[0]:4d}: {0[1]:12}    {0[2]:12.6f}    {0[3]:12.6f}    Diff= {0[4]:12.6f}\n'.format([yrout, d_crops[c], value[0],
+                value[1], value[2]]), Logger.DEBUG)
+        
