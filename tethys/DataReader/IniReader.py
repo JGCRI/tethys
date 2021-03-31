@@ -11,6 +11,7 @@ Get the simulator settings from configuration(.ini) file
 """
 
 import os
+import re
 from configobj import ConfigObj
 from tethys.Utils.exceptions import FileNotFoundError, DirectoryNotFoundError
 from tethys.Utils.Logging import Logger
@@ -27,10 +28,26 @@ class Settings:
         self.InputFolder        = config['Project']['InputFolder']
         self.OutputFolder       = os.path.join(config['Project']['OutputFolder'], self.ProjectName)
         self.rgnmapdir          = config['Project']['rgnmapdir']
-        self.OutputFormat       = int(config['Project']['OutputFormat'])
-        self.OutputUnit         = int(config['Project']['OutputUnit'])
-        self.PerformDiagnostics = int(config['Project']['PerformDiagnostics'])
-        self.PerformTemporal    = int(config['Project']['PerformTemporal'])
+        try: 
+            self.OutputFormat       = int(config['Project']['OutputFormat'])
+        except KeyError:
+            self.OutputFormat       = 0
+        try:    
+            self.OutputUnit         = int(config['Project']['OutputUnit'])
+        except KeyError:
+            self.OutputUnit         = 0
+        try:
+            self.PerformDiagnostics = int(config['Project']['PerformDiagnostics'])
+        except KeyError:
+            self.PerformDiagnostics = 1
+        try:     
+            self.PerformTemporal    = int(config['Project']['PerformTemporal'])
+        except KeyError:
+            self.PerformTemporal    = 0
+        try:
+            self.UseDemeter         = int(config['Project']['UseDemeter'])
+        except KeyError:
+            self.UseDemeter         = 0
         
         try:
             self.Logger           = config['Logger']
@@ -42,7 +59,7 @@ class Settings:
         # spatial params
         try:
             self.SpatialResolution = float(config['Project']['SpatialResolution'])
-        except:
+        except KeyError:
             self.SpatialResolution = 0.5
             self.mapsize = [int(180 / self.SpatialResolution), int(360 / self.SpatialResolution)]
 
@@ -52,6 +69,8 @@ class Settings:
         self.GCAM_query = os.path.join(self.GCAM_DBpath, config['GCAM']['GCAM_query'])
         self.subreg = int(config['GCAM']['GCAM_subreg'])
         self.years = config['GCAM']['GCAM_Years']
+        if not isinstance(self.years, (list,)): # a single year input will be string not list for self.years
+            self.years = [self.years]
 
         # reference data
         self.Area               = os.path.join(self.InputFolder, config['GriddedMap']['Area'])
@@ -66,8 +85,9 @@ class Settings:
         self.CountryNames       = os.path.join(self.InputFolder, config['GriddedMap']['CountryNames'])
         self.Population_GPW     = os.path.join(self.InputFolder, config['GriddedMap']['Population_GPW'])
         self.Population_HYDE    = os.path.join(self.InputFolder, config['GriddedMap']['Population_HYDE'])
-        self.Irrigation_GMIA    = os.path.join(self.InputFolder, config['GriddedMap']['Irrigation_GMIA'])
-        self.Irrigation_HYDE    = os.path.join(self.InputFolder, config['GriddedMap']['Irrigation_HYDE'])
+        if not self.UseDemeter:
+            self.Irrigation_GMIA    = os.path.join(self.InputFolder, config['GriddedMap']['Irrigation_GMIA'])
+            self.Irrigation_HYDE    = os.path.join(self.InputFolder, config['GriddedMap']['Irrigation_HYDE'])
         self.Livestock_Buffalo  = os.path.join(self.InputFolder, config['GriddedMap']['Livestock_Buffalo'])
         self.Livestock_Cattle   = os.path.join(self.InputFolder, config['GriddedMap']['Livestock_Cattle'])
         self.Livestock_Goat     = os.path.join(self.InputFolder, config['GriddedMap']['Livestock_Goat'])
@@ -79,7 +99,7 @@ class Settings:
         self.irrigated_fract    = os.path.join(self.InputFolder, config['GriddedMap']['Irrigated_Fract'])
 
         if self.PerformTemporal:
-            self.temporal_climate = config['TemporalDownscaling']['temporal_climate']
+            self.temporal_climate      = config['TemporalDownscaling']['temporal_climate']
             self.Domestic_R            = config['TemporalDownscaling']['Domestic_R']
             self.Elec_Building         = config['TemporalDownscaling']['Elec_Building']
             self.Elec_Industry         = config['TemporalDownscaling']['Elec_Industry']
@@ -88,6 +108,19 @@ class Settings:
             self.Elec_Building_others  = config['TemporalDownscaling']['Elec_Building_others']
             self.Irr_MonthlyData       = config['TemporalDownscaling']['Irr_MonthlyData']
             self.TemporalInterpolation = int(config['TemporalDownscaling']['TemporalInterpolation'])
+            
+        if self.UseDemeter:
+            self.DemeterOutputFolder = config['Project']['DemeterOutputFolder']
+            D_years = []
+            for filename in os.listdir(self.DemeterOutputFolder): # Folder contains Demeter outputs
+                if filename.endswith('.csv'):
+                    #yearstr = filename.split('.')[0].split('_')[-1]
+                    yearstr = re.sub("[^0-9]","",filename)
+                    D_years.append(int(yearstr))
+                           
+            years      = [int(x) for x in self.years]
+            startindex = years.index(D_years[0]) # If we use Demeter outputs, we will start from the beginning year in Demeter.
+            self.years = years[startindex:]
 
         self.check_existence()
 
@@ -108,10 +141,16 @@ class Settings:
         #     raise DirectoryNotFoundError(settings.GCAM_CSV)
 
         # Check the existence of input files
-        strlist = ['Area', 'Coord', 'aez', 'InputBasinFile', 'BasinNames', 'InputRegionFile', 'RegionNames',
-                   'InputCountryFile', 'CountryNames', 'Population_GPW', 'Population_HYDE', 'Irrigation_GMIA',
-                   'Irrigation_HYDE', 'Livestock_Buffalo', 'Livestock_Cattle', 'Livestock_Goat', 'Livestock_Sheep',
-                   'Livestock_Poultry', 'Livestock_Pig']
+        if not self.UseDemeter:
+            strlist = ['Area', 'Coord', 'aez', 'InputBasinFile', 'BasinNames', 'InputRegionFile', 'RegionNames',
+                       'InputCountryFile', 'CountryNames', 'Population_GPW', 'Population_HYDE', 'Irrigation_GMIA',
+                       'Irrigation_HYDE', 'Livestock_Buffalo', 'Livestock_Cattle', 'Livestock_Goat', 'Livestock_Sheep',
+                       'Livestock_Poultry', 'Livestock_Pig']
+        else:
+            strlist = ['Area', 'Coord', 'aez', 'InputBasinFile', 'BasinNames', 'InputRegionFile', 'RegionNames',
+                       'InputCountryFile', 'CountryNames', 'Population_GPW', 'Population_HYDE',
+                       'Livestock_Buffalo', 'Livestock_Cattle', 'Livestock_Goat', 'Livestock_Sheep',
+                       'Livestock_Poultry', 'Livestock_Pig']
 
         ifn = 0
         for s in strlist:
@@ -127,6 +166,10 @@ class Settings:
                 fn = getattr(self, s)
                 if not os.path.isfile(fn):
                     raise FileNotFoundError(fn)
+        
+        if self.UseDemeter and not os.path.exists(self.DemeterOutputFolder):
+            raise DirectoryNotFoundError(self.DemeterOutputFolder)
+						
 
     def print_info(self):
 

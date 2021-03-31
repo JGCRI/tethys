@@ -23,7 +23,6 @@ from scipy import io as spio
 from tethys.Utils.DataParser import GetArrayCSV, GetArrayTXT
 from tethys.Utils.DataParser import getContentArray as ArrayCSVRead
 from tethys.DataReader.HistPopIrrData import getPopYearData as GetPopData
-from tethys.DataReader.HistPopIrrData import getIrrYearData as GetIrrData
 from tethys.Utils.exceptions import FileNotFoundError
 
 
@@ -43,8 +42,14 @@ def getGISData(settings):
     ''' using finer resolution gridded population map (from HYDE or GPW) according to year availability '''
     GISData['pop']          = GetPopData(settings) # dictionary
      
-    ''' using finer resolution gridded Irrigation map (from HYDE or GMIA) according to year availability '''
-    GISData['irr']          = GetIrrData(settings) # dictionary            
+    if settings.UseDemeter:
+        # using finer resolution gridded Irrigation map (from demeter by individual crops) according to year availability
+        from tethys.DataReader.HistPopIrrData import getIrrYearData_Crops as GetIrrData
+    else:
+        # using finer resolution gridded Irrigation map (from HYDE or GMIA) according to year availability
+        from tethys.DataReader.HistPopIrrData import getIrrYearData as GetIrrData          
+    
+    GISData['irr']          = GetIrrData(settings) # dictionary   
     
     '''Livestock (heads) in year 2000: dim is 67420x1'''
     GISData['Buffalo']      = ArrayCSVRead(settings.Livestock_Buffalo,1)

@@ -8,7 +8,12 @@ Copyright (c) 2017, Battelle Memorial Institute
 
 """
 
+import os
+import re
+import csv
+import numpy as np
 from tethys.Utils.DataParser import getContentArray as ArrayCSVReader
+from tethys.Utils.DataParser import GetArrayCSV
 from tethys.Utils.Logging import Logger
 
 
@@ -63,6 +68,63 @@ def getIrrYearData(settings):
     
     return irr
 
+def getIrrYearData_Crops(settings):
+    
+    """
+    Update the irrigation maps to include a unique map for each historical time period from Demeter outputs by crop types
+    """
+    
+    irr = {}
+    folder = settings.DemeterOutputFolder
+    D_years = [] # is the range of years from Demeter outputs
+    D_irr = {}
+    
+    for filename in os.listdir(folder): # Folder contains Demeter outputs in the fraction of a 0.5 degree grid cell
+        if filename.endswith('.csv'):
+            # yearstr = filename.split('.')[0].split('_')[-1]
+            yearstr = re.sub("[^0-9]", "", filename)
+            D_years.append(int(yearstr)) 
+    
+    years     = [int(x) for x in settings.years] # is the range of years from GCAM
+    years_new = years[:]
+    inter     = list(set(D_years) & set(years)) # intersection of Demeter years and GCAM years
+    
+    for filename in os.listdir(folder): # Folder contains Demeter outputs in the fraction of a 0.5 degree grid cell
+        if filename.endswith('.csv'):
+            # yearstr = filename.split('.')[0].split('_')[-1]
+            yearstr = re.sub("[^0-9]", "", filename)
+            if int(yearstr) in inter:
+                D_years.append(int(yearstr))
+                tmp = GetArrayCSV(os.path.join(folder, filename), 1)
+                index = check_header_Demeter_outputs(os.path.join(folder, filename))
+                data = tmp[:,index] # irrigation fraction for 12 crops except biomass
+                # 0.5 degree total grid cell square kilometers can be calculated using:  np.cos(np.radians(latitude)) * (111.32 * 110.57) * (0.5**2)
+                latitude = np.cos(np.radians(tmp[:,-1])) * (111.32 * 110.57) * (0.5**2);
+                newdata = data*latitude[:,np.newaxis] # The irrigated cropland area for each type of crop: total_grid_cell_square_kilometers * irrigated_crop_fraction
+                newdata = np.insert(newdata,0,0, axis = 1) # no fraction data from Demeter for biomass, all zeros
+                D_irr[yearstr] = newdata
+    
+    mainlog = Logger.getlogger()
+    oldlvl = mainlog.setlevel(Logger.DEBUG)
+    
+    for i in range(0, len(years)):
+        if years[i] >= max(D_years):
+            years_new[i] = max(D_years)
+        else:
+            for j in range (0, len(D_years)-1):
+                if years[i] >= D_years[j] and years[i] < D_years[j+1]:
+                    years_new[i] = D_years[j] # use previous year
+                    
+        if not str(years_new[i]) in irr:
+            irr[str(years_new[i])] = D_irr[str(years_new[i])][:,:]       
+        mainlog.write('------Use Demeter ' + str(years_new[i]) + ' Irrigation Area Data for ' +
+                      str(years[i]) + '\n')
+    
+    irr['years'] = years # years (integer) from settings
+    irr['years_new'] = years_new # years to import irrigation data (integer) corresponding to years
+    
+    mainlog.setlevel(oldlvl)
+    return irr
 
 def getPopYearData(settings):
     
@@ -115,3 +177,20 @@ def getPopYearData(settings):
     mainlog.setlevel(oldlvl)
                    
     return pop
+
+def check_header_Demeter_outputs(filename):
+    # check the header (order) of the Demeter outputs are consistent and corresponding to the crops used in GCAM
+    d_crops = ['corn_irr', 'fibercrop_irr', 'foddergrass_irr','fodderherb_irr',
+               'misccrop_irr', 'oilcrop_irr', 'othergrain_irr', 'palmfruit_irr',
+               'rice_irr', 'root_tuber_irr', 'sugarcrop_irr','wheat_irr']
+
+    f = open(filename, "rU")
+    reader = csv.reader(f, delimiter=",")
+    headers = next(reader, None)
+    f.close()
+    headers = [x.lower() for x in headers]
+    index = []
+    for i in range(len(d_crops)):
+        index.append(headers.index(d_crops[i]))
+
+    return index
