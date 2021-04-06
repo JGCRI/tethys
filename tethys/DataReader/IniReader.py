@@ -121,6 +121,7 @@ class Settings:
             years      = [int(x) for x in self.years]
             # Subset D_years to match chosen years
             D_years = [number for number in D_years if number in years]
+            D_years = sorted(D_years)
             startindex = years.index(D_years[0]) # If we use Demeter outputs, we will start from the beginning year in Demeter.
             self.years = years[startindex:]
 

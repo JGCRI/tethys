@@ -86,9 +86,11 @@ def getIrrYearData_Crops(settings):
             D_years.append(int(yearstr)) 
     
     years     = [int(x) for x in settings.years] # is the range of years from GCAM
+    D_years = [number for number in D_years if number in years]
+    D_years = sorted(D_years)
     years_new = years[:]
     inter     = list(set(D_years) & set(years)) # intersection of Demeter years and GCAM years
-    
+
     for filename in os.listdir(folder): # Folder contains Demeter outputs in the fraction of a 0.5 degree grid cell
         if filename.endswith('.csv'):
             # yearstr = filename.split('.')[0].split('_')[-1]
