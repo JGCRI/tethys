@@ -9,3 +9,4 @@ Tethys Documentation
    description
    structure
    moduleList
+   news
