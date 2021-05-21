@@ -1,11 +1,13 @@
 """
+@Date: 09/09/2017
+@author: Xinya Li (xinya.li@pnl.gov)
+@Project: Tethys V1.0
+
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 
-Get the simulator settings from configuration(*.ini) file
+Get the simulator settings from configuration(.ini) file
 
-@author: Xinya Li (xinya.li@pnl.gov), Chris Vernon (chris.vernon@pnnl.gov)
-@Project: Tethys V1.0
 """
 
 import os

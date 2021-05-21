@@ -57,6 +57,10 @@ def Rearranging(mapsize, GISData, rgnmapData):
 
     
 def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
+    """
+    :param withd_dom_map: waer withdrawal domestic map
+    :type withd_dom_map: matrix
+    """
 # Total Non-Agricultural Water withdrawal in 1990, 2005, ... 2050, and 2010
 # population in millions in year 2000
 
@@ -458,15 +462,16 @@ def pop_scale_reshape(withd, pop_pro_rata, map_rgn, mapindex):
     scale the total withdrawal values for a region by the pro-rata population in each grid cell.
   
     Arguments:
-    withd        - regional total withdrawal for a single time slice.
-    pop_pro_rata - pro-rata population for each grid cell.  This is in the "flattened" format;
-               i.e., a single vector of ngrid values
+    withd - regional total withdrawal for a single time slice.
+    pop_pro_rata - pro-rata population for each grid cell.  This is in the "flattened" format; i.e., a single vector of ngrid values.
+    
     map_rgn      - the 2-D map of grid cell region assignments
     mapindex     - the mapping from 2-D grid to flattened grid (i.e., output of sub2ind)
 
     Return value:
     2D map of withdrawal scaled by pro-rata population.  Cells in the map that are not
     'live' grid cells (i.e., not referenced by mapindex) will be set to NaN.
+    
     '''
     
     #scaled_map = np.full(map_rgn.shape, np.NaN, dtype=float)
@@ -482,16 +487,16 @@ def rgnmapadjust(mapsize, map_pop, map_rgn, label):
     '''
     function rgn_map_adjust in matlab code
 
-    Find unassigned grid cells with nonzero population and assign them to an
-    adjacent region, if possible.
+    Find unassigned grid cells with nonzero population and assign them to an adjacent region, if possible.
 
     Arguments:
     mapsize - Dimensions of the map array (typically [360, 720])
     map_pop - Population map, dimensioned as mapsize
     map_rgn - Region map, dimensioned as mapsize
-      label - String to prefix to diagnostic output
+    label - String to prefix to diagnostic output
 
     Return value:  adjusted region map.
+    
     '''
 
     mainlog = Logger.getlogger()
