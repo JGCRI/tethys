@@ -49,6 +49,11 @@ def OutWriter(Settings, OUT, GISData):
            'MiscCrop', 'OilCrop', 'OtherGrain', 'PalmFruit', 'Rice',
            'Root_Tuber', 'SugarCrop', 'Wheat']
 
+    # Names of the 13 crop types
+    d_crops = ['biomass', 'Corn', 'FiberCrop', 'FodderGrass', 'FodderHerb', 
+           'MiscCrop', 'OilCrop', 'OtherGrain', 'PalmFruit', 'Rice',
+           'Root_Tuber', 'SugarCrop', 'Wheat']
+
     mainlog = Logger.getlogger()
     
     if Settings.OutputUnit:

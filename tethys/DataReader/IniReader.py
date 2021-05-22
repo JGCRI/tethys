@@ -11,6 +11,7 @@ Get the simulator settings from configuration(.ini) file
 """
 
 import os
+import re
 from configobj import ConfigObj
 from tethys.Utils.exceptions import FileNotFoundError, DirectoryNotFoundError
 from tethys.Utils.Logging import Logger
@@ -70,7 +71,7 @@ class Settings:
         self.years = config['GCAM']['GCAM_Years']
         if not isinstance(self.years, (list,)): # a single year input will be string not list for self.years
             self.years = [self.years]
-			
+
         # reference data
         self.Area               = os.path.join(self.InputFolder, config['GriddedMap']['Area'])
         self.Coord              = os.path.join(self.InputFolder, config['GriddedMap']['Coord'])
@@ -107,16 +108,22 @@ class Settings:
             self.Elec_Building_others  = config['TemporalDownscaling']['Elec_Building_others']
             self.Irr_MonthlyData       = config['TemporalDownscaling']['Irr_MonthlyData']
             self.TemporalInterpolation = int(config['TemporalDownscaling']['TemporalInterpolation'])
-        
+
         if self.UseDemeter:
             self.DemeterOutputFolder = config['Project']['DemeterOutputFolder']
             D_years = []
             for filename in os.listdir(self.DemeterOutputFolder): # Folder contains Demeter outputs
                 if filename.endswith('.csv'):
-                    yearstr = filename.split('.')[0].split('_')[-1]
+
+                    #yearstr = filename.split('.')[0].split('_')[-1]
+                    yearstr = re.sub("[^0-9]","",filename)
                     D_years.append(int(yearstr))
                            
             years      = [int(x) for x in self.years]
+            # Subset D_years to match chosen years
+            D_years = [number for number in D_years if number in years]
+            D_years = sorted(D_years)
+
             startindex = years.index(D_years[0]) # If we use Demeter outputs, we will start from the beginning year in Demeter.
             self.years = years[startindex:]
 
@@ -164,10 +171,11 @@ class Settings:
                 fn = getattr(self, s)
                 if not os.path.isfile(fn):
                     raise FileNotFoundError(fn)
-                
+        
         if self.UseDemeter and not os.path.exists(self.DemeterOutputFolder):
             raise DirectoryNotFoundError(self.DemeterOutputFolder)
 						
+
     def print_info(self):
 
         log    = Logger.getlogger()

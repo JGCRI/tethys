@@ -8,9 +8,12 @@ Copyright (c) 2017, Battelle Memorial Institute
 
 """
 
-import os, csv
+import os
+import re
+import csv
 import numpy as np
 from tethys.Utils.DataParser import getContentArray as ArrayCSVReader
+from tethys.Utils.DataParser import GetArrayCSV
 from tethys.Utils.Logging import Logger
 from tethys.Utils.DataParser import GetArrayCSV
 
@@ -79,16 +82,20 @@ def getIrrYearData_Crops(settings):
     
     for filename in os.listdir(folder): # Folder contains Demeter outputs in the fraction of a 0.5 degree grid cell
         if filename.endswith('.csv'):
-            yearstr = filename.split('.')[0].split('_')[-1]
+            # yearstr = filename.split('.')[0].split('_')[-1]
+            yearstr = re.sub("[^0-9]", "", filename)
             D_years.append(int(yearstr)) 
     
     years     = [int(x) for x in settings.years] # is the range of years from GCAM
+    D_years = [number for number in D_years if number in years]
+    D_years = sorted(D_years)
     years_new = years[:]
     inter     = list(set(D_years) & set(years)) # intersection of Demeter years and GCAM years
-    
+
     for filename in os.listdir(folder): # Folder contains Demeter outputs in the fraction of a 0.5 degree grid cell
         if filename.endswith('.csv'):
-            yearstr = filename.split('.')[0].split('_')[-1]
+            # yearstr = filename.split('.')[0].split('_')[-1]
+            yearstr = re.sub("[^0-9]", "", filename)
             if int(yearstr) in inter:
                 D_years.append(int(yearstr))
                 tmp = GetArrayCSV(os.path.join(folder, filename), 1)
@@ -121,7 +128,7 @@ def getIrrYearData_Crops(settings):
     
     mainlog.setlevel(oldlvl)
     return irr
-    
+
 def getPopYearData(settings):
     
     """"
@@ -180,8 +187,8 @@ def check_header_Demeter_outputs(filename):
                'misccrop_irr', 'oilcrop_irr', 'othergrain_irr', 'palmfruit_irr',
                'rice_irr', 'root_tuber_irr', 'sugarcrop_irr','wheat_irr']
 
-    f = open(filename, 'rb')
-    reader = csv.reader(f)
+    f = open(filename, "rU")
+    reader = csv.reader(f, delimiter=",")
     headers = next(reader, None)
     f.close()
     headers = [x.lower() for x in headers]

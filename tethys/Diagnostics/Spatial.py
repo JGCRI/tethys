@@ -123,7 +123,6 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
         np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s', comments='')
             
     mainlog.write('------Diagnostics information is saved to: {}\n'.format(OutputFilename), Logger.DEBUG)
-    
 
 def compare_downscaled_GCAMinput_irr_by_crops(Settings, GCAMData, OUT):
     mainlog = Logger.getlogger()
@@ -174,4 +173,3 @@ def compare_downscaled_GCAMinput_irr_by_crops(Settings, GCAMData, OUT):
             mainlog.write(
                 '      Year {0[0]:4d}: {0[1]:12}    {0[2]:12.6f}    {0[3]:12.6f}    Diff= {0[4]:12.6f}\n'.format([yrout, d_crops[c], value[0],
                 value[1], value[2]]), Logger.DEBUG)
-        

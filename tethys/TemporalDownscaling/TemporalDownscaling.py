@@ -6,7 +6,6 @@
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 
-
 Original Algorithms:
 Huang, Z., Hejazi, M., Li, X., Tang, Q., Leng, G., Liu, Y., Döll, P., Eisner, S., Gerten, D., Hanasaki, N. and Wada, Y., 2018. 
 Reconstruction of global gridded monthly sectoral water withdrawals for 1971-2010 and analysis of their spatiotemporal patterns. 
@@ -80,7 +79,7 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
             FNew = np.zeros((NM,NC,len(Nyears)),dtype = float)
             for j in range(np.shape(OUT.crops_wdirr)[1]):
                 FNew[:,j,:]  = LinearInterpolationAnnually(F[:,j,:],TDYears)    
-        
+
         # Update the TDYears to new values
         TDYears = list(np.interp(np.arange(min(TDYears), max(TDYears) + 1), TDYears, TDYears).astype(int))    
 
@@ -100,7 +99,7 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
         
         if settings.UseDemeter:
             FNew = np.copy(F)
-        
+
     settings.TDYears    = TDYears
     
     # Index of TDYears in Temperature data and GCAM
@@ -113,6 +112,7 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
         
     Temp_TDMonths_Index = np.zeros((len(TDYears)*12,), dtype = int)
     N = 0
+
     for i in Temp_TDYears_Index:
         Temp_TDMonths_Index[N*12:(N+1)*12] = np.arange(i*12, (i+1)*12)
         N += 1
@@ -138,12 +138,15 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
     ele['cooling']   = ArrayCSVRead(settings.Elec_Building_cool,0)[:,Temp_TDYears_Index]
     ele['others']    = ArrayCSVRead(settings.Elec_Building_others,0)[:,Temp_TDYears_Index]
     ele['region']    = regionID
-    
+
     """Domestic"""
     OUT.twddom = Domestic_Temporal_Downscaling(dom, OUT.WDom, settings.TDYears)
     
     """Electricity"""
     OUT.twdelec = Electricity_Temporal_Downscaling(ele, OUT.WEle, settings.TDYears)
+
+    # Monthly Irrigation Data from other models only available during 1971-2010
+    irr, irrprofile  = GetMonthlyIrrigationData(settings.Irr_MonthlyData, Temp_TDMonths_Index, settings.coords)
     
     # Monthly Irrigation Data from other models only available during 1971-2010
     irr, irrprofile  = GetMonthlyIrrigationData(settings.Irr_MonthlyData, Temp_TDMonths_Index, settings.coords)
@@ -152,7 +155,7 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
     OUT.twdirr = Irrigation_Temporal_Downscaling(irr, irrprofile, OUT.WIrr, settings.TDYears, basinID)
     if settings.UseDemeter: # Divide the temporal downscaled irrigation water demand ("twdirr") by crops
         OUT.crops_twdirr = Irrigation_Temporal_Downscaling_Crops(OUT.twdirr,FNew)
-        
+
     """Livestock, Mining and Manufacturing"""
     
     OUT.twdliv = AnnualtoMontlyUniform(OUT.WLiv, TDYears)
@@ -396,7 +399,6 @@ def Irrigation_Temporal_Downscaling_Crops(twdirr,Fraction):
             TDW[:,i,j] = twdirr[:,j]*Fraction[:,i,index]
     
     return TDW
-
 
 def LinearInterpolationAnnually(data,years):
     """
