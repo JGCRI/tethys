@@ -7,7 +7,6 @@ License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 
 
-
 Perform diagnostics to ensure that the temporally downscaled results of electricity, domestic and irrigation are reasonable
 Livestock, Mining and Manufacturing Sectors are uniformly downscaled, thus diagnostics are not needed.
 
@@ -75,7 +74,6 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
                 
     with open(os.path.join(Settings.OutputFolder, 'Diagnostics_Temporal_Downscaling_Irrigation.csv'), 'w') as outfile:
         np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s', comments='')
-        
         
         
     mainlog.write('------Domestic------\n', Logger.DEBUG)

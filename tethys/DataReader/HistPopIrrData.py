@@ -15,11 +15,14 @@ import numpy as np
 from tethys.Utils.DataParser import getContentArray as ArrayCSVReader
 from tethys.Utils.DataParser import GetArrayCSV
 from tethys.Utils.Logging import Logger
+from tethys.Utils.DataParser import GetArrayCSV
 
 
 def getIrrYearData(settings):
     
-    '''Update the irrigation maps to include a unique map for each historical time period'''
+    """
+    Update the irrigation maps to include a unique map for each historical time period
+    """
     
     irr = {}
     GMIA_irr = ArrayCSVReader(settings.Irrigation_GMIA,1)
@@ -43,7 +46,6 @@ def getIrrYearData(settings):
                         
             if not str(years_new[i]) in irr:      
                 irr[str(years_new[i])] = HYDE_irr[:,H_years.index(years_new[i])]       
-                #irr[str(years_new[i])] = importHYDE(settings.irr1 + "HYDE/crop" + str(years_new[i]) + "AD.asc", settings.mapsize)
             mainlog.write('------Use HYDE ' + str(years_new[i]) + ' Irrigation Area Data for ' +
                           str(years[i]) + '\n')
                                                               
@@ -57,7 +59,6 @@ def getIrrYearData(settings):
                         
             if not str(years_new[i]) in irr:
                 irr[str(years_new[i])] = GMIA_irr[:]        
-                #irr[str(years_new[i])] = importGMIA(settings.irr1 + "GMIA/gmia_v5_aei_ha.asc", settings.mapsize)
             mainlog.write('------Use FAO-GMIA ' + str(years_new[i]) + ' Irrigation Area Data for ' +
                           str(years[i]) + '\n')
                 
@@ -130,7 +131,9 @@ def getIrrYearData_Crops(settings):
 
 def getPopYearData(settings):
     
-    '''Update the population maps to include a unique map for each historical time period'''
+    """"
+    Update the population maps to include a unique map for each historical time period
+    """
     
     pop = {}
     GPW_pop = ArrayCSVReader(settings.Population_GPW,1)
@@ -155,7 +158,6 @@ def getPopYearData(settings):
                         
             if not str(years_new[i]) in pop:
                 pop[str(years_new[i])] = HYDE_pop[:,H_years.index(years_new[i])]         
-                #pop[str(years_new[i])] = importHYDE(settings.pop + "HYDE/popc_" + str(years_new[i]) + "AD.asc", settings.mapsize, settings.mapIndex)
             mainlog.write('------Use HYDE ' + str(years_new[i]) + ' Population Data for ' +
                           str(years[i]) + '\n')
                                                               
@@ -169,7 +171,6 @@ def getPopYearData(settings):
                         
             if not str(years_new[i]) in pop: 
                 pop[str(years_new[i])] = GPW_pop[:,G_years.index(years_new[i])]             
-                #pop[str(years_new[i])] = importGPW(settings.pop + "GPW/popc_v3_" + str(years_new[i]) + ".asc", settings.mapsize, settings.mapIndex)
             mainlog.write('------Use GPW ' + str(years_new[i]) + ' Population Data for ' +
                           str(years[i]) + '\n') 
                 

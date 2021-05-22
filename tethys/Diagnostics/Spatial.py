@@ -6,9 +6,8 @@
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 
-
-
 Perform diagnostics to ensure that the spatially downscaled results and initial aggregate results from GCAM are Consistent
+
 """
 
 import os
@@ -124,7 +123,7 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
         np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s', comments='')
             
     mainlog.write('------Diagnostics information is saved to: {}\n'.format(OutputFilename), Logger.DEBUG)
-    
+
 def compare_downscaled_GCAMinput_irr_by_crops(Settings, GCAMData, OUT):
     mainlog = Logger.getlogger()
     ## These calculations will be performed ONLY if we are logging debug-level output.

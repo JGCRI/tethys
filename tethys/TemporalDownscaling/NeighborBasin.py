@@ -12,7 +12,7 @@ Modified from class NearDistValue @author: ladmin
 """
 
 class NeighborBasin(object):
-    '''
+    """
     This is a class to define the neighbor basin for a certain basin (in 235 basins) in Temporal Downscaling.
     
     The three studies (H08, LPJml, PCR-globwb) from year 1971-2010 were investigated for the following situation: 
@@ -23,7 +23,7 @@ class NeighborBasin(object):
     
     dist.csv file in "reference" package includes the information of the distances of the surrounding basins to the target basin.
 
-    '''
+    """
 
 
     def __init__(self, in_file):
@@ -36,7 +36,7 @@ class NeighborBasin(object):
 
         
     def build_dist_dict(self):
-        '''
+        """
         Read distance information from file for each target basin (235 basins).  
         Add the values for each corresponding neighbor basin with the least distance to the target basin to a dictionary.
         If multiple corresponding basins have the same distance, add all their IDs.
@@ -45,7 +45,7 @@ class NeighborBasin(object):
                                 distance, and value
         
         RETURNS: dictionary d     Format:  {target: [distance, near1, near2, near3 ...]}
-        '''
+        """
         with open(self.f) as get:            
             for index, line in enumerate(get):
                 # skip header

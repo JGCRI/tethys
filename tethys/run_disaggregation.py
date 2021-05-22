@@ -21,6 +21,31 @@ from tethys.Utils.Logging import Logger
 
 def run_disaggregation(settings):
 
+    """
+    License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
+    Copyright (c) 2017, Battelle Memorial Institute
+
+    Module: run_disaggregation
+
+    Main Function of Tethys Steps for water disaggregation
+    1. Read in the GCAM Data and Get the number of years
+    2. Read in the GIS data
+    3. Rearranging data and map indices
+    4. Create proxy maps for population, livestock and irrigation
+       and downscale non-Agriculture (domestic, electricity, manufacturing and mining), 
+       livestock and irrigation water withdrawals to grid scale
+    5. Compute Total Water withdrawal
+    6. Diagnostics of Spatial Downscaling
+    7. Temporal Downscaling (annually -> monthly)
+    8. Diagnostics of Temporal Downscaling
+
+    # Input:
+    - settings    class DataReader.ConfigSettings, required input and control parameters
+
+    # Output:
+    - OUT         class DataWriter.OUTWritter, data for output, gridded results for each withdrawal category
+    """
+
     mainlog = Logger.getlogger()
     oldlvl = mainlog.setlevel(Logger.INFO)
     

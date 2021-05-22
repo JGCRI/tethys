@@ -5,6 +5,7 @@
 
 License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
+
 """
 
 import os
@@ -20,7 +21,7 @@ class OUTSettings():
 
     def __init__(self):
         
-        '''gridded results, 2D array, size: (360*720, NY)'''
+        # gridded results, 2D array, size: (360*720, NY)
         self.wdtotal  = None
         self.wdnonag  = None
         self.wddom    = None
@@ -30,7 +31,7 @@ class OUTSettings():
         self.wdirr    = None
         self.wdliv    = None
         
-        '''regional aggregates, 2D array, size: (NRegion, NY)'''       
+        #regional aggregates, 2D array, size: (NRegion, NY)       
         self.rtotal   = None
         self.rnonag   = None
         self.rdom     = None
@@ -42,6 +43,11 @@ class OUTSettings():
 
 
 def OutWriter(Settings, OUT, GISData):
+    
+    # Names of the 13 crop types
+    d_crops = ['biomass', 'Corn', 'FiberCrop', 'FodderGrass', 'FodderHerb', 
+           'MiscCrop', 'OilCrop', 'OtherGrain', 'PalmFruit', 'Rice',
+           'Root_Tuber', 'SugarCrop', 'Wheat']
 
     # Names of the 13 crop types
     d_crops = ['biomass', 'Corn', 'FiberCrop', 'FodderGrass', 'FodderHerb', 
@@ -90,7 +96,7 @@ def OutWriter(Settings, OUT, GISData):
                 #with open(OutputFilename + '.csv', 'w') as outfile:
                 #    np.savetxt(outfile, newvalue, delimiter=',')
                           
-            elif attr[0] == "w": # gridded output
+            elif attr[0] == "w": # gridded output from spatial downscaling
                 newvalue   = value[GISData['mapindex'],:]  # Only output 67420 cells (with coordinates)
                 
                 if Settings.OutputFormat == 1:          
@@ -101,7 +107,7 @@ def OutWriter(Settings, OUT, GISData):
                     writecsv(OutputFilename, newvalue, Settings, temp, GISData)
                     writeNETCDF(OutputFilename + '.nc', newvalue, GISData, temp, Settings.years)
                     
-            elif attr[0] == "t": # temporal downscaling output
+            elif attr[0] == "t": #  gridded output from temporal downscaling
                 if Settings.OutputFormat == 1:
                     writecsvMonthly(OutputFilename, value, TDMonthStr, temp, GISData)
 
@@ -158,18 +164,17 @@ def writecsvMonthly(filename, data, MonthStr, unit, GISData):
 
 
 def writeNETCDF(filename, data, GISData, unit, yearstrs):
-    '''
-    # Input:
+    """
+    Input:
     - filename    string, filename of netcdf file
     - data        2d array, row: number of cells (67420), col: number of years
     - GISData     structure, contains grid coordinates
     - unit        string, e.g. "mm" or 'km3'
-    '''
+    """
     # open
-#    datagrp = Dataset(filename, 'w', format='NETCDF4')
+    # datagrp = Dataset(filename, 'w', format='NETCDF4')
     datagrp = spio.netcdf.netcdf_file(filename, 'w')
     (nrows,ncols) = data.shape
-
 
     #Attributes
     #datagrp.description = ''
@@ -180,7 +185,6 @@ def writeNETCDF(filename, data, GISData, unit, yearstrs):
     
     # variables
     # Add the columns from coordinates: ID#, lon, lat, ilon, ilat
-    
     years     = datagrp.createVariable('years', 'i4', ('year',))
     ID        = datagrp.createVariable('ID', 'i4', ('index',))
     lon       = datagrp.createVariable('lon', 'f4', ('index',))
@@ -190,8 +194,7 @@ def writeNETCDF(filename, data, GISData, unit, yearstrs):
     map_index = datagrp.createVariable('mapindex', 'i4', ('index',))
     griddata  = datagrp.createVariable('data', 'f4', ('index', 'year'))
     griddata.units = unit + '/yr'
-    griddata.description = 'Downscaled Results: ' + str(nrows) + ' rows, ' + str(ncols) + ' columns (years)'
-    
+    griddata.description = 'Downscaled Results: ' + str(nrows) + ' rows, ' + str(ncols) + ' columns (years)'    
         
     # data
     years[:]      = np.array(yearstrs).astype(int)
@@ -202,7 +205,7 @@ def writeNETCDF(filename, data, GISData, unit, yearstrs):
     ilat[:]       = GISData['coord'][:,4].astype(int)
     map_index[:]  = GISData['mapindex'].astype(int) + 1
 
-#    griddata[:, :] = data[:, :]
+    # griddata[:, :] = data[:, :]
     griddata[:, :] = data[:, :].copy()    
     
     # close
@@ -210,19 +213,18 @@ def writeNETCDF(filename, data, GISData, unit, yearstrs):
 
 
 def writeNETCDFmonthly(filename, data, GISData, unit, monthstrs):
-    '''
-    # Input:
+    """
+    Input:
     - filename    string, filename of netcdf file
     - data        2d array, row: number of cells (67420), col: number of months
     - GISData     structure, contains grid coordinates
     - unit        string, e.g. "mm" or 'km3'
-    '''
-    # open
-
-#    datagrp = Dataset(filename, 'w', format='NETCDF4')
+    """
+    
+    #open
+    # datagrp = Dataset(filename, 'w', format='NETCDF4')
     datagrp = spio.netcdf.netcdf_file(filename, 'w')    
     (nrows,ncols) = data.shape
-
 
     #Attributes
     #datagrp.description = ''
@@ -233,7 +235,6 @@ def writeNETCDFmonthly(filename, data, GISData, unit, monthstrs):
     
     # variables
     # Add the columns from coordinates: ID#, lon, lat, ilon, ilat
-    
     months    = datagrp.createVariable('months', 'i4', ('month',))
     ID        = datagrp.createVariable('ID', 'i4', ('index',))
     lon       = datagrp.createVariable('lon', 'f4', ('index',))
@@ -244,9 +245,7 @@ def writeNETCDFmonthly(filename, data, GISData, unit, monthstrs):
     griddata  = datagrp.createVariable('data', 'f4', ('index', 'month'))
     griddata.units = unit + '/month'
     griddata.description = 'Downscaled Results: ' + str(nrows) + ' rows, ' + str(ncols) + ' columns (months)'
-    
-    
-        
+     
     # data
     months[:]     = np.array(monthstrs).astype(int)
     ID[:]         = GISData['coord'][:,0].astype(int)

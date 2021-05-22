@@ -108,12 +108,13 @@ class Settings:
             self.Elec_Building_others  = config['TemporalDownscaling']['Elec_Building_others']
             self.Irr_MonthlyData       = config['TemporalDownscaling']['Irr_MonthlyData']
             self.TemporalInterpolation = int(config['TemporalDownscaling']['TemporalInterpolation'])
-            
+
         if self.UseDemeter:
             self.DemeterOutputFolder = config['Project']['DemeterOutputFolder']
             D_years = []
             for filename in os.listdir(self.DemeterOutputFolder): # Folder contains Demeter outputs
                 if filename.endswith('.csv'):
+
                     #yearstr = filename.split('.')[0].split('_')[-1]
                     yearstr = re.sub("[^0-9]","",filename)
                     D_years.append(int(yearstr))
@@ -122,6 +123,7 @@ class Settings:
             # Subset D_years to match chosen years
             D_years = [number for number in D_years if number in years]
             D_years = sorted(D_years)
+
             startindex = years.index(D_years[0]) # If we use Demeter outputs, we will start from the beginning year in Demeter.
             self.years = years[startindex:]
 

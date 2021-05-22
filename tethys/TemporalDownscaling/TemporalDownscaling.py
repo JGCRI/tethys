@@ -18,10 +18,10 @@ Pre-processed Input Data Files:
 4. Monthly Irrigation Water withdrawal Data from other model
 
 Temporal Downscaling (Year to Month) for water withdrawal of five sectors:
-Domestic - Wada et al. (2011), need input data 1
-Electricity - Voisin et al. (2013), need input data 2&3
-Livestock, Mining and Manufacturing - Uniform distribution (based on days and leap years)
-Irrigation - Monthly Irrigation Data from other models as the weighting factor to downscale gridded annually irrigation water withdrawals, need input data 4
+Domestic: Wada et al. (2011), need input data 1
+Electricity: Voisin et al. (2013), need input data 2&3
+Livestock, Mining and Manufacturing: Uniform distribution (based on days and leap years)
+Irrigation: Monthly Irrigation Data from other models as the weighting factor to downscale gridded annually irrigation water withdrawals, need input data 4
 """
 
 import scipy.io as spio
@@ -33,10 +33,10 @@ from tethys.Utils.Logging import Logger
 
 
 def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):    
-    """Determine the temporal downscaling years"""
-
+    # Determine the temporal downscaling years
     mainlog = Logger.getlogger()
     
+    # Determine the available temporal downscaling years according to other models and future years (not covered by other models)
     startyear  = int(settings.temporal_climate.split("_")[-2][:4])
     endyear    = int(settings.temporal_climate.split("_")[-1][:4])
     startyear1 = int(settings.Irr_MonthlyData.split("_")[-2][:4])
@@ -79,7 +79,7 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
             FNew = np.zeros((NM,NC,len(Nyears)),dtype = float)
             for j in range(np.shape(OUT.crops_wdirr)[1]):
                 FNew[:,j,:]  = LinearInterpolationAnnually(F[:,j,:],TDYears)    
-                
+
         # Update the TDYears to new values
         TDYears = list(np.interp(np.arange(min(TDYears), max(TDYears) + 1), TDYears, TDYears).astype(int))    
 
@@ -99,7 +99,7 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
         
         if settings.UseDemeter:
             FNew = np.copy(F)
-           
+
     settings.TDYears    = TDYears
     
     # Index of TDYears in Temperature data and GCAM
@@ -138,7 +138,7 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
     ele['cooling']   = ArrayCSVRead(settings.Elec_Building_cool,0)[:,Temp_TDYears_Index]
     ele['others']    = ArrayCSVRead(settings.Elec_Building_others,0)[:,Temp_TDYears_Index]
     ele['region']    = regionID
-        
+
     """Domestic"""
     OUT.twddom = Domestic_Temporal_Downscaling(dom, OUT.WDom, settings.TDYears)
     
@@ -148,11 +148,14 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
     # Monthly Irrigation Data from other models only available during 1971-2010
     irr, irrprofile  = GetMonthlyIrrigationData(settings.Irr_MonthlyData, Temp_TDMonths_Index, settings.coords)
     
+    # Monthly Irrigation Data from other models only available during 1971-2010
+    irr, irrprofile  = GetMonthlyIrrigationData(settings.Irr_MonthlyData, Temp_TDMonths_Index, settings.coords)
+    
     """Irrigation"""
     OUT.twdirr = Irrigation_Temporal_Downscaling(irr, irrprofile, OUT.WIrr, settings.TDYears, basinID)
     if settings.UseDemeter: # Divide the temporal downscaled irrigation water demand ("twdirr") by crops
         OUT.crops_twdirr = Irrigation_Temporal_Downscaling_Crops(OUT.twdirr,FNew)
-            
+
     """Livestock, Mining and Manufacturing"""
     
     OUT.twdliv = AnnualtoMontlyUniform(OUT.WLiv, TDYears)
@@ -181,7 +184,6 @@ def AnnualtoMontlyUniform(WD, years):
     
 def set_month_arrays(Year):
     # Calculate the days in each month of a year
-    
     M  = np.zeros((12,), dtype=int) # year, month, number of days in month
     M1 = [31,    28,    31,    30,    31,    30,    31,    31,    30,    31,    30,    31]
     M2 = [31,    29,    31,    30,    31,    30,    31,    31,    30,    31,    30,    31]
@@ -218,7 +220,7 @@ def GetMonthlyIrrigationData(filename, monthindex, coords):
     
     datagrp.close()
     
-    # Calculate the irr profile (Averaged monthly irrigation from historical data
+    # Calculate the irr profile (Averaged monthly irrigation from historical data, e.g. averaged 1971-2010)
     irrprofile = np.zeros((coords.shape[0],12),dtype = float)
     for m in range(12):
         mi = range(m, nm, 12)
@@ -228,15 +230,17 @@ def GetMonthlyIrrigationData(filename, monthindex, coords):
     return irrdata, irrprofile
 
 def Domestic_Temporal_Downscaling(data, W, years):
-    # data: structure: 'tas' and 'R'
-    #     'tas': Temp Data (Monthly) for domestic category; 
-    #            converted into the format (Year: 1971-2010; Unit: C; Dimension: 67420, number of TDYears*12)
-    #     'R'  : a dimensionless amplitude, which adjusts the relative difference in domestic water withdrawal 
-    #            between the months with the warmest and the coldest temperatures
-    # W: water withdrawal of domestic sector, dimension: 67420,NY
-    # years: the list of years for temporal downscaling
-    # TDW: Temporally Downscaled W, dimension: 67420, NY*12
-    
+    """
+    data: structure: 'tas' and 'R'
+        'tas': Temp Data (Monthly) for domestic category; 
+            converted into the format (Year: 1971-2010; Unit: C; Dimension: 67420, number of TDYears*12)
+        'R'  : a dimensionless amplitude, which adjusts the relative difference in domestic water withdrawal 
+            between the months with the warmest and the coldest temperatures
+    W: water withdrawal of domestic sector, dimension: 67420,NY
+    years: the list of years for temporal downscaling
+    TDW: Temporally Downscaled W, dimension: 67420, NY*12
+    """
+
     TDW = np.zeros((np.shape(data['tas'])[0],len(years)*12),dtype = float)
     
     for i in range(np.shape(data['tas'])[0]):
@@ -259,20 +263,23 @@ def Domestic_Temporal_Downscaling(data, W, years):
     return TDW
 
 def Electricity_Temporal_Downscaling(data, W, years):
-    # data: structure:  'hdd', 'cdd','building','industry','heating','cooling','others'     
-    #        'hdd':      calculated monthly HDD according to the original daily air temperature of Temp 
-    #                    (Year: 1971-2010; Unit: C; Dimension: 67420, number of TDYears*12)
-    #        'cdd':      calculated monthly CDD according to the original daily air temperature of Temp 
-    #                    (Year: 1971-2010; Unit: C; Dimension: 67420, number of TDYears*12)
-    #        'building': the proportion of total electricity use for building
-    #        'industry': the proportion of total electricity use for industry; Pb + Pi = 1
-    #        'heating':  the proportion of total building electricity use for heating
-    #        'cooling':  the proportion of total building electricity use for cooling
-    #        'others':   the proportion of total building electricity use for other home utilities; Ph + Pc + Po = 1
-    #        'region":   the region ID for 67420 grids, 67420*1
-    # W:  water withdrawal of electricity sector, dimension: 67420,NY
-    # years: the list of years for temporal downscaling
-    # TDW: Temporally Downscaled W, dimension: 67420, NY*12
+    
+    """
+    data: structure:  'hdd', 'cdd','building','industry','heating','cooling','others'     
+            'hdd':      calculated monthly HDD according to the original daily air temperature of Temp 
+                        (Year: 1971-2010; Unit: C; Dimension: 67420, number of TDYears*12)
+            'cdd':      calculated monthly CDD according to the original daily air temperature of Temp 
+                        (Year: 1971-2010; Unit: C; Dimension: 67420, number of TDYears*12)
+            'building': the proportion of total electricity use for building
+            'industry': the proportion of total electricity use for industry; Pb + Pi = 1
+            'heating':  the proportion of total building electricity use for heating
+            'cooling':  the proportion of total building electricity use for cooling
+            'others':   the proportion of total building electricity use for other home utilities; Ph + Pc + Po = 1
+            'region":   the region ID for 67420 grids, 67420*1
+    W:  water withdrawal of electricity sector, dimension: 67420,NY
+    years: the list of years for temporal downscaling
+    TDW: Temporally Downscaled W, dimension: 67420, NY*12
+    """
     
     TDW = np.zeros((np.shape(W)[0],len(years)*12),dtype = float)
     
@@ -307,13 +314,16 @@ def Electricity_Temporal_Downscaling(data, W, years):
     return TDW
 
 def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basins):
-    # data: Irrigation Data (Monthly) from other model as weighting factors; converted into the format 
-    #       (Year: 1971-2010; Unit: kg m-2 s-1; Dimension: 67420, number of TDYears*12)
-    # W: water withdrawal of irrigation sector, dimension: 67420,NY
-    # years: the list of years for temporal downscaling
-    # The weighting factors will be aggregated and performed at basin scale (NB = 235)
-    # basins: the basin ID (1-235) for 67420 grids, 67420*1
-    # TDW: Temporally Downscaled W, dimension: 67420, NY*12
+    
+    """
+    data: Irrigation Data (Monthly) from other model as weighting factors; converted into the format 
+           (Year: 1971-2010; Unit: kg m-2 s-1; Dimension: 67420, number of TDYears*12)
+    W: water withdrawal of irrigation sector, dimension: 67420,NY
+    years: the list of years for temporal downscaling
+    The weighting factors will be aggregated and performed at basin scale (NB = 235)
+    basins: the basin ID (1-235) for 67420 grids, 67420*1
+    TDW: Temporally Downscaled W, dimension: 67420, NY*12
+    """
     
     NB = np.max(basins)
     NM = np.shape(W)[0]
@@ -327,10 +337,10 @@ def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basins):
     # Aggregate data into basin scale
     for index in range(0, NM):
         for m in range(0, NT): 
-            if m >=  Ndata:  # For future years, use irr profile
+            if m >=  Ndata:  # For future years, use irr profile as weighting factors
                 mi = m % 12
                 data_basin[basins[index] - 1, m] += dataprofile[index, mi]
-            else:    
+            else: # For available years, use irr data from other model as weighting factors
                 if not np.isnan(data[index, m]) and basins[index] > 0:
                     data_basin[basins[index] - 1, m] += data[index, m]
         for y in range(0, NY): 
@@ -391,10 +401,12 @@ def Irrigation_Temporal_Downscaling_Crops(twdirr,Fraction):
     return TDW
 
 def LinearInterpolationAnnually(data,years):
-    # data: dimension is [67420, NY]
-    # years: the list of years, length is NY, for example: [1990, 2005, 2010]
-    # Interpolate values linearly between years to create annual results
-    # Out: dimension is [67420, NNY], for example, NNY is 21
+    """
+    data: dimension is [67420, NY]
+    years: the list of years, length is NY, for example: [1990, 2005, 2010]
+    Interpolate values linearly between years to create annual results
+    Out: dimension is [67420, NNY], for example, NNY is 21
+    """
     Nyears = np.interp(np.arange(min(years), max(years) + 1), years, years)
     NM     = np.shape(data)[0]
     out    = np.zeros((NM,len(Nyears)),dtype = float)
