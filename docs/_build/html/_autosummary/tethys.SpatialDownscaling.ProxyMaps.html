@@ -87,7 +87,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../description.html">Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../structure.html">Model Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../moduleList.html">Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../news.html">NEWS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../news.html">News</a></li>
 </ul>
 
             
@@ -163,7 +163,7 @@ Copyright (c) 2017, Battelle Memorial Institute</p>
 <p>This is the core of Water Disaggregation</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>mapsize     [360,720]</p></li>
+<li><p>mapsize     [360,720] for 0.5 degree</p></li>
 <li><p>settings    class ConfigSettings(), required input and controlling parameters</p></li>
 <li><p>OUT         class OUTSettings(), data for output, gridded results for each withdrawal category</p></li>
 <li><p>GISData     structure GISData{}, GIS data on grid map of 360*720</p></li>
@@ -181,10 +181,13 @@ Copyright (c) 2017, Battelle Memorial Institute</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="tethys.SpatialDownscaling.ProxyMaps.IrrigationMap.html#tethys.SpatialDownscaling.ProxyMaps.IrrigationMap" title="tethys.SpatialDownscaling.ProxyMaps.IrrigationMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IrrigationMap</span></code></a>(mapsize, GISData, GCAMData, …)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="tethys.SpatialDownscaling.ProxyMaps.LivestockMap.html#tethys.SpatialDownscaling.ProxyMaps.LivestockMap" title="tethys.SpatialDownscaling.ProxyMaps.LivestockMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LivestockMap</span></code></a>(mapsize, GISData, GCAMData, …)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IrrigationMapCrops</span></code>(mapsize, GISData, …)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="tethys.SpatialDownscaling.ProxyMaps.PopulationMap.html#tethys.SpatialDownscaling.ProxyMaps.PopulationMap" title="tethys.SpatialDownscaling.ProxyMaps.PopulationMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PopulationMap</span></code></a>(mapsize, GISData, GCAMData, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="tethys.SpatialDownscaling.ProxyMaps.LivestockMap.html#tethys.SpatialDownscaling.ProxyMaps.LivestockMap" title="tethys.SpatialDownscaling.ProxyMaps.LivestockMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LivestockMap</span></code></a>(mapsize, GISData, GCAMData, …)</p></td>
+<td><p>Livestock gridded GIS data maps by six types are used to downscale livestock Water withdrawal</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="tethys.SpatialDownscaling.ProxyMaps.PopulationMap.html#tethys.SpatialDownscaling.ProxyMaps.PopulationMap" title="tethys.SpatialDownscaling.ProxyMaps.PopulationMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PopulationMap</span></code></a>(mapsize, GISData, GCAMData, …)</p></td>
 <td><p><dl class="field-list simple">
 <dt class="field-odd">param withd_dom_map</dt>
 <dd class="field-odd"><p>waer withdrawal domestic map</p>
@@ -192,13 +195,13 @@ Copyright (c) 2017, Battelle Memorial Institute</p>
 </dl>
 </p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="tethys.SpatialDownscaling.ProxyMaps.Rearranging.html#tethys.SpatialDownscaling.ProxyMaps.Rearranging" title="tethys.SpatialDownscaling.ProxyMaps.Rearranging"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Rearranging</span></code></a>(mapsize, GISData, rgnmapData)</p></td>
-<td><p>mapsize: [360,720]</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="tethys.SpatialDownscaling.ProxyMaps.Rearranging.html#tethys.SpatialDownscaling.ProxyMaps.Rearranging" title="tethys.SpatialDownscaling.ProxyMaps.Rearranging"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Rearranging</span></code></a>(mapsize, GISData, rgnmapData)</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="tethys.SpatialDownscaling.ProxyMaps.pop_scale_reshape.html#tethys.SpatialDownscaling.ProxyMaps.pop_scale_reshape" title="tethys.SpatialDownscaling.ProxyMaps.pop_scale_reshape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop_scale_reshape</span></code></a>(withd, pop_pro_rata, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="tethys.SpatialDownscaling.ProxyMaps.pop_scale_reshape.html#tethys.SpatialDownscaling.ProxyMaps.pop_scale_reshape" title="tethys.SpatialDownscaling.ProxyMaps.pop_scale_reshape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop_scale_reshape</span></code></a>(withd, pop_pro_rata, …)</p></td>
 <td><p>scale the total withdrawal values for a region by the pro-rata population in each grid cell.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="tethys.SpatialDownscaling.ProxyMaps.rgnmapadjust.html#tethys.SpatialDownscaling.ProxyMaps.rgnmapadjust" title="tethys.SpatialDownscaling.ProxyMaps.rgnmapadjust"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rgnmapadjust</span></code></a>(mapsize, map_pop, map_rgn, label)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="tethys.SpatialDownscaling.ProxyMaps.rgnmapadjust.html#tethys.SpatialDownscaling.ProxyMaps.rgnmapadjust" title="tethys.SpatialDownscaling.ProxyMaps.rgnmapadjust"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rgnmapadjust</span></code></a>(mapsize, map_pop, map_rgn, label)</p></td>
 <td><p>function rgn_map_adjust in matlab code</p></td>
 </tr>
 </tbody>

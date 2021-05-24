@@ -87,7 +87,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../description.html">Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../structure.html">Model Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../moduleList.html">Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../news.html">NEWS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../news.html">News</a></li>
 </ul>
 
             
@@ -158,7 +158,16 @@
 <dl class="py function">
 <dt id="tethys.TemporalDownscaling.TemporalDownscaling.Irrigation_Temporal_Downscaling">
 <code class="sig-prename descclassname">tethys.TemporalDownscaling.TemporalDownscaling.</code><code class="sig-name descname">Irrigation_Temporal_Downscaling</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">dataprofile</span></em>, <em class="sig-param"><span class="n">W</span></em>, <em class="sig-param"><span class="n">years</span></em>, <em class="sig-param"><span class="n">basins</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tethys.TemporalDownscaling.TemporalDownscaling.Irrigation_Temporal_Downscaling" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="simple">
+<dt>data: Irrigation Data (Monthly) from other model as weighting factors; converted into the format</dt><dd><p>(Year: 1971-2010; Unit: kg m-2 s-1; Dimension: 67420, number of TDYears*12)</p>
+</dd>
+</dl>
+<p>W: water withdrawal of irrigation sector, dimension: 67420,NY
+years: the list of years for temporal downscaling
+The weighting factors will be aggregated and performed at basin scale (NB = 235)
+basins: the basin ID (1-235) for 67420 grids, 67420*1
+TDW: Temporally Downscaled W, dimension: 67420, NY*12</p>
+</dd></dl>
 
 </div>
 

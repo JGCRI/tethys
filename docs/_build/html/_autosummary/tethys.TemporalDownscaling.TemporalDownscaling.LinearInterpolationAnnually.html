@@ -87,7 +87,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../description.html">Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../structure.html">Model Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../moduleList.html">Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../news.html">NEWS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../news.html">News</a></li>
 </ul>
 
             
@@ -158,7 +158,11 @@
 <dl class="py function">
 <dt id="tethys.TemporalDownscaling.TemporalDownscaling.LinearInterpolationAnnually">
 <code class="sig-prename descclassname">tethys.TemporalDownscaling.TemporalDownscaling.</code><code class="sig-name descname">LinearInterpolationAnnually</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">years</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tethys.TemporalDownscaling.TemporalDownscaling.LinearInterpolationAnnually" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>data: dimension is [67420, NY]
+years: the list of years, length is NY, for example: [1990, 2005, 2010]
+Interpolate values linearly between years to create annual results
+Out: dimension is [67420, NNY], for example, NNY is 21</p>
+</dd></dl>
 
 </div>
 
