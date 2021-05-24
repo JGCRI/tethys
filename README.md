@@ -27,16 +27,12 @@ Set up Tethys using the following steps:
 - `data_dir`/example/configDemeter.ini
 Before you can run these examples please find and replace all absolute paths in each of these files from "C:/Z/models/tethysExampleFolders/example_v1_3_0/..." to "`data_dir`/example/...".
 
-4.  To run Tethys:
+4.  To run the example configuration files:
 
     ```python
-    import tethys
-    
-    # the path and file name that my example configuration (.ini) file was downloaded to
-    config_file = '<path to my example config file>/pm_abcd_mrtm.ini'
-    
-    # run Tethys
-    tethys.run_model(config_file)
+    # In a command prompt
+	python `data_dir`/example/config.ini
+	python `data_dir`/example/configDemeter.ini
     ```
 
 # Citation
