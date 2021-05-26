@@ -9,7 +9,7 @@ Copyright (c) 2017, Battelle Memorial Institute
 """
 import numpy as np
 
-from tethys.Utils.Logging import Logger
+from tethys.utils.logging import Logger
 
 #__all__ = ['sub2ind', 'ind2sub']
 

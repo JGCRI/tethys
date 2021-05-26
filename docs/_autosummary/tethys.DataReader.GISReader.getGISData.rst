@@ -1,6 +1,6 @@
-tethys.DataReader.GISReader.getGISData
+tethys.data_reader.GISReader.getGISData
 ======================================
 
-.. currentmodule:: tethys.DataReader.GISReader
+.. currentmodule:: tethys.data_reader.GISReader
 
 .. autofunction:: getGISData

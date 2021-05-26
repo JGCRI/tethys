@@ -1,6 +1,6 @@
-tethys.DataReader.GISReader.load\_const\_griddata
+tethys.data_reader.GISReader.load\_const\_griddata
 =================================================
 
-.. currentmodule:: tethys.DataReader.GISReader
+.. currentmodule:: tethys.data_reader.GISReader
 
 .. autofunction:: load_const_griddata

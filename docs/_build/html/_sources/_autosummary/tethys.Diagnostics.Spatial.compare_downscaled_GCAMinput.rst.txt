@@ -1,6 +1,6 @@
-tethys.Diagnostics.Spatial.compare\_downscaled\_GCAMinput
+tethys.diagnostics.Spatial.compare\_downscaled\_GCAMinput
 =========================================================
 
-.. currentmodule:: tethys.Diagnostics.Spatial
+.. currentmodule:: tethys.diagnostics.Spatial
 
 .. autofunction:: compare_downscaled_GCAMinput

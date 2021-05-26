@@ -1,6 +1,6 @@
-tethys.SpatialDownscaling.ProxyMaps.Rearranging
+tethys.spatial_downscaling.ProxyMaps.Rearranging
 ===============================================
 
-.. currentmodule:: tethys.SpatialDownscaling.ProxyMaps
+.. currentmodule:: tethys.spatial_downscaling.ProxyMaps
 
 .. autofunction:: Rearranging

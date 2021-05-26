@@ -8,16 +8,16 @@ Copyright (c) 2017, Battelle Memorial Institute
 """
 
 import time
-from tethys.DataReader.GCAMOutputs import get_gcam_data
-from tethys.DataReader import GISReader
-from tethys.DataWriter.OUTWriter import OUTSettings
-from tethys.SpatialDownscaling.ProxyMaps import Rearranging
-import tethys.SpatialDownscaling.ProxyMaps as ProxyMaps
-import tethys.SpatialDownscaling.TotalWaterUse as TotalWaterUse
-import tethys.Diagnostics.Spatial as DiagnosticsSD
-import tethys.Diagnostics.Temporal as DiagnosticsTD
-import tethys.TemporalDownscaling.TemporalDownscaling as TemporalDownscaling
-from tethys.Utils.Logging import Logger
+from tethys.data_reader.gcam_outputs import get_gcam_data
+from tethys.data_reader import gis_reader
+from tethys.data_writer.outputs import OUTSettings
+from tethys.spatial_downscaling.proxy_maps import Rearranging
+import tethys.spatial_downscaling.proxy_maps as ProxyMaps
+import tethys.spatial_downscaling.total_water_use as TotalWaterUse
+import tethys.diagnostics.spatial_diagnostics as DiagnosticsSD
+import tethys.diagnostics.temporal_diagnostics as DiagnosticsTD
+import tethys.temporal_downscaling.temporal_downscaling as TemporalDownscaling
+from tethys.utils.logging import Logger
 
 def run_disaggregation(settings):
 
@@ -35,15 +35,15 @@ def run_disaggregation(settings):
        and downscale non-Agriculture (domestic, electricity, manufacturing and mining), 
        livestock and irrigation water withdrawals to grid scale
     5. Compute Total Water withdrawal
-    6. Diagnostics of Spatial Downscaling
+    6. diagnostics of Spatial Downscaling
     7. Temporal Downscaling (annually -> monthly)
-    8. Diagnostics of Temporal Downscaling
+    8. diagnostics of Temporal Downscaling
 
     # Input:
-    - settings    class DataReader.ConfigSettings, required input and control parameters
+    - settings    class data_reader.ConfigSettings, required input and control parameters
 
     # Output:
-    - OUT         class DataWriter.OUTWritter, data for output, gridded results for each withdrawal category
+    - OUT         class data_writer.OUTWritter, data for output, gridded results for each withdrawal category
     """
 
     mainlog = Logger.getlogger()
@@ -85,8 +85,8 @@ def run_disaggregation(settings):
 
     mainlog.write(
         '---Read in the GIS data (asc/txt/csv format) and the region map data (csv format)---\n')
-    GISData    = GISReader.getGISData(settings)
-    rgnmapData = GISReader.getRegionMapData(settings.InputRegionFile)
+    GISData    = gis_reader.getGISData(settings)
+    rgnmapData = gis_reader.getRegionMapData(settings.InputRegionFile)
     endtime2 = time.time()
     mainlog.write("------Time Cost: %s seconds ---\n" % (endtime2 - endtime1))
     mainlog.write('---Mapsize: {}\n'.format(settings.mapsize))
@@ -131,7 +131,7 @@ def run_disaggregation(settings):
     endtime7 = time.time()
     mainlog.write("------Time Cost: %s seconds ---\n" % (endtime7 - endtime6))
 
-    # 6. Diagnostics of Spatial Downscaling
+    # 6. diagnostics of Spatial Downscaling
     if settings.PerformDiagnostics:
         DiagnosticsSD.compare_downscaled_GCAMinput(settings, GCAMData, OUT)
     if settings.UseDemeter:
@@ -146,7 +146,7 @@ def run_disaggregation(settings):
         endtime7 = time.time()
         mainlog.write("------Time Cost: %s seconds ---\n" % (endtime7 - endtime6))
 
-    # 8. Diagnostics of Temporal Downscaling
+    # 8. diagnostics of Temporal Downscaling
     if settings.PerformDiagnostics and settings.PerformTemporal:
         DiagnosticsTD.compare_temporal_downscaled(settings, OUT, GISData)
 

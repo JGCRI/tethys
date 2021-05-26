@@ -1,6 +1,6 @@
-tethys.Diagnostics.Temporal.compare\_temporal\_downscaled
+tethys.diagnostics.Temporal.compare\_temporal\_downscaled
 =========================================================
 
-.. currentmodule:: tethys.Diagnostics.Temporal
+.. currentmodule:: tethys.diagnostics.Temporal
 
 .. autofunction:: compare_temporal_downscaled

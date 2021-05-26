@@ -19,10 +19,10 @@ This is the core of Water Disaggregation
 """
 
 import numpy as np
-from tethys.Utils.Math import SizeR, SizeC
-from tethys.Utils.Math import ind2sub
-from tethys.Utils.Math import sub2ind
-from tethys.Utils.Logging import Logger
+from tethys.utils.utils_math import SizeR, SizeC
+from tethys.utils.utils_math import ind2sub
+from tethys.utils.utils_math import sub2ind
+from tethys.utils.logging import Logger
 
 def Rearranging(mapsize, GISData, rgnmapData):
 
@@ -446,7 +446,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                     # GCAM has irrigation data for a region and a AEZ/basin.
                     # But from region map and AEZ/basin map, there are no cells belong to both.
                     # Thus, GCAM data will not be included for downscaling.
-                    # It will cause the difference in Spatial Downscaling Diagnostics
+                    # It will cause the difference in Spatial Downscaling diagnostics
                     mainlog.write('{}  {}  {}  {} {} {} {} \n'.format('[Year Index, Region ID,',
                                         GISData['AEZstring'],'ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
                                         y+1, i+1, j+1, irr_V[i,j,y]), Logger.WARNING)
@@ -687,7 +687,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                         # GCAM has irrigation data for a region and a AEZ/basin.
                         # But from region map and AEZ/basin map, there are no cells belong to both.
                         # Thus, GCAM data will not be included for downscaling.
-                        # It will cause the difference in Spatial Downscaling Diagnostics
+                        # It will cause the difference in Spatial Downscaling diagnostics
                         mainlog.write('{}  {}  {}  {} {} {} {} {}\n'.format('[Year Index, Region ID,',
                                             GISData['AEZstring'],'ID, Crop ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
                                             y+1, i+1, j+1, k+1, tempV_all[i,j,k,y]), Logger.WARNING)
@@ -930,7 +930,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                         # GCAM has irrigation data for a region and a AEZ/basin.
                         # But from region map and AEZ/basin map, there are no cells belong to both.
                         # Thus, GCAM data will not be included for downscaling.
-                        # It will cause the difference in Spatial Downscaling Diagnostics
+                        # It will cause the difference in Spatial Downscaling diagnostics
                         mainlog.write('{}  {}  {}  {} {} {} {} {}\n'.format('[Year Index, Region ID,',
                                             GISData['AEZstring'],'ID, Crop ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
                                             y+1, i+1, j+1, k+1, tempV_all[i,j,k,y]), Logger.WARNING)

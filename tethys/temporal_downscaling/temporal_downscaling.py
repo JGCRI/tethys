@@ -27,9 +27,9 @@ Irrigation: Monthly Irrigation Data from other models as the weighting factor to
 import scipy.io as spio
 import os, calendar
 import numpy as np
-from tethys.Utils.DataParser import getContentArray as ArrayCSVRead
-from tethys.TemporalDownscaling.NeighborBasin import NeighborBasin
-from tethys.Utils.Logging import Logger
+from tethys.utils.data_parser import getContentArray as ArrayCSVRead
+from tethys.temporal_downscaling.neighbor_basin import NeighborBasin
+from tethys.utils.logging import Logger
 
 
 def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):    

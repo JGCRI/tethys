@@ -1,7 +1,7 @@
-tethys.DataReader.IniReader
+tethys.data_reader.IniReader
 ===========================
 
-.. automodule:: tethys.DataReader.IniReader
+.. automodule:: tethys.data_reader.IniReader
 
    
    

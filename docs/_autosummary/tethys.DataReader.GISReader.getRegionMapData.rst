@@ -1,6 +1,6 @@
-tethys.DataReader.GISReader.getRegionMapData
+tethys.data_reader.GISReader.getRegionMapData
 ============================================
 
-.. currentmodule:: tethys.DataReader.GISReader
+.. currentmodule:: tethys.data_reader.GISReader
 
 .. autofunction:: getRegionMapData

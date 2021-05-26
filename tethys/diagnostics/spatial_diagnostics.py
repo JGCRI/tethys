@@ -13,8 +13,8 @@ Perform diagnostics to ensure that the spatially downscaled results and initial 
 import os
 import numpy as np
 import pandas as pd
-from tethys.DataWriter.OUTWriter import OUTSettings
-from tethys.Utils.Logging import Logger
+from tethys.data_writer.outputs import OUTSettings
+from tethys.utils.logging import Logger
     
 def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
     mainlog = Logger.getlogger()
@@ -24,7 +24,7 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
         return
 
     mainlog.write(
-        '---Spatial Downscaling Diagnostics (Global Total): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)\n',
+        '---Spatial Downscaling diagnostics (Global Total): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)\n',
         Logger.DEBUG)
     
     NY = Settings.NY
@@ -47,7 +47,7 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
                                                              value[y,1], value[y,2]]),
                 Logger.DEBUG)
     
-    # Comprehensive Diagnostics information to file:
+    # Comprehensive diagnostics information to file:
     
     category = ['Domestic', 'Electricity', 'Manufacturing', 'Mining', 'Livestock', 'Irrigation', 'Non-Agriculture', 'Agriculture', 'Total']
     group    = ['Downscaled_','GCAM_','Diff_']    
@@ -122,7 +122,7 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
     with open(OutputFilename, 'w') as outfile:   
         np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s', comments='')
             
-    mainlog.write('------Diagnostics information is saved to: {}\n'.format(OutputFilename), Logger.DEBUG)
+    mainlog.write('------diagnostics information is saved to: {}\n'.format(OutputFilename), Logger.DEBUG)
 
 def compare_downscaled_GCAMinput_irr_by_crops(Settings, GCAMData, OUT):
     mainlog = Logger.getlogger()
@@ -132,7 +132,7 @@ def compare_downscaled_GCAMinput_irr_by_crops(Settings, GCAMData, OUT):
         return
 
     mainlog.write(
-        '---Spatial Downscaling Diagnostics (Irr by Crops): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)\n',
+        '---Spatial Downscaling diagnostics (Irr by Crops): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)\n',
         Logger.DEBUG)
     
     NY = Settings.NY

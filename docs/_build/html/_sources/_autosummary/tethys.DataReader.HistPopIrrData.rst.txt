@@ -1,7 +1,7 @@
-﻿tethys.DataReader.HistPopIrrData
+﻿tethys.data_reader.HistPopIrrData
 ================================
 
-.. automodule:: tethys.DataReader.HistPopIrrData
+.. automodule:: tethys.data_reader.HistPopIrrData
 
    
    

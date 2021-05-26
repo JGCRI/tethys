@@ -1,7 +1,7 @@
-tethys.SpatialDownscaling
+tethys.spatial_downscaling
 =========================
 
-.. automodule:: tethys.SpatialDownscaling
+.. automodule:: tethys.spatial_downscaling
 
    
    
@@ -27,6 +27,6 @@ tethys.SpatialDownscaling
    :toctree:
    :recursive:
 
-   tethys.SpatialDownscaling.ProxyMaps
-   tethys.SpatialDownscaling.TotalWaterUse
+   tethys.spatial_downscaling.ProxyMaps
+   tethys.spatial_downscaling.TotalWaterUse
 

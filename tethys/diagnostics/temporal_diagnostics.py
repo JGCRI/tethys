@@ -13,10 +13,10 @@ Livestock, Mining and Manufacturing Sectors are uniformly downscaled, thus diagn
 """
 import os
 import numpy as np
-from tethys.Utils.DataParser import GetArrayCSV
+from tethys.utils.data_parser import GetArrayCSV
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from tethys.Utils.Logging import Logger
+from tethys.utils.logging import Logger
     
 def compare_temporal_downscaled(Settings, OUT, GISData):
 
@@ -36,7 +36,7 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
     NY         = len(years)
     NM         = len(mapindex)
     mainlog.write(
-        '---Temporal Downscaling Diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)\n',
+        '---Temporal Downscaling diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)\n',
         Logger.DEBUG)
     
     mainlog.write('------Irrigation------\n')

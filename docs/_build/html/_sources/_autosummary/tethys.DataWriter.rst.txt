@@ -1,7 +1,7 @@
-tethys.DataWriter
+tethys.data_writer
 =================
 
-.. automodule:: tethys.DataWriter
+.. automodule:: tethys.data_writer
 
    
    
@@ -27,5 +27,5 @@ tethys.DataWriter
    :toctree:
    :recursive:
 
-   tethys.DataWriter.OUTWriter
+   tethys.data_writer.OUTWriter
 

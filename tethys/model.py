@@ -3,10 +3,10 @@
 
 import time
 from datetime import datetime
-import tethys.Utils.Logging as Logging
+import tethys.utils.logging as Logging
 
-from tethys.DataReader.IniReader import Settings
-from tethys.DataWriter.OUTWriter import OutWriter
+from tethys.data_reader.config_reader import Settings
+from tethys.data_writer.outputs import OutWriter
 from tethys.run_disaggregation import run_disaggregation as disagg
 
 

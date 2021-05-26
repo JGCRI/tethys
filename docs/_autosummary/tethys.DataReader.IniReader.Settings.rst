@@ -1,6 +1,6 @@
-tethys.DataReader.IniReader.Settings
+tethys.data_reader.IniReader.Settings
 ====================================
 
-.. currentmodule:: tethys.DataReader.IniReader
+.. currentmodule:: tethys.data_reader.IniReader
 
 .. autoclass:: Settings

@@ -12,10 +12,10 @@ import os
 import re
 import csv
 import numpy as np
-from tethys.Utils.DataParser import getContentArray as ArrayCSVReader
-from tethys.Utils.DataParser import GetArrayCSV
-from tethys.Utils.Logging import Logger
-from tethys.Utils.DataParser import GetArrayCSV
+from tethys.utils.data_parser import getContentArray as ArrayCSVReader
+from tethys.utils.data_parser import GetArrayCSV
+from tethys.utils.logging import Logger
+from tethys.utils.data_parser import GetArrayCSV
 
 
 def getIrrYearData(settings):

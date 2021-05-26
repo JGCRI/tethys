@@ -11,7 +11,7 @@ This is the class to define logging process.
 
 """
 import os, sys
-import tethys.Utils.exceptions
+import tethys.utils.exceptions
 
 _mainlog = None
 
@@ -125,7 +125,7 @@ class Logger(object):
         """
         
         if _mainlog is None:
-            from tethys.Utils.exceptions import LoggerError
+            from tethys.utils.exceptions import LoggerError
             raise LoggerError('Trying to access main logger before it has been created.')
         return _mainlog
 

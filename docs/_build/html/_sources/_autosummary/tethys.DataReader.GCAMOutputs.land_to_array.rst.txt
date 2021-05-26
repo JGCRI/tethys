@@ -1,6 +1,6 @@
-tethys.DataReader.GCAMOutputs.land\_to\_array
+tethys.data_reader.GCAMOutputs.land\_to\_array
 =============================================
 
-.. currentmodule:: tethys.DataReader.GCAMOutputs
+.. currentmodule:: tethys.data_reader.GCAMOutputs
 
 .. autofunction:: land_to_array

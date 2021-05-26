@@ -1,7 +1,7 @@
-tethys.DataReader.GISReader
+tethys.data_reader.GISReader
 ===========================
 
-.. automodule:: tethys.DataReader.GISReader
+.. automodule:: tethys.data_reader.GISReader
 
    
    

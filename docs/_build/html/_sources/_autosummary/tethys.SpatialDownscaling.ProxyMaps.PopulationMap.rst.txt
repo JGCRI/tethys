@@ -1,6 +1,6 @@
-tethys.SpatialDownscaling.ProxyMaps.PopulationMap
+tethys.spatial_downscaling.ProxyMaps.PopulationMap
 =================================================
 
-.. currentmodule:: tethys.SpatialDownscaling.ProxyMaps
+.. currentmodule:: tethys.spatial_downscaling.ProxyMaps
 
 .. autofunction:: PopulationMap

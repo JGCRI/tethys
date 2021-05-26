@@ -11,7 +11,7 @@ Copyright (c) 2017, Battelle Memorial Institute
 import os
 import numpy as np
 from scipy import io as spio
-from tethys.Utils.Logging import Logger
+from tethys.utils.logging import Logger
 
 
 class OUTSettings():
