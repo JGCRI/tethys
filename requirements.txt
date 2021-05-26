@@ -1,5 +1,4 @@
 configobj~=5.0.6
-matplotlib~=3.3.2
 numpy~=1.20.3
 pandas~=1.2.4
 scipy~=1.6.3
