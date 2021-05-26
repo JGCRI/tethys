@@ -14,13 +14,12 @@ class Tethys:
     """Tethys class which evaluates inputs from a configuration input 'config'
     and calls other methods to disaggregate water use.
 
-    :param config: Configuration file with input settings. Default = 'config.ini'
-    :type config: str
+    :param config:                  Configuration file with input settings. Default = 'config.ini'
+    :type config:                   str
+
     """
 
     def __init__(self, config='config.ini'):
-        """Default Constructor Method
-        """
 
         # instantiate functions
         self.Disaggregation = disagg
@@ -42,22 +41,16 @@ class Tethys:
         self.gridded_data = None
         self.gis_data = None
 
-        # run model and save outputs
-        self.run_model()
+    def execute(self):
+        """Execute the model and save the outputs."""
 
-        # clean up log
-        Logging._shutdown()
-
-    def run_model(self):
-        """
-        Execute the model and save the outputs.
-        """
         Logger = Logging.Logger
         mainlog = Logger.getlogger()
         mainlog.write('Start Disaggregation... \n', Logger.INFO)
+
         s1 = time.time()
         self.gridded_data, self.gis_data = self.Disaggregation(self.settings)
-        e1= time.time()
+        e1 = time.time()
         mainlog.write('End Disaggregation... \n', Logger.INFO)
         mainlog.write("---Disaggregation: %s seconds ---\n" % (e1 - s1), Logger.INFO)
 
@@ -67,3 +60,23 @@ class Tethys:
         mainlog.write("---Output: %s seconds ---\n" % (e2 - e1), Logger.INFO)
 
         mainlog.write('End Project: %s\n'%self.settings.ProjectName, Logger.INFO)
+
+        # clean up log
+        Logging._shutdown()
+
+
+def run_model(config_file):
+    """Run the Tethys model based on a user-defined configuration.
+
+    :param config_file:                 Full path with file name and extension to the input configuration file.
+    :type config_file:                  str
+
+    :returns:                           model instance housing configuration and output data
+
+    """
+
+    model = Tethys(config_file)
+
+    model.execute()
+
+    return model

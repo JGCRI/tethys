@@ -12,6 +12,7 @@ Set up Tethys using the following steps:
     ```bash
     python -m pip install git+https://github.com/JGCRI/tethys.git
     ```
+    
 2.  Download the example data using the following in a Python prompt:
     ```python
     import tethys
@@ -22,17 +23,22 @@ Set up Tethys using the following steps:
     # download and unzip the package data to your local machine
     tethys.get_package_data(data_dir)
     ```
+
 3.  Setup your configuration file (.ini).  Inside the "example" directory that you just downloaded (`data_dir` from step 2 above) there will be two example configuration files:
 - `data_dir`/example/config.ini
 - `data_dir`/example/configDemeter.ini
 Before you can run these examples please find and replace all absolute paths in each of these files from "C:/Z/models/tethysExampleFolders/example_v1_3_0/..." to "`data_dir`/example/...".
 
-4.  To run the example configuration files:
+4.  To run Tethys:
 
     ```python
-    # In a command prompt
-	python `data_dir`/example/config.ini
-	python `data_dir`/example/configDemeter.ini
+    import tethys
+    
+    # the path and file name that my example configuration (.ini) file was downloaded to
+    config_file = '<path to my example config file>/config.ini'
+    
+    # run Tethys 
+    tethys.run_model(config_file)
     ```
 
 # Citation

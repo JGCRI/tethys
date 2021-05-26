@@ -61,7 +61,8 @@ class Settings:
             self.SpatialResolution = float(config['Project']['SpatialResolution'])
         except KeyError:
             self.SpatialResolution = 0.5
-            self.mapsize = [int(180 / self.SpatialResolution), int(360 / self.SpatialResolution)]
+
+        self.mapsize = [int(180 / self.SpatialResolution), int(360 / self.SpatialResolution)]
 
         # GCAM access settings
         self.GCAM_DBpath = os.path.join(self.InputFolder, config['GCAM']['GCAM_DBpath'])
@@ -99,15 +100,15 @@ class Settings:
         self.irrigated_fract    = os.path.join(self.InputFolder, config['GriddedMap']['Irrigated_Fract'])
 
         if self.PerformTemporal:
-            self.temporal_climate      = config['temporal_downscaling']['temporal_climate']
-            self.Domestic_R            = config['temporal_downscaling']['Domestic_R']
-            self.Elec_Building         = config['temporal_downscaling']['Elec_Building']
-            self.Elec_Industry         = config['temporal_downscaling']['Elec_Industry']
-            self.Elec_Building_heat    = config['temporal_downscaling']['Elec_Building_heat']
-            self.Elec_Building_cool    = config['temporal_downscaling']['Elec_Building_cool']
-            self.Elec_Building_others  = config['temporal_downscaling']['Elec_Building_others']
-            self.Irr_MonthlyData       = config['temporal_downscaling']['Irr_MonthlyData']
-            self.TemporalInterpolation = int(config['temporal_downscaling']['TemporalInterpolation'])
+            self.temporal_climate      = config['TemporalDownscaling']['temporal_climate']
+            self.Domestic_R            = config['TemporalDownscaling']['Domestic_R']
+            self.Elec_Building         = config['TemporalDownscaling']['Elec_Building']
+            self.Elec_Industry         = config['TemporalDownscaling']['Elec_Industry']
+            self.Elec_Building_heat    = config['TemporalDownscaling']['Elec_Building_heat']
+            self.Elec_Building_cool    = config['TemporalDownscaling']['Elec_Building_cool']
+            self.Elec_Building_others  = config['TemporalDownscaling']['Elec_Building_others']
+            self.Irr_MonthlyData       = config['TemporalDownscaling']['Irr_MonthlyData']
+            self.TemporalInterpolation = int(config['TemporalDownscaling']['TemporalInterpolation'])
 
         if self.UseDemeter:
             self.DemeterOutputFolder = config['Project']['DemeterOutputFolder']
