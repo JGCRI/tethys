@@ -19,7 +19,6 @@ Note we allow for (and in fact require) a single header line. The assumption is 
 import os
 import numpy as np
 from scipy import io as spio
-#from netCDF4 import Dataset
 from tethys.utils.data_parser import GetArrayCSV, GetArrayTXT
 from tethys.utils.data_parser import getContentArray as ArrayCSVRead
 from tethys.data_reader.hist_pop_irr_data import getPopYearData as GetPopData
