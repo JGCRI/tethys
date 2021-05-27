@@ -34,11 +34,11 @@ class ReadConfig(Logger):
         # read into config object
         self.config = ConfigObj(self.config_file)
 
-        # update any default dictionary values with items specified as arguments by the user
-        self.config.update(self.params)
-
         # project level
         self.project_config = self.config.get('Project')
+
+        # update any default dictionary values with items specified as arguments by the user
+        self.project_config.update(self.params)
 
         self.ProjectName = self.project_config.get('ProjectName')
         self.InputFolder = self.project_config.get('InputFolder')
@@ -71,6 +71,9 @@ class ReadConfig(Logger):
         # reference data
         self.map_params = self.config.get('GriddedMap')
 
+        # update any default dictionary values with items specified as arguments by the user
+        self.map_params.update(self.params)
+
         self.Area = os.path.join(self.InputFolder, self.map_params.get('Area'))
         self.Coord = os.path.join(self.InputFolder, self.map_params.get('Coord'))
         self.aez = os.path.join(self.InputFolder, self.map_params.get('AEZ'))
@@ -100,6 +103,9 @@ class ReadConfig(Logger):
 
         if self.PerformTemporal:
             self.temporal_params = self.config.get('TemporalDownscaling')
+
+            # update any default dictionary values with items specified as arguments by the user
+            self.temporal_params.update(self.params)
 
             self.temporal_climate = self.temporal_params.get('temporal_climate')
             self.Domestic_R = self.temporal_params.get('Domestic_R')
