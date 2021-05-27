@@ -7,11 +7,12 @@ License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 
 """
+import logging
+
 import numpy as np
 
-from tethys.utils.logging import Logger
+from tethys.utils.exceptions import DataError
 
-#__all__ = ['sub2ind', 'ind2sub']
 
 # get the size of a 2D array
 def Size(l): 
@@ -32,16 +33,18 @@ def SizeC(l):
     except:
         nc = 1
     return nc
-    
+
+
 # Convert subscripts to linear indices
 def sub2ind(arraySize,rowSub,colSub):
+
     linearInd  = []
     if len(rowSub) != len(colSub):
-        mainlog = logger.getlogger()
+
         msg = 'sub2ind: rowSub and colSub must have equal lengths.  len(rowSub) = {}  len(colSub) = {}'.format(
             len(rowSub), len(colSub))
-        mainlog.write(msg + '\n',
-                      Logger.ERROR)
+        logging.error(msg)
+
         raise DataError(msg)
 
     arr = tuple(arraySize)
@@ -51,12 +54,15 @@ def sub2ind(arraySize,rowSub,colSub):
         
     return np.array(linearInd)
 
+
 # Convert linear indices to subscripts
 def ind2sub(arraySize,index):
     ''' index is a list or 1d array'''
+
     linearInd  = np.zeros((len(index),2),dtype = int)
     arr = tuple(arraySize)
     for i in range(0, len(index)):
         temp = np.unravel_index(index[i], arr, order='F')
         linearInd[i] = np.array(temp)
+
     return linearInd

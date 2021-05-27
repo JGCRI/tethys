@@ -12,20 +12,19 @@ Livestock, Mining and Manufacturing Sectors are uniformly downscaled, thus diagn
 
 """
 import os
+import logging
+
 import numpy as np
-from tethys.utils.logging import Logger
 
 
 def compare_temporal_downscaled(Settings, OUT, GISData):
 
-    mainlog = Logger.getlogger()
-
     ## The outputs produced in this function are an extension of the debugging
     ## logs; therefore, if the logging level is set above DEBUG, we skip the
     ## calculations and the output
-    if mainlog.minlvl > Logger.DEBUG:
+    if Settings.PerformDiagnostics != 1:
         return
-    
+
     mapindex   = GISData['mapindex']
     BasinIDs   = GISData['BasinIDs']
     BasinNames = GISData['BasinNames']
@@ -33,11 +32,9 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
     years      = Settings.TDYears
     NY         = len(years)
     NM         = len(mapindex)
-    mainlog.write(
-        '---Temporal Downscaling diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)\n',
-        Logger.DEBUG)
-    
-    mainlog.write('------Irrigation------\n')
+    logging.info(f'Temporal Downscaling diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)')
+
+    logging.info('------Irrigation------')
     W = OUT.WIrr[:,:]
     value   = np.zeros((NY,3), dtype=float)
     for j in years: 
@@ -45,10 +42,8 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
         value[N,0]  = np.sum(OUT.twdirr[:,N*12:(N+1)*12])
         value[N,1]  = np.sum(W[:,N])
         value[N,2]  = value[N,0] - value[N,1]
-        mainlog.write(
-            '                Year {0[0]:4d}:   {0[1]:.6f}    {0[2]:.6f}    Diff= {0[3]:.6e}\n'.format([j, value[N,0],
-                                                                        value[N,1], value[N,2]]),
-            Logger.DEBUG)
+
+        logging.info(f'Year {j:4d}:  {value[N,0]:.6f}  {value[N,1]:.6f}  Diff= {value[N,2]:.6e}')
     
     # Print out the basin level comparison
     Sector   = ['Year', 'Basin ID', 'Basin Name', 'After Spatial Downscaling', 'After Temporal Downscaling', 'Diff']
@@ -66,15 +61,14 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
     values = []
     for j in years:
         N = years.index(j)
-        for i in range(0,NB):
+        for i in range(0, NB):
             data = [str(j), str(i+1), BasinNames[i]] + ["%.3f" % W_basin[i,N]] + ["%.3f" % Wtd_basin[i,N]] + ["%.3f" % (W_basin[i,N] - Wtd_basin[i,N])]
             values.append(data) 
                 
     with open(os.path.join(Settings.OutputFolder, 'Diagnostics_Temporal_Downscaling_Irrigation.csv'), 'w') as outfile:
         np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s', comments='')
-        
-        
-    mainlog.write('------Domestic------\n', Logger.DEBUG)
+
+    logging.info('------Domestic------')
     W = OUT.WDom[:, :]
     value   = np.zeros((NY,3), dtype=float)
     for j in years: 
@@ -82,13 +76,9 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
         value[N,0]  = np.sum(OUT.twddom[:,N*12:(N+1)*12])
         value[N,1]  = np.sum(W[:,N])
         value[N,2]  = value[N,0] - value[N,1]
-        mainlog.write(
-            '                Year {0[0]:4d}:   {0[1]:.6f}    {0[2]:.6f}    Diff= {0[3]:.6e}\n'.format([j, value[N,0],
-                                                                        value[N,1], value[N,2]]),
-            Logger.DEBUG)
-
+        logging.info(f'Year {j:4d}:   {value[N,0]:.6f}    {value[N,1]:.6f}    Diff= {value[N,2]:.6e}')
         
-    mainlog.write('------Electricity Generation------\n')
+    logging.info('------Electricity Generation------')
     W = OUT.WEle[:,:]
     value   = np.zeros((NY,3), dtype=float)
     for j in years: 
@@ -96,7 +86,5 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
         value[N,0]  = np.sum(OUT.twdelec[:,N*12:(N+1)*12])
         value[N,1]  = np.sum(W[:,N])
         value[N,2]  = value[N,0] - value[N,1]         
-        mainlog.write(
-            '                Year {0[0]:4d}:   {0[1]:.6f}    {0[2]:.6f}    Diff= {0[3]:.6e}\n'.format([j, value[N,0],
-                                                                        value[N,1], value[N,2]]),
-            Logger.DEBUG)
+        logging.info(f'Year {j:4d}:   {value[N,0]:.6f}    {value[N,1]:.6f}    Diff= {value[N,2]:.6e}')
+

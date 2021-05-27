@@ -24,18 +24,20 @@ Livestock, Mining and Manufacturing: Uniform distribution (based on days and lea
 Irrigation: Monthly Irrigation Data from other models as the weighting factor to downscale gridded annually irrigation water withdrawals, need input data 4
 """
 
-import scipy.io as spio
-import os, calendar
+import os
+import logging
+import calendar
+
 import numpy as np
+import scipy.io as spio
+
 from tethys.utils.data_parser import getContentArray as ArrayCSVRead
 from tethys.temporal_downscaling.neighbor_basin import NeighborBasin
-from tethys.utils.logging import Logger
 
 
 def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):    
     # Determine the temporal downscaling years
-    mainlog = Logger.getlogger()
-    
+
     # Determine the available temporal downscaling years according to other models and future years (not covered by other models)
     startyear  = int(settings.temporal_climate.split("_")[-2][:4])
     endyear    = int(settings.temporal_climate.split("_")[-1][:4])
@@ -117,7 +119,7 @@ def GetDownscaledResults(settings, OUT, mapindex, regionID, basinID):
         Temp_TDMonths_Index[N*12:(N+1)*12] = np.arange(i*12, (i+1)*12)
         N += 1
 
-    mainlog.write('------ Temporal downscaling is available for Year: {}\n'.format(TDYears), Logger.DEBUG)
+    logging.debug('------ Temporal downscaling is available for Year: {}'.format(TDYears))
 
     # load climate data
     tclim = np.load(settings.temporal_climate)

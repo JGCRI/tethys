@@ -9,12 +9,13 @@ Copyright (c) 2017, Battelle Memorial Institute
 """
 
 import os
+import logging
+
 import numpy as np
 from scipy import io as spio
-from tethys.utils.logging import Logger
 
 
-class OUTSettings():
+class OUTSettings:
     """
     Output file names
     """
@@ -31,7 +32,7 @@ class OUTSettings():
         self.wdirr    = None
         self.wdliv    = None
         
-        #regional aggregates, 2D array, size: (NRegion, NY)       
+        # regional aggregates, 2D array, size: (NRegion, NY)
         self.rtotal   = None
         self.rnonag   = None
         self.rdom     = None
@@ -42,48 +43,40 @@ class OUTSettings():
         self.rliv     = None
 
 
-def OutWriter(Settings, OUT, GISData):
+def write_outputs(Settings, OUT, GISData):
     
     # Names of the 13 crop types
-    d_crops = ['biomass', 'Corn', 'FiberCrop', 'FodderGrass', 'FodderHerb', 
-           'MiscCrop', 'OilCrop', 'OtherGrain', 'PalmFruit', 'Rice',
-           'Root_Tuber', 'SugarCrop', 'Wheat']
-
-    # Names of the 13 crop types
-    d_crops = ['biomass', 'Corn', 'FiberCrop', 'FodderGrass', 'FodderHerb', 
-           'MiscCrop', 'OilCrop', 'OtherGrain', 'PalmFruit', 'Rice',
-           'Root_Tuber', 'SugarCrop', 'Wheat']
-
-    mainlog = Logger.getlogger()
+    d_crops = ['biomass', 'Corn', 'FiberCrop', 'FodderGrass', 'FodderHerb', 'MiscCrop', 'OilCrop', 'OtherGrain',
+               'PalmFruit', 'Rice', 'Root_Tuber', 'SugarCrop', 'Wheat']
     
     if Settings.OutputUnit:
         temp = 'mm'
     else:
         temp = 'km3'
-    
-    if Settings.OutputFormat == 1: # CSV
-        mainlog.write(
-            'Save the gridded water usage results for each withdrawal category in CSV format (Unit: ' +
-            temp + '/yr)\n', Logger.INFO)
-           
-    elif Settings.OutputFormat == 2: # NetCDF
-        mainlog.write(
-            'Save the gridded water usage results for each withdrawal category in NetCDF format (Unit: ' +
-            temp + '/yr)\n', Logger.INFO)
-        
-    else: # Both
-        mainlog.write(
-            'Save the gridded water usage results for each withdrawal category in CSV and NetCDF format (Unit: ' +
-            temp + '/yr)\n', Logger.INFO)
+
+    # CSV
+    if Settings.OutputFormat == 1:
+        msg = f'Save the gridded water usage results for each withdrawal category in CSV format (Unit: {temp}/yr)'
+        logging.info(msg)
+
+    # NetCDF
+    elif Settings.OutputFormat == 2:
+        msg = f'Save the gridded water usage results for each withdrawal category in NetCDF format (Unit: {temp}/yr)'
+        logging.info(msg)
+
+    # Both
+    else:
+        msg = f'Save the gridded water usage results for each withdrawal category in CSV and NetCDF format (Unit: {temp}/yr)'
+        logging.info(msg)
     
     if Settings.PerformTemporal:
         TDMonthStr = np.chararray((len(Settings.TDYears)*12,), itemsize=6)
+
         for y in Settings.TDYears:
             N = Settings.TDYears.index(y)
             TDMonthStr[N*12:(N+1)*12] = [str(y) + str(i).zfill(2) for i in range(1,13)]
-        mainlog.write(
-            'Save the monthly water usage results for each withdrawal category (Unit: ' +
-            temp + '/month)\n', Logger.INFO)
+
+        logging.info(f'Save the monthly water usage results for each withdrawal category (Unit: {temp}/month)')
 
     for attr in list(OUT.__dict__.keys()):
         value = OUT.__dict__[attr]
@@ -92,12 +85,13 @@ def OutWriter(Settings, OUT, GISData):
             OutputFilename = os.path.join(Settings.OutputFolder, attr)
 
             if attr[0] == "r": # regional output
-                newvalue   = value[:,:]
-                #with open(OutputFilename + '.csv', 'w') as outfile:
-                #    np.savetxt(outfile, newvalue, delimiter=',')
-                          
-            elif attr[0] == "w": # gridded output from spatial downscaling
-                newvalue   = value[GISData['mapindex'],:]  # Only output 67420 cells (with coordinates)
+                newvalue   = value[:, :]
+
+            # gridded output from spatial downscaling
+            elif attr[0] == "w":
+
+                # Only output 67420 cells (with coordinates)
+                newvalue   = value[GISData['mapindex'],:]
                 
                 if Settings.OutputFormat == 1:          
                     writecsv(OutputFilename, newvalue, Settings, temp, GISData)
@@ -106,8 +100,9 @@ def OutWriter(Settings, OUT, GISData):
                 else:
                     writecsv(OutputFilename, newvalue, Settings, temp, GISData)
                     writeNETCDF(OutputFilename + '.nc', newvalue, GISData, temp, Settings.years)
-                    
-            elif attr[0] == "t": #  gridded output from temporal downscaling
+
+            #  gridded output from temporal downscaling
+            elif attr[0] == "t":
                 if Settings.OutputFormat == 1:
                     writecsvMonthly(OutputFilename, value, TDMonthStr, temp, GISData)
 
@@ -117,8 +112,9 @@ def OutWriter(Settings, OUT, GISData):
                 else:
                     writecsvMonthly(OutputFilename, value, TDMonthStr, temp, GISData)    
                     writeNETCDFmonthly(OutputFilename + '.nc', value, GISData, temp, TDMonthStr)
-            
-            elif attr[:7] == 'crops_t': # for outputs, divided twdirr by crops for additional files when using Demeter outputs
+
+            # for outputs, divided twdirr by crops for additional files when using Demeter outputs
+            elif attr[:7] == 'crops_t':
                 for i in range(value.shape[1]):
                     newvalue   = value[:,i,:]
                     if Settings.OutputFormat == 1:          
@@ -128,8 +124,9 @@ def OutWriter(Settings, OUT, GISData):
                     else:
                         writecsvMonthly(OutputFilename + '_' + d_crops[i], newvalue, TDMonthStr, temp, GISData)
                         writeNETCDFmonthly(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, TDMonthStr)
-                    
-            elif attr[:7] == 'crops_w': # for outputs, divided wdirr by crops for additional files when using Demeter outputs
+
+            # for outputs, divided wdirr by crops for additional files when using Demeter outputs
+            elif attr[:7] == 'crops_w':
                 for i in range(value.shape[1]):
                     newvalue   = value[GISData['mapindex'],i,:]
                     if Settings.OutputFormat == 1:          
@@ -171,13 +168,8 @@ def writeNETCDF(filename, data, GISData, unit, yearstrs):
     - GISData     structure, contains grid coordinates
     - unit        string, e.g. "mm" or 'km3'
     """
-    # open
-    # datagrp = Dataset(filename, 'w', format='NETCDF4')
     datagrp = spio.netcdf.netcdf_file(filename, 'w')
     (nrows,ncols) = data.shape
-
-    #Attributes
-    #datagrp.description = ''
 
     # dimensions
     datagrp.createDimension('index', nrows)
@@ -221,14 +213,10 @@ def writeNETCDFmonthly(filename, data, GISData, unit, monthstrs):
     - unit        string, e.g. "mm" or 'km3'
     """
     
-    #open
-    # datagrp = Dataset(filename, 'w', format='NETCDF4')
-    datagrp = spio.netcdf.netcdf_file(filename, 'w')    
+    # open
+    datagrp = spio.netcdf.netcdf_file(filename, 'w')
     (nrows,ncols) = data.shape
 
-    #Attributes
-    #datagrp.description = ''
-    
     # dimensions
     datagrp.createDimension('index', nrows)
     datagrp.createDimension('month', ncols)    
@@ -255,8 +243,7 @@ def writeNETCDFmonthly(filename, data, GISData, unit, monthstrs):
     ilat[:]       = GISData['coord'][:,4].astype(int)
     map_index[:]  = GISData['mapindex'].astype(int) + 1
     
-#    griddata[:, :] = data[:, :]
-    griddata[:, :] = data[:, :].copy()  
+    griddata[:, :] = data[:, :].copy()
     
     # close
     datagrp.close()

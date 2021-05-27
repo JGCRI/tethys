@@ -17,12 +17,13 @@ This is the core of Water Disaggregation
     - rgnmapData  structure rgnmapData{}, region names, region ID for each valid cell on grid map
 
 """
+import logging
 
 import numpy as np
 from tethys.utils.utils_math import SizeR, SizeC
 from tethys.utils.utils_math import ind2sub
 from tethys.utils.utils_math import sub2ind
-from tethys.utils.logging import Logger
+
 
 def Rearranging(mapsize, GISData, rgnmapData):
 
@@ -64,8 +65,6 @@ def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
     # Population density map is used to downscale Non-Agricultural Water withdrawal 
     """
 
-    mainlog = Logger.getlogger()
-	
     NY = settings.NY
     
     # non-agricultural (dom, elec, mfg, mining) total water withdrawals in (km3/yr) for each of the GCAM regions
@@ -80,8 +79,8 @@ def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
     # use historical population maps
     for y in range (0,NY):
         # population map
-        mainlog.write('{}\n'.format(GISData['pop']['years'][y]),
-                      Logger.DEBUG)
+        logging.info('{}'.format(GISData['pop']['years'][y]))
+
         yearstr = str(GISData['pop']['years_new'][y])
         pop     = np.zeros(rgnmapData['map_rgn_nonag'].shape, dtype=float)
         pop[GISData['mapindex']] = GISData['pop'][yearstr]
@@ -137,10 +136,7 @@ def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
     """
     Livestock gridded GIS data maps by six types are used to downscale livestock Water withdrawal 
     """
-    
-    mainlog = Logger.getlogger()
-    oldlvl = mainlog.setlevel(Logger.DEBUG)
-    
+
     # count how many animals live in each GCAM region first    
     map_rgn_ag = rgnmapData['map_rgn_ag']
     nrgnAG     = rgnmapData['nrgnAG']
@@ -197,31 +193,33 @@ def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
 
     OUT.wdliv    = withd_liv_map
 
-    fmtstr = '[Year Index, Region ID, {:7s} from GCAM not assigned (no GIS data)]:  {}  {}  {}\n'
+    fmtstr = '[Year Index, Region ID, {:7s} from GCAM not assigned (no GIS data)]:  {}  {}  {}'
     dat = GCAMData['wdliv']
     for y in range(0,NY):
         for IN in range(0,nrgnAG):
             if GCAMData['wdliv'][0*nrgnAG+IN,y] > 0 and tot_livestock[IN,0] == 0:
-                mainlog.write(fmtstr.format('buffalo', y+1, IN+1, dat[0*nrgnAG+IN,y]))
-            if GCAMData['wdliv'][1*nrgnAG+IN,y] > 0 and tot_livestock[IN,1] == 0:
-                mainlog.write(fmtstr.format('cattle', y+1, IN+1, dat[1*nrgnAG+IN,y]))
-            if GCAMData['wdliv'][2*nrgnAG+IN,y] > 0 and tot_livestock[IN,2] == 0:
-                mainlog.write(fmtstr.format('goat', y+1, IN+1, dat[2*nrgnAG+IN,y]))
-            if GCAMData['wdliv'][3*nrgnAG+IN,y] > 0 and tot_livestock[IN,3] == 0:
-                mainlog.write(fmtstr.format('sheep', y+1, IN+1, dat[3*nrgnAG+IN,y]))
-            if GCAMData['wdliv'][4*nrgnAG+IN,y] > 0 and tot_livestock[IN,4] == 0:
-                mainlog.write(fmtstr.format('poultry', y+1, IN+1, dat[4*nrgnAG+IN,y]))
-            if GCAMData['wdliv'][5*nrgnAG+IN,y] > 0 and tot_livestock[IN,5] == 0:
-                mainlog.write(fmtstr.format('pig', y+1, IN+1, dat[5*nrgnAG+IN,y]))
+                logging.info(fmtstr.format('buffalo', y+1, IN+1, dat[0*nrgnAG+IN,y]))
 
-    mainlog.setlevel(oldlvl)
+            if GCAMData['wdliv'][1*nrgnAG+IN,y] > 0 and tot_livestock[IN,1] == 0:
+                logging.info(fmtstr.format('cattle', y+1, IN+1, dat[1*nrgnAG+IN,y]))
+
+            if GCAMData['wdliv'][2*nrgnAG+IN,y] > 0 and tot_livestock[IN,2] == 0:
+                logging.info(fmtstr.format('goat', y+1, IN+1, dat[2*nrgnAG+IN,y]))
+
+            if GCAMData['wdliv'][3*nrgnAG+IN,y] > 0 and tot_livestock[IN,3] == 0:
+                logging.info(fmtstr.format('sheep', y+1, IN+1, dat[3*nrgnAG+IN,y]))
+
+            if GCAMData['wdliv'][4*nrgnAG+IN,y] > 0 and tot_livestock[IN,4] == 0:
+                logging.info(fmtstr.format('poultry', y+1, IN+1, dat[4*nrgnAG+IN,y]))
+
+            if GCAMData['wdliv'][5*nrgnAG+IN,y] > 0 and tot_livestock[IN,5] == 0:
+                logging.info(fmtstr.format('pig', y+1, IN+1, dat[5*nrgnAG+IN,y]))
+
     return withd_liv_map
 
     
 def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
 
-    mainlog = Logger.getlogger()
-    
     # Need to downscale the agricultural water withdrawal data for GCAM years
     # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
     # AEZ to grid scale CHALLENGE: where to add new agricultural lands
@@ -301,7 +299,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
     # use historical irrigation area maps
     # STEP 4: read a grid map of the irrigated area in km2 in a certain year
     for y in range (0,NY):
-        mainlog.write('{}\n'.format(GISData['irr']['years'][y]), Logger.DEBUG)
+        logging.info('{}'.format(GISData['irr']['years'][y]))
         yearstr = str(GISData['irr']['years_new'][y])
         irr     = np.zeros(rgnmapData['map_rgn_ag'].shape, dtype=float)
         irr[GISData['mapindex']] = GISData['irr'][yearstr]
@@ -399,13 +397,12 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                         cum_area = cum_area1 + irrA_grid[index, y]
                                     if cum_diff0 > 0:
                                         # GCAM irr_A is too large, the redistributed ls1 still has grids that irrigated area > total area
-                                        mainlog.write('{}  {}  {}  {} {} {} {} \n'.format(
+                                        logging.info('{}  {}  {}  {} {} {} {} '.format(
                                             '[Year Index, Region ID,',
                                             GISData['AEZstring'],
                                             'ID, irr from GCAM not assigned (km3) (condition 0)]         :',
                                             y+1, i+1, j+1,
-                                            cum_diff0*irr_V[i,j,y]/irr_A[i,j,y]),
-                                                      Logger.WARNING)
+                                            cum_diff0*irr_V[i,j,y]/irr_A[i,j,y]))
                             else: # if (num == 0 and counter2 == 0)  or num > 0 
                                 for index in ls1:
                                     irrA_grid[index, y] = np.NaN
@@ -428,13 +425,12 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                 num = num_new
                                 if cum_diff == 0 and counter3 == len(ls2):
                                     # GCAM irr_A is too large, the redistributed ls2 still has grids that irrigated area > total area
-                                    mainlog.write('{}  {}  {}  {} {} {} {} \n'.format(
+                                    logging.warning('{}  {}  {}  {} {} {} {} '.format(
                                         '[Year Index, Region ID,',
                                         GISData['AEZstring'],
                                         'ID, irr from GCAM not assigned (km3) (condition 1)]         :',
                                         y+1, i+1, j+1,
-                                        diff*irr_V[i,j,y]/irr_A[i,j,y]),
-                                                  Logger.WARNING)
+                                        diff*irr_V[i,j,y]/irr_A[i,j,y]))
                             counter += 1
                             diff    = cum_diff
        
@@ -447,9 +443,9 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                     # But from region map and AEZ/basin map, there are no cells belong to both.
                     # Thus, GCAM data will not be included for downscaling.
                     # It will cause the difference in Spatial Downscaling diagnostics
-                    mainlog.write('{}  {}  {}  {} {} {} {} \n'.format('[Year Index, Region ID,',
+                    logging.warning('{}  {}  {}  {} {} {} {} '.format('[Year Index, Region ID,',
                                         GISData['AEZstring'],'ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
-                                        y+1, i+1, j+1, irr_V[i,j,y]), Logger.WARNING)
+                                        y+1, i+1, j+1, irr_V[i,j,y]))
                                         
     # this loop will replace all the nan values with zeros to be able to take sums, if we want to keep the nans (for plotting), comment following 2 lines
     irrA_grid[np.isnan(irrA_grid)]         = 0
@@ -462,8 +458,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
     
 def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
 
-    mainlog = Logger.getlogger()
-    
+
     # Need to downscale the agricultural water withdrawal data for GCAM years
     # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
     # AEZ to grid scale CHALLENGE: where to add new agricultural lands
@@ -540,7 +535,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
     # use historical irrigation area maps
     # STEP 4: read a grid map of the irrigated area in km2 in a certain year
     for y in range (0,NY):
-        mainlog.write('{}\n'.format(GISData['irr']['years'][y]), Logger.DEBUG)
+        logging.debug('{}'.format(GISData['irr']['years'][y]))
         yearstr = str(GISData['irr']['years_new'][y])
         
         for k in range(0,ncrops): 
@@ -640,13 +635,12 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                             cum_area = cum_area1 + irrA_grid[index, k, y]
                                         if cum_diff0 > 0:
                                             # GCAM irr_A is too large, the redistributed ls1 still has grids that irrigated area > total area
-                                            mainlog.write('{}  {}  {}  {} {} {} {} {}\n'.format(
+                                            logging.warning('{}  {}  {}  {} {} {} {} {}'.format(
                                                 '[Year Index, Region ID,',
                                                 GISData['AEZstring'],
                                                 'ID, Crop ID, irr from GCAM not assigned (km3) (condition 0)]         :',
                                                 y+1, i+1, j+1, k+1,
-                                                cum_diff0*tempV_all[i,j,k,y]/irr_A[i,j,k,y]),
-                                                          Logger.WARNING)
+                                                cum_diff0*tempV_all[i,j,k,y]/irr_A[i,j,k,y]))
                                 else: # if (num == 0 and counter2 == 0)  or num > 0 
                                     for index in ls1:
                                         irrA_grid[index, k, y] = 0
@@ -669,13 +663,12 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                     num = num_new
                                     if cum_diff == 0 and counter3 == len(ls2):
                                         # GCAM irr_A is too large, the redistributed ls2 still has grids that irrigated area > total area
-                                        mainlog.write('{}  {}  {}  {} {} {} {} {}\n'.format(
+                                        logging.warning('{}  {}  {}  {} {} {} {} {}'.format(
                                             '[Year Index, Region ID,',
                                             GISData['AEZstring'],
                                             'ID, Crop ID, irr from GCAM not assigned (km3) (condition 1)]         :',
                                             y+1, i+1, j+1,  k+1,
-                                            diff*tempV_all[i,j,k,y]/irr_A[i,j,k,y]),
-                                                      Logger.WARNING)
+                                            diff*tempV_all[i,j,k,y]/irr_A[i,j,k,y]))
                                 counter += 1
                                 diff    = cum_diff
            
@@ -688,9 +681,9 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                         # But from region map and AEZ/basin map, there are no cells belong to both.
                         # Thus, GCAM data will not be included for downscaling.
                         # It will cause the difference in Spatial Downscaling diagnostics
-                        mainlog.write('{}  {}  {}  {} {} {} {} {}\n'.format('[Year Index, Region ID,',
+                        logging.warning('{}  {}  {}  {} {} {} {} {}'.format('[Year Index, Region ID,',
                                             GISData['AEZstring'],'ID, Crop ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
-                                            y+1, i+1, j+1, k+1, tempV_all[i,j,k,y]), Logger.WARNING)
+                                            y+1, i+1, j+1, k+1, tempV_all[i,j,k,y]))
                                         
     # this loop will replace all the nan values with zeros to be able to take sums, if we want to keep the nans (for plotting), comment following 2 lines
     #irrA_grid[np.isnan(irrA_grid)]         = 0
@@ -705,8 +698,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
 
 def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
 
-    mainlog = Logger.getlogger()
-    
+
     # Need to downscale the agricultural water withdrawal data for GCAM years
     # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
     # AEZ to grid scale CHALLENGE: where to add new agricultural lands
@@ -783,7 +775,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
     # use historical irrigation area maps
     # STEP 4: read a grid map of the irrigated area in km2 in a certain year
     for y in range (0,NY):
-        mainlog.write('{}\n'.format(GISData['irr']['years'][y]), Logger.DEBUG)
+        logging.debug('{}'.format(GISData['irr']['years'][y]))
         yearstr = str(GISData['irr']['years_new'][y])
         
         for k in range(0,ncrops): 
@@ -883,13 +875,12 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                             cum_area = cum_area1 + irrA_grid[index, k, y]
                                         if cum_diff0 > 0:
                                             # GCAM irr_A is too large, the redistributed ls1 still has grids that irrigated area > total area
-                                            mainlog.write('{}  {}  {}  {} {} {} {} {}\n'.format(
+                                            logging.warning('{}  {}  {}  {} {} {} {} {}'.format(
                                                 '[Year Index, Region ID,',
                                                 GISData['AEZstring'],
                                                 'ID, Crop ID, irr from GCAM not assigned (km3) (condition 0)]         :',
                                                 y+1, i+1, j+1, k+1,
-                                                cum_diff0*tempV_all[i,j,k,y]/irr_A[i,j,k,y]),
-                                                          Logger.WARNING)
+                                                cum_diff0*tempV_all[i,j,k,y]/irr_A[i,j,k,y]))
                                 else: # if (num == 0 and counter2 == 0)  or num > 0 
                                     for index in ls1:
                                         irrA_grid[index, k, y] = 0
@@ -912,13 +903,12 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                     num = num_new
                                     if cum_diff == 0 and counter3 == len(ls2):
                                         # GCAM irr_A is too large, the redistributed ls2 still has grids that irrigated area > total area
-                                        mainlog.write('{}  {}  {}  {} {} {} {} {}\n'.format(
+                                        logging.warning('{}  {}  {}  {} {} {} {} {}'.format(
                                             '[Year Index, Region ID,',
                                             GISData['AEZstring'],
                                             'ID, Crop ID, irr from GCAM not assigned (km3) (condition 1)]         :',
                                             y+1, i+1, j+1,  k+1,
-                                            diff*tempV_all[i,j,k,y]/irr_A[i,j,k,y]),
-                                                      Logger.WARNING)
+                                            diff*tempV_all[i,j,k,y]/irr_A[i,j,k,y]))
                                 counter += 1
                                 diff    = cum_diff
            
@@ -931,9 +921,9 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                         # But from region map and AEZ/basin map, there are no cells belong to both.
                         # Thus, GCAM data will not be included for downscaling.
                         # It will cause the difference in Spatial Downscaling diagnostics
-                        mainlog.write('{}  {}  {}  {} {} {} {} {}\n'.format('[Year Index, Region ID,',
+                        logging.warning('{}  {}  {}  {} {} {} {} {}'.format('[Year Index, Region ID,',
                                             GISData['AEZstring'],'ID, Crop ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
-                                            y+1, i+1, j+1, k+1, tempV_all[i,j,k,y]), Logger.WARNING)
+                                            y+1, i+1, j+1, k+1, tempV_all[i,j,k,y]))
                                         
     # this loop will replace all the nan values with zeros to be able to take sums, if we want to keep the nans (for plotting), comment following 2 lines
     #irrA_grid[np.isnan(irrA_grid)]         = 0
@@ -986,8 +976,7 @@ def rgnmapadjust(mapsize, map_pop, map_rgn, label):
     Return value:  adjusted region map.
     """
 
-    mainlog = Logger.getlogger()
-    
+
     new_map_rgn = np.copy(map_rgn)
     #map_pop     = map_pop.reshape(map_rgn.shape, order='F')
     map_pop[np.isnan(map_pop)]       = 0
@@ -1030,12 +1019,9 @@ def rgnmapadjust(mapsize, map_pop, map_rgn, label):
     fixedcells = np.where((map_pop > 0) & (map_rgn == 0) & (new_map_rgn > 0))[0]
     
     ## log diagnostics 
-    mainlog.write(label +   'Cells with pop/irr data but no region: {}\n'.format(len(adjust)),
-                  Logger.DEBUG)
-    mainlog.write(label +   'Cells adjusted to an adjacent region: {}\n'.format(len(fixedcells)),
-                  Logger.DEBUG)
+    logging.debug(label +   'Cells with pop/irr data but no region: {}'.format(len(adjust)))
+    logging.debug(label +   'Cells adjusted to an adjacent region: {}'.format(len(fixedcells)))
     
-    mainlog.write(label +   'Cells not adjusted: {}\n'.format(len(adjust) - len(fixedcells)),
-                  Logger.DEBUG)
+    logging.debug(label +   'Cells not adjusted: {}'.format(len(adjust) - len(fixedcells)))
     
     return new_map_rgn
