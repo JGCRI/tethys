@@ -1,69 +1,73 @@
 """model.py which defines the Tethys class and calls the run_model() method to run remaining model.
 """
 
+import logging
 import time
-from datetime import datetime
-import tethys.Utils.Logging as Logging
 
-from tethys.DataReader.IniReader import Settings
-from tethys.DataWriter.OUTWriter import OutWriter
-from tethys.run_disaggregation import run_disaggregation as disagg
+from tethys.config_reader import ReadConfig
+from tethys.data_writer.outputs import write_outputs
+from tethys.run_disaggregation import run_disaggregation
 
 
-class Tethys:
-    """Tethys class which evaluates inputs from a configuration input 'config'
-    and calls other methods to disaggregate water use.
+class Tethys(ReadConfig):
+    """Model wrapper for Tethys.
 
-    :param config: Configuration file with input settings. Default = 'config.ini'
-    :type config: str
+    :param config_file:                 Full path with file name and extension to a input config.ini file.  If not
+                                        passed, the default configuration will be used.
+    :type config_file:                  str
+
     """
 
-    def __init__(self, config='config.ini'):
-        """Default Constructor Method
-        """
+    def __init__(self, **kwargs):
 
-        # instantiate functions
-        self.Disaggregation = disagg
-        self.OutWriter = OutWriter
+        # start time for model run
+        self.start_time = time.time()
 
-        # compile config file
-        self.settings = Settings(config)
+        # initialize console handler for logger
+        self.console_handler()
 
-        # instantiate logger and log file
-        Logging._setmainlog(Logging.Logger(self.settings.Logger))
-        mainlog = Logging.Logger.getlogger()
-        mainlog.write('Log start\n', Logging.Logger.INFO)
-        mainlog.write(str(datetime.now()) + '\n', Logging.Logger.INFO)
+        logging.info("Starting Tethys model")
 
-        # write settings to log
-        self.settings.print_info()
+        # inherit the configuration reader class attributes
+        super(Tethys, self).__init__(**kwargs)
 
         # instantiate output variables for model run
         self.gridded_data = None
         self.gis_data = None
 
-        # run model and save outputs
-        self.run_model()
+    def execute(self):
+        """Execute the model and save the outputs."""
+
+        t0 = time.time()
+        logging.info('Start Disaggregation...')
+
+        self.gridded_data, self.gis_data = run_disaggregation(self)
+
+        logging.info(f"Disaggregation completed in : {(time.time() - t0)} seconds")
+
+        t0 = time.time()
+        logging.info('Writing outputs...')
+        write_outputs(self, self.gridded_data, self.gis_data)
+        logging.info(f"Outputs writen in: {(time.time() - t0)}")
+
+        logging.info(f'Tethys model run completed in {round(time.time() - self.start_time, 7)}')
 
         # clean up log
-        Logging._shutdown()
+        self.close_logger()
 
-    def run_model(self):
-        """
-        Execute the model and save the outputs.
-        """
-        Logger = Logging.Logger
-        mainlog = Logger.getlogger()
-        mainlog.write('Start Disaggregation... \n', Logger.INFO)
-        s1 = time.time()
-        self.gridded_data, self.gis_data = self.Disaggregation(self.settings)
-        e1= time.time()
-        mainlog.write('End Disaggregation... \n', Logger.INFO)
-        mainlog.write("---Disaggregation: %s seconds ---\n" % (e1 - s1), Logger.INFO)
 
-        mainlog.write('Saving outputs...\n', Logger.INFO)
-        self.OutWriter(self.settings, self.gridded_data, self.gis_data)
-        e2 = time.time()
-        mainlog.write("---Output: %s seconds ---\n" % (e2 - e1), Logger.INFO)
+def run_model(**kwargs):
+    """Run the Tethys model based on a user-defined configuration.
 
-        mainlog.write('End Project: %s\n'%self.settings.ProjectName, Logger.INFO)
+    :param config_file:                 Full path with file name and extension to the input configuration file.
+    :type config_file:                  str
+
+    :returns:                           model instance housing configuration and output data
+
+    """
+
+    model = Tethys(**kwargs)
+
+    model.execute()
+
+    return model

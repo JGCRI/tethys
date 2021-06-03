@@ -27,10 +27,10 @@
    :toctree:
    :recursive:
 
-   tethys.DataReader
-   tethys.DataWriter
+   tethys.data_reader
+   tethys.data_writer
    tethys.Diagnostics
-   tethys.SpatialDownscaling
+   tethys.spatial_downscaling
    tethys.TemporalDownscaling
    tethys.Utils
    tethys.install_supplement

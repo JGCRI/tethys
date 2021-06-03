@@ -1,60 +1,60 @@
     tethys
-    tethys.DataReader
-    tethys.DataReader.GCAMOutputs
-    tethys.DataReader.GCAMOutputs.dom_water_demand_to_array
-    tethys.DataReader.GCAMOutputs.elec_water_demand_to_array
-    tethys.DataReader.GCAMOutputs.get_basin_info
-    tethys.DataReader.GCAMOutputs.get_buffalo_frac
-    tethys.DataReader.GCAMOutputs.get_gcam_data
-    tethys.DataReader.GCAMOutputs.get_gcam_queries
-    tethys.DataReader.GCAMOutputs.get_goat_frac
-    tethys.DataReader.GCAMOutputs.get_region_info
-    tethys.DataReader.GCAMOutputs.irr_water_demand_to_array
-    tethys.DataReader.GCAMOutputs.land_to_array
-    tethys.DataReader.GCAMOutputs.livestock_water_demand_to_array
-    tethys.DataReader.GCAMOutputs.manuf_water_demand_to_array
-    tethys.DataReader.GCAMOutputs.mining_water_demand_to_array
-    tethys.DataReader.GCAMOutputs.population_to_array
-    tethys.DataReader.GISReader
-    tethys.DataReader.GISReader.getGISData
-    tethys.DataReader.GISReader.getRegionMapData
-    tethys.DataReader.GISReader.load_const_griddata
-    tethys.DataReader.GISReader.load_mat_var
-    tethys.DataReader.HistPopIrrData
-    tethys.DataReader.HistPopIrrData.getIrrYearData
-    tethys.DataReader.HistPopIrrData.getPopYearData
-    tethys.DataReader.IniReader
-    tethys.DataReader.IniReader.Settings
-    tethys.DataWriter
-    tethys.DataWriter.OUTWriter
-    tethys.DataWriter.OUTWriter.OUTSettings
-    tethys.DataWriter.OUTWriter.OutWriter
-    tethys.DataWriter.OUTWriter.writecsv
-    tethys.DataWriter.OUTWriter.writecsvMonthly
-    tethys.DataWriter.OUTWriter.writeNETCDF
-    tethys.DataWriter.OUTWriter.writeNETCDFmonthly
+    tethys.data_reader
+    tethys.data_reader.GCAMOutputs
+    tethys.data_reader.GCAMOutputs.dom_water_demand_to_array
+    tethys.data_reader.GCAMOutputs.elec_water_demand_to_array
+    tethys.data_reader.GCAMOutputs.get_basin_info
+    tethys.data_reader.GCAMOutputs.get_buffalo_frac
+    tethys.data_reader.GCAMOutputs.get_gcam_data
+    tethys.data_reader.GCAMOutputs.get_gcam_queries
+    tethys.data_reader.GCAMOutputs.get_goat_frac
+    tethys.data_reader.GCAMOutputs.get_region_info
+    tethys.data_reader.GCAMOutputs.irr_water_demand_to_array
+    tethys.data_reader.GCAMOutputs.land_to_array
+    tethys.data_reader.GCAMOutputs.livestock_water_demand_to_array
+    tethys.data_reader.GCAMOutputs.manuf_water_demand_to_array
+    tethys.data_reader.GCAMOutputs.mining_water_demand_to_array
+    tethys.data_reader.GCAMOutputs.population_to_array
+    tethys.data_reader.GISReader
+    tethys.data_reader.GISReader.getGISData
+    tethys.data_reader.GISReader.getRegionMapData
+    tethys.data_reader.GISReader.load_const_griddata
+    tethys.data_reader.GISReader.load_mat_var
+    tethys.data_reader.HistPopIrrData
+    tethys.data_reader.HistPopIrrData.getIrrYearData
+    tethys.data_reader.HistPopIrrData.getPopYearData
+    tethys.data_reader.IniReader
+    tethys.data_reader.IniReader.Settings
+    tethys.data_writer
+    tethys.data_writer.OUTWriter
+    tethys.data_writer.OUTWriter.OUTSettings
+    tethys.data_writer.OUTWriter.OutWriter
+    tethys.data_writer.OUTWriter.writecsv
+    tethys.data_writer.OUTWriter.writecsvMonthly
+    tethys.data_writer.OUTWriter.writeNETCDF
+    tethys.data_writer.OUTWriter.writeNETCDFmonthly
     tethys.Diagnostics
-    tethys.Diagnostics.Spatial
-    tethys.Diagnostics.Spatial.compare_downscaled_GCAMinput
-    tethys.Diagnostics.Temporal
-    tethys.Diagnostics.Temporal.compare_temporal_downscaled
-    tethys.Diagnostics.Temporal.Domestic_TD__Diagnostics_Plot
-    tethys.Diagnostics.Temporal.Electricity_TD__Diagnostics_Plot
+    tethys.diagnostics.Spatial
+    tethys.diagnostics.Spatial.compare_downscaled_GCAMinput
+    tethys.diagnostics.Temporal
+    tethys.diagnostics.Temporal.compare_temporal_downscaled
+    tethys.diagnostics.Temporal.Domestic_TD__Diagnostics_Plot
+    tethys.diagnostics.Temporal.Electricity_TD__Diagnostics_Plot
     tethys.model
     tethys.model.Tethys
     tethys.reference
     tethys.run_disaggregation
     tethys.run_disaggregation.run_disaggregation
-    tethys.SpatialDownscaling
-    tethys.SpatialDownscaling.ProxyMaps
-    tethys.SpatialDownscaling.ProxyMaps.IrrigationMap
-    tethys.SpatialDownscaling.ProxyMaps.LivestockMap
-    tethys.SpatialDownscaling.ProxyMaps.pop_scale_reshape
-    tethys.SpatialDownscaling.ProxyMaps.PopulationMap
-    tethys.SpatialDownscaling.ProxyMaps.Rearranging
-    tethys.SpatialDownscaling.ProxyMaps.rgnmapadjust
-    tethys.SpatialDownscaling.TotalWaterUse
-    tethys.SpatialDownscaling.TotalWaterUse.TotalWaterUse
+    tethys.spatial_downscaling
+    tethys.spatial_downscaling.ProxyMaps
+    tethys.spatial_downscaling.ProxyMaps.IrrigationMap
+    tethys.spatial_downscaling.ProxyMaps.LivestockMap
+    tethys.spatial_downscaling.ProxyMaps.pop_scale_reshape
+    tethys.spatial_downscaling.ProxyMaps.PopulationMap
+    tethys.spatial_downscaling.ProxyMaps.Rearranging
+    tethys.spatial_downscaling.ProxyMaps.rgnmapadjust
+    tethys.spatial_downscaling.TotalWaterUse
+    tethys.spatial_downscaling.TotalWaterUse.TotalWaterUse
     tethys.TemporalDownscaling
     tethys.TemporalDownscaling.NeighborBasin
     tethys.TemporalDownscaling.NeighborBasin.NeighborBasin

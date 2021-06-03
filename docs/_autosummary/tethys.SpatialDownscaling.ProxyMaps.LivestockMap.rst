@@ -1,6 +1,6 @@
-tethys.SpatialDownscaling.ProxyMaps.LivestockMap
+tethys.spatial_downscaling.ProxyMaps.LivestockMap
 ================================================
 
-.. currentmodule:: tethys.SpatialDownscaling.ProxyMaps
+.. currentmodule:: tethys.spatial_downscaling.ProxyMaps
 
 .. autofunction:: LivestockMap

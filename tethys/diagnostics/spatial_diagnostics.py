@@ -11,22 +11,23 @@ Perform diagnostics to ensure that the spatially downscaled results and initial 
 """
 
 import os
+import logging
+
 import numpy as np
 import pandas as pd
-from tethys.DataWriter.OUTWriter import OUTSettings
-from tethys.Utils.Logging import Logger
-    
+
+from tethys.data_writer.outputs import OUTSettings
+
+
 def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
-    mainlog = Logger.getlogger()
-    ## These calculations will be performed ONLY if we are logging debug-level output.
-    ## Otherwise, we skip the output and the calculations
-    if mainlog.minlvl > Logger.DEBUG:
+
+    # These calculations will be performed ONLY if we are logging debug-level output.
+    # Otherwise, we skip the output and the calculations
+    if Settings.PerformDiagnostics != 1:
         return
 
-    mainlog.write(
-        '---Spatial Downscaling Diagnostics (Global Total): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)\n',
-        Logger.DEBUG)
-    
+    logging.info(f"Spatial Downscaling diagnostics (Global Total): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)")
+
     NY = Settings.NY
     value   = np.zeros((NY,3), dtype=float)
     for y in range(0, NY): # Global Total For Each Year in log
@@ -42,13 +43,10 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
         else:
             yrout = y+1
             
-        mainlog.write(
-            '      Year {0[0]:4d}:   {0[1]:12.6f}    {0[2]:12.6f}    Diff= {0[3]:12.6f}\n'.format([yrout, value[y,0],
-                                                             value[y,1], value[y,2]]),
-                Logger.DEBUG)
+        msg = f'Year {yrout:4d}:  {value[y, 0]:12.6f}  {value[y, 1]:12.6f}  Diff= {value[y, 2]:12.6f}'
+        logging.info(msg)
     
-    # Comprehensive Diagnostics information to file:
-    
+    # Comprehensive diagnostics information to file:
     category = ['Domestic', 'Electricity', 'Manufacturing', 'Mining', 'Livestock', 'Irrigation', 'Non-Agriculture', 'Agriculture', 'Total']
     group    = ['Downscaled_','GCAM_','Diff_']    
     Sector   = ['Year', 'Region ID', 'Region Name', 'GCAM Population (millions)']
@@ -65,6 +63,7 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
     Regions[0] = 'Global'
     Years      = Settings.years    
     Population = GCAMData['pop_tot']/1e6
+
     # Add Global data to all
     Population = np.vstack([sum(Population), Population])
     OUT.rtotal = np.vstack([sum(OUT.rtotal), OUT.rtotal])
@@ -122,18 +121,16 @@ def compare_downscaled_GCAMinput(Settings, GCAMData, OUT):
     with open(OutputFilename, 'w') as outfile:   
         np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s', comments='')
             
-    mainlog.write('------Diagnostics information is saved to: {}\n'.format(OutputFilename), Logger.DEBUG)
+    logging.info(f'------diagnostics information is saved to: {OutputFilename}')
 
 def compare_downscaled_GCAMinput_irr_by_crops(Settings, GCAMData, OUT):
-    mainlog = Logger.getlogger()
-    ## These calculations will be performed ONLY if we are logging debug-level output.
-    ## Otherwise, we skip the output and the calculations
-    if mainlog.minlvl > Logger.DEBUG:
+
+    # These calculations will be performed ONLY if we are logging debug-level output.
+    # Otherwise, we skip the output and the calculations
+    if Settings.PerformDiagnostics != 1:
         return
 
-    mainlog.write(
-        '---Spatial Downscaling Diagnostics (Irr by Crops): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)\n',
-        Logger.DEBUG)
+    logging.info('---Spatial Downscaling diagnostics (Irr by Crops): downscaled results vs. aggregated results from GCAM (Total Water, km3/yr)')
     
     NY = Settings.NY
     NCrops  = OUT.crops_wdirr.shape[1]
@@ -153,14 +150,14 @@ def compare_downscaled_GCAMinput_irr_by_crops(Settings, GCAMData, OUT):
         else:
             yrout = y+1
             
-        mainlog.write(
-            '      Year {0[0]:4d}: AllCrops        {0[1]:12.6f}    {0[2]:12.6f}    Diff= {0[3]:12.6f}\n'.format([yrout, value[0],
-            value[1], value[2]]), Logger.DEBUG)
+        logging.info(f'Year {yrout:4d}: AllCrops  {value[0]:12.6f}  {value[1]:12.6f}  Diff= {value[2]:12.6f}')
         
         for c in range(NCrops):
             value   = np.zeros((3,), dtype=float)
+
             # GLobal Total [km3/yr] from downscaled results
             value[0]  = sum(OUT.crops_wdirr[:,c,y])
+
             # Global Total [km3/yr] from GCAM inputs
             index     = np.where(GCAMData['irrV'][:,2] == c+1) [0]
             value[1]  = sum(GCAMData['irrV'][index,y+3])
@@ -170,6 +167,4 @@ def compare_downscaled_GCAMinput_irr_by_crops(Settings, GCAMData, OUT):
             else:
                 yrout = y+1
                 
-            mainlog.write(
-                '      Year {0[0]:4d}: {0[1]:12}    {0[2]:12.6f}    {0[3]:12.6f}    Diff= {0[4]:12.6f}\n'.format([yrout, d_crops[c], value[0],
-                value[1], value[2]]), Logger.DEBUG)
+            logging.info(f'Year {yrout:4d}: {d_crops[c]:12} {value[0]:12.6f} {value[1]:12.6f} Diff= {value[2]:12.6f}')

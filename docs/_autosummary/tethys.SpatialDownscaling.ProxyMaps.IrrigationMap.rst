@@ -1,6 +1,6 @@
-tethys.SpatialDownscaling.ProxyMaps.IrrigationMap
+tethys.spatial_downscaling.ProxyMaps.IrrigationMap
 =================================================
 
-.. currentmodule:: tethys.SpatialDownscaling.ProxyMaps
+.. currentmodule:: tethys.spatial_downscaling.ProxyMaps
 
 .. autofunction:: IrrigationMap

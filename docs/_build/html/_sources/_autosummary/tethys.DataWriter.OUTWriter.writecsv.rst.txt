@@ -1,6 +1,6 @@
-tethys.DataWriter.OUTWriter.writecsv
+tethys.data_writer.OUTWriter.writecsv
 ====================================
 
-.. currentmodule:: tethys.DataWriter.OUTWriter
+.. currentmodule:: tethys.data_writer.OUTWriter
 
 .. autofunction:: writecsv

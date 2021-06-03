@@ -1,6 +1,6 @@
-tethys.SpatialDownscaling.TotalWaterUse.TotalWaterUse
+tethys.spatial_downscaling.TotalWaterUse.TotalWaterUse
 =====================================================
 
-.. currentmodule:: tethys.SpatialDownscaling.TotalWaterUse
+.. currentmodule:: tethys.spatial_downscaling.TotalWaterUse
 
 .. autofunction:: TotalWaterUse

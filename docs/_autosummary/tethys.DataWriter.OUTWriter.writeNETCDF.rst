@@ -1,6 +1,6 @@
-tethys.DataWriter.OUTWriter.writeNETCDF
+tethys.data_writer.OUTWriter.writeNETCDF
 =======================================
 
-.. currentmodule:: tethys.DataWriter.OUTWriter
+.. currentmodule:: tethys.data_writer.OUTWriter
 
 .. autofunction:: writeNETCDF

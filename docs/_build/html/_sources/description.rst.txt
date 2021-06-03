@@ -40,15 +40,15 @@ Implementation and architecture
 -------------------------------------
 Tethys as a downscaling tool follows a sequential flowchart ((:numref:`description_fig3`)):
 
-- Step 1: Import needed data files (module package “tethys\DataReader”)
+- Step 1: Import needed data files (module package “tethys\data_reader”)
 
-- Step 2: Spatial downscaling (module package “tethys\SpatialDownscaling”)
+- Step 2: Spatial downscaling (module package “tethys\spatial_downscaling”)
 
 - Step 3: Temporal downscaling (module package “tethys\TemporalDownscaling”)
 
 - Step 4: Diagnostics of spatial and temporal downscaling (module package “tethys\Diagnostics”)
 
-- Step 5: Output all the results of Step 2-5 (module package “tethys\DataWriter”)
+- Step 5: Output all the results of Step 2-5 (module package “tethys\data_writer”)
 
 For each step, the corresponding module package is also listed. Spatial downscaling (Step 2) is the core of computation flow in Tethys while temporal downscaling (Step 3) is an additional step. The outputs of Step 2, global gridded annual water withdrawal data by sectors, are the inputs of Step 3.
 
@@ -188,8 +188,8 @@ Another way to run the downscaling model is by calling different modules. In the
 
 .. code-block:: python
 
-  import tethys.DataReader.IniReader as IniReader
-  from tethys.DataWriter.OUTWriter import OutWriter
+  import tethys.data_reader.IniReader as IniReader
+  from tethys.data_writer.OUTWriter import OutWriter
   from tethys.Run_Disaggregation import run_disaggregation as Disaggregation
 
   # Read simulator settings from ini file.

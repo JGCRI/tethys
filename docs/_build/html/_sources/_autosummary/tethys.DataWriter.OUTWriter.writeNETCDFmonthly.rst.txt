@@ -1,6 +1,6 @@
-tethys.DataWriter.OUTWriter.writeNETCDFmonthly
+tethys.data_writer.OUTWriter.writeNETCDFmonthly
 ==============================================
 
-.. currentmodule:: tethys.DataWriter.OUTWriter
+.. currentmodule:: tethys.data_writer.OUTWriter
 
 .. autofunction:: writeNETCDFmonthly

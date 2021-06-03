@@ -1,7 +1,7 @@
-tethys.DataReader
+tethys.data_reader
 =================
 
-.. automodule:: tethys.DataReader
+.. automodule:: tethys.data_reader
 
    
    
@@ -27,8 +27,8 @@ tethys.DataReader
    :toctree:
    :recursive:
 
-   tethys.DataReader.GCAMOutputs
-   tethys.DataReader.GISReader
-   tethys.DataReader.HistPopIrrData
-   tethys.DataReader.IniReader
+   tethys.data_reader.GCAMOutputs
+   tethys.data_reader.GISReader
+   tethys.data_reader.HistPopIrrData
+   tethys.data_reader.IniReader
 

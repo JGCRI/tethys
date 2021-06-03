@@ -27,6 +27,6 @@ tethys.Diagnostics
    :toctree:
    :recursive:
 
-   tethys.Diagnostics.Spatial
-   tethys.Diagnostics.Temporal
+   tethys.diagnostics.Spatial
+   tethys.diagnostics.Temporal
 

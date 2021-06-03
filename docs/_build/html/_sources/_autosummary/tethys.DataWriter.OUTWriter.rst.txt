@@ -1,7 +1,7 @@
-tethys.DataWriter.OUTWriter
+tethys.data_writer.OUTWriter
 ===========================
 
-.. automodule:: tethys.DataWriter.OUTWriter
+.. automodule:: tethys.data_writer.OUTWriter
 
    
    

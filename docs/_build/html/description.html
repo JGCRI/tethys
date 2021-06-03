@@ -192,11 +192,11 @@
 <h2>Implementation and architecture<a class="headerlink" href="#implementation-and-architecture" title="Permalink to this headline">¶</a></h2>
 <p>Tethys as a downscaling tool follows a sequential flowchart ((<a class="reference internal" href="#description-fig3"><span class="std std-numref">Fig. 3</span></a>)):</p>
 <ul class="simple">
-<li><p>Step 1: Import needed data files (module package “tethysDataReader”)</p></li>
-<li><p>Step 2: Spatial downscaling (module package “tethysSpatialDownscaling”)</p></li>
+<li><p>Step 1: Import needed data files (module package “tethysdata_reader”)</p></li>
+<li><p>Step 2: Spatial downscaling (module package “tethysspatial_downscaling”)</p></li>
 <li><p>Step 3: Temporal downscaling (module package “tethysTemporalDownscaling”)</p></li>
 <li><p>Step 4: Diagnostics of spatial and temporal downscaling (module package “tethysDiagnostics”)</p></li>
-<li><p>Step 5: Output all the results of Step 2-5 (module package “tethysDataWriter”)</p></li>
+<li><p>Step 5: Output all the results of Step 2-5 (module package “tethysdata_writer”)</p></li>
 </ul>
 <p>For each step, the corresponding module package is also listed. Spatial downscaling (Step 2) is the core of computation flow in Tethys while temporal downscaling (Step 3) is an additional step. The outputs of Step 2, global gridded annual water withdrawal data by sectors, are the inputs of Step 3.</p>
 <div class="align-center figure" id="id34">
@@ -388,8 +388,8 @@ Save the monthly water usage results for each withdrawal category (Unit: km3/mon
 </pre></div>
 </div>
 <p>Another way to run the downscaling model is by calling different modules. In the source code package of Tethys, “tethysrun_disaggregation.py” contains the main function that executes the model steps described in “Implementation and architecture” section. A simple example script of calling the main function directly is as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tethys.DataReader.IniReader</span> <span class="k">as</span> <span class="nn">IniReader</span>
-<span class="kn">from</span> <span class="nn">tethys.DataWriter.OUTWriter</span> <span class="kn">import</span> <span class="n">OutWriter</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tethys.data_reader.IniReader</span> <span class="k">as</span> <span class="nn">IniReader</span>
+<span class="kn">from</span> <span class="nn">tethys.data_writer.OUTWriter</span> <span class="kn">import</span> <span class="n">OutWriter</span>
 <span class="kn">from</span> <span class="nn">tethys.Run_Disaggregation</span> <span class="kn">import</span> <span class="n">run_disaggregation</span> <span class="k">as</span> <span class="n">Disaggregation</span>
 
 <span class="c1"># Read simulator settings from ini file.</span>

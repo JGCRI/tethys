@@ -1,6 +1,6 @@
-tethys.DataReader.GCAMOutputs.get\_basin\_info
+tethys.data_reader.GCAMOutputs.get\_basin\_info
 ==============================================
 
-.. currentmodule:: tethys.DataReader.GCAMOutputs
+.. currentmodule:: tethys.data_reader.GCAMOutputs
 
 .. autofunction:: get_basin_info

@@ -1,6 +1,6 @@
-tethys.DataReader.HistPopIrrData.getIrrYearData
+tethys.data_reader.HistPopIrrData.getIrrYearData
 ===============================================
 
-.. currentmodule:: tethys.DataReader.HistPopIrrData
+.. currentmodule:: tethys.data_reader.HistPopIrrData
 
 .. autofunction:: getIrrYearData

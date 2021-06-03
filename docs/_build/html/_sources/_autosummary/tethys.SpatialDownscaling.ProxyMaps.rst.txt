@@ -1,7 +1,7 @@
-﻿tethys.SpatialDownscaling.ProxyMaps
+﻿tethys.spatial_downscaling.ProxyMaps
 ===================================
 
-.. automodule:: tethys.SpatialDownscaling.ProxyMaps
+.. automodule:: tethys.spatial_downscaling.ProxyMaps
 
    
    

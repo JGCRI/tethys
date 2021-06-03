@@ -19,11 +19,10 @@ Note we allow for (and in fact require) a single header line. The assumption is 
 import os
 import numpy as np
 from scipy import io as spio
-#from netCDF4 import Dataset
-from tethys.Utils.DataParser import GetArrayCSV, GetArrayTXT
-from tethys.Utils.DataParser import getContentArray as ArrayCSVRead
-from tethys.DataReader.HistPopIrrData import getPopYearData as GetPopData
-from tethys.Utils.exceptions import FileNotFoundError
+from tethys.utils.data_parser import GetArrayCSV, GetArrayTXT
+from tethys.utils.data_parser import getContentArray as ArrayCSVRead
+from tethys.data_reader.hist_pop_irr_data import getPopYearData as GetPopData
+from tethys.utils.exceptions import FileNotFoundError
 
 
 def getGISData(settings):
@@ -44,10 +43,10 @@ def getGISData(settings):
 
     if settings.UseDemeter:
         # using finer resolution gridded Irrigation map (from demeter by individual crops) according to year availability
-        from tethys.DataReader.HistPopIrrData import getIrrYearData_Crops as GetIrrData
+        from tethys.data_reader.hist_pop_irr_data import getIrrYearData_Crops as GetIrrData
     else:
         # using finer resolution gridded Irrigation map (from HYDE or GMIA) according to year availability
-        from tethys.DataReader.HistPopIrrData import getIrrYearData as GetIrrData          
+        from tethys.data_reader.hist_pop_irr_data import getIrrYearData as GetIrrData
     
     GISData['irr']          = GetIrrData(settings) # dictionary   
     

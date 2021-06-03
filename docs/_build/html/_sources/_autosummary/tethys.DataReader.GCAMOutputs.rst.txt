@@ -1,7 +1,7 @@
-tethys.DataReader.GCAMOutputs
+tethys.data_reader.GCAMOutputs
 =============================
 
-.. automodule:: tethys.DataReader.GCAMOutputs
+.. automodule:: tethys.data_reader.GCAMOutputs
 
    
    

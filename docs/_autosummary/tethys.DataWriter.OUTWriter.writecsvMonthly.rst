@@ -1,6 +1,6 @@
-tethys.DataWriter.OUTWriter.writecsvMonthly
+tethys.data_writer.OUTWriter.writecsvMonthly
 ===========================================
 
-.. currentmodule:: tethys.DataWriter.OUTWriter
+.. currentmodule:: tethys.data_writer.OUTWriter
 
 .. autofunction:: writecsvMonthly

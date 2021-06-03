@@ -1,7 +1,7 @@
-tethys.Diagnostics.Temporal
+tethys.diagnostics.Temporal
 ===========================
 
-.. automodule:: tethys.Diagnostics.Temporal
+.. automodule:: tethys.diagnostics.Temporal
 
    
    

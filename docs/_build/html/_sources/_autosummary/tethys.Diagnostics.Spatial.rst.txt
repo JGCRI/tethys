@@ -1,7 +1,7 @@
-﻿tethys.Diagnostics.Spatial
+﻿tethys.diagnostics.Spatial
 ==========================
 
-.. automodule:: tethys.Diagnostics.Spatial
+.. automodule:: tethys.diagnostics.Spatial
 
    
    

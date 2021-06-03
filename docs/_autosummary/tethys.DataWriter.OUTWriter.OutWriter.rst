@@ -1,6 +1,6 @@
-tethys.DataWriter.OUTWriter.OutWriter
+tethys.data_writer.OUTWriter.OutWriter
 =====================================
 
-.. currentmodule:: tethys.DataWriter.OUTWriter
+.. currentmodule:: tethys.data_writer.OUTWriter
 
 .. autofunction:: OutWriter

@@ -1,6 +1,6 @@
-tethys.SpatialDownscaling.ProxyMaps.rgnmapadjust
+tethys.spatial_downscaling.ProxyMaps.rgnmapadjust
 ================================================
 
-.. currentmodule:: tethys.SpatialDownscaling.ProxyMaps
+.. currentmodule:: tethys.spatial_downscaling.ProxyMaps
 
 .. autofunction:: rgnmapadjust
