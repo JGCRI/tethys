@@ -38,7 +38,7 @@ Before you can run these examples please find and replace all absolute paths in 
     config_file = '<path to my example config file>/config.ini'
     
     # run Tethys 
-    tethys.run_model(config_file)
+    tethys.run_model(config_file=config_file)
     ```
 
 # Citation

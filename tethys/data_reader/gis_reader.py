@@ -29,14 +29,8 @@ def getGISData(settings):
     # dictionary GISData{} saves the data related to GIS data
     GISData = {} 
         
-    # AEZ mapping:  67420x1 -- 1-18, missing using 0
-    GISData['aez']          = ArrayCSVRead(settings.aez,1).astype(int)
-    
-    # judge if use basin for aez
-    if settings.subreg == 0:
-        GISData['AEZstring'] = 'AEZ'
-    elif settings.subreg == 1:
-        GISData['AEZstring'] = 'Basin'
+
+    GISData['SubRegionString'] = 'Basin'
       
     # using finer resolution gridded population map (from HYDE or GPW) according to year availability
     GISData['pop']          = GetPopData(settings) # dictionary

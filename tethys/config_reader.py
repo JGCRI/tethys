@@ -76,7 +76,6 @@ class ReadConfig(Logger):
 
         self.Area = os.path.join(self.InputFolder, self.map_params.get('Area'))
         self.Coord = os.path.join(self.InputFolder, self.map_params.get('Coord'))
-        self.aez = os.path.join(self.InputFolder, self.map_params.get('AEZ'))
         self.InputBasinFile = os.path.join(self.InputFolder, self.map_params.get('BasinIDs'))
         self.BasinNames = os.path.join(self.InputFolder, self.map_params.get('BasinNames'))
         self.gcam_basin_lu = os.path.join(self.InputFolder, self.map_params.get('GCAM_Basin_Key'))

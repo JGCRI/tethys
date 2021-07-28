@@ -126,7 +126,6 @@ def irr_water_demand_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_c
 
     :param conn:          gcam_reader database object
     :param query:         XPath Query
-    :param subreg:        Either 0 (AEZ) or 1 (BASIN)
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param d_crops:       A dictionary of 'crop_name': crop_id
     :param years:         list of years to use
@@ -147,12 +146,7 @@ def irr_water_demand_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_c
     # replace region name with region number
     df['region'] = df['region'].map(d_reg_name)
 
-    if subreg == 0:
-        # break out subregion number
-        df['subreg'] = df['subsector'].apply(lambda x: int(x.split('AEZ')[1]))
-
-    elif subreg == 1:
-        df['subreg'] = df['subsector'].apply(lambda x: x.split('_')[-1]).map(d_basin_name)
+    df['subreg'] = df['subsector'].apply(lambda x: x.split('_')[-1]).map(d_basin_name)
 
     # break out crop and map the id to it
     df['crop'] = df['sector'].apply(lambda x: 'biomass' if x in l_biomass else x)
@@ -385,7 +379,6 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
 
     :param conn:          gcam_reader database object
     :param query:         XPath Query
-    :param subreg:        Either 0 (AEZ) or 1 (BASIN)
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param d_basin_name:  A dictionary of 'basin_name' : basin_id
     :param d_crops:       A dictionary of 'crop_name': crop_id
@@ -411,43 +404,26 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
     # replace region name with region number
     df['region'] = df['region'].map(d_reg_name)
 
-    if subreg == 0:
-        # create crop type column
-        df['crop'] = df['land-allocation'].apply(lambda x: x.split('AEZ')[0])
-
-        # create subreg number column
-        df['subreg'] = df['land-allocation'].apply(lambda x: int(x.split('AEZ')[1][:2]))
-
-        # create use column
-        df['use'] = df['land-allocation'].apply(lambda x: x.split('AEZ')[1][-3:])
-
-        # only keep irrigated crops
+    temp = df['land-allocation'].apply(lambda x: x.split('_')[-1])
+    if 'IRR' in temp.unique():
+        df['crop'] = df['land-allocation'].apply(lambda x: x.split('_')[:-2][0]) # 'Root_Tuber' will be 'Root'
+        df['subreg'] = df['land-allocation'].apply(lambda x: x.split('_')[-2]).map(d_basin_name)
+        df['use'] = df['land-allocation'].apply(lambda x: x.split('_')[-1])
         df = df.loc[df['use'] == 'IRR'].copy()
-
-        # drop cols
         df.drop('land-allocation', axis=1, inplace=True)
-
-    elif subreg == 1:
-        temp = df['land-allocation'].apply(lambda x: x.split('_')[-1])
-        if 'IRR' in temp.unique():
-            df['crop'] = df['land-allocation'].apply(lambda x: x.split('_')[:-2][0]) # 'Root_Tuber' will be 'Root'
-            df['subreg'] = df['land-allocation'].apply(lambda x: x.split('_')[-2]).map(d_basin_name)
-            df['use'] = df['land-allocation'].apply(lambda x: x.split('_')[-1])
-            df = df.loc[df['use'] == 'IRR'].copy()
-            df.drop('land-allocation', axis=1, inplace=True)
-        else:
-            # create management type column
-            df['mgmt'] = df['land-allocation'].apply(lambda x: x.split('_')[-1])
-            df['crop'] = df['land-allocation'].apply(lambda x: x.split('_')[:-3][0]) # 'Root_Tuber' will be 'Root'
-            df['subreg'] = df['land-allocation'].apply(lambda x: x.split('_')[-3]).map(d_basin_name)
-            df['use'] = df['land-allocation'].apply(lambda x: x.split('_')[-2])
-            df = df.loc[df['use'] == 'IRR'].copy()
-            df.drop('land-allocation', axis=1, inplace=True)
+    else:
+        # create management type column
+        df['mgmt'] = df['land-allocation'].apply(lambda x: x.split('_')[-1])
+        df['crop'] = df['land-allocation'].apply(lambda x: x.split('_')[:-3][0]) # 'Root_Tuber' will be 'Root'
+        df['subreg'] = df['land-allocation'].apply(lambda x: x.split('_')[-3]).map(d_basin_name)
+        df['use'] = df['land-allocation'].apply(lambda x: x.split('_')[-2])
+        df = df.loc[df['use'] == 'IRR'].copy()
+        df.drop('land-allocation', axis=1, inplace=True)
     
-            # sum hi and lo management allocation
-            df = df.drop(['mgmt'],axis=1)
-            df = df.groupby(['region', 'subreg', 'crop', 'use', 'Year']).sum()
-            df = df.reset_index()
+        # sum hi and lo management allocation
+        df = df.drop(['mgmt'],axis=1)
+        df = df.groupby(['region', 'subreg', 'crop', 'use', 'Year']).sum()
+        df = df.reset_index()
 
     # only keep crops in target list
     df['crop'] = df['crop'].apply(lambda x: 'Root_Tuber' if x == 'Root' else x)  # Correct "Root" back to crop name

@@ -222,28 +222,26 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
 
     # Need to downscale the agricultural water withdrawal data for GCAM years
     # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
-    # AEZ to grid scale CHALLENGE: where to add new agricultural lands
+    # SubRegion to grid scale CHALLENGE: where to add new agricultural lands
     
     mapAreaExt = GISData['mapAreaExt'] # float, unit is km2
 
-    # STEP 1: read in AEZ grid map AEZ map to match the aggregate withdrawal by GCAM, this loop reads
+    # STEP 1: read in SubRegion grid map SubRegion map to match the aggregate withdrawal by GCAM, this loop reads
     # the ascii data and rearranges in right format and omits missing data -9999
-    mapAEZ = np.zeros(mapAreaExt.shape, dtype=int)
+    mapSubRegion = np.zeros(mapAreaExt.shape, dtype=int)
 
-    if subreg == 0:
-        mapAEZ[GISData['mapindex']] = GISData['aez']
-    elif subreg == 1:
-        mapAEZ[GISData['mapindex']] = GISData['BasinIDs']
 
-    naez = np.amax(mapAEZ)
+    mapSubRegion[GISData['mapindex']] = GISData['BasinIDs']
+
+    nSubRegion = np.amax(mapSubRegion)
 
     # STEP 2: calculate the total amount of irrigated lands in each GCAM region from the GCAM output files.
     # The irrArea file from GCAM has the format:
     # 1: GCAM regions 1-nrgn
-    # 2: AEZs 1-18
+    # 2: SubRegions 1-18
     # 3: crops 1-17
     # 4 .. nyear+3: values for GCAM output years
-    # We are going to reorganize this into irrArea(rgn,aez,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
+    # We are going to reorganize this into irrArea(rgn,SubRegion,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
     nrgnAG = rgnmapData['nrgnAG']
     r1 = SizeR(GCAMData['irrArea'])
     try:
@@ -254,9 +252,9 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
         q2    = 0    
     r3        = SizeR(GCAMData['irrV'])
     ncrops    = max(max(GCAMData['irrArea'][:,2].astype(int)),max(GCAMData['irrV'][:,2].astype(int)))
-    tempA_all = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float)
-    tempS_all = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float) 
-    tempV_all = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float)
+    tempA_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
+    tempS_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
+    tempV_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
     
     for i in range(0, r1):
         for y in range(0, NY):
@@ -271,7 +269,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
             for y in range (0,NY):
                 tempS_all[GCAMData['irrShare'][i,0].astype(int)-1,GCAMData['irrShare'][i,1].astype(int)-1,GCAMData['irrShare'][i,2].astype(int)-1,y] = GCAMData['irrShare'][i,y+3]
     else:
-        tempS_all = np.ones((nrgnAG,naez,ncrops,NY), dtype = float)  
+        tempS_all = np.ones((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
 
     # Same reorganization for irrVolume. Result goes to tempV_all
     for i in range(0,r3):
@@ -279,12 +277,12 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
             tempV_all[GCAMData['irrV'][i,0].astype(int)-1,GCAMData['irrV'][i,1].astype(int)-1,GCAMData['irrV'][i,2].astype(int)-1,y] = GCAMData['irrV'][i,y+3]
                
     # STEP 3: now that we have computed the total irrigated lands, we can aggregate all
-    # the numbers for all the crops; we only keep the value per gcam region and aez
-    irr_A = np.zeros((nrgnAG,naez,NY), dtype = float)
-    irr_V = np.zeros((nrgnAG,naez,NY), dtype = float)
+    # the numbers for all the crops; we only keep the value per gcam region and SubRegion
+    irr_A = np.zeros((nrgnAG,nSubRegion,NY), dtype = float)
+    irr_V = np.zeros((nrgnAG,nSubRegion,NY), dtype = float)
     
     for i in range (0,nrgnAG):
-        for j in range(0,naez):
+        for j in range(0,nSubRegion):
             for y in range(0,NY):
                 for k in range(0,ncrops):                            
                     irr_A[i,j,y] += tempA_all[i,j,k,y]*tempS_all[i,j,k,y]
@@ -303,35 +301,35 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
         yearstr = str(GISData['irr']['years_new'][y])
         irr     = np.zeros(rgnmapData['map_rgn_ag'].shape, dtype=float)
         irr[GISData['mapindex']] = GISData['irr'][yearstr]
-        # add GCAM-AEZ labels to all cells with irrigation values
+        # add GCAM-SubRegion labels to all cells with irrigation values
         # XXX maybe this should be done further up when we do the population adjustments
         map_rgn_ag = rgnmapadjust(mapsize, irr, rgnmapData['map_rgn_ag'], '------[Adjusting map_rgn_ag with irr]: ')
-        mapAEZ     = rgnmapadjust(mapsize, irr, mapAEZ, '------[Adjusting map' + GISData['AEZstring'] + ' with irr]: ') # if we need to do this step for mapAEZ?
+        mapSubRegion     = rgnmapadjust(mapsize, irr, mapSubRegion, '------[Adjusting map' + GISData['SubRegionString'] + ' with irr]: ') # if we need to do this step for mapSubRegion?
     
         rgnmapData['map_rgn_ag'] = np.copy(map_rgn_ag)
         
         # STEP 5: calculate the total amount of irrigated lands from the GIS maps
     
-        irrAx   = np.zeros((nrgnAG,naez), dtype = float) # this is the max total available area of all grids with some irrigation
-        irrA    = np.zeros((nrgnAG,naez), dtype = float) # this is the existing area that is equipped with irrigation
-        totA    = np.zeros((nrgnAG,naez), dtype = float) # total land in each rgn, AEZ combo
+        irrAx   = np.zeros((nrgnAG,nSubRegion), dtype = float) # this is the max total available area of all grids with some irrigation
+        irrA    = np.zeros((nrgnAG,nSubRegion), dtype = float) # this is the existing area that is equipped with irrigation
+        totA    = np.zeros((nrgnAG,nSubRegion), dtype = float) # total land in each rgn, SubRegion combo
     
         for index in range(0,mapsize[0]*mapsize[1]):
-            temp  = mapAreaExt[index] > 0 and map_rgn_ag[index] > 0 and mapAEZ[index] > 0
+            temp  = mapAreaExt[index] > 0 and map_rgn_ag[index] > 0 and mapSubRegion[index] > 0
             if temp:
-                irrA[map_rgn_ag[index]-1,mapAEZ[index]-1] += irr[index]
-                totA[map_rgn_ag[index]-1,mapAEZ[index]-1] += mapAreaExt[index]
+                irrA[map_rgn_ag[index]-1,mapSubRegion[index]-1] += irr[index]
+                totA[map_rgn_ag[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
                 if irr[index] > 0:
-                    irrAx[map_rgn_ag[index]-1,mapAEZ[index]-1] += mapAreaExt[index]                                                          
+                    irrAx[map_rgn_ag[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
             else:
                 irr[index] = 0
             
             
         # STEP 6:        
         for i in range(0,nrgnAG):
-            for j in range(0,naez):
-                # To be efficient, the most important step in the loop is to identify the valid irr cell(index in 360*720 grid) for each region and each aez
-                ls = np.where((map_rgn_ag - 1 == i) & (mapAEZ - 1 == j))[0]
+            for j in range(0,nSubRegion):
+                # To be efficient, the most important step in the loop is to identify the valid irr cell(index in 360*720 grid) for each region and each SubRegion
+                ls = np.where((map_rgn_ag - 1 == i) & (mapSubRegion - 1 == j))[0]
                 if len(ls) > 0 and irr_A[i,j,y] > 0:                                    
                     ls1 = []
                     ls2 = []
@@ -399,7 +397,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                         # GCAM irr_A is too large, the redistributed ls1 still has grids that irrigated area > total area
                                         logging.info('{}  {}  {}  {} {} {} {} '.format(
                                             '[Year Index, Region ID,',
-                                            GISData['AEZstring'],
+                                            GISData['SubRegionString'],
                                             'ID, irr from GCAM not assigned (km3) (condition 0)]         :',
                                             y+1, i+1, j+1,
                                             cum_diff0*irr_V[i,j,y]/irr_A[i,j,y]))
@@ -427,7 +425,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                     # GCAM irr_A is too large, the redistributed ls2 still has grids that irrigated area > total area
                                     logging.warning('{}  {}  {}  {} {} {} {} '.format(
                                         '[Year Index, Region ID,',
-                                        GISData['AEZstring'],
+                                        GISData['SubRegionString'],
                                         'ID, irr from GCAM not assigned (km3) (condition 1)]         :',
                                         y+1, i+1, j+1,
                                         diff*irr_V[i,j,y]/irr_A[i,j,y]))
@@ -439,12 +437,12 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                             withd_irr_map[index, y] = irrA_grid[index, y]*irr_V[i,j,y]/irr_A[i,j,y] 
                                                       
                 elif len(ls) == 0 and irr_A[i,j,y] > 0 and irr_V[i,j,y] > 0:
-                    # GCAM has irrigation data for a region and a AEZ/basin.
-                    # But from region map and AEZ/basin map, there are no cells belong to both.
+                    # GCAM has irrigation data for a region and a SubRegion/basin.
+                    # But from region map and SubRegion/basin map, there are no cells belong to both.
                     # Thus, GCAM data will not be included for downscaling.
                     # It will cause the difference in Spatial Downscaling diagnostics
                     logging.warning('{}  {}  {}  {} {} {} {} '.format('[Year Index, Region ID,',
-                                        GISData['AEZstring'],'ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
+                                        GISData['SubRegionString'],'ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
                                         y+1, i+1, j+1, irr_V[i,j,y]))
                                         
     # this loop will replace all the nan values with zeros to be able to take sums, if we want to keep the nans (for plotting), comment following 2 lines
@@ -461,28 +459,25 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
 
     # Need to downscale the agricultural water withdrawal data for GCAM years
     # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
-    # AEZ to grid scale CHALLENGE: where to add new agricultural lands
+    # SubRegion to grid scale CHALLENGE: where to add new agricultural lands
     
     mapAreaExt = GISData['mapAreaExt'] # float, unit is km2
 
-    # STEP 1: read in AEZ grid map AEZ map to match the aggregate withdrawal by GCAM, this loop reads
+    # STEP 1: read in SubRegion grid map SubRegion map to match the aggregate withdrawal by GCAM, this loop reads
     # the ascii data and rearranges in right format and omits missing data -9999
-    mapAEZ = np.zeros(mapAreaExt.shape, dtype=int)
+    mapSubRegion = np.zeros(mapAreaExt.shape, dtype=int)
 
-    if subreg == 0:
-        mapAEZ[GISData['mapindex']] = GISData['aez']
-    elif subreg == 1:
-        mapAEZ[GISData['mapindex']] = GISData['BasinIDs']
+    mapSubRegion[GISData['mapindex']] = GISData['BasinIDs']
 
-    naez = np.amax(mapAEZ)
+    nSubRegion = np.amax(mapSubRegion)
 
     # STEP 2: calculate the total amount of irrigated lands in each GCAM region from the GCAM output files.
     # The irrArea file from GCAM has the format:
     # 1: GCAM regions 1-nrgn
-    # 2: AEZs 1-18
+    # 2: SubRegions 1-18
     # 3: crops 1-17
     # 4 .. nyear+3: values for GCAM output years
-    # We are going to reorganize this into irrArea(rgn,aez,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
+    # We are going to reorganize this into irrArea(rgn,SubRegion,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
     nrgnAG = rgnmapData['nrgnAG']
     r1 = SizeR(GCAMData['irrArea'])
     try:
@@ -493,9 +488,9 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
         q2    = 0    
     r3        = SizeR(GCAMData['irrV'])
     ncrops    = max(max(GCAMData['irrArea'][:,2].astype(int)),max(GCAMData['irrV'][:,2].astype(int)))
-    tempA_all = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float)
-    tempS_all = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float) 
-    tempV_all = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float)
+    tempA_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
+    tempS_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
+    tempV_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
     
     for i in range(0, r1):
         for y in range(0, NY):
@@ -510,7 +505,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
             for y in range (0,NY):
                 tempS_all[GCAMData['irrShare'][i,0].astype(int)-1,GCAMData['irrShare'][i,1].astype(int)-1,GCAMData['irrShare'][i,2].astype(int)-1,y] = GCAMData['irrShare'][i,y+3]
     else:
-        tempS_all = np.ones((nrgnAG,naez,ncrops,NY), dtype = float)  
+        tempS_all = np.ones((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
 
     # Same reorganization for irrVolume. Result goes to tempV_all
     for i in range(0,r3):
@@ -518,10 +513,10 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
             tempV_all[GCAMData['irrV'][i,0].astype(int)-1,GCAMData['irrV'][i,1].astype(int)-1,GCAMData['irrV'][i,2].astype(int)-1,y] = GCAMData['irrV'][i,y+3]
                
     # STEP 3: now that we have computed the total irrigated lands
-    irr_A = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float)
+    irr_A = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
     
     for i in range (0,nrgnAG):
-        for j in range(0,naez):
+        for j in range(0,nSubRegion):
             for y in range(0,NY):
                 for k in range(0,ncrops):                            
                     irr_A[i,j,k,y] = tempA_all[i,j,k,y]*tempS_all[i,j,k,y]
@@ -541,35 +536,35 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
         for k in range(0,ncrops): 
             irr     = np.zeros(rgnmapData['map_rgn_ag'].shape, dtype=float)
             irr[GISData['mapindex']] = GISData['irr'][yearstr][:,k]
-            # add GCAM-AEZ labels to all cells with irrigation values
+            # add GCAM-SubRegion labels to all cells with irrigation values
             # XXX maybe this should be done further up when we do the population adjustments
             map_rgn_ag = rgnmapadjust(mapsize, irr, rgnmapData['map_rgn_ag'], '------[Adjusting map_rgn_ag with irr crop # ' + str(k+1) + ']: ')
-            mapAEZ     = rgnmapadjust(mapsize, irr, mapAEZ, '------[Adjusting map' + GISData['AEZstring'] + ' with irr crop # ' + str(k+1) + ']: ') # if we need to do this step for mapAEZ?
+            mapSubRegion     = rgnmapadjust(mapsize, irr, mapSubRegion, '------[Adjusting map' + GISData['SubRegionString'] + ' with irr crop # ' + str(k+1) + ']: ') # if we need to do this step for mapSubRegion?
     
             rgnmapData['map_rgn_ag'] = np.copy(map_rgn_ag)
         
             # STEP 5: calculate the total amount of irrigated lands from the GIS maps
     
-            irrAx   = np.zeros((nrgnAG,naez), dtype = float) # this is the max total available area of all grids with some irrigation
-            irrA    = np.zeros((nrgnAG,naez), dtype = float) # this is the existing area that is equipped with irrigation
-            totA    = np.zeros((nrgnAG,naez), dtype = float) # total land in each rgn, AEZ combo
+            irrAx   = np.zeros((nrgnAG,nSubRegion), dtype = float) # this is the max total available area of all grids with some irrigation
+            irrA    = np.zeros((nrgnAG,nSubRegion), dtype = float) # this is the existing area that is equipped with irrigation
+            totA    = np.zeros((nrgnAG,nSubRegion), dtype = float) # total land in each rgn, SubRegion combo
         
             for index in range(0,mapsize[0]*mapsize[1]):
-                temp  = mapAreaExt[index] > 0 and map_rgn_ag[index] > 0 and mapAEZ[index] > 0
+                temp  = mapAreaExt[index] > 0 and map_rgn_ag[index] > 0 and mapSubRegion[index] > 0
                 if temp:
-                    irrA[map_rgn_ag[index]-1,mapAEZ[index]-1] += irr[index]
-                    totA[map_rgn_ag[index]-1,mapAEZ[index]-1] += mapAreaExt[index]
+                    irrA[map_rgn_ag[index]-1,mapSubRegion[index]-1] += irr[index]
+                    totA[map_rgn_ag[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
                     if irr[index] > 0:
-                        irrAx[map_rgn_ag[index]-1,mapAEZ[index]-1] += mapAreaExt[index]                                                          
+                        irrAx[map_rgn_ag[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
                 else:
                     irr[index] = 0
             
             
             # STEP 6:        
             for i in range(0,nrgnAG):
-                for j in range(0,naez):
-                    # To be efficient, the most important step in the loop is to identify the valid irr cell(index in 360*720 grid) for each region and each aez
-                    ls = np.where((map_rgn_ag - 1 == i) & (mapAEZ - 1 == j))[0]
+                for j in range(0,nSubRegion):
+                    # To be efficient, the most important step in the loop is to identify the valid irr cell(index in 360*720 grid) for each region and each SubRegion
+                    ls = np.where((map_rgn_ag - 1 == i) & (mapSubRegion - 1 == j))[0]
                     if len(ls) > 0 and irr_A[i,j,k,y] > 0:                                    
                         ls1 = []
                         ls2 = []
@@ -637,7 +632,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                             # GCAM irr_A is too large, the redistributed ls1 still has grids that irrigated area > total area
                                             logging.warning('{}  {}  {}  {} {} {} {} {}'.format(
                                                 '[Year Index, Region ID,',
-                                                GISData['AEZstring'],
+                                                GISData['SubRegionString'],
                                                 'ID, Crop ID, irr from GCAM not assigned (km3) (condition 0)]         :',
                                                 y+1, i+1, j+1, k+1,
                                                 cum_diff0*tempV_all[i,j,k,y]/irr_A[i,j,k,y]))
@@ -665,7 +660,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                         # GCAM irr_A is too large, the redistributed ls2 still has grids that irrigated area > total area
                                         logging.warning('{}  {}  {}  {} {} {} {} {}'.format(
                                             '[Year Index, Region ID,',
-                                            GISData['AEZstring'],
+                                            GISData['SubRegionString'],
                                             'ID, Crop ID, irr from GCAM not assigned (km3) (condition 1)]         :',
                                             y+1, i+1, j+1,  k+1,
                                             diff*tempV_all[i,j,k,y]/irr_A[i,j,k,y]))
@@ -677,12 +672,12 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                 withd_irr_map[index, k, y] = irrA_grid[index, k, y]*tempV_all[i,j,k,y]/irr_A[i,j,k,y] 
                                                           
                     elif len(ls) == 0 and irr_A[i,j,k,y] > 0 and tempV_all[i,j,k,y] > 0:
-                        # GCAM has irrigation data for a region and a AEZ/basin.
-                        # But from region map and AEZ/basin map, there are no cells belong to both.
+                        # GCAM has irrigation data for a region and a SubRegion/basin.
+                        # But from region map and SubRegion/basin map, there are no cells belong to both.
                         # Thus, GCAM data will not be included for downscaling.
                         # It will cause the difference in Spatial Downscaling diagnostics
                         logging.warning('{}  {}  {}  {} {} {} {} {}'.format('[Year Index, Region ID,',
-                                            GISData['AEZstring'],'ID, Crop ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
+                                            GISData['SubRegionString'],'ID, Crop ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
                                             y+1, i+1, j+1, k+1, tempV_all[i,j,k,y]))
                                         
     # this loop will replace all the nan values with zeros to be able to take sums, if we want to keep the nans (for plotting), comment following 2 lines
@@ -701,28 +696,25 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
 
     # Need to downscale the agricultural water withdrawal data for GCAM years
     # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
-    # AEZ to grid scale CHALLENGE: where to add new agricultural lands
+    # SubRegion to grid scale CHALLENGE: where to add new agricultural lands
     
     mapAreaExt = GISData['mapAreaExt'] # float, unit is km2
 
-    # STEP 1: read in AEZ grid map AEZ map to match the aggregate withdrawal by GCAM, this loop reads
+    # STEP 1: read in SubRegion grid map SubRegion map to match the aggregate withdrawal by GCAM, this loop reads
     # the ascii data and rearranges in right format and omits missing data -9999
-    mapAEZ = np.zeros(mapAreaExt.shape, dtype=int)
+    mapSubRegion = np.zeros(mapAreaExt.shape, dtype=int)
 
-    if subreg == 0:
-        mapAEZ[GISData['mapindex']] = GISData['aez']
-    elif subreg == 1:
-        mapAEZ[GISData['mapindex']] = GISData['BasinIDs']
+    mapSubRegion[GISData['mapindex']] = GISData['BasinIDs']
 
-    naez = np.amax(mapAEZ)
+    nSubRegion = np.amax(mapSubRegion)
 
     # STEP 2: calculate the total amount of irrigated lands in each GCAM region from the GCAM output files.
     # The irrArea file from GCAM has the format:
     # 1: GCAM regions 1-nrgn
-    # 2: AEZs 1-18
+    # 2: SubRegions 1-18
     # 3: crops 1-17
     # 4 .. nyear+3: values for GCAM output years
-    # We are going to reorganize this into irrArea(rgn,aez,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
+    # We are going to reorganize this into irrArea(rgn,SubRegion,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
     nrgnAG = rgnmapData['nrgnAG']
     r1 = SizeR(GCAMData['irrArea'])
     try:
@@ -733,9 +725,9 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
         q2    = 0    
     r3        = SizeR(GCAMData['irrV'])
     ncrops    = max(max(GCAMData['irrArea'][:,2].astype(int)),max(GCAMData['irrV'][:,2].astype(int)))
-    tempA_all = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float)
-    tempS_all = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float) 
-    tempV_all = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float)
+    tempA_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
+    tempS_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
+    tempV_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
     
     for i in range(0, r1):
         for y in range(0, NY):
@@ -750,7 +742,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
             for y in range (0,NY):
                 tempS_all[GCAMData['irrShare'][i,0].astype(int)-1,GCAMData['irrShare'][i,1].astype(int)-1,GCAMData['irrShare'][i,2].astype(int)-1,y] = GCAMData['irrShare'][i,y+3]
     else:
-        tempS_all = np.ones((nrgnAG,naez,ncrops,NY), dtype = float)  
+        tempS_all = np.ones((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
 
     # Same reorganization for irrVolume. Result goes to tempV_all
     for i in range(0,r3):
@@ -758,10 +750,10 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
             tempV_all[GCAMData['irrV'][i,0].astype(int)-1,GCAMData['irrV'][i,1].astype(int)-1,GCAMData['irrV'][i,2].astype(int)-1,y] = GCAMData['irrV'][i,y+3]
                
     # STEP 3: now that we have computed the total irrigated lands
-    irr_A = np.zeros((nrgnAG,naez,ncrops,NY), dtype = float)
+    irr_A = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
     
     for i in range (0,nrgnAG):
-        for j in range(0,naez):
+        for j in range(0,nSubRegion):
             for y in range(0,NY):
                 for k in range(0,ncrops):                            
                     irr_A[i,j,k,y] = tempA_all[i,j,k,y]*tempS_all[i,j,k,y]
@@ -781,35 +773,35 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
         for k in range(0,ncrops): 
             irr     = np.zeros(rgnmapData['map_rgn_ag'].shape, dtype=float)
             irr[GISData['mapindex']] = GISData['irr'][yearstr][:,k]
-            # add GCAM-AEZ labels to all cells with irrigation values
+            # add GCAM-SubRegion labels to all cells with irrigation values
             # XXX maybe this should be done further up when we do the population adjustments
             map_rgn_ag = rgnmapadjust(mapsize, irr, rgnmapData['map_rgn_ag'], '------[Adjusting map_rgn_ag with irr crop # ' + str(k+1) + ']: ')
-            mapAEZ     = rgnmapadjust(mapsize, irr, mapAEZ, '------[Adjusting map' + GISData['AEZstring'] + ' with irr crop # ' + str(k+1) + ']: ') # if we need to do this step for mapAEZ?
+            mapSubRegion     = rgnmapadjust(mapsize, irr, mapSubRegion, '------[Adjusting map' + GISData['SubRegionString'] + ' with irr crop # ' + str(k+1) + ']: ') # if we need to do this step for mapSubRegion?
     
             rgnmapData['map_rgn_ag'] = np.copy(map_rgn_ag)
         
             # STEP 5: calculate the total amount of irrigated lands from the GIS maps
     
-            irrAx   = np.zeros((nrgnAG,naez), dtype = float) # this is the max total available area of all grids with some irrigation
-            irrA    = np.zeros((nrgnAG,naez), dtype = float) # this is the existing area that is equipped with irrigation
-            totA    = np.zeros((nrgnAG,naez), dtype = float) # total land in each rgn, AEZ combo
+            irrAx   = np.zeros((nrgnAG,nSubRegion), dtype = float) # this is the max total available area of all grids with some irrigation
+            irrA    = np.zeros((nrgnAG,nSubRegion), dtype = float) # this is the existing area that is equipped with irrigation
+            totA    = np.zeros((nrgnAG,nSubRegion), dtype = float) # total land in each rgn, SubRegion combo
         
             for index in range(0,mapsize[0]*mapsize[1]):
-                temp  = mapAreaExt[index] > 0 and map_rgn_ag[index] > 0 and mapAEZ[index] > 0
+                temp  = mapAreaExt[index] > 0 and map_rgn_ag[index] > 0 and mapSubRegion[index] > 0
                 if temp:
-                    irrA[map_rgn_ag[index]-1,mapAEZ[index]-1] += irr[index]
-                    totA[map_rgn_ag[index]-1,mapAEZ[index]-1] += mapAreaExt[index]
+                    irrA[map_rgn_ag[index]-1,mapSubRegion[index]-1] += irr[index]
+                    totA[map_rgn_ag[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
                     if irr[index] > 0:
-                        irrAx[map_rgn_ag[index]-1,mapAEZ[index]-1] += mapAreaExt[index]                                                          
+                        irrAx[map_rgn_ag[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
                 else:
                     irr[index] = 0
             
             
             # STEP 6:        
             for i in range(0,nrgnAG):
-                for j in range(0,naez):
-                    # To be efficient, the most important step in the loop is to identify the valid irr cell(index in 360*720 grid) for each region and each aez
-                    ls = np.where((map_rgn_ag - 1 == i) & (mapAEZ - 1 == j))[0]
+                for j in range(0,nSubRegion):
+                    # To be efficient, the most important step in the loop is to identify the valid irr cell(index in 360*720 grid) for each region and each SubRegion
+                    ls = np.where((map_rgn_ag - 1 == i) & (mapSubRegion - 1 == j))[0]
                     if len(ls) > 0 and irr_A[i,j,k,y] > 0:                                    
                         ls1 = []
                         ls2 = []
@@ -877,7 +869,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                             # GCAM irr_A is too large, the redistributed ls1 still has grids that irrigated area > total area
                                             logging.warning('{}  {}  {}  {} {} {} {} {}'.format(
                                                 '[Year Index, Region ID,',
-                                                GISData['AEZstring'],
+                                                GISData['SubRegionString'],
                                                 'ID, Crop ID, irr from GCAM not assigned (km3) (condition 0)]         :',
                                                 y+1, i+1, j+1, k+1,
                                                 cum_diff0*tempV_all[i,j,k,y]/irr_A[i,j,k,y]))
@@ -905,7 +897,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                         # GCAM irr_A is too large, the redistributed ls2 still has grids that irrigated area > total area
                                         logging.warning('{}  {}  {}  {} {} {} {} {}'.format(
                                             '[Year Index, Region ID,',
-                                            GISData['AEZstring'],
+                                            GISData['SubRegionString'],
                                             'ID, Crop ID, irr from GCAM not assigned (km3) (condition 1)]         :',
                                             y+1, i+1, j+1,  k+1,
                                             diff*tempV_all[i,j,k,y]/irr_A[i,j,k,y]))
@@ -917,12 +909,12 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                                 withd_irr_map[index, k, y] = irrA_grid[index, k, y]*tempV_all[i,j,k,y]/irr_A[i,j,k,y] 
                                                           
                     elif len(ls) == 0 and irr_A[i,j,k,y] > 0 and tempV_all[i,j,k,y] > 0:
-                        # GCAM has irrigation data for a region and a AEZ/basin.
-                        # But from region map and AEZ/basin map, there are no cells belong to both.
+                        # GCAM has irrigation data for a region and a SubRegion/basin.
+                        # But from region map and SubRegion/basin map, there are no cells belong to both.
                         # Thus, GCAM data will not be included for downscaling.
                         # It will cause the difference in Spatial Downscaling diagnostics
                         logging.warning('{}  {}  {}  {} {} {} {} {}'.format('[Year Index, Region ID,',
-                                            GISData['AEZstring'],'ID, Crop ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
+                                            GISData['SubRegionString'],'ID, Crop ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
                                             y+1, i+1, j+1, k+1, tempV_all[i,j,k,y]))
                                         
     # this loop will replace all the nan values with zeros to be able to take sums, if we want to keep the nans (for plotting), comment following 2 lines
