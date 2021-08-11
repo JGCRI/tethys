@@ -12,10 +12,10 @@ Subpackages
 Submodules
 ----------
 
-tethys.gcam_outputs module
--------------------
+tethys.run_disaggregation module
+---------------------------
 
-.. automodule:: tethys.gcam_outputs
+.. automodule:: tethys.run_disaggregation
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,4 +1,4 @@
-cerf.tests package
+tethys.tests package
 ==================
 
 Testing Submodules
