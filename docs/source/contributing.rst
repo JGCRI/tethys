@@ -1,25 +1,25 @@
-Contributing to **cerf**
+Contributing to **tethys**
 ========================
 
-Whether you find a typo in the documentation, find a bug, or want to develop functionality that you think will make **cerf** more robust, you are welcome to contribute!
+Whether you find a typo in the documentation, find a bug, or want to develop functionality that you think will make **tethys** more robust, you are welcome to contribute!
 
 
 Opening issues
 ______________
 
-If you find a bug or would like to contribute a new feature, please `open an issue <https://github.com/IMMM-SFA/cerf/issues>`_.
+If you find a bug or would like to contribute a new feature, please `open an issue <https://github.com/JGCRI/tethys/issues>`_.
 
 
 Contribution workflow
 _____________________
 
-The following is the recommended workflow for contributing to **cerf**:
+The following is the recommended workflow for contributing to **tethys**:
 
-1. `Fork the cerf repository <https://github.com/IMMM-SFA/cerf/fork>`_ and then clone it locally:
+1. `Fork the tethys repository <https://github.com/JGCRI/tethys/fork>`_ and then clone it locally:
 
   .. code-block:: bash
 
-    git clone https://github.com/<your-user-name>/cerf
+    git clone https://github.com/<your-user-name>/tethys
 
 
 2. Create a branch for your changes
