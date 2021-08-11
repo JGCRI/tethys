@@ -42,6 +42,7 @@ setup(
             'sphinx~=4.0.2',
             'sphinx-panels~=0.6.0',
             'sphinx-rtd-theme~=0.5.2',
+            'sphinx-mathjax-offline~=0.0.1',
             'twine~=3.4.1'
         ]
     }

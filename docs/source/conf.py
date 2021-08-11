@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'cerf'
+project = 'tethys'
 copyright = '2021, Battelle Memorial Institute'
 author = 'Chris R. Vernon'
 
@@ -79,8 +79,8 @@ html_css_files = [
     "css/getting_started.css",
 ]
 
-import cerf
-version = str(cerf.__version__)
+import tethys
+version = str(tethys.__version__)
 
 
 # -- Extension configuration -------------------------------------------------
