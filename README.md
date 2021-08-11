@@ -1,4 +1,7 @@
 [![DOI](https://zenodo.org/badge/104476654.svg)](https://zenodo.org/badge/latestdoi/104476654)
+[![build](https://github.com/JGCRI/tethys/actions/workflows/build.yml/badge.svg)](https://github.com/JGCRI/tethys/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/JGCRI/tethys/branch/master/graph/badge.svg?token=EzEcfk940f)](https://codecov.io/gh/JGCRI/tethys)
+[![docs](https://github.com/JGCRI/tethys/actions/workflows/docs.yml/badge.svg)](https://github.com/JGCRI/tethys/actions/workflows/docs.yml)
 
 # Model Documentation
 https://tethys-readthedocs.readthedocs.io
