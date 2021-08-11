@@ -1,4 +1,5 @@
-from tethys.model import *
-from tethys.install_supplement import get_package_data
+from .model import *
+from .install_supplement import *
 
-__all__ = ['get_package_data', 'run_model']
+
+__version__ = "2.0.0"
