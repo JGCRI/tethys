@@ -7,7 +7,7 @@ License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 Copyright (c) 2017, Battelle Memorial Institute
 """
 
-import gcam_reader
+import gcamreader
 import numpy as np
 import pandas as pd
 
@@ -79,13 +79,13 @@ def get_gcam_queries(db_path, db_file, f_queries):
     :param db_path:         full path to the directory containing the input GCAM database
     :param db_file:         directory name of the GCAM database
     :param f_queries:       full path to the XML query file
-    :return:                gcam_reader db and queries objects
+    :return:                gcamreader db and queries objects
     """
     # instantiate GCAM db
-    c = gcam_reader.LocalDBConn(db_path, db_file, suppress_gabble=False)
+    c = gcamreader.LocalDBConn(db_path, db_file, suppress_gabble=False)
 
     # get queries
-    q = gcam_reader.parse_batch_query(f_queries)
+    q = gcamreader.parse_batch_query(f_queries)
 
     return c, q
 
@@ -97,7 +97,7 @@ def population_to_array(conn, query, d_reg_name, years):
     In unit:  thousands
     Out unit:  ones
 
-    :param conn:          gcam_reader database object
+    :param conn:          gcamreader database object
     :param query:         XPath Query
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param years:         list of years to use in YYYY integer format
@@ -124,7 +124,7 @@ def irr_water_demand_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_c
     Query GCAM database for irrigated water demand (billion m3).  Place
     in format required by Tethys.
 
-    :param conn:          gcam_reader database object
+    :param conn:          gcamreader database object
     :param query:         XPath Query
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param d_crops:       A dictionary of 'crop_name': crop_id
@@ -167,7 +167,7 @@ def dom_water_demand_to_array(conn, query, d_reg_name, years):
     Query GCAM database for domestic water demand (billion m3). Place in format
     required by Tethys.
 
-    :param conn:          gcam_reader database object
+    :param conn:          gcamreader database object
     :param query:         XPath Query
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param years:         list of years to use
@@ -194,7 +194,7 @@ def elec_water_demand_to_array(conn, query, d_reg_name, years):
     Query GCAM database for industrial electricity water demand (billion m3).
     Place in format required by Tethys.
 
-    :param conn:          gcam_reader database object
+    :param conn:          gcamreader database object
     :param query:         XPath Query
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param years:         list of years to use
@@ -221,7 +221,7 @@ def manuf_water_demand_to_array(conn, query, d_reg_name, years):
     Query GCAM database for industrical manufacturing water demand (billion m3).
     Place in format required by Tethys.
 
-    :param conn:          gcam_reader database object
+    :param conn:          gcamreader database object
     :param query:         XPath Query
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param years:         list of years to use
@@ -248,7 +248,7 @@ def mining_water_demand_to_array(conn, query, d_reg_name, years):
     Query GCAM database for industrical manufacturing water demand (billion m3).
     Place in format required by Tethys.
 
-    :param conn:          gcam_reader database object
+    :param conn:          gcamreader database object
     :param query:         XPath Query
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param years:         list of years to use
@@ -277,7 +277,7 @@ def livestock_water_demand_to_array(conn, query, d_reg_name, d_buf_frac, d_goat_
 
     Outputs are ordered by region and then by [Buffalo, Cattle, Goat, Sheep, Poultry, Pig]
 
-    :param conn:          gcam_reader database object
+    :param conn:          gcamreader database object
     :param query:         XPath Query
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param years:         list of years to use
@@ -377,7 +377,7 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
     Query GCAM database for irrigated land area per region, subregion,
     and crop type.  Place in format required by Tethys.
 
-    :param conn:          gcam_reader database object
+    :param conn:          gcamreader database object
     :param query:         XPath Query
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param d_basin_name:  A dictionary of 'basin_name' : basin_id
