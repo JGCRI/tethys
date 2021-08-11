@@ -12,34 +12,10 @@ Subpackages
 Submodules
 ----------
 
-tethys.data_reader module
+tethys.gcam_outputs module
 -------------------
 
-.. automodule:: tethys.data_reader
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-tethys.data_writer module
--------------------
-
-.. automodule:: tethys.data_writer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-tethys.spatial_downscaling module
--------------------
-
-.. automodule:: tethys.spatial_downscaling
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   
-tethys.TemporalDownscaling module
--------------------
-
-.. automodule:: tethys.TemporalDownscaling
+.. automodule:: tethys.gcam_outputs
    :members:
    :undoc-members:
    :show-inheritance:
