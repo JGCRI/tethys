@@ -42,7 +42,7 @@ Before you can run these examples please find and replace all absolute paths in 
     ```
 
 # Citation
-Vernon, C.R.,  (2019, May 29). JGCRI/tethys: Tethys v1.3.0 (Version v1.3.0). Zenodo. UPDATE TO V1.3.0
+Vernon, C.R.,  (2019, May 29). JGCRI/tethys: Tethys v2.0.0 (Version v1.3.0). Zenodo. UPDATE TO V2.0.0
 
 # Supporting Documents
 Li, X., Vernon, C.R., Hejazi, M.I., Link, R.P., Huang, Z., Liu, L. and Feng, L., 2018. Tethys – A Python Package for Spatial and Temporal Downscaling of Global Water Withdrawals. Journal of Open Research Software, 6(1), p.9. DOI: http://doi.org/10.5334/jors.197
