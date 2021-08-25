@@ -17,19 +17,19 @@ import logging
 import numpy as np
 
 
-def compare_temporal_downscaled(Settings, OUT, GISData):
+def compare_temporal_downscaled(PerformDiagnostics, TDYears, OutputFolder, OUT, GISData):
 
     ## The outputs produced in this function are an extension of the debugging
     ## logs; therefore, if the logging level is set above DEBUG, we skip the
     ## calculations and the output
-    if Settings.PerformDiagnostics != 1:
+    if PerformDiagnostics != 1:
         return
 
     mapindex   = GISData['mapindex']
     BasinIDs   = GISData['BasinIDs']
     BasinNames = GISData['BasinNames']
     NB         = np.max(BasinIDs)
-    years      = Settings.TDYears
+    years      = TDYears
     NY         = len(years)
     NM         = len(mapindex)
     logging.info(f'Temporal Downscaling diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)')
@@ -65,7 +65,7 @@ def compare_temporal_downscaled(Settings, OUT, GISData):
             data = [str(j), str(i+1), BasinNames[i]] + ["%.3f" % W_basin[i,N]] + ["%.3f" % Wtd_basin[i,N]] + ["%.3f" % (W_basin[i,N] - Wtd_basin[i,N])]
             values.append(data) 
                 
-    with open(os.path.join(Settings.OutputFolder, 'Diagnostics_Temporal_Downscaling_Irrigation.csv'), 'w') as outfile:
+    with open(os.path.join(OutputFolder, 'Diagnostics_Temporal_Downscaling_Irrigation.csv'), 'w') as outfile:
         np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s', comments='')
 
     logging.info('------Domestic------')

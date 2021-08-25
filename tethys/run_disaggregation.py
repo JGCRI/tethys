@@ -21,13 +21,12 @@ import tethys.diagnostics.temporal_diagnostics as DiagnosticsTD
 import tethys.temporal_downscaling.temporal_downscaling as TemporalDownscaling
 
 
-def run_disaggregation(settings):
+def run_disaggregation(settings, years, InputRegionFile, mapsize, subreg, UseDemeter, PerformDiagnostics,
+                       PerformTemporal):
+    """Main Function of Tethys Steps for water disaggregation
 
-    """
-    License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
-    Copyright (c) 2017, Battelle Memorial Institute
-
-    Module: run_disaggregation
+    :param settings:    Settings description
+    :type settings:     settings type here
 
     Main Function of Tethys Steps for water disaggregation
     1. Read in the GCAM Data and Get the number of years
@@ -56,7 +55,7 @@ def run_disaggregation(settings):
     # b.    irrigation tables
     # c.    livestock tables
     # d.    Results of water withdrawals from GCAM by sectors and regions
-    starttime1 = time.time() # Set-up timer
+    starttime1 = time.time()  # Set-up timer
     logging.info('---Read in and format GCAM data---')
 
     GCAMData = get_gcam_data(settings)
@@ -64,15 +63,15 @@ def run_disaggregation(settings):
     logging.info("------Time Cost: %s seconds ---" % (endtime1 - starttime1))
 
     # e. Get the number of years
-    settings.years = [int(i) for i in settings.years]
-    if settings.years:
-        settings.NY = len(settings.years)
-        logging.info('---Number of years: {}'.format(settings.NY))
-        logging.info('------ {}'.format(str(settings.years)))
+    years = [int(i) for i in years]
+    if years:
+        NY = len(years)
+        logging.info('---Number of years: {}'.format(NY))
+        logging.info('------ {}'.format(str(years)))
     else:
         (_, size) = GCAMData['pop_tot'].shape
-        settings.NY = size
-        logging.info('---Number of years: {}'.format(settings.NY))
+        NY = size
+        logging.info('---Number of years: {}'.format(NY))
 
     # 2. Read in the GIS data
     # a.    Coordinates of grids
@@ -84,16 +83,16 @@ def run_disaggregation(settings):
 
     logging.info(
         '---Read in the GIS data (asc/txt/csv format) and the region map data (csv format)---')
-    GISData    = gis_reader.getGISData(settings)
-    rgnmapData = gis_reader.getRegionMapData(settings.InputRegionFile)
+    GISData = gis_reader.getGISData(settings)
+    rgnmapData = gis_reader.getRegionMapData(InputRegionFile)
     endtime2 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime2 - endtime1))
-    logging.info('---Mapsize: {}'.format(settings.mapsize))
+    logging.info('---Mapsize: {}'.format(mapsize))
 
     # 3. Rearranging data and map indices
     #    Rearrange all the input data into a common framework (from 2D to 1D)
     logging.info('---Rearranging data and map indices')
-    Rearranging(settings.mapsize,GISData,rgnmapData)
+    Rearranging(mapsize, GISData, rgnmapData)
     endtime3 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime3 - endtime2))
 
@@ -101,26 +100,26 @@ def run_disaggregation(settings):
     #    withdrawals to grid scale
     # a.    Create a population proxy map
     logging.info('---Create a population map as proxy of non-agricultural water withdrawals')
-    ProxyMaps.PopulationMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings, OUT)
+    ProxyMaps.PopulationMap(mapsize, GISData, GCAMData, rgnmapData, OUT, NY)
     endtime4 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime4 - endtime3))
 
     # b.    Create a livestock proxy map and downscale livestock water withdrawal to grid scale
     logging.info('---Create an livestock map as proxy of livestock water withdrawal')
-    ProxyMaps.LivestockMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT)
+    ProxyMaps.LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT)
     endtime5 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime5 - endtime4))
 
     # c.    Create an irrigation proxy map and downscale irrigation water withdrawal to grid scale
-    if settings.UseDemeter: 
+    if UseDemeter:
         # Use Demeter outputs (irrigated cropland areas for each type of crops ) to replace the GMIA/HYSE data used in downscaling of irrigation water withdrawal
         # Additional gridded outputs: irrigation water withdrawal by 13 crop types
         logging.info('---Create an irrigation map as proxy of agricultural water withdrawal using Demeter outputs')
-        ProxyMaps.IrrigationMapCrops(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT, settings.subreg)
+        ProxyMaps.IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg)
     else:
         logging.info('---Create an irrigation map as proxy of agricultural water withdrawal ')
-        ProxyMaps.IrrigationMap(settings.mapsize, GISData, GCAMData, rgnmapData, settings.NY, OUT, settings.subreg)
-    
+        ProxyMaps.IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg)
+
     endtime6 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime6 - endtime5))
 
@@ -131,22 +130,52 @@ def run_disaggregation(settings):
     logging.info("------Time Cost: %s seconds ---" % (endtime7 - endtime6))
 
     # 6. diagnostics of Spatial Downscaling
-    if settings.PerformDiagnostics:
-        DiagnosticsSD.compare_downscaled_GCAMinput(settings, GCAMData, OUT)
-    if settings.UseDemeter:
-        DiagnosticsSD.compare_downscaled_GCAMinput_irr_by_crops(settings, GCAMData, OUT)
+    if PerformDiagnostics:
+        DiagnosticsSD.compare_downscaled_GCAMinput(PerformDiagnostics=PerformDiagnostics,
+                                                   NY=NY,
+                                                   years=years,
+                                                   OutputFolder=settings.OutputFolder,
+                                                   RegionNames=settings.RegionNames,
+                                                   GCAMData=GCAMData,
+                                                   OUT=OUT)
+    if UseDemeter:
+        DiagnosticsSD.compare_downscaled_GCAMinput_irr_by_crops(PerformDiagnostics=PerformDiagnostics,
+                                                                NY=NY,
+                                                                years=years,
+                                                                GCAMData=GCAMData,
+                                                                OUT=OUT)
 
     # 7. Temporal Downscaling
-    if settings.PerformTemporal:
+    if PerformTemporal:
         logging.info(
             '---Temporal downscaling for Domestic, Electricity, Irrigation, Livestock, Mining and Manufacturing')
         endtime6 = time.time()
-        TemporalDownscaling.GetDownscaledResults(settings, OUT, GISData['mapindex'], rgnmapData['rgnmapNONAG'], GISData['BasinIDs'])
+        TDYears = TemporalDownscaling.GetDownscaledResults(temporal_climate=settings.temporal_climate,
+                                                           Irr_MonthlyData=settings.Irr_MonthlyData,
+                                                           years=years,
+                                                           UseDemeter=UseDemeter,
+                                                           TemporalInterpolation=settings.TemporalInterpolation,
+                                                           Domestic_R=settings.Domestic_R,
+                                                           Elec_Building=settings.Elec_Building,
+                                                           Elec_Industry=settings.Elec_Industry,
+                                                           Elec_Building_heat=settings.Elec_Building_heat,
+                                                           Elec_Building_cool=settings.Elec_Building_cool,
+                                                           Elec_Building_others=settings.Elec_Building_others,
+                                                           coords=settings.coords,
+                                                           OUT=OUT,
+                                                           mapindex=GISData['mapindex'],
+                                                           regionID=rgnmapData['rgnmapNONAG'],
+                                                           basinID=GISData['BasinIDs'])
+        print(f'TDyears = {TDYears}')
         endtime7 = time.time()
         logging.info("------Time Cost: %s seconds ---" % (endtime7 - endtime6))
 
     # 8. diagnostics of Temporal Downscaling
-    if settings.PerformDiagnostics and settings.PerformTemporal:
-        DiagnosticsTD.compare_temporal_downscaled(settings, OUT, GISData)
+    if PerformDiagnostics and PerformTemporal:
+        DiagnosticsTD.compare_temporal_downscaled(PerformDiagnostics=PerformDiagnostics,
+                                                  TDYears=TDYears,
+                                                  OutputFolder=settings.OutputFolder,
+                                                  OUT=OUT,
+                                                  GISData=GISData)
 
     return OUT, GISData

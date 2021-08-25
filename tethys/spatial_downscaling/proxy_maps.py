@@ -55,7 +55,7 @@ def Rearranging(mapsize, GISData, rgnmapData):
     rgnmapData['map_rgn_ag']    = map_rgn_ag
 
     
-def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
+def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, OUT, NY):
     """
     :param withd_dom_map: waer withdrawal domestic map
     :type withd_dom_map: matrix
@@ -65,8 +65,6 @@ def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, settings, OUT):
     # Population density map is used to downscale Non-Agricultural Water withdrawal 
     """
 
-    NY = settings.NY
-    
     # non-agricultural (dom, elec, mfg, mining) total water withdrawals in (km3/yr) for each of the GCAM regions
     # population map for all years 1990, 2005:2100
     ms      = (mapsize[0]*mapsize[1],NY)
