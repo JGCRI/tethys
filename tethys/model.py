@@ -5,7 +5,6 @@ import logging
 import time
 
 from tethys.config_reader import ReadConfig
-from tethys.data_writer.outputs import write_outputs
 from tethys.run_disaggregation import run_disaggregation
 
 
@@ -44,7 +43,26 @@ class Tethys(ReadConfig):
                                                     subreg=self.subreg,
                                                     UseDemeter=self.UseDemeter,
                                                     PerformDiagnostics=self.PerformDiagnostics,
-                                                    PerformTemporal=self.PerformTemporal)
+                                                    PerformTemporal=self.PerformTemporal,
+                                                    RegionNames=self.RegionNames,
+                                                    gcam_basin_lu=self.gcam_basin_lu,
+                                                    buff_fract=self.buff_fract,
+                                                    goat_fract=self.goat_fract,
+                                                    GCAM_DBpath=self.GCAM_DBpath,
+                                                    GCAM_DBfile=self.GCAM_DBfile,
+                                                    GCAM_query=self.GCAM_query,
+                                                    OutputFolder=self.OutputFolder,
+                                                    temporal_climate=self.temporal_climate,
+                                                    Irr_MonthlyData=self.Irr_MonthlyData,
+                                                    TemporalInterpolation=self.TemporalInterpolation,
+                                                    Domestic_R=self.Domestic_R,
+                                                    Elec_Building=self.Elec_Building,
+                                                    Elec_Industry=self.Elec_Industry,
+                                                    Elec_Building_heat=self.Elec_Building_heat,
+                                                    Elec_Building_cool=self.Elec_Building_cool,
+                                                    Elec_Building_others=self.Elec_Building_others,
+                                                    coords=self.coords
+                                                    )
 
         print(gridded_data)
 
@@ -83,5 +101,3 @@ def run_model(config_file=None, **kwargs):
     model.execute()
 
     return model
-
-

@@ -444,7 +444,8 @@ def land_to_array(conn, query, subreg, d_reg_name, d_basin_name, d_crops, years)
     return piv.values
 
 
-def get_gcam_data(s):
+def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCAM_DBpath, GCAM_DBfile, GCAM_query,
+                  subreg):
     """
     Import and format GCAM data from database for use in Tethys.
 
@@ -452,25 +453,25 @@ def get_gcam_data(s):
     :return:                dictionary, {metric: numpy array, ...}
     """
     
-    if type(s.years) is str: # a single year string, multiple years will be list
-        s.years = [s.years]
+    if type(years) is str: # a single year string, multiple years will be list
+        years = [years]
 
-    years = [int(i) for i in s.years]
+    years = [int(i) for i in years]
 
     # get region info as dict
-    d_reg_name = get_region_info(s.RegionNames)
+    d_reg_name = get_region_info(RegionNames)
 
     # get basin info as dict
-    d_basin_name = get_basin_info(s.gcam_basin_lu)
+    d_basin_name = get_basin_info(gcam_basin_lu)
 
     # get buffalo fraction of region as dict
-    d_buf_frac = get_buffalo_frac(s.buff_fract)
+    d_buf_frac = get_buffalo_frac(buff_fract)
 
     # get goad fraction of region as dict
-    d_goat_frac = get_goat_frac(s.goat_fract)
+    d_goat_frac = get_goat_frac(goat_fract)
 
     # get GCAM database connection and queries objects
-    conn, queries = get_gcam_queries(s.GCAM_DBpath, s.GCAM_DBfile, s.GCAM_query)
+    conn, queries = get_gcam_queries(GCAM_DBpath, GCAM_DBfile, GCAM_query)
     
 #     for q in queries:
 #         df = conn.runQuery(q)
@@ -483,8 +484,8 @@ def get_gcam_data(s):
     d['rgn_wdmfg']    = manuf_water_demand_to_array(conn, queries[6], d_reg_name, years)
     d['rgn_wdmining'] = mining_water_demand_to_array(conn, queries[7], d_reg_name, years)
     d['wdliv']        = livestock_water_demand_to_array(conn, queries[5], d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years)
-    d['irrArea']      = land_to_array(conn, queries[0], s.subreg, d_reg_name, d_basin_name, d_crops, years)
-    d['irrV']         = irr_water_demand_to_array(conn, queries[2], s.subreg, d_reg_name, d_basin_name, d_crops, years)
+    d['irrArea']      = land_to_array(conn, queries[0], subreg, d_reg_name, d_basin_name, d_crops, years)
+    d['irrV']         = irr_water_demand_to_array(conn, queries[2], subreg, d_reg_name, d_basin_name, d_crops, years)
     
 #    for key, value in d.iteritems():
 #        np.savetxt(key + '.csv', d[key], delimiter=',')

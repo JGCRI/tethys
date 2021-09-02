@@ -22,7 +22,10 @@ import tethys.temporal_downscaling.temporal_downscaling as TemporalDownscaling
 
 
 def run_disaggregation(settings, years, InputRegionFile, mapsize, subreg, UseDemeter, PerformDiagnostics,
-                       PerformTemporal):
+                       PerformTemporal, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCAM_DBpath,
+                       GCAM_DBfile, GCAM_query, OutputFolder, temporal_climate, Irr_MonthlyData,
+                       TemporalInterpolation, Domestic_R, Elec_Building, Elec_Industry, Elec_Building_heat,
+                       Elec_Building_cool, Elec_Building_others, coords):
     """Main Function of Tethys Steps for water disaggregation
 
     :param settings:    Settings description
@@ -58,7 +61,15 @@ def run_disaggregation(settings, years, InputRegionFile, mapsize, subreg, UseDem
     starttime1 = time.time()  # Set-up timer
     logging.info('---Read in and format GCAM data---')
 
-    GCAMData = get_gcam_data(settings)
+    GCAMData = get_gcam_data(years=years,
+                             RegionNames=RegionNames,
+                             gcam_basin_lu=gcam_basin_lu,
+                             buff_fract=buff_fract,
+                             goat_fract=goat_fract,
+                             GCAM_DBpath=GCAM_DBpath,
+                             GCAM_DBfile=GCAM_DBfile,
+                             GCAM_query=GCAM_query,
+                             subreg=subreg)
     endtime1 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime1 - starttime1))
 
@@ -134,8 +145,8 @@ def run_disaggregation(settings, years, InputRegionFile, mapsize, subreg, UseDem
         DiagnosticsSD.compare_downscaled_GCAMinput(PerformDiagnostics=PerformDiagnostics,
                                                    NY=NY,
                                                    years=years,
-                                                   OutputFolder=settings.OutputFolder,
-                                                   RegionNames=settings.RegionNames,
+                                                   OutputFolder=OutputFolder,
+                                                   RegionNames= RegionNames,
                                                    GCAMData=GCAMData,
                                                    OUT=OUT)
     if UseDemeter:
@@ -150,18 +161,18 @@ def run_disaggregation(settings, years, InputRegionFile, mapsize, subreg, UseDem
         logging.info(
             '---Temporal downscaling for Domestic, Electricity, Irrigation, Livestock, Mining and Manufacturing')
         endtime6 = time.time()
-        TDYears = TemporalDownscaling.GetDownscaledResults(temporal_climate=settings.temporal_climate,
-                                                           Irr_MonthlyData=settings.Irr_MonthlyData,
+        TDYears = TemporalDownscaling.GetDownscaledResults(temporal_climate=temporal_climate,
+                                                           Irr_MonthlyData=Irr_MonthlyData,
                                                            years=years,
                                                            UseDemeter=UseDemeter,
-                                                           TemporalInterpolation=settings.TemporalInterpolation,
-                                                           Domestic_R=settings.Domestic_R,
-                                                           Elec_Building=settings.Elec_Building,
-                                                           Elec_Industry=settings.Elec_Industry,
-                                                           Elec_Building_heat=settings.Elec_Building_heat,
-                                                           Elec_Building_cool=settings.Elec_Building_cool,
-                                                           Elec_Building_others=settings.Elec_Building_others,
-                                                           coords=settings.coords,
+                                                           TemporalInterpolation=TemporalInterpolation,
+                                                           Domestic_R=Domestic_R,
+                                                           Elec_Building=Elec_Building,
+                                                           Elec_Industry=Elec_Industry,
+                                                           Elec_Building_heat=Elec_Building_heat,
+                                                           Elec_Building_cool=Elec_Building_cool,
+                                                           Elec_Building_others=Elec_Building_others,
+                                                           coords=coords,
                                                            OUT=OUT,
                                                            mapindex=GISData['mapindex'],
                                                            regionID=rgnmapData['rgnmapNONAG'],
@@ -174,7 +185,7 @@ def run_disaggregation(settings, years, InputRegionFile, mapsize, subreg, UseDem
     if PerformDiagnostics and PerformTemporal:
         DiagnosticsTD.compare_temporal_downscaled(PerformDiagnostics=PerformDiagnostics,
                                                   TDYears=TDYears,
-                                                  OutputFolder=settings.OutputFolder,
+                                                  OutputFolder=OutputFolder,
                                                   OUT=OUT,
                                                   GISData=GISData)
 
