@@ -61,7 +61,7 @@ class Tethys(ReadConfig):
                                                     Elec_Building_heat=self.Elec_Building_heat,
                                                     Elec_Building_cool=self.Elec_Building_cool,
                                                     Elec_Building_others=self.Elec_Building_others,
-                                                    coords=self.coords
+                                                    coords=self.Coord
                                                     )
 
         print(gridded_data)
