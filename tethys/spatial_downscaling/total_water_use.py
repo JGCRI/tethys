@@ -18,7 +18,7 @@ withd_nonAg_map, OUT.wdirr, OUT.wdliv have no nan
 
 import numpy as np
 
-def TotalWaterUse(Settings, GISData, rgnmapData, OUT):
+def TotalWaterUse(OutputUnit, GISData, rgnmapData, OUT):
     """"
     We use the grid-level representations of all the water withdrawal sources to aggregate them all into a total withdrawal. 
     When we go to re-aggregate them, we use the non-ag region map, since it will typically be the most detailed.
@@ -43,7 +43,7 @@ def TotalWaterUse(Settings, GISData, rgnmapData, OUT):
 
                 outrr[rgnmapData['map_rgn_nonag'][index]-1,y] += outwd[index,y]
     
-    if Settings.OutputUnit: # convert the original unit km3/yr to new unit mm
+    if OutputUnit: # convert the original unit km3/yr to new unit mm
         mapindex    = GISData['mapindex']
         area        = GISData['mapAreaExt'][mapindex]
         conversion  = 1e6 # km -> mm

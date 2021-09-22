@@ -18,18 +18,18 @@ from tethys.utils.data_parser import getContentArray as ArrayCSVReader
 from tethys.utils.data_parser import GetArrayCSV
 
 
-def getIrrYearData(settings):
+def getIrrYearData(Irrigation_GMIA, years, Irrigation_HYDE):
     
     """
     Update the irrigation maps to include a unique map for each historical time period
     """
     
     irr = {}
-    GMIA_irr = ArrayCSVReader(settings.Irrigation_GMIA,1)
-    HYDE_irr = ArrayCSVReader(settings.Irrigation_HYDE,1)
+    GMIA_irr = ArrayCSVReader(Irrigation_GMIA,1)
+    HYDE_irr = ArrayCSVReader(Irrigation_HYDE,1)
     H_years  = [1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000]
     G_years  = [2005]
-    years    = [int(x) for x in settings.years]
+    years    = [int(x) for x in years]
     years_new= years[:]
     
     for i in range(0, len(years)):
@@ -62,14 +62,14 @@ def getIrrYearData(settings):
 
     return irr
 
-def getIrrYearData_Crops(settings):
+def getIrrYearData_Crops(DemeterOutputFolder, years):
     
     """
     Update the irrigation maps to include a unique map for each historical time period from Demeter outputs by crop types
     """
     
     irr = {}
-    folder = settings.DemeterOutputFolder
+    folder = DemeterOutputFolder
     D_years = [] # is the range of years from Demeter outputs
     D_irr = {}
     
@@ -79,7 +79,7 @@ def getIrrYearData_Crops(settings):
             yearstr = re.sub("[^0-9]", "", filename)
             D_years.append(int(yearstr)) 
     
-    years     = [int(x) for x in settings.years] # is the range of years from GCAM
+    years     = [int(x) for x in years] # is the range of years from GCAM
     D_years = [number for number in D_years if number in years]
     D_years = sorted(D_years)
     years_new = years[:]
@@ -118,19 +118,19 @@ def getIrrYearData_Crops(settings):
     return irr
 
 
-def getPopYearData(settings):
+def getPopYearData(Population_GPW, Population_HYDE, years):
     """"
     Update the population maps to include a unique map for each historical time period
     """
 
     pop = {}
-    GPW_pop = ArrayCSVReader(settings.Population_GPW, 1)
-    HYDE_pop = ArrayCSVReader(settings.Population_HYDE, 1)
+    GPW_pop = ArrayCSVReader(Population_GPW, 1)
+    HYDE_pop = ArrayCSVReader(Population_HYDE, 1)
 
     H_years = [1750, 1760, 1770, 1780, 1790, 1800, 1810, 1820, 1830, 1840, 1850, 1860, 1870, 1880, 1890, 1900, 1910,
                1920, 1930, 1940, 1950, 1960, 1970, 1980]
     G_years = [1990, 1995, 2000, 2005, 2010, 2015]
-    years = [int(x) for x in settings.years]
+    years = [int(x) for x in years]
     years_new = years[:]
 
     for i in range(0, len(years)):

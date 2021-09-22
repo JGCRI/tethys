@@ -40,6 +40,11 @@ class ReadConfig(Logger):
         # update any default dictionary values with items specified as arguments by the user
         self.project_config.update(self.params)
 
+        # Initialize variables that are used conidtionally for Demeter
+        self.DemeterOutputFolder = 'None'
+        self.Irrigation_GMIA = 'None'
+        self.Irrigation_HYDE = 'None'
+
         self.ProjectName = self.project_config.get('ProjectName')
         self.InputFolder = self.project_config.get('InputFolder')
         self.OutputFolder = os.path.join(self.project_config.get('OutputFolder'), self.ProjectName)

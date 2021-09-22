@@ -21,15 +21,18 @@ import tethys.diagnostics.temporal_diagnostics as DiagnosticsTD
 import tethys.temporal_downscaling.temporal_downscaling as TemporalDownscaling
 
 
-def run_disaggregation(settings, years, InputRegionFile, mapsize, subreg, UseDemeter, PerformDiagnostics,
+def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, PerformDiagnostics,
                        PerformTemporal, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCAM_DBpath,
                        GCAM_DBfile, GCAM_query, OutputFolder, temporal_climate, Irr_MonthlyData,
                        TemporalInterpolation, Domestic_R, Elec_Building, Elec_Industry, Elec_Building_heat,
-                       Elec_Building_cool, Elec_Building_others, coords):
+                       Elec_Building_cool, Elec_Building_others, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat,
+                       Livestock_Sheep, Livestock_Poultry, Livestock_Pig, Coord, Area, InputBasinFile, BasinNames,
+                       InputCountryFile, CountryNames,Irrigation_GMIA, Irrigation_HYDE, DemeterOutputFolder,
+                       Population_GPW, Population_HYDE, OutputUnit):
     """Main Function of Tethys Steps for water disaggregation
 
-    :param settings:    Settings description
-    :type settings:     settings type here
+    :param x:    x description
+    :type x:     x type here
 
     Main Function of Tethys Steps for water disaggregation
     1. Read in the GCAM Data and Get the number of years
@@ -42,9 +45,6 @@ def run_disaggregation(settings, years, InputRegionFile, mapsize, subreg, UseDem
     6. diagnostics of Spatial Downscaling
     7. Temporal Downscaling (annually -> monthly)
     8. diagnostics of Temporal Downscaling
-
-    # Input:
-    - settings    class data_reader.ConfigSettings, required input and control parameters
 
     # Output:
     - OUT         class data_writer.OUTWritter, data for output, gridded results for each withdrawal category
@@ -94,7 +94,26 @@ def run_disaggregation(settings, years, InputRegionFile, mapsize, subreg, UseDem
 
     logging.info(
         '---Read in the GIS data (asc/txt/csv format) and the region map data (csv format)---')
-    GISData = gis_reader.getGISData(settings)
+    GISData = gis_reader.getGISData(UseDemeter=UseDemeter,
+                                    Livestock_Buffalo=Livestock_Buffalo,
+                                    Livestock_Cattle=Livestock_Cattle,
+                                    Livestock_Goat=Livestock_Goat,
+                                    Livestock_Sheep=Livestock_Sheep,
+                                    Livestock_Poultry=Livestock_Poultry,
+                                    Livestock_Pig=Livestock_Pig,
+                                    Coord=Coord,
+                                    Area=Area,
+                                    InputBasinFile=InputBasinFile,
+                                    BasinNames=BasinNames,
+                                    InputCountryFile=InputCountryFile,
+                                    CountryNames=CountryNames,
+                                    Population_GPW=Population_GPW,
+                                    Population_HYDE=Population_HYDE,
+                                    years=years,
+                                    Irrigation_GMIA=Irrigation_GMIA,
+                                    Irrigation_HYDE=Irrigation_HYDE,
+                                    DemeterOutputFolder=DemeterOutputFolder
+                                    )
     rgnmapData = gis_reader.getRegionMapData(InputRegionFile)
     endtime2 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime2 - endtime1))
@@ -136,7 +155,10 @@ def run_disaggregation(settings, years, InputRegionFile, mapsize, subreg, UseDem
 
     # 5. Total Water Withdrawal
     logging.info('---Aggregate to compute total water withdrawal at grid scale')
-    TotalWaterUse.TotalWaterUse(settings, GISData, rgnmapData, OUT)
+    TotalWaterUse.TotalWaterUse(OutputUnit=OutputUnit,
+                                GISData=GISData,
+                                rgnmapData=rgnmapData,
+                                OUT=OUT)
     endtime7 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime7 - endtime6))
 
@@ -172,7 +194,7 @@ def run_disaggregation(settings, years, InputRegionFile, mapsize, subreg, UseDem
                                                            Elec_Building_heat=Elec_Building_heat,
                                                            Elec_Building_cool=Elec_Building_cool,
                                                            Elec_Building_others=Elec_Building_others,
-                                                           coords=coords,
+                                                           coords=GISData['coord'][:,:],
                                                            OUT=OUT,
                                                            mapindex=GISData['mapindex'],
                                                            regionID=rgnmapData['rgnmapNONAG'],

@@ -36,8 +36,7 @@ class Tethys(ReadConfig):
         t0 = time.time()
         logging.info('Start Disaggregation...')
 
-        gridded_data, gis_data = run_disaggregation(settings=self,
-                                                    years=self.years,
+        gridded_data, gis_data = run_disaggregation(years=self.years,
                                                     InputRegionFile=self.InputRegionFile,
                                                     mapsize=self.mapsize,
                                                     subreg=self.subreg,
@@ -61,7 +60,24 @@ class Tethys(ReadConfig):
                                                     Elec_Building_heat=self.Elec_Building_heat,
                                                     Elec_Building_cool=self.Elec_Building_cool,
                                                     Elec_Building_others=self.Elec_Building_others,
-                                                    coords=self.Coord
+                                                    Livestock_Buffalo=self.Livestock_Buffalo,
+                                                    Livestock_Cattle=self.Livestock_Cattle,
+                                                    Livestock_Goat=self.Livestock_Goat,
+                                                    Livestock_Sheep=self.Livestock_Sheep,
+                                                    Livestock_Poultry=self.Livestock_Poultry,
+                                                    Livestock_Pig=self.Livestock_Pig,
+                                                    Coord=self.Coord,
+                                                    Area=self.Area,
+                                                    InputBasinFile=self.InputBasinFile,
+                                                    BasinNames=self.BasinNames,
+                                                    InputCountryFile=self.InputCountryFile,
+                                                    CountryNames=self.CountryNames,
+                                                    Population_GPW=self.Population_GPW,
+                                                    Population_HYDE=self.Population_HYDE,
+                                                    Irrigation_GMIA=self.Irrigation_GMIA,
+                                                    Irrigation_HYDE=self.Irrigation_HYDE,
+                                                    DemeterOutputFolder=self.DemeterOutputFolder,
+                                                    OutputUnit=self.OutputUnit
                                                     )
 
         print(gridded_data)
