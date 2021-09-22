@@ -190,15 +190,18 @@
 <span class="kn">import</span> <span class="nn">tethys.temporal_downscaling.temporal_downscaling</span> <span class="k">as</span> <span class="nn">TemporalDownscaling</span>
 
 
-<div class="viewcode-block" id="run_disaggregation"><a class="viewcode-back" href="../../tethys.html#tethys.run_disaggregation.run_disaggregation">[docs]</a><span class="k">def</span> <span class="nf">run_disaggregation</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">years</span><span class="p">,</span> <span class="n">InputRegionFile</span><span class="p">,</span> <span class="n">mapsize</span><span class="p">,</span> <span class="n">subreg</span><span class="p">,</span> <span class="n">UseDemeter</span><span class="p">,</span> <span class="n">PerformDiagnostics</span><span class="p">,</span>
+<div class="viewcode-block" id="run_disaggregation"><a class="viewcode-back" href="../../tethys.html#tethys.run_disaggregation.run_disaggregation">[docs]</a><span class="k">def</span> <span class="nf">run_disaggregation</span><span class="p">(</span><span class="n">years</span><span class="p">,</span> <span class="n">InputRegionFile</span><span class="p">,</span> <span class="n">mapsize</span><span class="p">,</span> <span class="n">subreg</span><span class="p">,</span> <span class="n">UseDemeter</span><span class="p">,</span> <span class="n">PerformDiagnostics</span><span class="p">,</span>
                        <span class="n">PerformTemporal</span><span class="p">,</span> <span class="n">RegionNames</span><span class="p">,</span> <span class="n">gcam_basin_lu</span><span class="p">,</span> <span class="n">buff_fract</span><span class="p">,</span> <span class="n">goat_fract</span><span class="p">,</span> <span class="n">GCAM_DBpath</span><span class="p">,</span>
                        <span class="n">GCAM_DBfile</span><span class="p">,</span> <span class="n">GCAM_query</span><span class="p">,</span> <span class="n">OutputFolder</span><span class="p">,</span> <span class="n">temporal_climate</span><span class="p">,</span> <span class="n">Irr_MonthlyData</span><span class="p">,</span>
                        <span class="n">TemporalInterpolation</span><span class="p">,</span> <span class="n">Domestic_R</span><span class="p">,</span> <span class="n">Elec_Building</span><span class="p">,</span> <span class="n">Elec_Industry</span><span class="p">,</span> <span class="n">Elec_Building_heat</span><span class="p">,</span>
-                       <span class="n">Elec_Building_cool</span><span class="p">,</span> <span class="n">Elec_Building_others</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
+                       <span class="n">Elec_Building_cool</span><span class="p">,</span> <span class="n">Elec_Building_others</span><span class="p">,</span> <span class="n">Livestock_Buffalo</span><span class="p">,</span> <span class="n">Livestock_Cattle</span><span class="p">,</span> <span class="n">Livestock_Goat</span><span class="p">,</span>
+                       <span class="n">Livestock_Sheep</span><span class="p">,</span> <span class="n">Livestock_Poultry</span><span class="p">,</span> <span class="n">Livestock_Pig</span><span class="p">,</span> <span class="n">Coord</span><span class="p">,</span> <span class="n">Area</span><span class="p">,</span> <span class="n">InputBasinFile</span><span class="p">,</span> <span class="n">BasinNames</span><span class="p">,</span>
+                       <span class="n">InputCountryFile</span><span class="p">,</span> <span class="n">CountryNames</span><span class="p">,</span><span class="n">Irrigation_GMIA</span><span class="p">,</span> <span class="n">Irrigation_HYDE</span><span class="p">,</span> <span class="n">DemeterOutputFolder</span><span class="p">,</span>
+                       <span class="n">Population_GPW</span><span class="p">,</span> <span class="n">Population_HYDE</span><span class="p">,</span> <span class="n">OutputUnit</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Main Function of Tethys Steps for water disaggregation</span>
 
-<span class="sd">    :param settings:    Settings description</span>
-<span class="sd">    :type settings:     settings type here</span>
+<span class="sd">    :param x:    x description</span>
+<span class="sd">    :type x:     x type here</span>
 
 <span class="sd">    Main Function of Tethys Steps for water disaggregation</span>
 <span class="sd">    1. Read in the GCAM Data and Get the number of years</span>
@@ -211,9 +214,6 @@
 <span class="sd">    6. diagnostics of Spatial Downscaling</span>
 <span class="sd">    7. Temporal Downscaling (annually -&gt; monthly)</span>
 <span class="sd">    8. diagnostics of Temporal Downscaling</span>
-
-<span class="sd">    # Input:</span>
-<span class="sd">    - settings    class data_reader.ConfigSettings, required input and control parameters</span>
 
 <span class="sd">    # Output:</span>
 <span class="sd">    - OUT         class data_writer.OUTWritter, data for output, gridded results for each withdrawal category</span>
@@ -263,7 +263,26 @@
 
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
         <span class="s1">&#39;---Read in the GIS data (asc/txt/csv format) and the region map data (csv format)---&#39;</span><span class="p">)</span>
-    <span class="n">GISData</span> <span class="o">=</span> <span class="n">gis_reader</span><span class="o">.</span><span class="n">getGISData</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+    <span class="n">GISData</span> <span class="o">=</span> <span class="n">gis_reader</span><span class="o">.</span><span class="n">getGISData</span><span class="p">(</span><span class="n">UseDemeter</span><span class="o">=</span><span class="n">UseDemeter</span><span class="p">,</span>
+                                    <span class="n">Livestock_Buffalo</span><span class="o">=</span><span class="n">Livestock_Buffalo</span><span class="p">,</span>
+                                    <span class="n">Livestock_Cattle</span><span class="o">=</span><span class="n">Livestock_Cattle</span><span class="p">,</span>
+                                    <span class="n">Livestock_Goat</span><span class="o">=</span><span class="n">Livestock_Goat</span><span class="p">,</span>
+                                    <span class="n">Livestock_Sheep</span><span class="o">=</span><span class="n">Livestock_Sheep</span><span class="p">,</span>
+                                    <span class="n">Livestock_Poultry</span><span class="o">=</span><span class="n">Livestock_Poultry</span><span class="p">,</span>
+                                    <span class="n">Livestock_Pig</span><span class="o">=</span><span class="n">Livestock_Pig</span><span class="p">,</span>
+                                    <span class="n">Coord</span><span class="o">=</span><span class="n">Coord</span><span class="p">,</span>
+                                    <span class="n">Area</span><span class="o">=</span><span class="n">Area</span><span class="p">,</span>
+                                    <span class="n">InputBasinFile</span><span class="o">=</span><span class="n">InputBasinFile</span><span class="p">,</span>
+                                    <span class="n">BasinNames</span><span class="o">=</span><span class="n">BasinNames</span><span class="p">,</span>
+                                    <span class="n">InputCountryFile</span><span class="o">=</span><span class="n">InputCountryFile</span><span class="p">,</span>
+                                    <span class="n">CountryNames</span><span class="o">=</span><span class="n">CountryNames</span><span class="p">,</span>
+                                    <span class="n">Population_GPW</span><span class="o">=</span><span class="n">Population_GPW</span><span class="p">,</span>
+                                    <span class="n">Population_HYDE</span><span class="o">=</span><span class="n">Population_HYDE</span><span class="p">,</span>
+                                    <span class="n">years</span><span class="o">=</span><span class="n">years</span><span class="p">,</span>
+                                    <span class="n">Irrigation_GMIA</span><span class="o">=</span><span class="n">Irrigation_GMIA</span><span class="p">,</span>
+                                    <span class="n">Irrigation_HYDE</span><span class="o">=</span><span class="n">Irrigation_HYDE</span><span class="p">,</span>
+                                    <span class="n">DemeterOutputFolder</span><span class="o">=</span><span class="n">DemeterOutputFolder</span>
+                                    <span class="p">)</span>
     <span class="n">rgnmapData</span> <span class="o">=</span> <span class="n">gis_reader</span><span class="o">.</span><span class="n">getRegionMapData</span><span class="p">(</span><span class="n">InputRegionFile</span><span class="p">)</span>
     <span class="n">endtime2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------Time Cost: </span><span class="si">%s</span><span class="s2"> seconds ---&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endtime2</span> <span class="o">-</span> <span class="n">endtime1</span><span class="p">))</span>
@@ -305,7 +324,10 @@
 
     <span class="c1"># 5. Total Water Withdrawal</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;---Aggregate to compute total water withdrawal at grid scale&#39;</span><span class="p">)</span>
-    <span class="n">TotalWaterUse</span><span class="o">.</span><span class="n">TotalWaterUse</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">GISData</span><span class="p">,</span> <span class="n">rgnmapData</span><span class="p">,</span> <span class="n">OUT</span><span class="p">)</span>
+    <span class="n">TotalWaterUse</span><span class="o">.</span><span class="n">TotalWaterUse</span><span class="p">(</span><span class="n">OutputUnit</span><span class="o">=</span><span class="n">OutputUnit</span><span class="p">,</span>
+                                <span class="n">GISData</span><span class="o">=</span><span class="n">GISData</span><span class="p">,</span>
+                                <span class="n">rgnmapData</span><span class="o">=</span><span class="n">rgnmapData</span><span class="p">,</span>
+                                <span class="n">OUT</span><span class="o">=</span><span class="n">OUT</span><span class="p">)</span>
     <span class="n">endtime7</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------Time Cost: </span><span class="si">%s</span><span class="s2"> seconds ---&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endtime7</span> <span class="o">-</span> <span class="n">endtime6</span><span class="p">))</span>
 
@@ -341,7 +363,7 @@
                                                            <span class="n">Elec_Building_heat</span><span class="o">=</span><span class="n">Elec_Building_heat</span><span class="p">,</span>
                                                            <span class="n">Elec_Building_cool</span><span class="o">=</span><span class="n">Elec_Building_cool</span><span class="p">,</span>
                                                            <span class="n">Elec_Building_others</span><span class="o">=</span><span class="n">Elec_Building_others</span><span class="p">,</span>
-                                                           <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
+                                                           <span class="n">coords</span><span class="o">=</span><span class="n">GISData</span><span class="p">[</span><span class="s1">&#39;coord&#39;</span><span class="p">][:,:],</span>
                                                            <span class="n">OUT</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
                                                            <span class="n">mapindex</span><span class="o">=</span><span class="n">GISData</span><span class="p">[</span><span class="s1">&#39;mapindex&#39;</span><span class="p">],</span>
                                                            <span class="n">regionID</span><span class="o">=</span><span class="n">rgnmapData</span><span class="p">[</span><span class="s1">&#39;rgnmapNONAG&#39;</span><span class="p">],</span>
