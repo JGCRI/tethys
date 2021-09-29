@@ -40,11 +40,6 @@ class ReadConfig(Logger):
         # update any default dictionary values with items specified as arguments by the user
         self.project_config.update(self.params)
 
-        # Initialize variables that are used conidtionally for Demeter
-        self.DemeterOutputFolder = 'None'
-        self.Irrigation_GMIA = 'None'
-        self.Irrigation_HYDE = 'None'
-
         self.ProjectName = self.project_config.get('ProjectName')
         self.InputFolder = self.project_config.get('InputFolder')
         self.OutputFolder = os.path.join(self.project_config.get('OutputFolder'), self.ProjectName)
@@ -92,8 +87,8 @@ class ReadConfig(Logger):
         self.Population_HYDE = os.path.join(self.InputFolder, self.map_params.get('Population_HYDE'))
 
         if not self.UseDemeter:
-            self.Irrigation_GMIA = os.path.join(self.InputFolder, self.map_params.get('Irrigation_GMIA'))
-            self.Irrigation_HYDE = os.path.join(self.InputFolder, self.map_params.get('Irrigation_HYDE'))
+            self.Irrigation_GMIA = os.path.join(self.InputFolder, self.map_params.get('Irrigation_GMIA', 'None'))
+            self.Irrigation_HYDE = os.path.join(self.InputFolder, self.map_params.get('Irrigation_HYDE', 'None'))
 
         self.Livestock_Buffalo = os.path.join(self.InputFolder, self.map_params.get('Livestock_Buffalo'))
         self.Livestock_Cattle = os.path.join(self.InputFolder, self.map_params.get('Livestock_Cattle'))
@@ -122,7 +117,7 @@ class ReadConfig(Logger):
             self.TemporalInterpolation = int(self.temporal_params.get('TemporalInterpolation'))
 
         if self.UseDemeter:
-            self.DemeterOutputFolder = self.project_config.get('DemeterOutputFolder')
+            self.DemeterOutputFolder = self.project_config.get('DemeterOutputFolder', 'None')
             D_years = []
             for filename in os.listdir(self.DemeterOutputFolder):  # Folder contains Demeter outputs
                 if filename.endswith('.csv'):
