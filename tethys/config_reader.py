@@ -37,11 +37,18 @@ class ReadConfig(Logger):
         # project level
         self.project_config = self.config.get('Project')
 
+        # GCAM access settings
+        self.gcam_config = self.config.get('GCAM')
+
+        # reference data
+        self.map_params = self.config.get('GriddedMap')
+
         # update any default dictionary values with items specified as arguments by the user
         self.project_config.update(self.params)
 
-        self.ProjectName = self.project_config.get('ProjectName')
-        self.InputFolder = self.project_config.get('InputFolder')
+        self.ProjectName = self.validate_string(self.project_config.get('ProjectName'))
+
+        self.InputFolder = self.validate_directory(self.project_config.get('InputFolder'), 'InputFolder')
         self.OutputFolder = os.path.join(self.project_config.get('OutputFolder'), self.ProjectName)
         self.rgnmapdir = self.project_config.get('rgnmapdir')
         self.OutputFormat = int(self.project_config.get('OutputFormat', 0))
@@ -49,13 +56,11 @@ class ReadConfig(Logger):
         self.PerformDiagnostics = int(self.project_config.get('PerformDiagnostics', 0))
         self.PerformTemporal = int(self.project_config.get('PerformTemporal', 0))
         self.UseDemeter = int(self.project_config.get('UseDemeter', 0))
+        self.DemeterOutputFolder = self.project_config.get('DemeterOutputFolder', 'None')
         self.SpatialResolution = float(self.project_config.get('SpatialResolution', 0.5))
 
         # assumes geographic coordinates
         self.mapsize = [int(180 / self.SpatialResolution), int(360 / self.SpatialResolution)]
-
-        # GCAM access settings
-        self.gcam_config = self.config.get('GCAM')
 
         self.GCAM_DBpath = os.path.join(self.InputFolder, self.gcam_config.get('GCAM_DBpath', None))
         self.GCAM_DBfile = self.gcam_config.get('GCAM_DBfile', None)
@@ -67,9 +72,6 @@ class ReadConfig(Logger):
 
         if not isinstance(self.years, list):
             self.years = [self.years]
-
-        # reference data
-        self.map_params = self.config.get('GriddedMap')
 
         # update any default dictionary values with items specified as arguments by the user
         self.map_params.update(self.params)
@@ -86,9 +88,8 @@ class ReadConfig(Logger):
         self.Population_GPW = os.path.join(self.InputFolder, self.map_params.get('Population_GPW'))
         self.Population_HYDE = os.path.join(self.InputFolder, self.map_params.get('Population_HYDE'))
 
-        if not self.UseDemeter:
-            self.Irrigation_GMIA = os.path.join(self.InputFolder, self.map_params.get('Irrigation_GMIA', 'None'))
-            self.Irrigation_HYDE = os.path.join(self.InputFolder, self.map_params.get('Irrigation_HYDE', 'None'))
+        self.Irrigation_GMIA = os.path.join(self.InputFolder, self.map_params.get('Irrigation_GMIA', 'None'))
+        self.Irrigation_HYDE = os.path.join(self.InputFolder, self.map_params.get('Irrigation_HYDE', 'None'))
 
         self.Livestock_Buffalo = os.path.join(self.InputFolder, self.map_params.get('Livestock_Buffalo'))
         self.Livestock_Cattle = os.path.join(self.InputFolder, self.map_params.get('Livestock_Cattle'))
@@ -117,7 +118,6 @@ class ReadConfig(Logger):
             self.TemporalInterpolation = int(self.temporal_params.get('TemporalInterpolation'))
 
         if self.UseDemeter:
-            self.DemeterOutputFolder = self.project_config.get('DemeterOutputFolder', 'None')
             D_years = []
             for filename in os.listdir(self.DemeterOutputFolder):  # Folder contains Demeter outputs
                 if filename.endswith('.csv'):
@@ -134,3 +134,26 @@ class ReadConfig(Logger):
             startindex = years.index(D_years[0])
             self.years = years[startindex:]
 
+    @staticmethod
+    def validate_string(string):
+        """Ensure that a string is all lower case and spaces are underscore separated.
+
+        :param string:                      any string value
+        :type string:                       str
+
+        :return:                            lower case underscore separated string
+
+        """
+
+        return '_'.join(string.strip().lower().split(' '))
+
+    @staticmethod
+    def validate_directory(directory, param_name):
+        """Ensure directory exists."""
+
+        if os.path.isdir(directory):
+            return directory
+
+        else:
+            msg = f"Directory {directory} not found for {param_name}"
+            raise NotADirectoryError(msg)
