@@ -3,10 +3,11 @@
 
 import logging
 import time
+import os
 
 from tethys.config_reader import ReadConfig
 from tethys.run_disaggregation import run_disaggregation
-
+from tethys.data_writer.outputs import write_outputs
 
 class Tethys(ReadConfig):
     """Model wrapper for Tethys.
@@ -36,7 +37,14 @@ class Tethys(ReadConfig):
         t0 = time.time()
         logging.info('Start Disaggregation...')
 
-        gridded_data, gis_data = run_disaggregation(years=self.years,
+        # Create OutputFolder if doesn't exist
+        # Check whether the specified path exists or not
+        if not os.path.exists(self.OutputFolder):
+            # Create a new directory because it does not exist
+            os.makedirs(self.OutputFolder)
+            print(f"Output folder created: {self.OutputFolder}")
+
+        TDYears, gridded_data, gis_data = run_disaggregation(years=self.years,
                                                     InputRegionFile=self.InputRegionFile,
                                                     mapsize=self.mapsize,
                                                     subreg=self.subreg,
@@ -84,10 +92,17 @@ class Tethys(ReadConfig):
 
         logging.info(f"Disaggregation completed in : {(time.time() - t0)} seconds")
 
-        # t0 = time.time()
-        # logging.info('Writing outputs...')
-        # write_outputs(self, self.gridded_data, self.gis_data)
-        # logging.info(f"Outputs writen in: {(time.time() - t0)}")
+        t0 = time.time()
+        logging.info('Writing outputs...')
+        write_outputs(OutputUnit=self.OutputUnit,
+                      OutputFormat=self.OutputFormat,
+                      OutputFolder=self.OutputFolder,
+                      PerformTemporal=self.PerformTemporal,
+                      TDYears=TDYears,
+                      years=self.years,
+                      OUT=gridded_data,
+                      GISData=gis_data)
+        logging.info(f"Outputs writen in: {(time.time() - t0)}")
 
         logging.info(f'Tethys model run completed in {round(time.time() - self.start_time, 7)}')
 

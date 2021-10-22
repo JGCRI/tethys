@@ -203,6 +203,9 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
         endtime7 = time.time()
         logging.info("------Time Cost: %s seconds ---" % (endtime7 - endtime6))
 
+    else:
+        TDYears = 'None'
+
     # 8. diagnostics of Temporal Downscaling
     if PerformDiagnostics and PerformTemporal:
         DiagnosticsTD.compare_temporal_downscaled(PerformDiagnostics=PerformDiagnostics,
@@ -211,4 +214,4 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
                                                   OUT=OUT,
                                                   GISData=GISData)
 
-    return OUT, GISData
+    return TDYears, OUT, GISData

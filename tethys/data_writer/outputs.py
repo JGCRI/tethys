@@ -43,24 +43,24 @@ class OUTSettings:
         self.rliv     = None
 
 
-def write_outputs(Settings, OUT, GISData):
+def write_outputs(OutputUnit, OutputFormat, OutputFolder, PerformTemporal, TDYears, years, OUT, GISData):
     
     # Names of the 13 crop types
     d_crops = ['biomass', 'Corn', 'FiberCrop', 'FodderGrass', 'FodderHerb', 'MiscCrop', 'OilCrop', 'OtherGrain',
                'PalmFruit', 'Rice', 'Root_Tuber', 'SugarCrop', 'Wheat']
-    
-    if Settings.OutputUnit:
+
+    if OutputUnit:
         temp = 'mm'
     else:
         temp = 'km3'
 
     # CSV
-    if Settings.OutputFormat == 1:
+    if OutputFormat == 1:
         msg = f'Save the gridded water usage results for each withdrawal category in CSV format (Unit: {temp}/yr)'
         logging.info(msg)
 
     # NetCDF
-    elif Settings.OutputFormat == 2:
+    elif OutputFormat == 2:
         msg = f'Save the gridded water usage results for each withdrawal category in NetCDF format (Unit: {temp}/yr)'
         logging.info(msg)
 
@@ -69,11 +69,11 @@ def write_outputs(Settings, OUT, GISData):
         msg = f'Save the gridded water usage results for each withdrawal category in CSV and NetCDF format (Unit: {temp}/yr)'
         logging.info(msg)
     
-    if Settings.PerformTemporal:
-        TDMonthStr = np.chararray((len(Settings.TDYears)*12,), itemsize=6)
+    if PerformTemporal:
+        TDMonthStr = np.chararray((len(TDYears)*12,), itemsize=6)
 
-        for y in Settings.TDYears:
-            N = Settings.TDYears.index(y)
+        for y in TDYears:
+            N = TDYears.index(y)
             TDMonthStr[N*12:(N+1)*12] = [str(y) + str(i).zfill(2) for i in range(1,13)]
 
         logging.info(f'Save the monthly water usage results for each withdrawal category (Unit: {temp}/month)')
@@ -82,7 +82,7 @@ def write_outputs(Settings, OUT, GISData):
         value = OUT.__dict__[attr]
 
         if value is not None:
-            OutputFilename = os.path.join(Settings.OutputFolder, attr)
+            OutputFilename = os.path.join(OutputFolder, attr)
 
             if attr[0] == "r": # regional output
                 newvalue   = value[:, :]
@@ -93,20 +93,20 @@ def write_outputs(Settings, OUT, GISData):
                 # Only output 67420 cells (with coordinates)
                 newvalue   = value[GISData['mapindex'],:]
                 
-                if Settings.OutputFormat == 1:          
-                    writecsv(OutputFilename, newvalue, Settings, temp, GISData)
-                elif Settings.OutputFormat == 2:
-                    writeNETCDF(OutputFilename + '.nc', newvalue, GISData, temp, Settings.years)
+                if OutputFormat == 1:          
+                    writecsv(OutputFilename, newvalue, years, temp, GISData)
+                elif OutputFormat == 2:
+                    writeNETCDF(OutputFilename + '.nc', newvalue, GISData, temp, years)
                 else:
-                    writecsv(OutputFilename, newvalue, Settings, temp, GISData)
-                    writeNETCDF(OutputFilename + '.nc', newvalue, GISData, temp, Settings.years)
+                    writecsv(OutputFilename, newvalue, years, temp, GISData)
+                    writeNETCDF(OutputFilename + '.nc', newvalue, GISData, temp, years)
 
             #  gridded output from temporal downscaling
             elif attr[0] == "t":
-                if Settings.OutputFormat == 1:
+                if OutputFormat == 1:
                     writecsvMonthly(OutputFilename, value, TDMonthStr, temp, GISData)
 
-                elif Settings.OutputFormat == 2:
+                elif OutputFormat == 2:
                     writeNETCDFmonthly(OutputFilename + '.nc', value, GISData, temp, TDMonthStr)
 
                 else:
@@ -117,9 +117,9 @@ def write_outputs(Settings, OUT, GISData):
             elif attr[:7] == 'crops_t':
                 for i in range(value.shape[1]):
                     newvalue   = value[:,i,:]
-                    if Settings.OutputFormat == 1:          
+                    if OutputFormat == 1:          
                         writecsvMonthly(OutputFilename + '_' + d_crops[i], newvalue, TDMonthStr, temp, GISData)
-                    elif Settings.OutputFormat == 2:
+                    elif OutputFormat == 2:
                         writeNETCDFmonthly(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, TDMonthStr)
                     else:
                         writecsvMonthly(OutputFilename + '_' + d_crops[i], newvalue, TDMonthStr, temp, GISData)
@@ -129,19 +129,19 @@ def write_outputs(Settings, OUT, GISData):
             elif attr[:7] == 'crops_w':
                 for i in range(value.shape[1]):
                     newvalue   = value[GISData['mapindex'],i,:]
-                    if Settings.OutputFormat == 1:          
-                        writecsv(OutputFilename + '_' + d_crops[i], newvalue, Settings, temp, GISData)
-                    elif Settings.OutputFormat == 2:
-                        writeNETCDF(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, Settings.years)
+                    if OutputFormat == 1:          
+                        writecsv(OutputFilename + '_' + d_crops[i], newvalue, years, temp, GISData)
+                    elif OutputFormat == 2:
+                        writeNETCDF(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, years)
                     else:
-                        writecsv(OutputFilename + '_' + d_crops[i], newvalue, Settings, temp, GISData)
-                        writeNETCDF(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, Settings.years)
+                        writecsv(OutputFilename + '_' + d_crops[i], newvalue, years, temp, GISData)
+                        writeNETCDF(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, years)
 
 
-def writecsv(filename, data, Settings, unit, GISData):
+def writecsv(filename, data, years, unit, GISData):
 
-    if Settings.years:
-        headerline = "Grid_ID,lon,lat,ilon,ilat," + ",".join([str(year) for year in Settings.years])
+    if years:
+        headerline = "Grid_ID,lon,lat,ilon,ilat," + ",".join([str(year) for year in years])
     else:
         headerline = "Grid_ID,lon,lat,ilon,ilat," + ",".join(["Year Index " + str(y+1) for y in range(0, data.shape[1])])
 
