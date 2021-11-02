@@ -101,6 +101,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#about">About</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-package-data">Installing Package Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run">Run</a></li>
 </ul>
 </li>
@@ -180,23 +181,44 @@
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="about">
 <h2>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h2>
-<p>Short description.</p>
+<p>Tethys is a water withdrawal downscaling package constructed at the Joint Global Change Research Institute of the Pacific Northwest National Laboratory (<a class="reference external" href="http://www.globalchange.umd.edu">http://www.globalchange.umd.edu</a>). It serves to link various hydrological models to the Global Change Analysis Model (GCAM) by disaggregating the geopolitical region and water basin data from GCAM into finer spatial and temporal resolutions.</p>
 </div>
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>Python Version (Maybe download link)
-Java</p>
+<ul class="simple">
+<li><p>Python (3.7-3.9 should work) <a class="reference external" href="https://www.python.org/downloads/">https://www.python.org/downloads/</a></p></li>
+<li><p>Java <a class="reference external" href="https://www.java.com/en/download/">https://www.java.com/en/download/</a></p></li>
+</ul>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>Open python
-Code to install</p>
+<p>Currently, tethys can be cloned from <a class="reference external" href="https://github.com/JGCRI/tethys">https://github.com/JGCRI/tethys</a> using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/JGCRI/tethys
+</pre></div>
+</div>
+<p>Once downloaded, install as a Python package by running “setup.py” from the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py install
+</pre></div>
+</div>
+<p>This will also install the dependencies listed in “requirements.txt”. In order to avoid package version conflicts, consider creating a virtual environment for tethys.</p>
+<p>In the future, easy installation will be available via pip.</p>
+</div>
+<div class="section" id="installing-package-data">
+<h2>Installing Package Data<a class="headerlink" href="#installing-package-data" title="Permalink to this headline">¶</a></h2>
+<p>Example data is available at <a class="reference external" href="https://zenodo.org/record/4780604#.YXGH8Z7MJPY">https://zenodo.org/record/4780604#.YXGH8Z7MJPY</a>. It is 2.1 GB.</p>
+<p>Once extracted, change the filepaths in “config.ini” to point to the relevant files on your machine.</p>
 </div>
 <div class="section" id="run">
 <h2>Run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h2>
-<p>Get example data (zenodo)
-Run example
-expected outputs</p>
+<p>If the installation was successful, Tethys can be imported with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tethys.model</span> <span class="kn">import</span> <span class="n">Tethys</span>
+</pre></div>
+</div>
+<p>Then, if the config file is properly set up, the model can be run using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dmw</span> <span class="o">=</span> <span class="n">Tethys</span><span class="p">(</span><span class="s1">&#39;config.ini&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Logging info should begin printing to the console, and after a few minutes downscaled data and diagnostics files be created.</p>
 </div>
 </div>
 
