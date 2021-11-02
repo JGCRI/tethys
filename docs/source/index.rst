@@ -1,7 +1,7 @@
 :notoc:
 
 tethys documentation
-==================
+====================
 
 **Date**: |today| **Version**: |version|
 
