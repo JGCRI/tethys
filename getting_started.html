@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/tethys.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/getting_started.css" type="text/css" />
@@ -103,6 +103,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-package-data">Installing Package Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run">Run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-dependencies">Optional Dependencies</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
@@ -181,14 +183,19 @@
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="about">
 <h2>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h2>
-<p>Tethys is a water withdrawal downscaling package constructed at the Joint Global Change Research Institute of the Pacific Northwest National Laboratory (<a class="reference external" href="http://www.globalchange.umd.edu">http://www.globalchange.umd.edu</a>). It serves to link various hydrological models to the Global Change Analysis Model (GCAM) by disaggregating the geopolitical region and water basin data from GCAM into finer spatial and temporal resolutions.</p>
+<p>Tethys is a spatiotemporal downscaling model for global water use constructed at the Joint Global Change Research Institute of the Pacific Northwest National Laboratory (<a class="reference external" href="http://www.globalchange.umd.edu">http://www.globalchange.umd.edu</a>). It serves to link several hydrological models to the Global Change Analysis Model (GCAM) by disaggregating geopolitical region and water basin scale data from GCAM into finer spatial and temporal resolutions.</p>
+<p>GCAM uses 32 geopolitical regions for energy and economy systems, and 235 water basins for land, agriculture, and water systems, with 5 year timesteps. Hydrological and other sectoral models often need gridded data with 0.5 or 0.125 geographic degree resolution and monthly timesteps in order to model physical processes heavily influenced by surface and subsurface features. Tethys applies statistical downscaling algorithms to reconstruct water withdrawal data at this resolution across six sectors: irrigation, livestock, domestic, electricity generation, manufacturing, and mining. The methodology and equations used are described in more detail <a class="reference external" href="user_guide.rst#introduction">here</a>.</p>
 </div>
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Python (3.7-3.9 should work) <a class="reference external" href="https://www.python.org/downloads/">https://www.python.org/downloads/</a></p></li>
+<li><p>Python (tested on 3.9) <a class="reference external" href="https://www.python.org/downloads/">https://www.python.org/downloads/</a></p></li>
 <li><p>Java <a class="reference external" href="https://www.java.com/en/download/">https://www.java.com/en/download/</a></p></li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Without Java installed, the dependency gcamreader will be unable to query the GCAM database files.</p>
+</div>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
@@ -196,29 +203,107 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/JGCRI/tethys
 </pre></div>
 </div>
+<p>To switch to the active development branch, use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout dev
+</pre></div>
+</div>
 <p>Once downloaded, install as a Python package by running “setup.py” from the command line:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py install
 </pre></div>
 </div>
-<p>This will also install the dependencies listed in “requirements.txt”. In order to avoid package version conflicts, consider creating a virtual environment for tethys.</p>
+<p>This will also install the packages listed in <a class="reference internal" href="user_guide.html#dependencies"><span class="std std-ref">Dependencies</span></a>. In order to avoid package version conflicts, consider creating a virtual environment for tethys.</p>
 <p>In the future, easy installation will be available via pip.</p>
 </div>
 <div class="section" id="installing-package-data">
 <h2>Installing Package Data<a class="headerlink" href="#installing-package-data" title="Permalink to this headline">¶</a></h2>
 <p>Example data is available at <a class="reference external" href="https://zenodo.org/record/4780604#.YXGH8Z7MJPY">https://zenodo.org/record/4780604#.YXGH8Z7MJPY</a>. It is 2.1 GB.</p>
-<p>Once extracted, change the filepaths in “config.ini” to point to the relevant files on your machine.</p>
+<p>Once extracted, change the paths in “config.ini” to point to the relevant files and directories on your machine.</p>
 </div>
 <div class="section" id="run">
 <h2>Run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h2>
-<p>If the installation was successful, Tethys can be imported with:</p>
+<p>Verify the installation was successful by running the following in Python:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tethys.model</span> <span class="kn">import</span> <span class="n">Tethys</span>
 </pre></div>
 </div>
-<p>Then, if the config file is properly set up, the model can be run using:</p>
+<p>Make sure the config file is properly set up and somewhere Python can find it (or use its absolute file path), then run:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dmw</span> <span class="o">=</span> <span class="n">Tethys</span><span class="p">(</span><span class="s1">&#39;config.ini&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Logging info should begin printing to the console, and after a few minutes downscaled data and diagnostics files be created.</p>
+<p>Logging info should begin printing to the console, and after a few minutes downscaled data and diagnostics output files will be created.</p>
+</div>
+<div class="section" id="dependencies">
+<span id="id1"></span><h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 41%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Dependency</p></th>
+<th class="head"><p>Minimum Version</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>configobj</p></td>
+<td><p>5.0.6</p></td>
+</tr>
+<tr class="row-odd"><td><p>numpy</p></td>
+<td><p>1.20.3</p></td>
+</tr>
+<tr class="row-even"><td><p>pandas</p></td>
+<td><p>1.2.4</p></td>
+</tr>
+<tr class="row-odd"><td><p>scipy</p></td>
+<td><p>1.6.3</p></td>
+</tr>
+<tr class="row-even"><td><p>requests</p></td>
+<td><p>2.20.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>gcamreader</p></td>
+<td><p>1.2.5</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="optional-dependencies">
+<h2>Optional Dependencies<a class="headerlink" href="#optional-dependencies" title="Permalink to this headline">¶</a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Dependency</p></th>
+<th class="head"><p>Minimum Version</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>build</p></td>
+<td><p>0.5.1</p></td>
+</tr>
+<tr class="row-odd"><td><p>nbsphinx</p></td>
+<td><p>0.8.6</p></td>
+</tr>
+<tr class="row-even"><td><p>setuptools</p></td>
+<td><p>57.0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>sphinx</p></td>
+<td><p>4.0.2</p></td>
+</tr>
+<tr class="row-even"><td><p>sphinx-panels</p></td>
+<td><p>0.6.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>sphinx-rtd-theme</p></td>
+<td><p>0.5.2</p></td>
+</tr>
+<tr class="row-even"><td><p>sphinx-mathjax-offline</p></td>
+<td><p>0.0.1</p></td>
+</tr>
+<tr class="row-odd"><td><p>twine</p></td>
+<td><p>3.4.1</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
