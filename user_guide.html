@@ -99,14 +99,22 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#implementation-and-architecture">Implementation and architecture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#quality-control">Quality control</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#reuse-potential">Reuse potential</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#programming-language">Programming Language</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input-files">Input files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gcam">GCAM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rgn32">rgn32</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#harmonized-inputs">harmonized_inputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#temporaldownscaling">TemporalDownscaling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#other">Other</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#output-files">Output files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation-and-architecture">Implementation and Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#downscaling-algorithms">Downscaling Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#spatial">Spatial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#temporal">Temporal</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tethys.html">API reference</a></li>
@@ -182,242 +190,147 @@
             
   <div class="section" id="user-guide">
 <h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>Tethys was constructed at the Joint Global Change Research Institute of the Pacific Northwest National Laboratory (<a class="reference external" href="http://www.globalchange.umd.edu">http://www.globalchange.umd.edu</a>). It served as a critical step to link Xanthos (a global hydrologic model) <a class="footnote-reference brackets" href="#li2017" id="id1">1</a> and the Global Change Analysis Model (GCAM) <a class="footnote-reference brackets" href="#edmonds1985" id="id2">2</a> <a class="footnote-reference brackets" href="#edmonds1997" id="id3">3</a>. The spatial resolution of GCAM is geopolitical regional scale for energy and economy systems (32 regions), and river basins for the land, agriculture, and water systems (235 water basins <a class="footnote-reference brackets" href="#kim2016" id="id4">21</a>). GCAM is often used as a boundary condition and coupled to sectoral models, such as the Community Land Model and Xanthos, which typically operate at finer spatial and temporal scales than GCAM <a class="footnote-reference brackets" href="#voisin2013" id="id5">19</a> <a class="footnote-reference brackets" href="#hejazi2015" id="id6">20</a>. For example, Xanthos is a globally gridded hydrology model that operates at monthly scale. Resolving such a mismatch in spatial and temporal scales facilitated coupling these models together. It is also helpful for understanding seasonal patterns of water use and acquiring high resolution water use data <a class="footnote-reference brackets" href="#huang2017" id="id7">5</a>. The main objective of Tethys is to reconstruct global monthly gridded (0.5 geographic degree) water withdrawal datasets by spatial and temporal downscaling water withdrawal estimates at region/basin and annual scale (<code class="xref std std-numref docutils literal notranslate"><span class="pre">description_fig1</span></code>). As an open-access software, Tethys applies statistical downscaling algorithms, to spatially and temporally downscale water withdrawal data from annual region/basin scale into monthly grid scale. In our study, the water withdrawals are separated into six sectors: irrigation, livestock, domestic, electricity (generation), manufacturing and mining.</p>
-<div class="align-center figure" id="id32">
-<span id="description-fig1"></span><a class="reference internal image-reference" href="_images/workflow.png"><img alt="workflow" src="_images/workflow.png" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text"><em>Major inputs and outputs of Tethys by six sectors</em></span><a class="headerlink" href="#id32" title="Permalink to this image">¶</a></p>
+<div class="section" id="input-files">
+<h2>Input files<a class="headerlink" href="#input-files" title="Permalink to this headline">¶</a></h2>
+<p>The following is an overview of the example input files from <a class="reference internal" href="getting_started.html#installing-package-data"><span class="std std-ref">Installing Package Data</span></a>.</p>
+<p>Adapt from <a class="reference external" href="https://github.com/JGCRI/tethys/blob/main/docs/ReadMe_IO_Data.pdf">https://github.com/JGCRI/tethys/blob/main/docs/ReadMe_IO_Data.pdf</a></p>
+<div class="section" id="gcam">
+<h3>GCAM<a class="headerlink" href="#gcam" title="Permalink to this headline">¶</a></h3>
 </div>
-<p>The algorithms for spatial downscaling were derived from research by Edmonds and Reilly <a class="footnote-reference brackets" href="#edmonds1985" id="id8">2</a>. Non-agriculture (domestic, electricity, manufacturing and mining) sectors are downscaled based on global gridded population density maps <a class="footnote-reference brackets" href="#wada2011" id="id9">6</a>. Irrigation water withdrawal is downscaled using global coverage of gridded cropland areas equipped with irrigation <a class="footnote-reference brackets" href="#siebert2007" id="id10">7</a> <a class="footnote-reference brackets" href="#portmann2008" id="id11">8</a>. The gridded population maps (combined Historical Database of the Global Environment (HYDE) <a class="footnote-reference brackets" href="#klein2011" id="id12">9</a> and Gridded Population of the World (GPW) <a class="footnote-reference brackets" href="#ciesin2016" id="id13">10</a> data products) and gridded crop irrigation area maps (combined HYDE <a class="footnote-reference brackets" href="#klein2011" id="id14">9</a> and Food and Agriculture Organization (FAO) <a class="footnote-reference brackets" href="#siebert2013" id="id15">11</a> data products) are updated in the algorithms over time by using historical datasets (the most recent available historical map is applied for future years). The gridded global maps of livestock in six types (cattle, buffalo, sheep, goats, pigs and poultry) [12] are used as proxy to downscale livestock water withdrawal <a class="footnote-reference brackets" href="#wada2011" id="id16">6</a> <a class="footnote-reference brackets" href="#alcamo2002" id="id17">13</a> <a class="footnote-reference brackets" href="#florke2004" id="id18">14</a>.</p>
-<div class="align-center figure" id="id33">
-<span id="description-fig2"></span><a class="reference internal image-reference" href="_images/TDExample.png"><img alt="TDExample" src="_images/TDExample.png" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text"><em>Downscaled sectoral (domestic, electricity generation and irrigation) monthly distributions of water withdrawals in USA from annual estimates in 2010</em></span><a class="headerlink" href="#id33" title="Permalink to this image">¶</a></p>
+<div class="section" id="rgn32">
+<h3>rgn32<a class="headerlink" href="#rgn32" title="Permalink to this headline">¶</a></h3>
 </div>
-<p>Different temporal downscaling algorithms to downscale annual water withdrawal estimates to monthly were applied to the different water withdrawal sectors <a class="footnote-reference brackets" href="#huang2017" id="id19">5</a>:</p>
-<ol class="arabic simple">
-<li><p>Irrigation: The monthly gridded irrigation water withdrawal was estimated by relying on monthly irrigation results from several global hydrological models (e.g. H08 <a class="footnote-reference brackets" href="#hanasaki2008a" id="id20">15</a> <a class="footnote-reference brackets" href="#hanasaki2008b" id="id21">16</a>, LPJmL <a class="footnote-reference brackets" href="#rost2008" id="id22">17</a>, and PCR-GLOBWB <a class="footnote-reference brackets" href="#wada2011" id="id23">6</a> <a class="footnote-reference brackets" href="#vanbeek2011" id="id24">18</a>) to quantify monthly weighting profiles of how irrigation is spread out within a year in a particular region and per crop type.</p></li>
-<li><p>Domestic: Temporally downscaling domestic water withdrawal from annual to monthly was based on a formula from <a class="footnote-reference brackets" href="#wada2011" id="id25">6</a> and <a class="footnote-reference brackets" href="#voisin2013" id="id26">19</a> and utilizing monthly temperature data; details of data sources were listed in <a class="footnote-reference brackets" href="#huang2017" id="id27">5</a>.</p></li>
-<li><p>Electricity: Temporally downscaling domestic water withdrawal from annual to monthly was based on the assumption that the amount of water withdrawal for electricity generation is proportional to the amount of electricity generated <a class="footnote-reference brackets" href="#voisin2013" id="id28">19</a> <a class="footnote-reference brackets" href="#hejazi2015" id="id29">20</a>.</p></li>
-<li><p>Livestock, manufacturing and mining: A uniform distribution was applied; i.e., the same water withdrawal amount was applied to each month within a year. An example of data products from temporal downscaling was illustrated in (<code class="xref std std-numref docutils literal notranslate"><span class="pre">description_fig2</span></code>). Monthly profiles were estimated from annual water withdrawal estimates of USA in 2010 for domestic, electricity generation and irrigation sectors.</p></li>
-</ol>
-<p>Tethys is written in Python (version 2.7) with related scientific libraries. Besides the modules, it also provides collected and consolidated data from various sources as inputs. Each of the datasets used by Tethys has clear sources and references that will be beneficial for the users to update and create their own datasets.</p>
+<div class="section" id="harmonized-inputs">
+<h3>harmonized_inputs<a class="headerlink" href="#harmonized-inputs" title="Permalink to this headline">¶</a></h3>
+<p>The term “grid” is used to describe the spatial resolution of 0.5 geographic degrees. A global full data map contains a total of 259,200 grid cells (360 x 720) of which 67,420 grid cells are categorized as “land grids” and are considered valid for simulation purposes. In this study, the land grid cells are used to define a “gridded” map according to the coordinates and the indexes of the 67,420 cells on the 360 x 720 grid. The inputs converted using the 67,420 grid cells according to the coordinate data file are called harmonized inputs.</p>
+<p>Mostly uniformed dimension and format in this folder: one-row header csv file, 67,420 x 1, 0 means no assignment. Population files may have multiple columns</p>
+<table class="colwidths-auto docutils align-default" id="id1">
+<caption><span class="caption-text">harmonized_inputs</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>File name</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Reference</p></th>
+<th class="head"><p>Unit</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AEZ.csv</p></td>
+<td><p>AEZ ID for each cell, 18 zones: 1-18</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>basin.csv</p></td>
+<td><p>Basin ID for each cell, 235 basins: 1-235</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>country.csv</p></td>
+<td><p>Country ID for each cell, 249 countries: 1-249</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>GMIA_cropland.csv</p></td>
+<td><p>Irrigation areas in 2005 in each grid cell</p></td>
+<td><p>Siebert, 2013</p></td>
+<td><p>km<sup>2</sup></p></td>
+</tr>
+<tr class="row-even"><td><p>HYDE_cropland.csv</p></td>
+<td><p>Irrigation area in 1900-2000 in each grid cell: every 10 years</p></td>
+<td><p>HYDE 3.1 Final, Klein Goldewijk et al., 2011</p></td>
+<td><p>km<sup>2</sup></p></td>
+</tr>
+<tr class="row-odd"><td><p>HYDE_grassland.csv</p></td>
+<td><p>Irrigation areas in 1900-2000 in each grid cell: every 10 years</p></td>
+<td><p>HYDE 3.1 Final, Klein Goldewijk et al., 2011</p></td>
+<td><p>km<sup>2</sup></p></td>
+</tr>
+<tr class="row-even"><td><p>GPW_population.csv</p></td>
+<td><p>Population: 1990-2015 data, every 5 years</p></td>
+<td><p>CIESIN, 2016</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>HYDE_population.csv</p></td>
+<td><p>Population: 1750-2000 data, every 10 years</p></td>
+<td><p>HYDE 3.1 Final, Klein Goldewijk et al., 2011</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>livestock_buffalo.csv</p></td>
+<td><p>Number of buffalo in each grid cell</p></td>
+<td><p>Wint and Robinson, 2007.</p></td>
+<td><p>head</p></td>
+</tr>
+<tr class="row-odd"><td><p>livestock_cattle.csv</p></td>
+<td><p>Number of cattle in each grid cell</p></td>
+<td><p>Wint and Robinson, 2007.</p></td>
+<td><p>head</p></td>
+</tr>
+<tr class="row-even"><td><p>livestock_goat.csv</p></td>
+<td><p>Number of goat in each grid cell</p></td>
+<td><p>Wint and Robinson, 2007.</p></td>
+<td><p>head</p></td>
+</tr>
+<tr class="row-odd"><td><p>livestock_pig.csv</p></td>
+<td><p>Number of pig in each grid cell</p></td>
+<td><p>Wint and Robinson, 2007.</p></td>
+<td><p>head</p></td>
+</tr>
+<tr class="row-even"><td><p>livestock_poultry.csv</p></td>
+<td><p>Number of poultry in each grid cell</p></td>
+<td><p>Wint and Robinson, 2007.</p></td>
+<td><p>head</p></td>
+</tr>
+<tr class="row-odd"><td><p>livestock_sheep.csv</p></td>
+<td><p>Number of sheep in each grid cell</p></td>
+<td><p>Wint and Robinson, 2007.</p></td>
+<td><p>head</p></td>
+</tr>
+<tr class="row-even"><td><p>soil_moisture.csv</p></td>
+<td><p>Maximum Soil Moisture</p></td>
+<td><p>FAO, 2003.</p></td>
+<td><p>mm/month</p></td>
+</tr>
+<tr class="row-odd"><td><p>region32_grids.csv</p></td>
+<td><p>Region ID for each cell, 32 regions: 1-32</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="temporaldownscaling">
+<h3>TemporalDownscaling<a class="headerlink" href="#temporaldownscaling" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="other">
+<h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="configuration-file">
+<h2>Configuration file<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h2>
+<p>Tethys uses an INI configuration file to specify the input data, options, and output folder. The example “config.ini” is extensively commented.</p>
+</div>
+<div class="section" id="output-files">
+<h2>Output files<a class="headerlink" href="#output-files" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="implementation-and-architecture">
-<h2>Implementation and architecture<a class="headerlink" href="#implementation-and-architecture" title="Permalink to this headline">¶</a></h2>
-<p>Tethys as a downscaling tool follows a sequential flowchart ((<code class="xref std std-numref docutils literal notranslate"><span class="pre">description_fig3</span></code>)):</p>
-<ul class="simple">
-<li><p>Step 1: Import needed data files (module package “tethysdata_reader”)</p></li>
-<li><p>Step 2: Spatial downscaling (module package “tethysspatial_downscaling”)</p></li>
-<li><p>Step 3: Temporal downscaling (module package “tethysTemporalDownscaling”)</p></li>
-<li><p>Step 4: Diagnostics of spatial and temporal downscaling (module package “tethysDiagnostics”)</p></li>
-<li><p>Step 5: Output all the results of Step 2-5 (module package “tethysdata_writer”)</p></li>
-</ul>
-<p>For each step, the corresponding module package is also listed. Spatial downscaling (Step 2) is the core of computation flow in Tethys while temporal downscaling (Step 3) is an additional step. The outputs of Step 2, global gridded annual water withdrawal data by sectors, are the inputs of Step 3.</p>
-<div class="align-center figure" id="id34">
-<span id="description-fig3"></span><a class="reference internal image-reference" href="_images/flowchart.png"><img alt="flowchart" src="_images/flowchart.png" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text"><em>Flowchart of Tethys</em></span><a class="headerlink" href="#id34" title="Permalink to this image">¶</a></p>
+<h2>Implementation and Architecture<a class="headerlink" href="#implementation-and-architecture" title="Permalink to this headline">¶</a></h2>
+<div class="align-center figure" id="id2">
+<a class="reference internal image-reference" href="_images/flowchart.png"><img alt="flowchart" src="_images/flowchart.png" style="width: 100%;" /></a>
+<p class="caption"><span class="caption-text"><em>Flowchart of Tethys</em></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>
-<p>The term “grid” is used to describe the spatial resolution of 0.5 geographic degrees. A global full data map contains a total of 259,200 grid cells (360 x 720) of which 67,420 grid cells are categorized as “land grids” and are considered valid for simulation purposes. In this study, the land grid cells are used to define a “gridded” map according to the coordinates and the indexes of the 67,420 cells on the 360x720 grid. To aggregate the gridded data into basin/country/region scale for outputs and diagnostics, certain commonly used global data maps such as IDs of basins/countries/regions are harmonized into the gridded format required by Tethys. The inputs converted using the 67,420 grid cells according to the coordinate data file are called harmonized inputs. The input interface of Tethys is controlled by the user through the configuration file (e.g. “<a href="#id30"><span class="problematic" id="id31">*</span></a>.ini” file). Each downscaling simulation is initiated by importing a single configuration file into Tethys. There are four sections included in the configuration file:</p>
-<ol class="arabic simple">
-<li><p>Project (Required): This section defines the paths of input and output folders, the output formatting, along with two important options 1) “PerformDiagnostics” determines if diagnostics will be performed; 2) “PerformTemporal” determines if temporal downscaling will be performed.</p></li>
-<li><p>GCAM (Required): As described previously, two formats are allowed 1) GCAM database format; 2) GCAM csv format. The related parameters need to be defined when switching between options for “UseGCAMDatabase”.</p></li>
-<li><p>GriddedMap (Required): This section defines the required global data maps, such as population, irrigation area, and livestock counts for each grid.</p></li>
-<li><p>TemporaDownscaling (Optional, required only if “PerformTemproal = 1” in “Project” section): All the required data files for temporal downscaling are defined in this section. The time period of the data files should be uniformed (e.g. 1971-2010). When “TemporalInterpolation = 1”, Tethys will linearly interpolate the downscaling results when the input data sets are not annual. The example data files for inputs are all included in the “exampleInput” folder while they are divided by subfolders according to the sections described above. The metadata (data source, format, related pre-processing, etc.) of all the input files are described in a document called “ReadMe_IO_Data.pdf”, and included in the document folder “docs”.</p></li>
-</ol>
-<p>As we described previously, data files of water withdrawal by sectors and region are imported in Tethys, representing the datasets to be downscaled. Since Tethys was originally designed to link to GCAM, a GCAM reader was developed to query information from GCAM database (BaseX format). To extend the usability of Tethys to the wider community, a series of csv files can be prepared following the GCAM csv format as inputs (<a class="reference internal" href="#table-1">Table 1</a>). The user is required to provide the data files for each sector. The format for each file and how to prepare them are introduced in “ReadMe_IO_Data.pdf”.</p>
-<p>The results after the spatial downscaling step (<code class="xref std std-numref docutils literal notranslate"><span class="pre">description_fig3</span></code>), i.e., global annual gridded water withdrawal by sectors, are the default outputs of Tethys. If temporal downscaling step is selected, the results of global monthly gridded water withdrawals by sectors will be additionally outputted (<a class="reference internal" href="#table-2">Table 2</a>). The outputs can be formatted as classic NetCDF [22] file. The alternative output format is CSV (comma-separated values). The default option generates results in both formats. The default unit is billion m3 and another optional unit is mm. Tables and plots from the diagnostics step will also be stored in the output folder if the diagnostics option is selected.</p>
-<p class="centered">
-<strong><span class="target" id="table-1">Table 1</span>: Input file names and their corresponding sectors</strong></p><p class="centered">
-<strong><span class="target" id="table-2">Table 2</span>: Output file names and their corresponding sectors*</strong></p></div>
-<div class="section" id="quality-control">
-<h2>Quality control<a class="headerlink" href="#quality-control" title="Permalink to this headline">¶</a></h2>
-<p>A straightforward method to verify the success of the spatial downscaling step is to compare the downscaled results with the original inputs. For example, the following information showed the comparison between the global total values of spatially downscaled results and aggregated results of the original GCAM outputs:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">---</span><span class="n">Spatial</span> <span class="n">Downscaling</span> <span class="n">Diagnostics</span> <span class="p">(</span><span class="n">Global</span><span class="p">):</span> <span class="n">downscaled</span> <span class="n">results</span> <span class="n">vs</span><span class="o">.</span> <span class="n">aggregated</span> <span class="n">results</span> <span class="kn">from</span> <span class="nn">GCAM</span> <span class="p">(</span><span class="n">Total</span> <span class="n">Water</span><span class="p">,</span> <span class="n">km3</span><span class="o">/</span><span class="n">yr</span><span class="p">)</span>
-          <span class="n">Year</span>  <span class="mi">2005</span> <span class="p">:</span>    <span class="mf">3019.53988001</span>       <span class="mf">3019.55000639</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">0.0101263749998</span>
-          <span class="n">Year</span>  <span class="mi">2010</span> <span class="p">:</span>    <span class="mf">3253.31261669</span>       <span class="mf">3253.32433411</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">0.0117174209977</span>
-          <span class="n">Year</span>  <span class="mi">2015</span> <span class="p">:</span>    <span class="mf">3446.70647763</span>       <span class="mf">3446.71935673</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">0.0128790970007</span>
-          <span class="n">Year</span>  <span class="mi">2020</span> <span class="p">:</span>    <span class="mf">3563.76181958</span>       <span class="mf">3563.77567633</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">0.0138567450035</span>
-          <span class="n">Year</span>  <span class="mi">2025</span> <span class="p">:</span>    <span class="mf">3730.10510977</span>       <span class="mf">3730.12000467</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">0.014894899004</span>
-<span class="o">------</span><span class="n">Diagnostics</span> <span class="n">information</span> <span class="ow">is</span> <span class="n">saved</span> <span class="n">to</span><span class="p">:</span>
-<span class="o">../../</span><span class="n">Output</span><span class="o">/</span><span class="n">Test001</span><span class="o">/</span><span class="n">Diagnostics_Spatial_Downscaling</span><span class="o">.</span><span class="n">csv</span>
-</pre></div>
 </div>
-<p>The differences were insignificant indicating that water withdrawals at large scale (e.g. region/basin) are simulated at local scale (e.g. grid). A full table of comparison (“Diagnostics_Spatial_Downscaling.csv”) can be found in the output folder, which will help the user to examine the downscaling results by year, region and sector in case large differences are observed. Since the temporal downscaling step was performed using different algorithms among sectors, the diagnostics module provides different methods to examine the quality of the downscaling results. Results of livestock, mining and manufacturing are not considered for diagnostics while downscaling results of irrigation, domestic and electricity generation are inspected.</p>
-<p>Similar to spatial downscaling, the global total values of temporal downscaled results and aggregated results before temporal downscaling are compared:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">---</span><span class="n">Temporal</span> <span class="n">Downscaling</span> <span class="n">Diagnostics</span> <span class="p">(</span><span class="n">Global</span><span class="p">):</span> <span class="n">downscaled</span> <span class="n">results</span> <span class="n">vs</span><span class="o">.</span> <span class="n">results</span> <span class="n">before</span> <span class="n">temporal</span> <span class="n">downscaling</span> <span class="p">(</span><span class="n">Total</span> <span class="n">Water</span><span class="p">,</span> <span class="n">km3</span><span class="o">/</span><span class="n">yr</span><span class="p">)</span>
-<span class="o">------</span><span class="n">Irrigation</span><span class="o">------</span>
-                                <span class="n">Year</span>  <span class="mi">2005</span> <span class="p">:</span>      <span class="mf">1611.86438331</span>       <span class="mf">1611.86438331</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="mf">2.27373675443e-13</span>
-                                <span class="n">Year</span>  <span class="mi">2006</span> <span class="p">:</span>      <span class="mf">1642.38442693</span>       <span class="mf">1642.38442693</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">4.54747350886e-13</span>
-                                <span class="n">Year</span>  <span class="mi">2007</span> <span class="p">:</span>      <span class="mf">1672.90447055</span>       <span class="mf">1672.90447055</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">4.54747350886e-13</span>
-                                <span class="n">Year</span>  <span class="mi">2008</span> <span class="p">:</span>      <span class="mf">1703.42451417</span>       <span class="mf">1703.42451417</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="mf">2.27373675443e-13</span>
-                                <span class="n">Year</span>  <span class="mi">2009</span> <span class="p">:</span>      <span class="mf">1733.94455779</span>       <span class="mf">1733.94455779</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="mf">0.0</span>
-                                <span class="n">Year</span>  <span class="mi">2010</span> <span class="p">:</span>      <span class="mf">1764.46460142</span>       <span class="mf">1764.46460142</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">6.8212102633e-13</span>
-<span class="o">------</span><span class="n">Domestic</span><span class="o">------</span>
-                                <span class="n">Year</span>  <span class="mi">2005</span> <span class="p">:</span>      <span class="mf">456.71</span>        <span class="mf">456.71</span>       <span class="n">Diff</span><span class="o">=</span>  <span class="mf">0.0</span>
-                                <span class="n">Year</span>  <span class="mi">2006</span> <span class="p">:</span>      <span class="mf">460.118</span>       <span class="mf">460.118</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">1.70530256582e-13</span>
-                                <span class="n">Year</span>  <span class="mi">2007</span> <span class="p">:</span>      <span class="mf">463.526</span>       <span class="mf">463.526</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="mf">0.0</span>
-                                <span class="n">Year</span>  <span class="mi">2008</span> <span class="p">:</span>      <span class="mf">466.934</span>       <span class="mf">466.934</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">1.70530256582e-13</span>
-                                <span class="n">Year</span>  <span class="mi">2009</span> <span class="p">:</span>      <span class="mf">470.342</span>       <span class="mf">470.342</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="mf">5.68434188608e-14</span>
-                                <span class="n">Year</span>  <span class="mi">2010</span> <span class="p">:</span>      <span class="mf">473.75</span>        <span class="mf">473.75</span>       <span class="n">Diff</span><span class="o">=</span>  <span class="mf">0.0</span>
-<span class="o">------</span><span class="n">Electricity</span> <span class="n">Generation</span><span class="o">------</span>
-                                <span class="n">Year</span>  <span class="mi">2005</span> <span class="p">:</span>      <span class="mf">540.376128006</span>       <span class="mf">540.37612801</span>       <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">3.8929783841e-09</span>
-                                <span class="n">Year</span>  <span class="mi">2006</span> <span class="p">:</span>      <span class="mf">544.776521342</span>       <span class="mf">544.776521326</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="mf">1.61905973073e-08</span>
-                                <span class="n">Year</span>  <span class="mi">2007</span> <span class="p">:</span>      <span class="mf">549.176914654</span>       <span class="mf">549.176914641</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="mf">1.27258772409e-08</span>
-                                <span class="n">Year</span>  <span class="mi">2008</span> <span class="p">:</span>      <span class="mf">553.577307938</span>       <span class="mf">553.577307957</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">1.83796373676e-08</span>
-                                <span class="n">Year</span>  <span class="mi">2009</span> <span class="p">:</span>      <span class="mf">557.977701031</span>       <span class="mf">557.977701272</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">2.40958343056e-07</span>
-                                <span class="n">Year</span>  <span class="mi">2010</span> <span class="p">:</span>      <span class="mf">562.378094473</span>       <span class="mf">562.378094588</span>      <span class="n">Diff</span><span class="o">=</span>  <span class="o">-</span><span class="mf">1.15136913337e-07</span>
-</pre></div>
+<div class="section" id="downscaling-algorithms">
+<h2>Downscaling Algorithms<a class="headerlink" href="#downscaling-algorithms" title="Permalink to this headline">¶</a></h2>
+<p>Withdrawal data is downscaled spatially first (5 year regional -&gt; 5 year gridded) then temporally (5 year gridded -&gt; monthly gridded).</p>
+<div class="section" id="spatial">
+<h3>Spatial<a class="headerlink" href="#spatial" title="Permalink to this headline">¶</a></h3>
+<p>For non-agricultural sectors (domestic, electricity, manfufacturing, and mining), water withdrawal in each grid square is assumed to be proportional to that square’s population.</p>
+<div class="math">
+<p><span class="math">W_{grid} = W_{region}\frac{P_{grid}}{P_{region}}</span></p>
+</div><p>Where <em>W</em> is withdrawal and <em>P</em> is population.</p>
 </div>
-<p>The comparison details for irrigation can be found in a csv file in the output folder (“Diagnostics_Temporal_Downscaling_Irrigation.csv”). Two figures adopted from [5] are plotted to monitor domestic and electricity generation sectors. The simulated mean monthly domestic water withdrawals were displayed in Figure 4, with reasonable agreement with observations in some listed urban centres and countries. Figure 5 shows the comparison between simulated and observed monthly water withdrawals for electricity generation during 2000-2012 in 9 OECD countries. It is found that the simulations agree well with observations in most of the countries. Perfect matches in Figure 4 and Figure 5 are not expected considering the inherent uncertainties [5] in estimating monthly profiles of water withdrawals. The user is able to get familiar with the features and I/O interface of Tethys by a comprehensive example case. This case teaches how to spatially and temporally downscale a datasets of 32 regions and 5 years in 2005, 2010, 2015, 2020 and 2025. The available input data for temporal downscaling is in the period of 1971-2010. Thus, the interpolated temporal downscaling results will be saved for 72 months (2005/01, 2005/02 … 2010/11, 2010/12). The name of the configuration file is “config.ini” and the outputs are saved in the folder of “exampleOutputTest001”. The example will print the following messages at the beginning and at the end into the log file when it runs successfully:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Project Name        :  Test001
-Input Folder        :  ../../Input/
-Output Folder       :  ../../Output/Test001/
-GCAM CSV Folder     :  ../../Input/GCAM/CSV/Case001/
-Region Info Folder  :  ../../Input/rgn32/
-Start Run_Disaggregation...
-……
-End Run_Disaggregation...
----Disaggregation: 103.512000084 seconds ---
-Save the gridded water usage results for each withdrawal category in NetCDF format (Unit: km3/yr)
-Save the monthly water usage results for each withdrawal category (Unit: km3/month)
----Output: 75.7409999371 seconds ---
-(&#39;End Project:   &#39;, &#39;Test001&#39;)
-</pre></div>
+<div class="section" id="temporal">
+<h3>Temporal<a class="headerlink" href="#temporal" title="Permalink to this headline">¶</a></h3>
 </div>
-<p>An automatically created log file will be saved in the output folder, that lists:
-1. Model settings;
-2. Progress and time cost for each step;
-3. Information of regions, years, and adjustment to region maps;
-4. Used population and irrigation data for each year;
-5. Information of unassigned GCAM data during downscaling of livestock and irrigation;
-6. Diagnostics (the comparison results showed above will be printed into the log file);
-7. Output format and unit;
-8. Warnings and errors if applicable.</p>
-</div>
-<div class="section" id="reuse-potential">
-<h2>Reuse potential<a class="headerlink" href="#reuse-potential" title="Permalink to this headline">¶</a></h2>
-<p>The Python language and the dependent library packages used are all open-source. Tethys is highly modularized and designed for easy installation. The modules can be used independently by the user, which also allows the future development and feasibility of user contribution with least effort. Modification of a certain step could be restricted to the corresponding module. Extension of the model is achievable by adding a new module to an existing sub-folder or a new sub-folder. All the source codes are in “tethys”. “example” folder contains inputs, outputs and configuration file of example cases. The documents are included in “docs”. The user is able to install Tethys as a Python package by running “setup.py” from terminal or command line:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>$ python setup.py install
-</pre></div>
-</div>
-<p>After installation, Tethys is able to be imported through “model” class as follows in a Python script:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tethys.model</span> <span class="kn">import</span> <span class="n">Tethys</span>
-</pre></div>
-</div>
-<p>And the user is able to run the Tethys model and obtain the outputs as simple as follows in a Python script:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dmw</span> <span class="o">=</span> <span class="n">Tethys</span><span class="p">(</span><span class="s1">&#39;config.ini&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Another way to run the downscaling model is by calling different modules. In the source code package of Tethys, “tethysrun_disaggregation.py” contains the main function that executes the model steps described in “Implementation and architecture” section. A simple example script of calling the main function directly is as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tethys.data_reader.IniReader</span> <span class="k">as</span> <span class="nn">IniReader</span>
-<span class="kn">from</span> <span class="nn">tethys.data_writer.OUTWriter</span> <span class="kn">import</span> <span class="n">OutWriter</span>
-<span class="kn">from</span> <span class="nn">tethys.Run_Disaggregation</span> <span class="kn">import</span> <span class="n">run_disaggregation</span> <span class="k">as</span> <span class="n">Disaggregation</span>
-
-<span class="c1"># Read simulator settings from ini file.</span>
-<span class="n">settingFile</span> <span class="o">=</span> <span class="s1">&#39;config.ini&#39;</span>
-<span class="n">settings</span> <span class="o">=</span> <span class="n">IniReader</span><span class="o">.</span><span class="n">getSimulatorSettings</span><span class="p">(</span><span class="n">settingFile</span><span class="p">)</span>
-<span class="c1"># Execute the main function</span>
-<span class="n">OUT</span><span class="p">,</span> <span class="n">GISData</span> <span class="o">=</span> <span class="n">Disaggregation</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
-<span class="c1"># Output the results</span>
-<span class="n">OutWriter</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">OUT</span><span class="p">,</span> <span class="n">GISData</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Documentation is organized through intensive comments inside the python code and the example configuration file. Execution will also produce a detailed log file lists model settings, the processing steps, CPU cost and warnings if applicable. The users can get support by contacting the authors when issues/bugs are found. The users may also contact the authors for contributions to the code base. The following guidance documents will help the users to get familiar with Tethys in applications:</p>
-<ol class="arabic simple">
-<li><p>The installation requirements can be referred in the pdf file “InstallationRequirements.pdf” in the “docs” folder on the repository.</p></li>
-<li><p>Inside the “docs” folder, an introduction file (“ReadMe_IO_Data.pdf”) is included helping the user to get familiar with the data source and format of each input data file. Tethys is founded as a member of an integrated modelling software for global water withdrawal, supply, and scarcity, which the authors’ team is continuing to develop.</p></li>
-</ol>
-</div>
-<div class="section" id="programming-language">
-<h2>Programming Language<a class="headerlink" href="#programming-language" title="Permalink to this headline">¶</a></h2>
-<p>Python 3</p>
-</div>
-<div class="section" id="dependencies">
-<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>NumPy (version 1.13.1)</p></li>
-<li><p>Scipy (version 0.18.1)</p></li>
-<li><p>Matplotlib (version 2.0.2)</p></li>
-<li><p>Pandas (version 0.19.2)</p></li>
-<li><p>configobj (version 5.0.6)</p></li>
-<li><p>Additional System Requirements</p></li>
-</ul>
-</div>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>The “InstallationRequirements” file in “docs” on the repository is to help the user set up the Python environment for a proper run. It explains the steps required for a user to download and install the software with all its dependencies. Also, “setup.py” file is included in the repository.</p>
-</div>
-<div class="section" id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<dl class="footnote brackets">
-<dt class="label" id="li2017"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Li, X., Vernon, C.R., Hejazi, M.I., Link, R.P, Feng, L., Liu, Y., Rauchenstein, L.T., 2017. Xanthos – A Global Hydrologic Model. Journal of Open Research Software 5(1): 21. DOI: <a class="reference external" href="http://doi.org/10.5334/jors.181">http://doi.org/10.5334/jors.181</a></p>
-</dd>
-<dt class="label" id="edmonds1985"><span class="brackets">2</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id8">2</a>)</span></dt>
-<dd><p>Edmonds, J., and Reilly, J. M., 1985. Global Energy: Assessing the Future. Oxford University Press, New York, pp.317.</p>
-</dd>
-<dt class="label" id="edmonds1997"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
-<dd><p>Edmonds, J., Wise, M., Pitcher, H., Richels, R., Wigley, T. and Maccracken, C., 1997. An integrated assessment of climate change and the accelerated introduction of advanced energy technologies-an application of MiniCAM 1.0. Mitigation and adaptation strategies for global change 1(4): 311-339. DOI: <a class="reference external" href="http://dx.doi.org/10.1023/B:MITI.0000027386.34214.60">http://dx.doi.org/10.1023/B:MITI.0000027386.34214.60</a></p>
-</dd>
-<dt class="label" id="hejazi2014"><span class="brackets">4</span></dt>
-<dd><p>Hejazi, M.I., Edmonds, J., Clarke, L., Kyle, P., Davies, E., Chaturvedi, V., Wise, M., Patel, P., Eom, J. and Calvin, K., 2014. Integrated assessment of global water scarcity over the 21st century under multiple climate change mitigation policies. Hydrology and Earth System Sciences 18: 2859-2883. DOI: <a class="reference external" href="http://dx.doi.org/10.5194/hess-18-2859-2014">http://dx.doi.org/10.5194/hess-18-2859-2014</a></p>
-</dd>
-<dt class="label" id="huang2017"><span class="brackets">5</span><span class="fn-backref">(<a href="#id7">1</a>,<a href="#id19">2</a>,<a href="#id27">3</a>)</span></dt>
-<dd><p>Huang, Z., Hejazi, M., Li, X., Tang, Q., Leng, G., Liu, Y., Döll, P., Eisner, S., Gerten, D., Hanasaki, N., and Wada, Y., 2017. Reconstruction of global gridded monthly sectoral water withdrawals for 1971–2010 and analysis of their spatiotemporal patterns, Hydrology and Earth System Sciences Discussions, DOI: <a class="reference external" href="https://doi.org/10.5194/hess-2017-551">https://doi.org/10.5194/hess-2017-551</a></p>
-</dd>
-<dt class="label" id="wada2011"><span class="brackets">6</span><span class="fn-backref">(<a href="#id9">1</a>,<a href="#id16">2</a>,<a href="#id23">3</a>,<a href="#id25">4</a>)</span></dt>
-<dd><p>Wada, Y., Van Beek, L.P.H., Viviroli, D., Dürr, H.H., Weingartner, R. and Bierkens, M.F., 2011. Global monthly water stress: 2. Water withdrawal and severity of water stress. Water Resources Research 47(7): W07518. DOI: <a class="reference external" href="http://dx.doi.org/10.1029/2010WR009792">http://dx.doi.org/10.1029/2010WR009792</a></p>
-</dd>
-<dt class="label" id="siebert2007"><span class="brackets"><a class="fn-backref" href="#id10">7</a></span></dt>
-<dd><p>Siebert, S., Döll, P., Feick, S., Hoogeveen, J. and Frenken, K., 2007. Global map of irrigation areas version 4.0. 1. Johann Wolfgang Goethe University, Frankfurt am Main, Germany/Food and Agriculture Organization of the United Nations, Rome, Italy.</p>
-</dd>
-<dt class="label" id="portmann2008"><span class="brackets"><a class="fn-backref" href="#id11">8</a></span></dt>
-<dd><p>Portmann, F.T., Siebert, S., Bauer, C. and Döll, P., 2008. Global dataset of monthly growing areas of 26 irrigated crops: version 1.0. University of Frankfurt, Germany.</p>
-</dd>
-<dt class="label" id="klein2011"><span class="brackets">9</span><span class="fn-backref">(<a href="#id12">1</a>,<a href="#id14">2</a>)</span></dt>
-<dd><p>Klein Goldewijk, K., Beusen, A., Van Drecht, G. and De Vos, M., 2011. The HYDE 3.1 spatially explicit database of human induced global land use change over the past 12,000 years. Global Ecology and Biogeography 20(1): 73-86. DOI: <a class="reference external" href="https://doi.org/10.1111/j.1466-8238.2010.00587.x">https://doi.org/10.1111/j.1466-8238.2010.00587.x</a></p>
-</dd>
-<dt class="label" id="ciesin2016"><span class="brackets"><a class="fn-backref" href="#id13">10</a></span></dt>
-<dd><p>Center for International Earth Science Information Network (CIESIN) - Columbia University. 2016. Gridded Population of the World, Version 4 (GPWv4): Population Count. NASA Socioeconomic Data and Applications Center (SEDAC), Palisades, NY. DOI: <a class="reference external" href="http://dx.doi.org/10.7927/H4X63JVC">http://dx.doi.org/10.7927/H4X63JVC</a></p>
-</dd>
-<dt class="label" id="siebert2013"><span class="brackets"><a class="fn-backref" href="#id15">11</a></span></dt>
-<dd><p>Siebert, S., Henrich, V., Frenken, K., and Burke, J., 2013. Global Map of Irrigation Areas version 5. Rheinische Friedrich-Wilhelms-University, Bonn, Germany / Food and Agriculture Organization of the United Nations, Rome, Italy.</p>
-</dd>
-<dt class="label" id="wint2007"><span class="brackets">12</span></dt>
-<dd><p>Wint, W. and Robinson, T., 2007. Gridded livestock of the world. Food and Agriculture Organization (FAO), report 131, Rome.</p>
-</dd>
-<dt class="label" id="alcamo2002"><span class="brackets"><a class="fn-backref" href="#id17">13</a></span></dt>
-<dd><p>Alcamo, J. and Henrichs, T., 2002. Critical regions: A model-based estimation of world water resources sensitive to global changes. Aquatic Sciences-Research Across Boundaries, 64(4): 352-362. DOI: <a class="reference external" href="https://doi.org/10.1007/PL00012591">https://doi.org/10.1007/PL00012591</a></p>
-</dd>
-<dt class="label" id="florke2004"><span class="brackets"><a class="fn-backref" href="#id18">14</a></span></dt>
-<dd><p>Flörke, M. and Alcamo, J., 2004. European outlook on water use. Center for Environmental Systems Research, University of Kassel, Final Report, EEA/RNC/03/007, 83.</p>
-</dd>
-<dt class="label" id="hanasaki2008a"><span class="brackets"><a class="fn-backref" href="#id20">15</a></span></dt>
-<dd><p>Hanasaki, N., Kanae, S., Oki, T., Masuda, K., Motoya, K., Shirakawa, N., Shen, Y. and Tanaka, K., 2008. An integrated model for the assessment of global water resources–Part 1: Model description and input meteorological forcing. Hydrology and Earth System Sciences 12(4): 1007-1025. DOI: <a class="reference external" href="https://doi.org/10.5194/hess-12-1007-2008">https://doi.org/10.5194/hess-12-1007-2008</a></p>
-</dd>
-<dt class="label" id="hanasaki2008b"><span class="brackets"><a class="fn-backref" href="#id21">16</a></span></dt>
-<dd><p>Hanasaki, N., Kanae, S., Oki, T., Masuda, K., Motoya, K., Shirakawa, N., Shen, Y. and Tanaka, K., 2008. An integrated model for the assessment of global water resources–Part 2: Applications and assessments. Hydrology and Earth System Sciences 12(4): 1027-1037. DOI: <a class="reference external" href="https://doi.org/10.5194/hess-12-1027-2008">https://doi.org/10.5194/hess-12-1027-2008</a></p>
-</dd>
-<dt class="label" id="rost2008"><span class="brackets"><a class="fn-backref" href="#id22">17</a></span></dt>
-<dd><p>Rost, S., Gerten, D., Bondeau, A., Lucht, W., Rohwer, J. and Schaphoff, S., 2008. Agricultural green and blue water consumption and its influence on the global water system. Water Resources Research 44(9): W09405. DOI: <a class="reference external" href="https://doi.org/10.1029/2007WR006331">https://doi.org/10.1029/2007WR006331</a></p>
-</dd>
-<dt class="label" id="vanbeek2011"><span class="brackets"><a class="fn-backref" href="#id24">18</a></span></dt>
-<dd><p>Van Beek, L.P.H., Wada, Y. and Bierkens, M.F., 2011. Global monthly water stress: 1. Water balance and water availability. Water Resources Research 47(7): W07517. DOI: <a class="reference external" href="https://doi.org/10.1029/2010WR009791">https://doi.org/10.1029/2010WR009791</a></p>
-</dd>
-<dt class="label" id="voisin2013"><span class="brackets">19</span><span class="fn-backref">(<a href="#id5">1</a>,<a href="#id26">2</a>,<a href="#id28">3</a>)</span></dt>
-<dd><p>Voisin, N., Liu, L., Hejazi, M., Tesfa, T., Li, H., Huang, M., Liu, Y. and Leung, L.R., 2013. One-way coupling of an integrated assessment model and a water resources model: evaluation and implications of future changes over the US Midwest. Hydrology and Earth System Sciences 17(11): 4555-4575. DOI: <a class="reference external" href="https://doi.org/10.5194/hess-17-4555-2013">https://doi.org/10.5194/hess-17-4555-2013</a></p>
-</dd>
-<dt class="label" id="hejazi2015"><span class="brackets">20</span><span class="fn-backref">(<a href="#id6">1</a>,<a href="#id29">2</a>)</span></dt>
-<dd><p>Hejazi, M.I., Voisin, N., Liu, L., Bramer, L.M., Fortin, D.C., Hathaway, J.E., Huang, M., Kyle, P., Leung, L.R., Li, H.Y. and Liu, Y., 2015. 21st century United States emissions mitigation could increase water stress more than the climate change it is mitigating. Proceedings of the National Academy of Sciences 112(34): 10635-10640. DOI: <a class="reference external" href="https://doi.org/10.1073/pnas.1421675112">https://doi.org/10.1073/pnas.1421675112</a></p>
-</dd>
-<dt class="label" id="kim2016"><span class="brackets"><a class="fn-backref" href="#id4">21</a></span></dt>
-<dd><p>Kim, S.H., Hejazi, M., Liu, L., Calvin, K., Clarke, L., Edmonds, J., Kyle, P., Patel, P., Wise, M. and Davies, E., 2016. Balancing global water availability and use at basin scale in an integrated assessment model. Climatic Change 136(2): 217-231. DOI: <a class="reference external" href="http://dx.doi.org/10.1007/s10584-016-1604-6">http://dx.doi.org/10.1007/s10584-016-1604-6</a></p>
-</dd>
-<dt class="label" id="netcdf"><span class="brackets">22</span></dt>
-<dd><p>An Introduction to NetCDF. <a class="reference external" href="http://www.unidata.ucar.edu/software/netcdf/docs/netcdf_introduction.html">http://www.unidata.ucar.edu/software/netcdf/docs/netcdf_introduction.html</a></p>
-</dd>
-</dl>
 </div>
 </div>
 

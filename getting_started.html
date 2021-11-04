@@ -185,6 +185,10 @@
 <h2>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h2>
 <p>Tethys is a spatiotemporal downscaling model for global water use constructed at the Joint Global Change Research Institute of the Pacific Northwest National Laboratory (<a class="reference external" href="http://www.globalchange.umd.edu">http://www.globalchange.umd.edu</a>). It serves to link several hydrological models to the Global Change Analysis Model (GCAM) by disaggregating geopolitical region and water basin scale data from GCAM into finer spatial and temporal resolutions.</p>
 <p>GCAM uses 32 geopolitical regions for energy and economy systems, and 235 water basins for land, agriculture, and water systems, with 5 year timesteps. Hydrological and other sectoral models often need gridded data with 0.5 or 0.125 geographic degree resolution and monthly timesteps in order to model physical processes heavily influenced by surface and subsurface features. Tethys applies statistical downscaling algorithms to reconstruct water withdrawal data at this resolution across six sectors: irrigation, livestock, domestic, electricity generation, manufacturing, and mining. The methodology and equations used are described in more detail <a class="reference external" href="user_guide.rst#introduction">here</a>.</p>
+<div class="align-center figure" id="id3">
+<a class="reference internal image-reference" href="_images/workflow.png"><img alt="workflow" src="_images/workflow.png" style="width: 100%;" /></a>
+<p class="caption"><span class="caption-text"><em>Major inputs and outputs of Tethys by six sectors</em></span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
 </div>
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
@@ -211,12 +215,13 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py install
 </pre></div>
 </div>
-<p>This will also install the packages listed in <a class="reference internal" href="user_guide.html#dependencies"><span class="std std-ref">Dependencies</span></a>. In order to avoid package version conflicts, consider creating a virtual environment for tethys.</p>
+<p>This will automatically install the packages listed in <a class="reference internal" href="#dependencies"><span class="std std-ref">Dependencies</span></a>. In order to avoid package version conflicts, consider creating a virtual environment for tethys.</p>
 <p>In the future, easy installation will be available via pip.</p>
 </div>
 <div class="section" id="installing-package-data">
-<h2>Installing Package Data<a class="headerlink" href="#installing-package-data" title="Permalink to this headline">¶</a></h2>
-<p>Example data is available at <a class="reference external" href="https://zenodo.org/record/4780604#.YXGH8Z7MJPY">https://zenodo.org/record/4780604#.YXGH8Z7MJPY</a>. It is 2.1 GB.</p>
+<span id="id1"></span><h2>Installing Package Data<a class="headerlink" href="#installing-package-data" title="Permalink to this headline">¶</a></h2>
+<p>Example data is available for download at <a class="reference external" href="https://zenodo.org/record/4780604#.YXGH8Z7MJPY">https://zenodo.org/record/4780604#.YXGH8Z7MJPY</a>.</p>
+<p><strong>NOTE</strong>: The data will require around 2.1 GB of storage space.</p>
 <p>Once extracted, change the paths in “config.ini” to point to the relevant files and directories on your machine.</p>
 </div>
 <div class="section" id="run">
@@ -232,7 +237,7 @@
 <p>Logging info should begin printing to the console, and after a few minutes downscaled data and diagnostics output files will be created.</p>
 </div>
 <div class="section" id="dependencies">
-<span id="id1"></span><h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 41%" />
