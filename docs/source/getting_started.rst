@@ -7,6 +7,14 @@ Tethys is a spatiotemporal downscaling model for global water use constructed at
 
 GCAM uses 32 geopolitical regions for energy and economy systems, and 235 water basins for land, agriculture, and water systems, with 5 year timesteps. Hydrological and other sectoral models often need gridded data with 0.5 or 0.125 geographic degree resolution and monthly timesteps in order to model physical processes heavily influenced by surface and subsurface features. Tethys applies statistical downscaling algorithms to reconstruct water withdrawal data at this resolution across six sectors: irrigation, livestock, domestic, electricity generation, manufacturing, and mining. The methodology and equations used are described in more detail `here <user_guide.rst#introduction>`_.
 
+.. figure:: _static/workflow.png
+  :width: 100%
+  :alt: workflow
+  :align: center
+  :figclass: align-center
+  
+  *Major inputs and outputs of Tethys by six sectors*
+
 Prerequisites
 -----------------------------------
 * Python (tested on 3.9) https://www.python.org/downloads/ 
@@ -28,15 +36,18 @@ To switch to the active development branch, use::
 Once downloaded, install as a Python package by running "setup.py" from the command line::
 
 	$ python setup.py install
-
-This will also install the packages listed in :ref:`dependencies`. In order to avoid package version conflicts, consider creating a virtual environment for tethys.
+	
+This will automatically install the packages listed in :ref:`dependencies`. In order to avoid package version conflicts, consider creating a virtual environment for tethys.
 
 In the future, easy installation will be available via pip.
 
+.. _installing-package-data:
 
 Installing Package Data
 -----------------------------------
-Example data is available at https://zenodo.org/record/4780604#.YXGH8Z7MJPY. It is 2.1 GB.
+Example data is available for download at https://zenodo.org/record/4780604#.YXGH8Z7MJPY. 
+
+**NOTE**: The data will require around 2.1 GB of storage space.
 
 Once extracted, change the paths in "config.ini" to point to the relevant files and directories on your machine.
 
