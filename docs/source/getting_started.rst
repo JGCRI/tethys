@@ -5,7 +5,7 @@ About
 -----------------------------------
 Tethys is a spatiotemporal downscaling model for global water use constructed at the Joint Global Change Research Institute of the Pacific Northwest National Laboratory (http://www.globalchange.umd.edu). It serves to link several hydrological models to the Global Change Analysis Model (GCAM) by disaggregating geopolitical region and water basin scale data from GCAM into finer spatial and temporal resolutions.
 
-GCAM uses 32 geopolitical regions for energy and economy systems, and 235 water basins for land, agriculture, and water systems, with 5 year timesteps. Hydrological and other sectoral models often need gridded data with 0.5 or 0.125 geographic degree resolution and monthly timesteps in order to model physical processes heavily influenced by surface and subsurface features. Tethys applies statistical downscaling algorithms to reconstruct water withdrawal data at this resolution across six sectors: irrigation, livestock, domestic, electricity generation, manufacturing, and mining. The methodology and equations used are described in more detail `here <user_guide.rst#introduction>`_.
+GCAM uses 32 geopolitical regions for energy and economy systems, and 235 water basins for land, agriculture, and water systems, with 5 year timesteps. Hydrological and other sectoral models often need gridded data with 0.5 or 0.125 geographic degree resolution and monthly timesteps in order to model physical processes heavily influenced by surface and subsurface features. Tethys applies statistical downscaling algorithms to reconstruct water withdrawal data at this resolution across six sectors: irrigation, livestock, domestic, electricity generation, manufacturing, and mining. The methodology and equations used are described in more detail in :ref:`downscaling-algorithms`.
 
 .. figure:: _static/workflow.png
   :width: 100%
@@ -47,7 +47,7 @@ Installing Package Data
 -----------------------------------
 Example data is available for download at https://zenodo.org/record/4780604#.YXGH8Z7MJPY. 
 
-**NOTE**: The data will require around 2.1 GB of storage space.
+.. note:: Although the download is 2.1 GB, the extracted data will require around **9.6 GB** of storage space.
 
 Once extracted, change the paths in "config.ini" to point to the relevant files and directories on your machine.
 
