@@ -99,17 +99,68 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#architecture">Architecture</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#input-files">Input files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-input">Example/Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#basinnames-csv">BasinNames.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#coordinates-csv">coordinates.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#country-names-csv">country-names.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gcam-basin-lookup-csv">gcam_basin_lookup.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grid-areas-id-csv">Grid_Areas_ID.csv</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#gcam">GCAM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#rgn32">rgn32</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#harmonized-inputs">harmonized_inputs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#temporaldownscaling">TemporalDownscaling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#other">Other</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rgn32">rgn32</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rgnnames-csv">RgnNames.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bfracfao2005-csv-and-gfracfao2005-csv">bfracFAO2005.csv and gfracFAO2005.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#irrigation-frac-csv">irrigation-frac.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#td-elec-paras">TD_Elec_paras</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#harmonized-inputs">harmonized_inputs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aez-csv">AEZ.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#basin-csv">basin.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#country-csv">country.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gmia-cropland-csv">GMIA_cropland.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hyde-cropland-csv">HYDE_cropland.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hyde-grassland-csv">HYDE_grassland.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gpw-population-csv">GPW_population.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hyde-population-csv">HYDE_population.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#livestock-animal-csv">livestock_(animal).csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#soil-moisture-csv">soil_moisture.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#region32-grids-csv">region32_grids.csv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#temporaldownscaling">TemporalDownscaling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#domesticr-csv">DomesticR.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#irrigation">Irrigation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#climateforcing-watch">ClimateForcing/WATCH</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#tethys-reference">tethys/reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dist-csv">dist.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#obv-dom-csv">obv_dom.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#iea-9-countries-monthly-avgelectricity-2000-2015-csv">IEA_9_Countries_Monthly_AvgElectricity_2000_2015.csv</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#output-files">Output files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#implementation-and-architecture">Implementation and Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#output-files">Output files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#diagnostics">Diagnostics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#diagnostics-spatial-downscaling-csv">Diagnostics_Spatial_Downscaling.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#diagnostics-temporal-downscaling-irrigation-csv">Diagnostics_Temporal_Downscaling_Irrigation.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#diagnostics-temporal-downscaling-domestic-png">Diagnostics_Temporal_Downscaling_Domestic.png</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#diagnostics-temporal-downscaling-electricity-png">Diagnostics_Temporal_Downscaling_Electricity.png</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#downscaling-results">Downscaling Results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#wd-sector-km3peryr-csv">wd(sector)_km3peryr.csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#twd-sector-km3permonth-csv">twd(sector)_km3permonth.csv</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#downscaling-algorithms">Downscaling Algorithms</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#spatial">Spatial</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#temporal">Temporal</a></li>
@@ -190,143 +241,476 @@
             
   <div class="section" id="user-guide">
 <h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h2>
+<p>Below is a conceptual overview of tethys. The downscaling process can be thought of in 2 main stages: First, the GCAM data is downscaled spatially, from 32 geopolitical regions and 235 basins to a 0.5 geographic degree grid. Then, that data is further downscaled temporally, from every 5 years to monthly. During both of these stages, water withdrawal data is downscaled separately within six sectors (irrigation, livestock, domestic, electricity generation, manufacturing, and mining), using data from various <a class="reference internal" href="#input-files"><span class="std std-ref">Input files</span></a> and several <a class="reference internal" href="#downscaling-algorithms"><span class="std std-ref">Downscaling Algorithms</span></a>.</p>
+<div class="align-center figure" id="id7">
+<a class="reference internal image-reference" href="_images/flowchart.png"><img alt="flowchart" src="_images/flowchart.png" style="width: 100%;" /></a>
+<p class="caption"><span class="caption-text"><em>Flowchart of Tethys</em></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</div>
+<p>The resulting <a class="reference internal" href="#output-files"><span class="std std-ref">Output files</span></a> are written to a folder, which can be specified by the user in the <a class="reference internal" href="#configuration-file"><span class="std std-ref">Configuration file</span></a>. The config file also has options to make tethys perform diagnostics on the output, or even skip the temporal downscaling step, should that be desired.</p>
+</div>
 <div class="section" id="input-files">
-<h2>Input files<a class="headerlink" href="#input-files" title="Permalink to this headline">¶</a></h2>
-<p>The following is an overview of the example input files from <a class="reference internal" href="getting_started.html#installing-package-data"><span class="std std-ref">Installing Package Data</span></a>.</p>
-<p>Adapt from <a class="reference external" href="https://github.com/JGCRI/tethys/blob/main/docs/ReadMe_IO_Data.pdf">https://github.com/JGCRI/tethys/blob/main/docs/ReadMe_IO_Data.pdf</a></p>
+<span id="id1"></span><h2>Input files<a class="headerlink" href="#input-files" title="Permalink to this headline">¶</a></h2>
+<p>This section contains descriptions of the example input files from <a class="reference internal" href="getting_started.html#installing-package-data"><span class="std std-ref">Installing Package Data</span></a>, and some additional reference files included with tethys. Should you wish to run tethys with alternate input data, you’ll need to prepare those files using this same structure.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Adapted from <a class="reference external" href="https://github.com/JGCRI/tethys/blob/main/docs/ReadMe_IO_Data.pdf">https://github.com/JGCRI/tethys/blob/main/docs/ReadMe_IO_Data.pdf</a>, may need to be further modified to reflect recent changes.</p>
+</div>
+<div class="section" id="example-input">
+<h3>Example/Input<a class="headerlink" href="#example-input" title="Permalink to this headline">¶</a></h3>
+<p>The following files are located at the top level of the example input folder. They provide information about the regions, basins, countries, and grid coordinates.</p>
+<div class="section" id="basinnames-csv">
+<h4>BasinNames.csv<a class="headerlink" href="#basinnames-csv" title="Permalink to this headline">¶</a></h4>
+<p>235 basin names corresponding to harmonized_inputs/basin.csv</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, no header</p></li>
+<li><p><strong>Dimension:</strong> 235 row * 1 column</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> N/A</p></li>
+</ul>
+</div>
+<div class="section" id="coordinates-csv">
+<h4>coordinates.csv<a class="headerlink" href="#coordinates-csv" title="Permalink to this headline">¶</a></h4>
+<p>Coordinates of the 67420 grid cells</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, no header</p></li>
+<li><p><strong>Dimension:</strong> 67420 rows x 5 columns (ID #, longitude, latitude, ilon, ilat)</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> N/A</p></li>
+</ul>
+</div>
+<div class="section" id="country-names-csv">
+<h4>country-names.csv<a class="headerlink" href="#country-names-csv" title="Permalink to this headline">¶</a></h4>
+<p>249 country names corresponding to harmonized_inputs/country.csv</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, no header</p></li>
+<li><p><strong>Dimension:</strong> 235 row * 2 column, first column is ID (integer, 0-248), second column is country name (string)</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> N/A</p></li>
+</ul>
+</div>
+<div class="section" id="gcam-basin-lookup-csv">
+<h4>gcam_basin_lookup.csv<a class="headerlink" href="#gcam-basin-lookup-csv" title="Permalink to this headline">¶</a></h4>
+<p>235 gcam basin lookup names corresponding to basin id and name</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, no header</p></li>
+<li><p><strong>Dimension:</strong> 235 row * 3 columns, first column is ID (integer, 1-235), second column is basin name (string), third column is gcam lookup name</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> N/A</p></li>
+</ul>
+</div>
+<div class="section" id="grid-areas-id-csv">
+<h4>Grid_Areas_ID.csv<a class="headerlink" href="#grid-areas-id-csv" title="Permalink to this headline">¶</a></h4>
+<p>Area value of each land grid cell</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, no header</p></li>
+<li><p><strong>Dimension:</strong> 67420 rows x 1 column column, decimal values</p></li>
+<li><p><strong>Unit:</strong> ha (convert to km2 by <a href="#id2"><span class="problematic" id="id3">*</span></a>0.01)</p></li>
+<li><p><strong>Reference:</strong> N/A</p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="gcam">
 <h3>GCAM<a class="headerlink" href="#gcam" title="Permalink to this headline">¶</a></h3>
+<p>The GCAM folder is where the regional water withdrawal data to be downscaled comes from. It actually contains full GCAM output databases (which have a lot of data other than water withdrawal, hence their size). These databases are queried for the relevant water withdrawal data across the six sectors (at the scale of 32 regions, every 5 years), which gets fed into tethys.</p>
+<p>The example data contains 2 different output databases from GCAM: <em>gcam5p1_ref_db</em> and <em>ssp1_rcp26_gfdl</em>. There are are also 2 xml query files, <em>query_regaez.xml</em> and <em>query_regbasin.xml</em> corresponding to different versions of GCAM (regions and AEZ or regions and basins). The choice of database and query is indicated by the user in the config file.</p>
+<p>The specifics of GCAM outputs and queries are outside the scope of this documentation. For more information, refer to RELEVANT_LINK.</p>
 </div>
 <div class="section" id="rgn32">
 <h3>rgn32<a class="headerlink" href="#rgn32" title="Permalink to this headline">¶</a></h3>
+<p>The <em>rgn32</em> folder contains additional information about these regions, such as region names, and various region-specific conversion ratios (eg, GCAM models the aggregate sheep+goat count in each region, but separate sheep and goat populations can be reconstructed from a “sheep to goat” ratio).</p>
+<div class="section" id="rgnnames-csv">
+<h4>RgnNames.csv<a class="headerlink" href="#rgnnames-csv" title="Permalink to this headline">¶</a></h4>
+<p>The region names (e.g. “USA”) and its corresponding id (e.g. 1 for USA).</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 32 rows x 2 columns, first column for region name (string), second column for region id (integer, 1-32)</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> N/A</p></li>
+</ul>
+</div>
+<div class="section" id="bfracfao2005-csv-and-gfracfao2005-csv">
+<h4>bfracFAO2005.csv and gfracFAO2005.csv<a class="headerlink" href="#bfracfao2005-csv-and-gfracfao2005-csv" title="Permalink to this headline">¶</a></h4>
+<p>Livestock in GCAM has five sectors (beef, dairy, pork, poultry and sheepgoat), to be reorganized into six sectors used by Tethys (buffalo, cattle, goat, sheep, pig and poultry), two fraction numbers are needed. One is recorded in bfracFAO2005.csv, the other is recorded in gfracFAO2005.csv:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>buffalo       = (beef + diary)*bfrac</p></li>
+<li><p>cattle        = (beef + diary)*(1-bfrac)</p></li>
+<li><p>goat          = sheepgoat*gfrac</p></li>
+<li><p>sheep         = sheepgoat*(1-gfrac)</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 32 rows x 2 columns, first column for region name (string), second column for buffalo (bfrac) or goat (gfrac) fraction (decimal, &lt; 1) in this region</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> estimated from FAO gridded livestock of the world (refer to “harmonized inputs/livestock_*.csv”)</p></li>
+</ul>
+</div>
+<div class="section" id="irrigation-frac-csv">
+<h4>irrigation-frac.csv<a class="headerlink" href="#irrigation-frac-csv" title="Permalink to this headline">¶</a></h4>
+<p>Pre-calculated irrigation shares as a fixed input, is used when extracting data files from GCAM database, if GCAM didn’t produce endogenous irrigated and rain-fed land allocations.</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 26 columns: region #, aez #, crop #, 1990, 2005, 2010, …, 2100, region name, crop name, decimal values (0-1) for column 4-24</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> N/A</p></li>
+</ul>
+</div>
+<div class="section" id="td-elec-paras">
+<h4>TD_Elec_paras<a class="headerlink" href="#td-elec-paras" title="Permalink to this headline">¶</a></h4>
+<p>Five tables are included in this folder:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 62%" />
+<col style="width: 38%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>ElecBuilding_1971_2010.csv</p></td>
+<td><p>P<sub>b</sub></p></td>
+</tr>
+<tr class="row-even"><td><p>ElecBuildingHeat_1971_2010.csv</p></td>
+<td><p>P<sub>h</sub></p></td>
+</tr>
+<tr class="row-odd"><td><p>ElecBuildingCool_1971_2010.csv</p></td>
+<td><p>P<sub>c</sub></p></td>
+</tr>
+<tr class="row-even"><td><p>ElecBuildingOthers_1971_2010.csv</p></td>
+<td><p>P<sub>u</sub></p></td>
+</tr>
+<tr class="row-odd"><td><p>ElecIndustry_1971_2010.csv</p></td>
+<td><p>P<sub>it</sub></p></td>
+</tr>
+</tbody>
+</table>
+<p>P<sub>b</sub> and P<sub>it</sub> are the proportions of total electricity use for building and transportation and industry together, respectively, P<sub>b</sub> + P<sub>it</sub> = 1.</p>
+<p>P<sub>h</sub>, P<sub>c</sub> and P<sub>u</sub> are the proportions of total building electricity use for heating, cooling and other home utilities, respectively, P<sub>h</sub> + P<sub>c</sub> + P<sub>u</sub> = 1.</p>
+<p>The proportions of electricity use, are used in temporal downscaling of electricity sector</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, no header</p></li>
+<li><p><strong>Dimension:</strong> 32 rows x 40 columns (32 regions x 40 years), decimal values (0-1)</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> N/A</p></li>
+</ul>
+</div>
 </div>
 <div class="section" id="harmonized-inputs">
 <h3>harmonized_inputs<a class="headerlink" href="#harmonized-inputs" title="Permalink to this headline">¶</a></h3>
 <p>The term “grid” is used to describe the spatial resolution of 0.5 geographic degrees. A global full data map contains a total of 259,200 grid cells (360 x 720) of which 67,420 grid cells are categorized as “land grids” and are considered valid for simulation purposes. In this study, the land grid cells are used to define a “gridded” map according to the coordinates and the indexes of the 67,420 cells on the 360 x 720 grid. The inputs converted using the 67,420 grid cells according to the coordinate data file are called harmonized inputs.</p>
-<p>Mostly uniformed dimension and format in this folder: one-row header csv file, 67,420 x 1, 0 means no assignment. Population files may have multiple columns</p>
-<table class="colwidths-auto docutils align-default" id="id1">
-<caption><span class="caption-text">harmonized_inputs</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
-<thead>
-<tr class="row-odd"><th class="head"><p>File name</p></th>
-<th class="head"><p>Description</p></th>
-<th class="head"><p>Reference</p></th>
-<th class="head"><p>Unit</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>AEZ.csv</p></td>
-<td><p>AEZ ID for each cell, 18 zones: 1-18</p></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>basin.csv</p></td>
-<td><p>Basin ID for each cell, 235 basins: 1-235</p></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p>country.csv</p></td>
-<td><p>Country ID for each cell, 249 countries: 1-249</p></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>GMIA_cropland.csv</p></td>
-<td><p>Irrigation areas in 2005 in each grid cell</p></td>
-<td><p>Siebert, 2013</p></td>
-<td><p>km<sup>2</sup></p></td>
-</tr>
-<tr class="row-even"><td><p>HYDE_cropland.csv</p></td>
-<td><p>Irrigation area in 1900-2000 in each grid cell: every 10 years</p></td>
-<td><p>HYDE 3.1 Final, Klein Goldewijk et al., 2011</p></td>
-<td><p>km<sup>2</sup></p></td>
-</tr>
-<tr class="row-odd"><td><p>HYDE_grassland.csv</p></td>
-<td><p>Irrigation areas in 1900-2000 in each grid cell: every 10 years</p></td>
-<td><p>HYDE 3.1 Final, Klein Goldewijk et al., 2011</p></td>
-<td><p>km<sup>2</sup></p></td>
-</tr>
-<tr class="row-even"><td><p>GPW_population.csv</p></td>
-<td><p>Population: 1990-2015 data, every 5 years</p></td>
-<td><p>CIESIN, 2016</p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>HYDE_population.csv</p></td>
-<td><p>Population: 1750-2000 data, every 10 years</p></td>
-<td><p>HYDE 3.1 Final, Klein Goldewijk et al., 2011</p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p>livestock_buffalo.csv</p></td>
-<td><p>Number of buffalo in each grid cell</p></td>
-<td><p>Wint and Robinson, 2007.</p></td>
-<td><p>head</p></td>
-</tr>
-<tr class="row-odd"><td><p>livestock_cattle.csv</p></td>
-<td><p>Number of cattle in each grid cell</p></td>
-<td><p>Wint and Robinson, 2007.</p></td>
-<td><p>head</p></td>
-</tr>
-<tr class="row-even"><td><p>livestock_goat.csv</p></td>
-<td><p>Number of goat in each grid cell</p></td>
-<td><p>Wint and Robinson, 2007.</p></td>
-<td><p>head</p></td>
-</tr>
-<tr class="row-odd"><td><p>livestock_pig.csv</p></td>
-<td><p>Number of pig in each grid cell</p></td>
-<td><p>Wint and Robinson, 2007.</p></td>
-<td><p>head</p></td>
-</tr>
-<tr class="row-even"><td><p>livestock_poultry.csv</p></td>
-<td><p>Number of poultry in each grid cell</p></td>
-<td><p>Wint and Robinson, 2007.</p></td>
-<td><p>head</p></td>
-</tr>
-<tr class="row-odd"><td><p>livestock_sheep.csv</p></td>
-<td><p>Number of sheep in each grid cell</p></td>
-<td><p>Wint and Robinson, 2007.</p></td>
-<td><p>head</p></td>
-</tr>
-<tr class="row-even"><td><p>soil_moisture.csv</p></td>
-<td><p>Maximum Soil Moisture</p></td>
-<td><p>FAO, 2003.</p></td>
-<td><p>mm/month</p></td>
-</tr>
-<tr class="row-odd"><td><p>region32_grids.csv</p></td>
-<td><p>Region ID for each cell, 32 regions: 1-32</p></td>
-<td></td>
-<td></td>
-</tr>
-</tbody>
-</table>
+<div class="section" id="aez-csv">
+<h4>AEZ.csv<a class="headerlink" href="#aez-csv" title="Permalink to this headline">¶</a></h4>
+<p>AEZ ID for each cell, 18 zones: 1-18</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67,420 rows x 1 column column</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> N/A</p></li>
+</ul>
+</div>
+<div class="section" id="basin-csv">
+<h4>basin.csv<a class="headerlink" href="#basin-csv" title="Permalink to this headline">¶</a></h4>
+<p>Basin ID for each cell, 235 basins: 1-235</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67,420 rows x 1 column column</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> N/A</p></li>
+</ul>
+</div>
+<div class="section" id="country-csv">
+<h4>country.csv<a class="headerlink" href="#country-csv" title="Permalink to this headline">¶</a></h4>
+<p>Country ID for each cell, 249 countries: 1-249</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67,420 rows x 1 column column</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> N/A</p></li>
+</ul>
+</div>
+<div class="section" id="gmia-cropland-csv">
+<h4>GMIA_cropland.csv<a class="headerlink" href="#gmia-cropland-csv" title="Permalink to this headline">¶</a></h4>
+<p>Irrigation areas in 2005 in each grid cell</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67,420 rows x 1 column column</p></li>
+<li><p><strong>Unit:</strong> km<sup>2</sup></p></li>
+<li><p><strong>Reference:</strong> Siebert, 2013</p></li>
+</ul>
+</div>
+<div class="section" id="hyde-cropland-csv">
+<h4>HYDE_cropland.csv<a class="headerlink" href="#hyde-cropland-csv" title="Permalink to this headline">¶</a></h4>
+<p>Irrigation area in 1900-2000 in each grid cell: every 10 years</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67,420 rows x 1 column1 columns (11 years)</p></li>
+<li><p><strong>Unit:</strong> km<sup>2</sup></p></li>
+<li><p><strong>Reference:</strong> HYDE 3.1 Final, Klein Goldewijk et al., 2011</p></li>
+</ul>
+</div>
+<div class="section" id="hyde-grassland-csv">
+<h4>HYDE_grassland.csv<a class="headerlink" href="#hyde-grassland-csv" title="Permalink to this headline">¶</a></h4>
+<p>Irrigation areas in 1900-2000 in each grid cell: every 10 years</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67,420 rows x 1 column1 columns (11 years)</p></li>
+<li><p><strong>Unit:</strong> km<sup>2</sup></p></li>
+<li><p><strong>Reference:</strong> HYDE 3.1 Final, Klein Goldewijk et al., 2011</p></li>
+</ul>
+</div>
+<div class="section" id="gpw-population-csv">
+<h4>GPW_population.csv<a class="headerlink" href="#gpw-population-csv" title="Permalink to this headline">¶</a></h4>
+<p>Population: 1990-2015 data, every 5 years</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67,420 rows x 6 columns (6 years)</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> CIESIN, 2016</p></li>
+</ul>
+</div>
+<div class="section" id="hyde-population-csv">
+<h4>HYDE_population.csv<a class="headerlink" href="#hyde-population-csv" title="Permalink to this headline">¶</a></h4>
+<p>Population: 1750-2000 data, every 10 years</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67,420 rows x 26 columns (26 years)</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> HYDE 3.1 Final, Klein Goldewijk et al., 2011</p></li>
+</ul>
+</div>
+<div class="section" id="livestock-animal-csv">
+<h4>livestock_(animal).csv<a class="headerlink" href="#livestock-animal-csv" title="Permalink to this headline">¶</a></h4>
+<p>6 files, containing the number of (buffalo/cattle/goat/pig/poultry/sheep) in each grid cell</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67,420 rows x 1 column</p></li>
+<li><p><strong>Unit:</strong> head</p></li>
+<li><p><strong>Reference:</strong> Wint and Robinson, 2007.</p></li>
+</ul>
+</div>
+<div class="section" id="soil-moisture-csv">
+<h4>soil_moisture.csv<a class="headerlink" href="#soil-moisture-csv" title="Permalink to this headline">¶</a></h4>
+<p>Population: Maximum Soil Moisture</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67,420 rows x 1 column</p></li>
+<li><p><strong>Unit:</strong> mm/month</p></li>
+<li><p><strong>Reference:</strong> FAO, 2003.</p></li>
+</ul>
+</div>
+<div class="section" id="region32-grids-csv">
+<h4>region32_grids.csv<a class="headerlink" href="#region32-grids-csv" title="Permalink to this headline">¶</a></h4>
+<p>Region ID for each cell, 32 regions: 1-32</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67,420 rows x 1 column</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> N/A</p></li>
+</ul>
+</div>
 </div>
 <div class="section" id="temporaldownscaling">
 <h3>TemporalDownscaling<a class="headerlink" href="#temporaldownscaling" title="Permalink to this headline">¶</a></h3>
+<p>The following files and folders are used during the temporal downscaling step.</p>
+<div class="section" id="domesticr-csv">
+<h4>DomesticR.csv<a class="headerlink" href="#domesticr-csv" title="Permalink to this headline">¶</a></h4>
+<p>The amplitude (dimensionless) which measures the relative difference of domestic water withdraw between the warmest and coldest months. It is used in the temporal downscaling of domestic sector.</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67420 rows x 1 column, decimal values</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> calibrated by Huang et al., 2017</p></li>
+</ul>
 </div>
-<div class="section" id="other">
-<h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="irrigation">
+<h4>Irrigation<a class="headerlink" href="#irrigation" title="Permalink to this headline">¶</a></h4>
+<p>The monthly gridded irrigation water withdrawal was estimated by relying on monthly irrigation results from other global hydrological models to quantify monthly weighting profiles of how irrigation is spread out within a year in a particular region and per crop type.</p>
+<p>In this folder, three global gridded monthly irrigation water withdrawal models are provided as references for the period of 1971-2010:</p>
+<ul>
+<li><p>H08 (Hanasaki et al., 2008a; 2008b)</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>h08_wfdei_hist_varsoc_pirrww_global_monthly_1971_2010.nc</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>LPJmL (Rost et al., 2008)</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>lpjml_wfdei_hist_varsoc_co2_pirrww_global_monthly_1971_2010.nc</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>PCR-GLOBWB (Van Beek et al., 2011; Wada et al., 2011)</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>pcrglobwb_wfdei_varsoc_pirrww_global_monthly_1971_2010.nc</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>The original data files were obtained from ISI-MIP (Warszawski et al., 2014). We processed
+the original data files into gridded monthly percentage values as the weighting profiles
+applied in temporal downscaling of irrigation.</p>
+<p>The data files are classic NetCDF file. They follow the same format:</p>
+<ul class="simple">
+<li><p><strong>Size</strong>:       67420 x 480</p></li>
+<li><p><strong>Dimensions</strong>:  index, month</p></li>
+<li><p><strong>Datatype</strong>:   single</p></li>
+<li><p><strong>Variables</strong>: ‘pirrww’</p></li>
+</ul>
+<p>For more information about these three models and their data files, please refer to Huang
+et al., 2017.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>note to self: Seems to have been replaced by 1 file, watch_wfdei_monthly_1971_2010.npz</p>
+</div>
+</div>
+<div class="section" id="climateforcing-watch">
+<h4>ClimateForcing/WATCH<a class="headerlink" href="#climateforcing-watch" title="Permalink to this headline">¶</a></h4>
+<p>For temporal downscaling of electricity and domestic water withdrawal from annual to monthly, the gridded daily air temperature data from WATCH forcing data methodology applied to Era Interim reanalysis data (WFDEI) from 1971 to 2010 is applied (Weedon et al., 2014).</p>
+<div class="section" id="tas-watch-wfdei-monthly-1971-2010-mat">
+<h5>tas_watch_wfdei_monthly_1971_2010.mat<a class="headerlink" href="#tas-watch-wfdei-monthly-1971-2010-mat" title="Permalink to this headline">¶</a></h5>
+<p>Averaged temperature in a month.</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> mat (MATLAB formatted data), one variable: “tas”</p></li>
+<li><p><strong>Dimension:</strong> 67420 * 480 (480 months in 1971 - 2010)</p></li>
+<li><p><strong>Unit:</strong> Celsius</p></li>
+</ul>
+</div>
+<div class="section" id="hdd-cdd-tas-watch-wfdei-monthly-1971-2010-mat">
+<h5>hdd_cdd_tas_watch_wfdei_monthly_1971_2010.mat<a class="headerlink" href="#hdd-cdd-tas-watch-wfdei-monthly-1971-2010-mat" title="Permalink to this headline">¶</a></h5>
+<p>HDD (heating degree days) and CDD (cooling degree days) in a month</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> mat (MATLAB formatted data), two variables: “hdd” and “cdd”</p></li>
+<li><p><strong>Dimension:</strong> 67420 * 480 (480 months in 1971 - 2010)</p></li>
+<li><p><strong>Unit:</strong> Celsius</p></li>
+</ul>
+<p>For more information about how to calculate HDD and CDD, please refer to Huang et al.,
+2017.</p>
+</div>
+</div>
+</div>
+<div class="section" id="tethys-reference">
+<h3>tethys/reference<a class="headerlink" href="#tethys-reference" title="Permalink to this headline">¶</a></h3>
+<p>In addition to the input files from the example data, there are a few reference files included with tethys itself. The files in this folder are dependent files used by temporal downscaling modules of Tethys. They will be copied at install time to Tethys’s folder inside site-packages.</p>
+<div class="section" id="dist-csv">
+<h4>dist.csv<a class="headerlink" href="#dist-csv" title="Permalink to this headline">¶</a></h4>
+<p>This file lists the distances between a target basin and its neighbor basins, to show the closest neighbor basins for a target basin. The basin IDs are based on the global basin map (235 basins). It is a fixed input.</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one header</p></li>
+<li><p><strong>Dimension:</strong> 4 columns (target basin #, neighbor basin #, distance in m, value ID)</p></li>
+<li><p><strong>Unit:</strong> meters</p></li>
+<li><p><strong>Reference:</strong> N/A</p></li>
+</ul>
+</div>
+<div class="section" id="obv-dom-csv">
+<h4>obv_dom.csv<a class="headerlink" href="#obv-dom-csv" title="Permalink to this headline">¶</a></h4>
+<p>Observed domestic water withdrawals (averaged) in 12 months at five cities in five different countries. The values do not need to be unformed under the same unit for different cities since normalized values (=each month / 12 month total) will be used by Tethys.</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 5 rows (5 cities) * 18 columns (city name, country name, period of years, gird index in 67420 cells, latitude, longitude, data of Jan, Feb, …, Dec)</p></li>
+<li><p><strong>Unit:</strong> N/A</p></li>
+<li><p><strong>Reference:</strong> Collected and consolidated by Huang et al. (2017)</p></li>
+</ul>
+</div>
+<div class="section" id="iea-9-countries-monthly-avgelectricity-2000-2015-csv">
+<h4>IEA_9_Countries_Monthly_AvgElectricity_2000_2015.csv<a class="headerlink" href="#iea-9-countries-monthly-avgelectricity-2000-2015-csv" title="Permalink to this headline">¶</a></h4>
+<p>Observed electricity generation (averaged) in 12 months at 9 countries. Normalized values (=each month / 12 month total) will be used by Tethys.</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 13 rows (12 months + 1) * 10 columns (9 countries + 1), the first row of data lists the country IDs from 249 counties (ID: 0-248), the first column of data lists the month index.</p></li>
+<li><p><strong>Unit:</strong> GWh</p></li>
+<li><p><strong>Reference:</strong> Collected and consolidated by Huang et al. (2017) from IEA historical data</p></li>
+</ul>
+</div>
 </div>
 </div>
 <div class="section" id="configuration-file">
-<h2>Configuration file<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h2>
+<span id="id4"></span><h2>Configuration file<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h2>
 <p>Tethys uses an INI configuration file to specify the input data, options, and output folder. The example “config.ini” is extensively commented.</p>
 </div>
 <div class="section" id="output-files">
-<h2>Output files<a class="headerlink" href="#output-files" title="Permalink to this headline">¶</a></h2>
+<span id="id5"></span><h2>Output files<a class="headerlink" href="#output-files" title="Permalink to this headline">¶</a></h2>
+<p>Here is an overview of the example output files.</p>
+<div class="section" id="diagnostics">
+<h3>Diagnostics<a class="headerlink" href="#diagnostics" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="diagnostics-spatial-downscaling-csv">
+<h4>Diagnostics_Spatial_Downscaling.csv<a class="headerlink" href="#diagnostics-spatial-downscaling-csv" title="Permalink to this headline">¶</a></h4>
+<p>This table is created by diagnostics module for spatial downscaling. It lists the water withdrawal values for each year, each region and each water demand sector comparing between downscaled results and input data from GCAM along with their differences.</p>
 </div>
-<div class="section" id="implementation-and-architecture">
-<h2>Implementation and Architecture<a class="headerlink" href="#implementation-and-architecture" title="Permalink to this headline">¶</a></h2>
-<div class="align-center figure" id="id2">
-<a class="reference internal image-reference" href="_images/flowchart.png"><img alt="flowchart" src="_images/flowchart.png" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text"><em>Flowchart of Tethys</em></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+<div class="section" id="diagnostics-temporal-downscaling-irrigation-csv">
+<h4>Diagnostics_Temporal_Downscaling_Irrigation.csv<a class="headerlink" href="#diagnostics-temporal-downscaling-irrigation-csv" title="Permalink to this headline">¶</a></h4>
+</div>
+<div class="section" id="diagnostics-temporal-downscaling-domestic-png">
+<h4>Diagnostics_Temporal_Downscaling_Domestic.png<a class="headerlink" href="#diagnostics-temporal-downscaling-domestic-png" title="Permalink to this headline">¶</a></h4>
+</div>
+<div class="section" id="diagnostics-temporal-downscaling-electricity-png">
+<h4>Diagnostics_Temporal_Downscaling_Electricity.png<a class="headerlink" href="#diagnostics-temporal-downscaling-electricity-png" title="Permalink to this headline">¶</a></h4>
+<p>These three files are created by diagnostics module for temporal downscaling. A diagnostics table for irrigation sector will be generated listing the water withdrawal values for each year, each basin before and after temporal downscaling. Two figures will also be plotted to show the simulated monthly profiles for domestic sector and electricity generation sector respectively, comparing with overserved results. The observed monthly profiles were imported from files described in “tethys/reference” (Huang et al., 2017).</p>
+</div>
+</div>
+<div class="section" id="downscaling-results">
+<h3>Downscaling Results<a class="headerlink" href="#downscaling-results" title="Permalink to this headline">¶</a></h3>
+<p>The downscaled withdrawal results for each sector will be saved. They are divided into two groups, Spatial Downscaling (SD) results (the file name starts with “wd”) and Temporal Downscaling (TD) results (the file name starts with “twd”). The following abbreviations for sectors are used in the file names:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 44%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Sector Name</p></th>
+<th class="head"><p>Abbreviation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Domestic</p></td>
+<td><p>dom</p></td>
+</tr>
+<tr class="row-odd"><td><p>Electricity Generation</p></td>
+<td><p>elec</p></td>
+</tr>
+<tr class="row-even"><td><p>Manufacturing</p></td>
+<td><p>mfg</p></td>
+</tr>
+<tr class="row-odd"><td><p>Mining</p></td>
+<td><p>min</p></td>
+</tr>
+<tr class="row-even"><td><p>Irrigation</p></td>
+<td><p>irr</p></td>
+</tr>
+<tr class="row-odd"><td><p>Livestock</p></td>
+<td><p>liv</p></td>
+</tr>
+</tbody>
+</table>
+<p>“nonag” is used for nonagricultural, which refers to the Domestic, Electricity Generation, Manufacturing, and Mining sectors.</p>
+<div class="section" id="wd-sector-km3peryr-csv">
+<h4>wd(sector)_km3peryr.csv<a class="headerlink" href="#wd-sector-km3peryr-csv" title="Permalink to this headline">¶</a></h4>
+<p>There are 8 spatial downscaling result files. One for each of the 6 sectors, combined results for the nonagricultural sectors, and the totals.</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67,420 rows x 5+ columns (grid ID, lon, lat, ilon, ilat, first_year,…, last_year)</p></li>
+<li><p><strong>Unit:</strong> km<sup>3</sup></p></li>
+</ul>
+</div>
+<div class="section" id="twd-sector-km3permonth-csv">
+<h4>twd(sector)_km3permonth.csv<a class="headerlink" href="#twd-sector-km3permonth-csv" title="Permalink to this headline">¶</a></h4>
+<p>There are 6 temporal downscaling result files, one for each of the 6 sectors.</p>
+<ul class="simple">
+<li><p><strong>File Format:</strong> csv, one-row header</p></li>
+<li><p><strong>Dimension:</strong> 67,420 rows x 5+ columns (grid ID, lon, lat, ilon, ilat, first_month,…, last_month)</p></li>
+<li><p><strong>Unit:</strong> km<sup>3</sup></p></li>
+</ul>
+</div>
 </div>
 </div>
 <div class="section" id="downscaling-algorithms">
-<h2>Downscaling Algorithms<a class="headerlink" href="#downscaling-algorithms" title="Permalink to this headline">¶</a></h2>
+<span id="id6"></span><h2>Downscaling Algorithms<a class="headerlink" href="#downscaling-algorithms" title="Permalink to this headline">¶</a></h2>
 <p>Withdrawal data is downscaled spatially first (5 year regional -&gt; 5 year gridded) then temporally (5 year gridded -&gt; monthly gridded).</p>
 <div class="section" id="spatial">
 <h3>Spatial<a class="headerlink" href="#spatial" title="Permalink to this headline">¶</a></h3>
 <p>For non-agricultural sectors (domestic, electricity, manfufacturing, and mining), water withdrawal in each grid square is assumed to be proportional to that square’s population.</p>
-<div class="math">
-<p><span class="math">W_{grid} = W_{region}\frac{P_{grid}}{P_{region}}</span></p>
-</div><p>Where <em>W</em> is withdrawal and <em>P</em> is population.</p>
 </div>
 <div class="section" id="temporal">
 <h3>Temporal<a class="headerlink" href="#temporal" title="Permalink to this headline">¶</a></h3>
