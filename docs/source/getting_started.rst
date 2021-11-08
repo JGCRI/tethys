@@ -49,7 +49,7 @@ Example data is available for download at https://zenodo.org/record/4780604#.YXG
 
 .. note:: Although the download is 2.1 GB, the extracted data will require around **9.6 GB** of storage space.
 
-Once extracted, change the paths in "config.ini" to point to the relevant files and directories on your machine.
+Once extracted, change the paths in *config.ini* to point to the relevant files and directories on your machine.
 
 Run
 -----------------------------------
