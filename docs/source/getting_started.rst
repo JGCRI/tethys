@@ -33,7 +33,7 @@ To switch to the active development branch, use::
 
 	$ git checkout dev
 
-Once downloaded, install as a Python package by running "setup.py" from the command line::
+Once downloaded, install as a Python package by running *setup.py* from the command line::
 
 	$ python setup.py install
 	

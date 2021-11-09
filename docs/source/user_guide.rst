@@ -3,7 +3,6 @@ User Guide
 
 Architecture
 ------------
-
 Below is a conceptual overview of tethys. The downscaling process can be thought of in 2 main stages: First, the GCAM data is downscaled spatially, from 32 geopolitical regions and 235 basins to a 0.5 geographic degree grid. Then, that data is further downscaled temporally, from every 5 years to monthly. During both of these stages, water withdrawal data is downscaled separately within six sectors (irrigation, livestock, domestic, electricity generation, manufacturing, and mining), using data from various :ref:`input-files` and several :ref:`downscaling-algorithms`.
 
 .. figure:: _static/flowchart.png
@@ -17,13 +16,124 @@ Below is a conceptual overview of tethys. The downscaling process can be thought
 The resulting :ref:`output-files` are written to a folder, which can be specified by the user in the :ref:`configuration-file`. The config file also has options to make tethys perform diagnostics on the output, or even skip the temporal downscaling step, should that be desired.
 
 
+Generalization
+--------------
+The Python language and the dependent library packages used are all open-source. Tethys is highly modularized and designed for easy installation. The modules can be used independently by the user, which also allows the future development and feasibility of user contribution with least effort. Modification of a certain step could be restricted to the corresponding module. Extension of the model is achievable by adding a new module to an existing sub-folder or a new sub-folder. For detailed documentation on Tethys's modules, refer to the API reference.
+
+In order to run Tethys on alternate input data, no changes to Tethys itself would be needed, provided the data is appropriately prepared (i.e. in the same fashion described in :ref:`input-files`). User control over Tethys is primarily done through a configuration file, which is explained in the following section.
+
+
+.. _configuration-file:
+
+Configuration file
+------------------
+Tethys uses an INI configuration file to specify the input data, options, and output folder. The example *config.ini* is extensively commented. For concise reference, the following tables summarize the keys for each section, with links to documentation for the relevant file or directory when applicable.
+
+.. note:: Depending on where you've extracted the example data, you may need to use the absolute paths for each file or folder, and acceptable directory separators may vary between operating systems.
+
+..
+	Bad referencing practices in this section.
+
+
+``[Project]``
+^^^^^^^^^^^^^
+This section defines project-level parameters.
+
+==================	=========================
+Key Name			Value Description
+==================	=========================
+ProjectName			Name for the downscaling project
+InputFolder			Path to :ref:`Example/Input`
+OutputFolder		Folder where :ref:`Output files` will be created
+rgnmapdir			Path to :ref:`rgn32`
+OutputFormat		0 = create both (default), 1 = csv file, 2 = netcdf(nc) file
+OutputUnit			0 = cubic kilometers (default), 1 = mm
+PerformDiagnostics	1 = perform diagnostics (default), 0 = don't
+PerformTemporal		0 = don't perform temporal downscaling (default), 1 = do
+==================	=========================
+
+``[GCAM]``
+^^^^^^^^^^
+This section indicates the GCAM database location, query, and options.
+
+==================	=========================
+Key Name			Value Description
+==================	=========================
+GCAM_subreg			GCAM version; 0 = regions/aez, 1= regions/basin 
+GCAM_DBpath			Path to the :ref:`GCAM` folder, e.g. Example/Input/GCAM
+GCAM_DBfile			The name of the database folder, e.g. gcam5p1_ref_db
+GCAM_query			xml query file for GCAM database, e.g. *query_regbasin.xml*
+GCAM_Years			comma separated YYYY string, e.g. 2005,2010,2015,2020,2025
+==================	=========================
+
+``[GriddedMap]``
+^^^^^^^^^^^^^^^^
+This section contains the paths to various files from :ref:`Example/Input`, :ref:`rgn32`, and :ref:`harmonized_inputs`.
+
+==================	=========================
+Key Name			Value Description
+==================	=========================
+Area				Path to :ref:`*Grid_Areas_ID.csv*`
+Coord				Path to :ref:`*coordinates.csv*`
+AEZ					Path to :ref:`*AEZ.csv*`
+Population_GPW		Path to :ref:`*GPW_population.csv*`
+Population_HYDE		Path to :ref:`*HYDE_population.csv*`
+Irrigation_GMIA		Path to :ref:`*GMIA_cropland.csv*`
+Irrigation_HYDE		Path to :ref:`*HYDE_cropland.csv*`
+Livestock_Buffalo	Path to :ref:`livestock_buffalo.csv <*livestock_(animal).csv*>`
+Livestock_Cattle	Path to :ref:`livestock_cattle.csv <*livestock_(animal).csv*>`
+Livestock_Goat		Path to :ref:`livestock_goat.csv <*livestock_(animal).csv*>`
+Livestock_Sheep		Path to :ref:`livestock_sheep.csv <*livestock_(animal).csv*>`
+Livestock_Poultry	Path to :ref:`livestock_poultry.csv <*livestock_(animal).csv*>`
+Livestock_Pig		Path to :ref:`livestock_pig.csv <*livestock_(animal).csv*>`
+BasinIDs			Path to :ref:`*basin.csv*`
+BasinNames			Path to :ref:`*BasinNames.csv*`
+RegionIDs			Path to :ref:`*region32_grids.csv*`
+RegionNames			Path to :ref:`*RgnNames.csv*`
+CountryIDs			Path to :ref:`*country.csv*`
+CountryNames		Path to :ref:`*country-names.csv*`
+GCAM_Basin_Key		Path to :ref:`*gcam_basin_lookup.csv*`
+Buffalo_Fraction	Path to :ref:`bfracFAO2005.csv <*bfracFAO2005.csv* and *gfracFAO2005.csv*>`
+Goat_Fraction		Path to :ref:`gfracFAO2005.csv <*bfracFAO2005.csv* and *gfracFAO2005.csv*>`
+Irrigated_Fract		Path to :ref:`*irrigation-frac.csv*`
+==================	=========================
+
+``[TemporalDownscaling]``
+^^^^^^^^^^^^^^^^^^^^^^^^^
+This section is only required if ``PerformTemporal = 1`` in the ``[Project]`` section. It contains paths to files used in temporal downscaling.
+
+=====================	=========================
+Key Name				Value Description
+=====================	=========================
+temporal_climate		Path to :ref:`ClimateForcing/WATCH/watch_wfdei_monthly_1971_2010.npz <ClimateForcing/WATCH>`
+Domestic_R				Path to :ref:`*DomesticR.csv*`
+Elec_Building			Path to :ref:`ElecBuilding_1971_2010.csv <TD_elec_paras>`
+Elec_Industry			Path to :ref:`ElecIndustry_1971_2010.csv <TD_elec_paras>`
+Elec_Building_heat		Path to :ref:`ElecBuildingHeat_1971_2010.csv <TD_elec_paras>`
+Elec_Building_cool		Path to :ref:`ElecBuildingCool_1971_2010.csv <TD_elec_paras>`
+Elec_Building_others	Path to :ref:`ElecBuildingOthers_1971_2010.csv <TD_elec_paras>`
+Irr_MonthlyData			Path to :ref:`Irrigation/pcrglobwb_wfdei_varsoc_pirrww_global_monthly_1971_2010.nc <Irrigation>`
+TemporalInterpolation	0 = GCAM outputs are annual (default), 1 = linear interpolation needed
+=====================	=========================
+
+``[Logger]``
+^^^^^^^^^^^^
+Defualt logging options can be found in the table below.
+
+==============	=================
+Key Name		Value Description
+==============	=================
+filename		mainlog.txt
+MinLogLevel		DEBUG
+MinScreenLevel	INFO
+==============	=================
+
 .. _input-files:
 
 Input files
 -----------
 
 This section contains descriptions of the example input files from :ref:`installing-package-data`, and some additional reference files included with tethys. Should you wish to run tethys with alternate input data, you'll need to prepare those files using this same structure.
-
 
 .. note:: Adapted from https://github.com/JGCRI/tethys/blob/main/docs/ReadMe_IO_Data.pdf, may need to be further modified to reflect recent changes.
 
@@ -66,7 +176,7 @@ Area value of each land grid cell
 
 * **File Format:** csv, no header
 * **Dimension:** 67,420 rows x 1 column, decimal values 
-* **Unit:** ha (convert to km2 by *0.01)
+* **Unit:** ha (multiply by 0.01 to convert to km\ :sup:`2`)
 * **Reference:** N/A
 
 
@@ -138,8 +248,7 @@ The proportions of electricity use, are used in temporal downscaling of electric
 
 harmonized_inputs
 ^^^^^^^^^^^^^^^^^
-The term "grid" is used to describe the spatial resolution of 0.5 geographic degrees. A global full data map contains a total of 259,200 grid cells (360 x 720) of which 67,420 grid cells are categorized as "land grids" and are considered valid for simulation purposes. In this study, the land grid cells are used to define a "gridded" map according to the coordinates and the indexes of the 67,420 cells on the 360 x 720 grid. The inputs converted using the 67,420 grid cells according to the coordinate data file are called harmonized inputs.
-
+The term "grid" is used here to describe the spatial resolution of 0.5 geographic degrees. A global full data map contains a total of 259,200 grid cells (360 x 720), of which 67,420 grid cells are categorized as "land grids" and are considered valid for simulation purposes. In this study, the land grid cells are used to define a "gridded" map according to the coordinates and the indices of the 67,420 cells on the 360 x 720 grid. The inputs converted using the 67,420 grid cells according to the coordinate data file are called harmonized inputs.
 
 *AEZ.csv*
 """""""""
@@ -266,7 +375,7 @@ The original data files were obtained from ISI-MIP (Warszawski et al., 2014). We
 the original data files into gridded monthly percentage values as the weighting profiles 
 applied in temporal downscaling of irrigation.
 
-The data files are classic NetCDF file. They follow the same format:
+The data files are classic NetCDF files. They follow the same format:
 
 * **Size**:       67,420 x 480 
 * **Dimensions**:  index, month 
@@ -280,14 +389,14 @@ ClimateForcing/WATCH
 """"""""""""""""""""
 For temporal downscaling of electricity and domestic water withdrawal from annual to monthly, the gridded daily air temperature data from WATCH forcing data methodology applied to Era Interim reanalysis data (WFDEI) from 1971 to 2010 is applied (Weedon et al., 2014).
 
-.. note:: note to self: Seems to have been replaced by 1 file, *watch_wfdei_monthly_1971_2010.npz*
+.. note:: these may have been replaced by 1 file, *watch_wfdei_monthly_1971_2010.npz*
 
 *tas_watch_wfdei_monthly_1971_2010.mat*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Averaged temperature in a month.
 
 * **File Format:** mat (MATLAB formatted data), one variable: "tas"
-* **Dimension:** 67,420 * 480 (480 months in 1971 - 2010)
+* **Dimension:** 67,420 x 480 (480 months in 1971 - 2010)
 * **Unit:** Celsius
  
 *hdd_cdd_tas_watch_wfdei_monthly_1971_2010.mat*
@@ -295,12 +404,11 @@ Averaged temperature in a month.
 HDD (heating degree days) and CDD (cooling degree days) in a month
 
 * **File Format:** mat (MATLAB formatted data), two variables: "hdd" and "cdd"
-* **Dimension:** 67,420 * 480 (480 months in 1971 - 2010)
+* **Dimension:** 67,420 x 480 (480 months in 1971 - 2010)
 * **Unit:** Celsius
  
 For more information about how to calculate HDD and CDD, please refer to Huang et al., 
 2017.
-
 
 
 tethys/reference
@@ -321,7 +429,7 @@ This file lists the distances between a target basin and its neighbor basins, to
 Observed domestic water withdrawals (averaged) in 12 months at five cities in five different countries. The values do not need to be unformed under the same unit for different cities since normalized values (=each month / 12 month total) will be used by Tethys.
 
 * **File Format:** csv, one-row header
-* **Dimension:** 5 rows (5 cities) * 18 columns (city name, country name, period of years, gird index in 67,420 cells, latitude, longitude, data of Jan, Feb, ..., Dec)
+* **Dimension:** 5 rows (5 cities) x 18 columns (city name, country name, period of years, gird index in 67,420 cells, latitude, longitude, data of Jan, Feb, ..., Dec)
 * **Unit:** N/A
 * **Reference:** Collected and consolidated by Huang et al. (2017)
  
@@ -330,122 +438,16 @@ Observed domestic water withdrawals (averaged) in 12 months at five cities in fi
 Observed electricity generation (averaged) in 12 months at 9 countries. Normalized values (=each month / 12 month total) will be used by Tethys.
 
 * **File Format:** csv, one-row header 
-* **Dimension:** 13 rows (12 months + 1) * 10 columns (9 countries + 1), the first row of data lists the country IDs from 249 counties (ID: 0-248), the first column of data lists the month index.
+* **Dimension:** 13 rows (12 months + 1) x 10 columns (9 countries + 1), the first row of data lists the country IDs from 249 counties (ID: 0-248), the first column of data lists the month index.
 * **Unit:** GWh
 * **Reference:** Collected and consolidated by Huang et al. (2017) from IEA historical data
- 
 
-.. _configuration-file:
-
-Configuration file
-------------------
-
-Tethys uses an INI configuration file to specify the input data, options, and output folder. The example *config.ini* is extensively commented. For concise reference, the following tables summarize the keys for each section, with links to documentation for the relevant file or directory when applicable.
-
-.. note:: Depending on where you've placed the example data and installed tethys, you may need to use the absolute paths for each file or folder, and acceptable directory separators may vary between operating systems.
-
-..
-	Bad referencing practices in this section, but was convenient at the time
-
-
-``[Project]``
-^^^^^^^^^^^^^
-This section defines the project parameters.
-
-==================	=========================
-Key Name			Value Description
-==================	=========================
-ProjectName			Name for the downscaling project
-InputFolder			Path to :ref:`Example/Input`
-OutputFolder		Folder where :ref:`Output files` will be created
-rgnmapdir			Path to :ref:`rgn32`
-OutputFormat		0 = create both (default), 1 = csv file, 2 = netcdf(nc) file
-OutputUnit			0 = cubic kilometers (default), 1 = mm
-PerformDiagnostics	1 = perform diagnostics (default), 0 = don't
-PerformTemporal		0 = don't perform temporal downscaling (default), 1 = do
-==================	=========================
-
-``[GCAM]``
-^^^^^^^^^^
-GCAM database location, query, and options.
-
-==================	=========================
-Key Name			Value Description
-==================	=========================
-GCAM_subreg			GCAM version; 0 = regions/aez, 1= regions/basin 
-GCAM_DBpath			The path to the :ref:`GCAM` folder, e.g. Example/Input/GCAM
-GCAM_DBfile			The name of the database folder, e.g. gcam5p1_ref_db
-GCAM_query			xml query file for GCAM database, e.g. *query_regbasin.xml*
-GCAM_Years			comma separated YYYY string, e.g. 2005,2010,2015,2020,2025
-==================	=========================
-
-``[GriddedMap]``
-^^^^^^^^^^^^^^^^
-This section contains the names of various files from :ref:`Example/Input`, :ref:`rgn32`, and :ref:`harmonized_inputs`.
-
-==================	=========================
-Key Name			Value Description
-==================	=========================
-Area				:ref:`*Grid_Areas_ID.csv*`
-Coord				:ref:`*coordinates.csv*`
-AEZ					:ref:`*AEZ.csv*`
-Population_GPW		:ref:`*GPW_population.csv*`
-Population_HYDE		:ref:`*HYDE_population.csv*`
-Irrigation_GMIA		:ref:`*GMIA_cropland.csv*`
-Irrigation_HYDE		:ref:`*HYDE_cropland.csv*`
-Livestock_Buffalo	:ref:`livestock_buffalo.csv <*livestock_(animal).csv*>`
-Livestock_Cattle	:ref:`livestock_cattle.csv <*livestock_(animal).csv*>`
-Livestock_Goat		:ref:`livestock_goat.csv <*livestock_(animal).csv*>`
-Livestock_Sheep		:ref:`livestock_sheep.csv <*livestock_(animal).csv*>`
-Livestock_Poultry	:ref:`livestock_poultry.csv <*livestock_(animal).csv*>`
-Livestock_Pig		:ref:`livestock_pig.csv <*livestock_(animal).csv*>`
-BasinIDs			:ref:`*basin.csv*`
-BasinNames			:ref:`*BasinNames.csv*`
-RegionIDs			:ref:`*region32_grids.csv*`
-RegionNames			:ref:`*RgnNames.csv*`
-CountryIDs			:ref:`*country.csv*`
-CountryNames		:ref:`*country-names.csv*`
-GCAM_Basin_Key		:ref:`*gcam_basin_lookup.csv*`
-Buffalo_Fraction	:ref:`bfracFAO2005.csv <*bfracFAO2005.csv* and *gfracFAO2005.csv*>`
-Goat_Fraction		:ref:`gfracFAO2005.csv <*bfracFAO2005.csv* and *gfracFAO2005.csv*>`
-Irrigated_Fract		:ref:`*irrigation-frac.csv*`
-==================	=========================
-
-``[TemporalDownscaling]``
-^^^^^^^^^^^^^^^^^^^^^^^^^
-Temporal Downscaling: Year to Month
-
-=====================	=========================
-Key Name				Value Description
-=====================	=========================
-temporal_climate		:ref:`ClimateForcing/WATCH/watch_wfdei_monthly_1971_2010.npz <ClimateForcing/WATCH>`
-Domestic_R				:ref:`*DomesticR.csv*`
-Elec_Building			:ref:`ElecBuilding_1971_2010.csv <TD_elec_paras>`
-Elec_Industry			:ref:`ElecIndustry_1971_2010.csv <TD_elec_paras>`
-Elec_Building_heat		:ref:`ElecBuildingHeat_1971_2010.csv <TD_elec_paras>`
-Elec_Building_cool		:ref:`ElecBuildingCool_1971_2010.csv <TD_elec_paras>`
-Elec_Building_others	:ref:`ElecBuildingOthers_1971_2010.csv <TD_elec_paras>`
-Irr_MonthlyData			:ref:`Irrigation/pcrglobwb_wfdei_varsoc_pirrww_global_monthly_1971_2010.nc <Irrigation>`
-TemporalInterpolation	0 = GCAM outputs are annual (default), 1 = linear interpolation needed
-=====================	=========================
-
-``[Logger]``
-^^^^^^^^^^^^
-Defualt logging options.
-
-==============	=================
-Key Name		Value Description
-==============	=================
-filename		mainlog.txt
-MinLogLevel		DEBUG
-MinScreenLevel	INFO
-==============	=================
 
 .. _output-files:
 
 Output files
 ------------
-Below is an overview of the example output files.
+Below is an overview of the output files that will be created by Tethys, which include the downscaling results and some diagnostics files.
 
 Downscaling Results
 ^^^^^^^^^^^^^^^^^^^
@@ -464,13 +466,12 @@ Livestock				liv
 
 The abbreviation "nonag" is used for non-agricultural sectors (i.e. the total of all but irrigation and livestock).
 
-
 *wd(sector)_km3peryr.csv*
 """""""""""""""""""""""""
 There are 8 spatial downscaling result files. One for each of the 6 sectors (dom/elec/mfg/min/irr/liv), combined results for the non-agricultural sectors (nonag), and the totals (total).
 
 * **File Format:** csv, one-row header 
-* **Dimension:** 67,420 rows x 5+ columns (grid ID, lon, lat, ilon, ilat; first_year, ... , last_year)
+* **Dimension:** 67,420 rows x 5+ columns (grid ID, lon, lat, ilon, ilat; first_year, ..., final_year)
 * **Unit:** km\ :sup:`3`
 
 *twd(sector)_km3permonth.csv*
@@ -478,7 +479,7 @@ There are 8 spatial downscaling result files. One for each of the 6 sectors (dom
 There are 6 temporal downscaling result files, one for each of the 6 sectors (dom/elec/mfg/min/irr/liv).
 
 * **File Format:** csv, one-row header 
-* **Dimension:** 67,420 rows x 5+ columns (grid ID, lon, lat, ilon, ilat; first_month, ... , last_month)
+* **Dimension:** 67,420 rows x 5+ columns (grid ID, lon,lat, ilon, ilat; first_month, ... , final_month)
 * **Unit:** km\ :sup:`3`
 
 
@@ -507,20 +508,24 @@ Downscaling Algorithms
 ----------------------
 Withdrawal data is downscaled spatially first, then temporally.
 
+..
+	Would be nice to have the actual formulas here
+
 Spatial
 ^^^^^^^
+The algorithms for spatial downscaling were derived from research by Edmonds and Reilly [#Edmonds1985]_.
 
 Non-agricultural
 """"""""""""""""
-For non-agricultural sectors (domestic, electricity, manfufacturing, and mining), water withdrawal in each grid square is assumed to be proportional to that square's population.
+For non-agricultural sectors (domestic, electricity, manfufacturing, and mining), water withdrawal in each grid square is assumed to be proportional to that square's population [#Wada2011]_.
 
 Irrigation
 """"""""""
-Irrigation water withdrawal is downscaled using global coverage of gridded cropland areas equipped with irrigation.
+Irrigation water withdrawal is downscaled using global coverage of gridded cropland areas equipped with irrigation [#Siebert2007]_ [#Portmann2008]_.
 
 Livestock
 """""""""
-The gridded global maps of livestock in six types (cattle, buffalo, sheep, goats, pigs and poultry) are used as proxy to downscale livestock water withdrawal.
+The gridded global maps of livestock in six types (cattle, buffalo, sheep, goats, pigs and poultry) are used as proxy to downscale livestock water withdrawal [#Wada2011]_ [#Alcamo2002]_ [#Florke2004]_.
 
 
 Temporal
@@ -536,12 +541,62 @@ For the livestock, manufacturing and mining sectors, it was assumed that water w
 
 Irrigation
 """"""""""
-The monthly gridded irrigation water withdrawal was estimated by relying on monthly irrigation results from several global hydrological models to quantify monthly weighting profiles of how irrigation is spread out within a year in a particular region and per crop type.
+The monthly gridded irrigation water withdrawal was estimated by relying on monthly irrigation results from several global hydrological models (e.g. H08 [#Hanasaki2008a]_ [#Hanasaki2008b]_, LPJmL [#Rost2008]_, and PCR-GLOBWB [#Wada2011]_ [#VanBeek2011]_) to quantify monthly weighting profiles of how irrigation is spread out within a year in a particular region and per crop type.
 
 Domestic
 """"""""
-Temporally downscaling domestic water withdrawal from annual to monthly was based on a formula utilizing monthly temperature data.
+Temporally downscaling domestic water withdrawal from annual to monthly was based on a formula from [#Wada2011]_ and [#Voisin2013]_ and utilizing monthly temperature data; details of data sources were listed in [#huang2017]_.
 
 Electricity Generation
 """"""""""""""""""""""
-Temporally downscaling electricity generation water withdrawal from annual to monthly was based on the assumption that the amount of water withdrawal for electricity generation is proportional to the amount of electricity generated.
+Temporally downscaling electric water withdrawal from annual to monthly was based on the assumption that the amount of water withdrawal for electricity generation is proportional to the amount of electricity generated [#Voisin2013]_ [#Hejazi2015]_.
+
+
+References
+----------
+..
+	NOTE: The below references were all copied from the previous version. In-line reference links have also been preserved in most sections that were largely copied from the previous verion. This should be reviewed.
+
+.. [#Li2017] Li, X., Vernon, C.R., Hejazi, M.I., Link, R.P, Feng, L., Liu, Y., Rauchenstein, L.T., 2017. Xanthos – A Global Hydrologic Model. Journal of Open Research Software 5(1): 21. DOI: http://doi.org/10.5334/jors.181
+
+.. [#Edmonds1985] Edmonds, J., and Reilly, J. M., 1985. Global Energy: Assessing the Future. Oxford University Press, New York, pp.317.
+
+.. [#Edmonds1997] Edmonds, J., Wise, M., Pitcher, H., Richels, R., Wigley, T. and Maccracken, C., 1997. An integrated assessment of climate change and the accelerated introduction of advanced energy technologies-an application of MiniCAM 1.0. Mitigation and adaptation strategies for global change 1(4): 311-339. DOI: http://dx.doi.org/10.1023/B:MITI.0000027386.34214.60
+
+.. [#Hejazi2014] Hejazi, M.I., Edmonds, J., Clarke, L., Kyle, P., Davies, E., Chaturvedi, V., Wise, M., Patel, P., Eom, J. and Calvin, K., 2014. Integrated assessment of global water scarcity over the 21st century under multiple climate change mitigation policies. Hydrology and Earth System Sciences 18: 2859-2883. DOI: http://dx.doi.org/10.5194/hess-18-2859-2014
+
+.. [#Huang2017] Huang, Z., Hejazi, M., Li, X., Tang, Q., Leng, G., Liu, Y., Döll, P., Eisner, S., Gerten, D., Hanasaki, N., and Wada, Y., 2017. Reconstruction of global gridded monthly sectoral water withdrawals for 1971–2010 and analysis of their spatiotemporal patterns, Hydrology and Earth System Sciences Discussions, DOI: https://doi.org/10.5194/hess-2017-551
+
+.. [#Wada2011] Wada, Y., Van Beek, L.P.H., Viviroli, D., Dürr, H.H., Weingartner, R. and Bierkens, M.F., 2011. Global monthly water stress: 2. Water withdrawal and severity of water stress. Water Resources Research 47(7): W07518. DOI: http://dx.doi.org/10.1029/2010WR009792
+
+.. [#Siebert2007] Siebert, S., Döll, P., Feick, S., Hoogeveen, J. and Frenken, K., 2007. Global map of irrigation areas version 4.0. 1. Johann Wolfgang Goethe University, Frankfurt am Main, Germany/Food and Agriculture Organization of the United Nations, Rome, Italy.
+
+.. [#Portmann2008] Portmann, F.T., Siebert, S., Bauer, C. and Döll, P., 2008. Global dataset of monthly growing areas of 26 irrigated crops: version 1.0. University of Frankfurt, Germany.
+
+.. [#Klein2011] Klein Goldewijk, K., Beusen, A., Van Drecht, G. and De Vos, M., 2011. The HYDE 3.1 spatially explicit database of human induced global land use change over the past 12,000 years. Global Ecology and Biogeography 20(1): 73-86. DOI: https://doi.org/10.1111/j.1466-8238.2010.00587.x
+
+.. [#CIESIN2016] Center for International Earth Science Information Network (CIESIN) - Columbia University. 2016. Gridded Population of the World, Version 4 (GPWv4): Population Count. NASA Socioeconomic Data and Applications Center (SEDAC), Palisades, NY. DOI: http://dx.doi.org/10.7927/H4X63JVC
+
+.. [#Siebert2013] Siebert, S., Henrich, V., Frenken, K., and Burke, J., 2013. Global Map of Irrigation Areas version 5. Rheinische Friedrich-Wilhelms-University, Bonn, Germany / Food and Agriculture Organization of the United Nations, Rome, Italy.
+
+.. [#Wint2007] Wint, W. and Robinson, T., 2007. Gridded livestock of the world. Food and Agriculture Organization (FAO), report 131, Rome.
+
+.. [#Alcamo2002] Alcamo, J. and Henrichs, T., 2002. Critical regions: A model-based estimation of world water resources sensitive to global changes. Aquatic Sciences-Research Across Boundaries, 64(4): 352-362. DOI: https://doi.org/10.1007/PL00012591
+
+.. [#Florke2004] Flörke, M. and Alcamo, J., 2004. European outlook on water use. Center for Environmental Systems Research, University of Kassel, Final Report, EEA/RNC/03/007, 83.
+
+.. [#Hanasaki2008a] Hanasaki, N., Kanae, S., Oki, T., Masuda, K., Motoya, K., Shirakawa, N., Shen, Y. and Tanaka, K., 2008. An integrated model for the assessment of global water resources–Part 1: Model description and input meteorological forcing. Hydrology and Earth System Sciences 12(4): 1007-1025. DOI: https://doi.org/10.5194/hess-12-1007-2008
+
+.. [#Hanasaki2008b] Hanasaki, N., Kanae, S., Oki, T., Masuda, K., Motoya, K., Shirakawa, N., Shen, Y. and Tanaka, K., 2008. An integrated model for the assessment of global water resources–Part 2: Applications and assessments. Hydrology and Earth System Sciences 12(4): 1027-1037. DOI: https://doi.org/10.5194/hess-12-1027-2008
+
+.. [#Rost2008] Rost, S., Gerten, D., Bondeau, A., Lucht, W., Rohwer, J. and Schaphoff, S., 2008. Agricultural green and blue water consumption and its influence on the global water system. Water Resources Research 44(9): W09405. DOI: https://doi.org/10.1029/2007WR006331
+
+.. [#VanBeek2011] Van Beek, L.P.H., Wada, Y. and Bierkens, M.F., 2011. Global monthly water stress: 1. Water balance and water availability. Water Resources Research 47(7): W07517. DOI: https://doi.org/10.1029/2010WR009791
+
+.. [#Voisin2013] Voisin, N., Liu, L., Hejazi, M., Tesfa, T., Li, H., Huang, M., Liu, Y. and Leung, L.R., 2013. One-way coupling of an integrated assessment model and a water resources model: evaluation and implications of future changes over the US Midwest. Hydrology and Earth System Sciences 17(11): 4555-4575. DOI: https://doi.org/10.5194/hess-17-4555-2013
+
+.. [#Hejazi2015] Hejazi, M.I., Voisin, N., Liu, L., Bramer, L.M., Fortin, D.C., Hathaway, J.E., Huang, M., Kyle, P., Leung, L.R., Li, H.Y. and Liu, Y., 2015. 21st century United States emissions mitigation could increase water stress more than the climate change it is mitigating. Proceedings of the National Academy of Sciences 112(34): 10635-10640. DOI: https://doi.org/10.1073/pnas.1421675112
+
+.. [#Kim2016] Kim, S.H., Hejazi, M., Liu, L., Calvin, K., Clarke, L., Edmonds, J., Kyle, P., Patel, P., Wise, M. and Davies, E., 2016. Balancing global water availability and use at basin scale in an integrated assessment model. Climatic Change 136(2): 217-231. DOI: http://dx.doi.org/10.1007/s10584-016-1604-6
+
+.. [#NetCDF] An Introduction to NetCDF. http://www.unidata.ucar.edu/software/netcdf/docs/netcdf_introduction.html
