@@ -107,11 +107,11 @@ Key Name				Value Description
 =====================	=========================
 temporal_climate		Path to :ref:`ClimateForcing/WATCH/watch_wfdei_monthly_1971_2010.npz <ClimateForcing/WATCH>`
 Domestic_R				Path to :ref:`*DomesticR.csv*`
-Elec_Building			Path to :ref:`ElecBuilding_1971_2010.csv <TD_elec_paras>`
-Elec_Industry			Path to :ref:`ElecIndustry_1971_2010.csv <TD_elec_paras>`
-Elec_Building_heat		Path to :ref:`ElecBuildingHeat_1971_2010.csv <TD_elec_paras>`
-Elec_Building_cool		Path to :ref:`ElecBuildingCool_1971_2010.csv <TD_elec_paras>`
-Elec_Building_others	Path to :ref:`ElecBuildingOthers_1971_2010.csv <TD_elec_paras>`
+Elec_Building			Path to :ref:`ElecBuilding_1971_2010.csv <TD_Elec_paras>`
+Elec_Industry			Path to :ref:`ElecIndustry_1971_2010.csv <TD_Elec_paras>`
+Elec_Building_heat		Path to :ref:`ElecBuildingHeat_1971_2010.csv <TD_Elec_paras>`
+Elec_Building_cool		Path to :ref:`ElecBuildingCool_1971_2010.csv <TD_Elec_paras>`
+Elec_Building_others	Path to :ref:`ElecBuildingOthers_1971_2010.csv <TD_Elec_paras>`
 Irr_MonthlyData			Path to :ref:`Irrigation/pcrglobwb_wfdei_varsoc_pirrww_global_monthly_1971_2010.nc <Irrigation>`
 TemporalInterpolation	0 = GCAM outputs are annual (default), 1 = linear interpolation needed
 =====================	=========================
@@ -506,10 +506,7 @@ These three files are created by the diagnostics module for temporal downscaling
 
 Downscaling Algorithms
 ----------------------
-Withdrawal data is downscaled spatially first, then temporally.
-
-..
-	Would be nice to have the actual formulas here
+Water withdrawal data is downscaled spatially first, then temporally.
 
 Spatial
 ^^^^^^^
@@ -517,7 +514,12 @@ The algorithms for spatial downscaling were derived from research by Edmonds and
 
 Non-agricultural
 """"""""""""""""
-For non-agricultural sectors (domestic, electricity, manfufacturing, and mining), water withdrawal in each grid square is assumed to be proportional to that square's population [#Wada2011]_.
+For non-agricultural sectors (domestic, electricity, manfufacturing, and mining), water withdrawal in each grid square is assumed to be proportional to that square's population [#Wada2011]_. The sectoral water withdrawal of grid i belonging to region j is given by
+
+.. math::
+	W_i = W_j\times\frac{P_i}{P_j},
+
+where W_j is the sectoral withdrawal of region j, P_i is the human population of grid i, and P_j is the population of region j.
 
 Irrigation
 """"""""""
@@ -525,7 +527,15 @@ Irrigation water withdrawal is downscaled using global coverage of gridded cropl
 
 Livestock
 """""""""
-The gridded global maps of livestock in six types (cattle, buffalo, sheep, goats, pigs and poultry) are used as proxy to downscale livestock water withdrawal [#Wada2011]_ [#Alcamo2002]_ [#Florke2004]_.
+The gridded global maps of livestock in six types (cattle, buffalo, sheep, goats, pigs and poultry) are used as a proxy to downscale livestock water withdrawal [#Wada2011]_ [#Alcamo2002]_ [#Florke2004]_. Water withdrawal for livestock in grid i of region j is given by
+
+.. math::
+	W_i = \sum_{L}W_{Lj}\times\frac{P_{Li}}{P_{Lj}},
+
+where the sum is over the 6 livestock types, W_Lj is the water withdrawal for livestock type L in region j, P_Li is the number of L in grid i, and P_Lj is the number of L in region j.
+
+..
+	some intermediate steps (gfrac, bfrac) have been ommitted, more data prep than downscaling procedure?
 
 
 Temporal
@@ -534,10 +544,16 @@ When the data from GCAM is not annual, such as the 5-year increments from the ex
 
 Livestock, Manufacturing, and Mining
 """"""""""""""""""""""""""""""""""""
-For the livestock, manufacturing and mining sectors, it was assumed that water withdrawal is uniform throughout the year.
+For the livestock, manufacturing and mining sectors, it was assumed that water withdrawal is uniform throughout the year. As months (and years) can have different numbers of days, this is also taken into consideration. For month i of year j, the monthly water withdrawal for any of these sectors is given by
 
+.. math::
+
+	W_i = W_j\times\frac{D_i}{D_j}
+	
 ..
-	Different months have different numbers of days, so I'm guessing rather than month_withdrawal = year_withdrawal/12, something like month_withdrawal = year_withdrawal*(month_days/year_days) is used?
+	math isn't typesetting for some reason? It works when I test with alabaster theme locally, but not when I use conf.py
+
+where W_j is the annual sectoral withdrawal, D_i is the number of days in month i, and D_j is the number of days in year j.
 
 Irrigation
 """"""""""
@@ -545,11 +561,26 @@ The monthly gridded irrigation water withdrawal was estimated by relying on mont
 
 Domestic
 """"""""
-Temporally downscaling domestic water withdrawal from annual to monthly was based on a formula from [#Wada2011]_ and [#Voisin2013]_ and utilizing monthly temperature data; details of data sources were listed in [#huang2017]_.
+Temporally downscaling domestic water withdrawal from annual to monthly was based on a formula from [#Wada2011]_ and [#Voisin2013]_ and utilizing monthly temperature data; details of data sources were listed in [#huang2017]_. For each grid square, domestic water withdrawal in month i of year j is given by
+
+.. math::
+	W_{d_{ij}} = \frac{W_{d_j}}{12}\left(\frac{T_{ij}-T_{\text{avg}}}{T_{\max}-T_{\min}}R+1\right),
+
+where W_d_j is the domestic withdrawal in year j, T_ij is the average temperature of that month, and T_avg, T_max, and T_min are the average maximum and minimum monthly temperature of that year, and R is the amplitude of relative withdrawal between the warmest and coldest months, as found in :ref:`*DomesticR.csv*`.
 
 Electricity Generation
 """"""""""""""""""""""
 Temporally downscaling electric water withdrawal from annual to monthly was based on the assumption that the amount of water withdrawal for electricity generation is proportional to the amount of electricity generated [#Voisin2013]_ [#Hejazi2015]_.
+When both annual heating and cooling are above certain thresholds, the water withdrawal for electricity generation in month i of year j is given by
+
+.. math::
+	W_{ij} = W_j\times\left[p_b\times\left(p_h\frac{\text{HDD}_{ij}}{\sum\text{HDD}_{ij}}+p_c\frac{\text{CDD}_{ij}}{\sum\text{CDD}_{ij}}+p_u\frac{1}{12}\right)+p_{it}\frac{1}{12}\right]
+	
+where W_j is the water withdrawal for electricity generation in year j, the p values are taken from :ref:`TD_Elec_paras`, and monthly and annual HDD/CDD values are calculated from :ref:`ClimateForcing/WATCH`. When sum(HDD) < 650 or sum(CDD) < 450, slightly different versions of this formula are used.
+
+..
+	need to elaborate on this explanation a bit, can't find source on meaning of alternate formulae
+
 
 
 References
