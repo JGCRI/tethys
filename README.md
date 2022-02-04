@@ -1,7 +1,7 @@
 [![DOI](https://zenodo.org/badge/104476654.svg)](https://zenodo.org/badge/latestdoi/104476654)
 
 # Model Documentation
-jgcri.github.io/tethys/
+https://jgcri.github.io/tethys/index.html
 
 # Summary
 Tethys serves as a critical step to link Xanthos (a global hydrologic model) and the Global Change Analysis Model (GCAM). The spatial resolution of GCAM is geopolitical regional scale for energy and economy systems (32 regions), and river basins for the land, agriculture, and water systems (235 water basins). GCAM is often used as a boundary condition and coupled to sectoral models, such as the Community Land Model and Xanthos, which typically operate at finer spatial and temporal scales than GCAM. For example, Xanthos is a globally gridded hydrology model that operates at monthly scale. Resolving such a mismatch in spatial and temporal scales facilitated coupling these models together. It is also helpful for understanding seasonal patterns of water use and acquiring high resolution water use data. The main objective of Tethys is to reconstruct global monthly gridded (0.5 geographic degree) water withdrawal datasets by spatial and temporal downscaling water withdrawal estimates at region/basin and annual scale. As an open-access software, Tethys applies statistical downscaling algorithms, to spatially and temporally downscale water withdrawal data from annual region/basin scale into monthly grid scale. In our study, the water withdrawals are separated into six sectors: irrigation, livestock, domestic, electricity (generation), manufacturing and mining.
