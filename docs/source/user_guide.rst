@@ -514,7 +514,7 @@ The algorithms for spatial downscaling were derived from research by Edmonds and
 
 Non-agricultural
 """"""""""""""""
-For non-agricultural sectors (domestic, electricity, manfufacturing, and mining), water withdrawal in each grid square is assumed to be proportional to that square's population [#Wada2011]_. The sectoral water withdrawal of grid i belonging to region j is given by
+For non-agricultural sectors (domestic, electricity, manufacturing, and mining), water withdrawal in each grid square is assumed to be proportional to that square's population [#Wada2011]_. The sectoral water withdrawal of grid i belonging to region j is given by
 
 .. math::
 	W_i = W_j\times\frac{P_i}{P_j},
@@ -524,6 +524,8 @@ where W_j is the sectoral withdrawal of region j, P_i is the human population of
 Irrigation
 """"""""""
 Irrigation water withdrawal is downscaled using global coverage of gridded cropland areas equipped with irrigation [#Siebert2007]_ [#Portmann2008]_.
+
+Irrigation water withdrawal is the total of water withdrawal for 13 crop types: Corn, FiberCrop, MiscCrop, OilCrop, OtherGrain, PalmFruit, Rice, Root_Tuber, SugarCrop, Wheat, FodderHerb, FodderGrass, and biomass. The Demeter outputs contain the fraction of land use for all crops except biomass, for each grid cell in 5 year timesteps. For these 12 crops, water withdrawal from each region-basin is distributed among its constituent grid cells, proportional to the amount of land used for that crop in that grid cell. At present, biomass is divided evenly between a region's cells, with respect to the area of that cell.
 
 Livestock
 """""""""
