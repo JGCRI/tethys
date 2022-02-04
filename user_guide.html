@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
   <link rel="stylesheet" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
+  <link rel="stylesheet" href="_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
   <link rel="stylesheet" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/tethys.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/getting_started.css" type="text/css" />
@@ -956,7 +956,7 @@ et al., 2017.</p>
 <p>The algorithms for spatial downscaling were derived from research by Edmonds and Reilly <a class="footnote-reference brackets" href="#edmonds1985" id="id7">2</a>.</p>
 <div class="section" id="non-agricultural">
 <h4>Non-agricultural<a class="headerlink" href="#non-agricultural" title="Permalink to this headline">¶</a></h4>
-<p>For non-agricultural sectors (domestic, electricity, manfufacturing, and mining), water withdrawal in each grid square is assumed to be proportional to that square’s population <a class="footnote-reference brackets" href="#wada2011" id="id8">6</a>. The sectoral water withdrawal of grid i belonging to region j is given by</p>
+<p>For non-agricultural sectors (domestic, electricity, manufacturing, and mining), water withdrawal in each grid square is assumed to be proportional to that square’s population <a class="footnote-reference brackets" href="#wada2011" id="id8">6</a>. The sectoral water withdrawal of grid i belonging to region j is given by</p>
 <div class="math">
 <p><span class="math">W_i = W_j\times\frac{P_i}{P_j},</span></p>
 </div><p>where W_j is the sectoral withdrawal of region j, P_i is the human population of grid i, and P_j is the population of region j.</p>
@@ -964,6 +964,7 @@ et al., 2017.</p>
 <div class="section" id="id9">
 <h4>Irrigation<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
 <p>Irrigation water withdrawal is downscaled using global coverage of gridded cropland areas equipped with irrigation <a class="footnote-reference brackets" href="#siebert2007" id="id10">7</a> <a class="footnote-reference brackets" href="#portmann2008" id="id11">8</a>.</p>
+<p>Irrigation water withdrawal is the total of water withdrawal for 13 crop types: Corn, FiberCrop, MiscCrop, OilCrop, OtherGrain, PalmFruit, Rice, Root_Tuber, SugarCrop, Wheat, FodderHerb, FodderGrass, and biomass. The Demeter outputs contain the fraction of land use for all crops except biomass, for each grid cell in 5 year timesteps. For these 12 crops, water withdrawal from each region-basin is distributed among its constituent grid cells, proportional to the amount of land used for that crop in that grid cell. At present, biomass is divided evenly between a region’s cells, with respect to the area of that cell.</p>
 </div>
 <div class="section" id="livestock">
 <h4>Livestock<a class="headerlink" href="#livestock" title="Permalink to this headline">¶</a></h4>

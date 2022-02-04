@@ -55,11 +55,11 @@ Run
 -----------------------------------
 Verify the installation was successful by running the following in Python::
 
-	from tethys.model import Tethys
+	import tethys
 	
 Make sure the config file is properly set up and somewhere Python can find it (or use its absolute file path), then run::
 
-   dmw = Tethys('config.ini')
+   dmw = tethys.model.run_model('config.ini')
    
 Logging info should begin printing to the console, and after a few minutes downscaled data and diagnostics output files will be created.
 
