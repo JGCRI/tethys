@@ -37,72 +37,143 @@ class Tethys(ReadConfig):
         t0 = time.time()
         logging.info('Start Disaggregation...')
 
-        # Create OutputFolder if doesn't exist
-        # Check whether the specified path exists or not
-        if not os.path.exists(self.OutputFolder):
-            # Create a new directory because it does not exist
-            os.makedirs(self.OutputFolder)
-            print(f"Output folder created: {self.OutputFolder}")
+        if self.GCAM_query[-4:] == ".xml":
 
-        TDYears, gridded_data, gis_data = run_disaggregation(years=self.years,
-                                                    InputRegionFile=self.InputRegionFile,
-                                                    mapsize=self.mapsize,
-                                                    subreg=self.subreg,
-                                                    UseDemeter=self.UseDemeter,
-                                                    PerformDiagnostics=self.PerformDiagnostics,
-                                                    PerformTemporal=self.PerformTemporal,
-                                                    RegionNames=self.RegionNames,
-                                                    gcam_basin_lu=self.gcam_basin_lu,
-                                                    buff_fract=self.buff_fract,
-                                                    goat_fract=self.goat_fract,
-                                                    GCAM_DBpath=self.GCAM_DBpath,
-                                                    GCAM_DBfile=self.GCAM_DBfile,
-                                                    GCAM_query=self.GCAM_query,
-                                                    OutputFolder=self.OutputFolder,
-                                                    temporal_climate=self.temporal_climate,
-                                                    Irr_MonthlyData=self.Irr_MonthlyData,
-                                                    TemporalInterpolation=self.TemporalInterpolation,
-                                                    Domestic_R=self.Domestic_R,
-                                                    Elec_Building=self.Elec_Building,
-                                                    Elec_Industry=self.Elec_Industry,
-                                                    Elec_Building_heat=self.Elec_Building_heat,
-                                                    Elec_Building_cool=self.Elec_Building_cool,
-                                                    Elec_Building_others=self.Elec_Building_others,
-                                                    Livestock_Buffalo=self.Livestock_Buffalo,
-                                                    Livestock_Cattle=self.Livestock_Cattle,
-                                                    Livestock_Goat=self.Livestock_Goat,
-                                                    Livestock_Sheep=self.Livestock_Sheep,
-                                                    Livestock_Poultry=self.Livestock_Poultry,
-                                                    Livestock_Pig=self.Livestock_Pig,
-                                                    Coord=self.Coord,
-                                                    Area=self.Area,
-                                                    InputBasinFile=self.InputBasinFile,
-                                                    BasinNames=self.BasinNames,
-                                                    InputCountryFile=self.InputCountryFile,
-                                                    CountryNames=self.CountryNames,
-                                                    Population_GPW=self.Population_GPW,
-                                                    Population_HYDE=self.Population_HYDE,
-                                                    Irrigation_GMIA=self.Irrigation_GMIA,
-                                                    Irrigation_HYDE=self.Irrigation_HYDE,
-                                                    DemeterOutputFolder=self.DemeterOutputFolder,
-                                                    OutputUnit=self.OutputUnit
-                                                    )
+            # Create OutputFolder if doesn't exist
+            # Check whether the specified path exists or not
+            if not os.path.exists(self.OutputFolder):
+                # Create a new directory because it does not exist
+                os.makedirs(self.OutputFolder)
+                print(f"Output folder created: {self.OutputFolder}")
 
-        print(gridded_data)
+            TDYears, gridded_data, gis_data = run_disaggregation(years=self.years,
+                                                        InputRegionFile=self.InputRegionFile,
+                                                        mapsize=self.mapsize,
+                                                        subreg=self.subreg,
+                                                        UseDemeter=self.UseDemeter,
+                                                        PerformDiagnostics=self.PerformDiagnostics,
+                                                        PerformTemporal=self.PerformTemporal,
+                                                        RegionNames=self.RegionNames,
+                                                        gcam_basin_lu=self.gcam_basin_lu,
+                                                        buff_fract=self.buff_fract,
+                                                        goat_fract=self.goat_fract,
+                                                        GCAM_DBpath=self.GCAM_DBpath,
+                                                        GCAM_DBfile=self.GCAM_DBfile,
+                                                        GCAM_query=self.GCAM_query,
+                                                        OutputFolder=self.OutputFolder,
+                                                        temporal_climate=self.temporal_climate,
+                                                        Irr_MonthlyData=self.Irr_MonthlyData,
+                                                        TemporalInterpolation=self.TemporalInterpolation,
+                                                        Domestic_R=self.Domestic_R,
+                                                        Elec_Building=self.Elec_Building,
+                                                        Elec_Industry=self.Elec_Industry,
+                                                        Elec_Building_heat=self.Elec_Building_heat,
+                                                        Elec_Building_cool=self.Elec_Building_cool,
+                                                        Elec_Building_others=self.Elec_Building_others,
+                                                        Livestock_Buffalo=self.Livestock_Buffalo,
+                                                        Livestock_Cattle=self.Livestock_Cattle,
+                                                        Livestock_Goat=self.Livestock_Goat,
+                                                        Livestock_Sheep=self.Livestock_Sheep,
+                                                        Livestock_Poultry=self.Livestock_Poultry,
+                                                        Livestock_Pig=self.Livestock_Pig,
+                                                        Coord=self.Coord,
+                                                        Area=self.Area,
+                                                        InputBasinFile=self.InputBasinFile,
+                                                        BasinNames=self.BasinNames,
+                                                        InputCountryFile=self.InputCountryFile,
+                                                        CountryNames=self.CountryNames,
+                                                        Population_GPW=self.Population_GPW,
+                                                        Population_HYDE=self.Population_HYDE,
+                                                        Irrigation_GMIA=self.Irrigation_GMIA,
+                                                        Irrigation_HYDE=self.Irrigation_HYDE,
+                                                        DemeterOutputFolder=self.DemeterOutputFolder,
+                                                        OutputUnit=self.OutputUnit
+                                                        )
 
-        logging.info(f"Disaggregation completed in : {(time.time() - t0)} seconds")
+            print(gridded_data)
 
-        t0 = time.time()
-        logging.info('Writing outputs...')
-        write_outputs(OutputUnit=self.OutputUnit,
-                      OutputFormat=self.OutputFormat,
-                      OutputFolder=self.OutputFolder,
-                      PerformTemporal=self.PerformTemporal,
-                      TDYears=TDYears,
-                      years=self.years,
-                      OUT=gridded_data,
-                      GISData=gis_data)
-        logging.info(f"Outputs writen in: {(time.time() - t0)}")
+            logging.info(f"Disaggregation completed in : {(time.time() - t0)} seconds")
+
+            t0 = time.time()
+            logging.info('Writing outputs...')
+            write_outputs(OutputUnit=self.OutputUnit,
+                          OutputFormat=self.OutputFormat,
+                          OutputFolder=self.OutputFolder,
+                          PerformTemporal=self.PerformTemporal,
+                          TDYears=TDYears,
+                          years=self.years,
+                          OUT=gridded_data,
+                          GISData=gis_data)
+            logging.info(f"Outputs writen in: {(time.time() - t0)}")
+
+        if self.GCAM_query_C[-4:] == ".xml":
+
+            # Create OutputFolder if doesn't exist
+            # Check whether the specified path exists or not
+            if not os.path.exists(self.OutputFolder + "_C"):
+                # Create a new directory because it does not exist
+                os.makedirs(self.OutputFolder + "_C")
+                print(f"Consumption Output folder created: {self.OutputFolder + '_C'}")
+
+            TDYears, gridded_data, gis_data = run_disaggregation(years=self.years,
+                                                                 InputRegionFile=self.InputRegionFile,
+                                                                 mapsize=self.mapsize,
+                                                                 subreg=self.subreg,
+                                                                 UseDemeter=self.UseDemeter,
+                                                                 PerformDiagnostics=self.PerformDiagnostics,
+                                                                 PerformTemporal=self.PerformTemporal,
+                                                                 RegionNames=self.RegionNames,
+                                                                 gcam_basin_lu=self.gcam_basin_lu,
+                                                                 buff_fract=self.buff_fract,
+                                                                 goat_fract=self.goat_fract,
+                                                                 GCAM_DBpath=self.GCAM_DBpath,
+                                                                 GCAM_DBfile=self.GCAM_DBfile,
+                                                                 GCAM_query=self.GCAM_query_C,
+                                                                 OutputFolder=self.OutputFolder,
+                                                                 temporal_climate=self.temporal_climate,
+                                                                 Irr_MonthlyData=self.Irr_MonthlyData,
+                                                                 TemporalInterpolation=self.TemporalInterpolation,
+                                                                 Domestic_R=self.Domestic_R,
+                                                                 Elec_Building=self.Elec_Building,
+                                                                 Elec_Industry=self.Elec_Industry,
+                                                                 Elec_Building_heat=self.Elec_Building_heat,
+                                                                 Elec_Building_cool=self.Elec_Building_cool,
+                                                                 Elec_Building_others=self.Elec_Building_others,
+                                                                 Livestock_Buffalo=self.Livestock_Buffalo,
+                                                                 Livestock_Cattle=self.Livestock_Cattle,
+                                                                 Livestock_Goat=self.Livestock_Goat,
+                                                                 Livestock_Sheep=self.Livestock_Sheep,
+                                                                 Livestock_Poultry=self.Livestock_Poultry,
+                                                                 Livestock_Pig=self.Livestock_Pig,
+                                                                 Coord=self.Coord,
+                                                                 Area=self.Area,
+                                                                 InputBasinFile=self.InputBasinFile,
+                                                                 BasinNames=self.BasinNames,
+                                                                 InputCountryFile=self.InputCountryFile,
+                                                                 CountryNames=self.CountryNames,
+                                                                 Population_GPW=self.Population_GPW,
+                                                                 Population_HYDE=self.Population_HYDE,
+                                                                 Irrigation_GMIA=self.Irrigation_GMIA,
+                                                                 Irrigation_HYDE=self.Irrigation_HYDE,
+                                                                 DemeterOutputFolder=self.DemeterOutputFolder,
+                                                                 OutputUnit=self.OutputUnit
+                                                                 )
+
+            print(gridded_data)
+
+            logging.info(f"Consumption Disaggregation completed in : {(time.time() - t0)} seconds")
+
+            t0 = time.time()
+            logging.info('Writing Consumption outputs...')
+            write_outputs(OutputUnit=self.OutputUnit,
+                          OutputFormat=self.OutputFormat,
+                          OutputFolder=self.OutputFolder + "_C",
+                          PerformTemporal=self.PerformTemporal,
+                          TDYears=TDYears,
+                          years=self.years,
+                          OUT=gridded_data,
+                          GISData=gis_data)
+            logging.info(f"Consumption Outputs writen in: {(time.time() - t0)}")
 
         logging.info(f'Tethys model run completed in {round(time.time() - self.start_time, 7)}')
 

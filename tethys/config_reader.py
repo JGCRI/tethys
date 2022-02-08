@@ -65,6 +65,10 @@ class ReadConfig(Logger):
         self.GCAM_DBpath = os.path.join(self.InputFolder, self.gcam_config.get('GCAM_DBpath', None))
         self.GCAM_DBfile = self.gcam_config.get('GCAM_DBfile', None)
         self.GCAM_query = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_query', None))
+        try:
+            self.GCAM_query_C = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_query_C', None))
+        except:
+            self.GCAM_query_C = ''
         self.subreg = int(self.gcam_config.get('GCAM_subreg', None))
 
         # a single year input will be string not list for self.years
