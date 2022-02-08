@@ -129,7 +129,7 @@ class Tethys(ReadConfig):
                                                                  GCAM_DBpath=self.GCAM_DBpath,
                                                                  GCAM_DBfile=self.GCAM_DBfile,
                                                                  GCAM_query=self.GCAM_query_C,
-                                                                 OutputFolder=self.OutputFolder,
+                                                                 OutputFolder=self.OutputFolder + '_C',
                                                                  temporal_climate=self.temporal_climate,
                                                                  Irr_MonthlyData=self.Irr_MonthlyData,
                                                                  TemporalInterpolation=self.TemporalInterpolation,
@@ -173,6 +173,17 @@ class Tethys(ReadConfig):
                           years=self.years,
                           OUT=gridded_data,
                           GISData=gis_data)
+
+            for filename in os.listdir(self.OutputFolder + '_C'): #TODO make write_outputs write these right instead
+                if 'wd' in filename:
+                    oldname = os.path.join(self.OutputFolder + '_C', filename)
+                    newname = os.path.join(self.OutputFolder + '_C', filename.replace('wd', 'cd', 1))
+                    try:
+                        os.rename(oldname, newname)
+                    except:
+                        os.remove(newname)
+                        os.rename(oldname, newname)
+
             logging.info(f"Consumption Outputs writen in: {(time.time() - t0)}")
 
         logging.info(f'Tethys model run completed in {round(time.time() - self.start_time, 7)}')
