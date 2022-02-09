@@ -53,6 +53,8 @@ class ReadConfig(Logger):
         self.rgnmapdir = self.project_config.get('rgnmapdir')
         self.OutputFormat = int(self.project_config.get('OutputFormat', 0))
         self.OutputUnit = int(self.project_config.get('OutputUnit', 0))
+        self.PerformWithdrawal = int(self.project_config.get('PerformWithdrawal', 1))
+        self.PerformConsumption = int(self.project_config.get('PerformConsumption', 0))
         self.PerformDiagnostics = int(self.project_config.get('PerformDiagnostics', 0))
         self.PerformTemporal = int(self.project_config.get('PerformTemporal', 0))
         self.UseDemeter = int(self.project_config.get('UseDemeter', 0))
@@ -64,11 +66,16 @@ class ReadConfig(Logger):
 
         self.GCAM_DBpath = os.path.join(self.InputFolder, self.gcam_config.get('GCAM_DBpath', None))
         self.GCAM_DBfile = self.gcam_config.get('GCAM_DBfile', None)
-        self.GCAM_query = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_query', None))
-        try:
-            self.GCAM_query_C = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_query_C', None))
-        except:
-            self.GCAM_query_C = ''
+
+        # for backwards compatability, and allow for non-default query files
+        self.GCAM_query = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_query', 'None'))
+        if self.PerformWithdrawal == 1 and not self.GCAM_query.endswith('.xml'):
+            self.GCAM_query = pkg_resources.resource_filename('tethys', 'reference/query_withdrawal.xml')
+
+        self.GCAM_query_C = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_query_C', 'None'))
+        if self.PerformConsumption == 1 and not self.GCAM_query_C.endswith('.xml'):
+            self.GCAM_query = pkg_resources.resource_filename('tethys', 'reference/query_consumption.xml')
+
         self.subreg = int(self.gcam_config.get('GCAM_subreg', None))
 
         # a single year input will be string not list for self.years

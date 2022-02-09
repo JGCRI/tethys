@@ -37,7 +37,7 @@ class Tethys(ReadConfig):
         t0 = time.time()
         logging.info('Start Disaggregation...')
 
-        if self.GCAM_query[-4:] == ".xml":
+        if self.PerformWithdrawal == 1 or self.GCAM_query.endswith('.xml'):
 
             # Create OutputFolder if doesn't exist
             # Check whether the specified path exists or not
@@ -106,7 +106,7 @@ class Tethys(ReadConfig):
                           GISData=gis_data)
             logging.info(f"Outputs writen in: {(time.time() - t0)}")
 
-        if self.GCAM_query_C[-4:] == ".xml":
+        if self.PerformConsumption == 1 or self.GCAM_query_C.endswith('.xml'):
 
             # Create OutputFolder if doesn't exist
             # Check whether the specified path exists or not
