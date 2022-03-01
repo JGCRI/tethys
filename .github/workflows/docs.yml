@@ -12,6 +12,8 @@ jobs:
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "docs/"
+        pre-build-command: "apt-get update -y && apt-get install -y texlive-latex-basic dvipng"
+        build-command: "make html"
     - name: Deploy
       uses: JamesIves/github-pages-deploy-action@4.1.4
       with:
