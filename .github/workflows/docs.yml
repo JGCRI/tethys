@@ -14,7 +14,6 @@ jobs:
     - name: Can we find latex
       run: |
         which latex
-        dpkg -L latex
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with:
