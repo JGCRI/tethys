@@ -8,12 +8,21 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: ammaraskar/sphinx-action@master
+    - name: Install pandoc
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y pandoc
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
       with:
-        docs-folder: "docs/"
-        pre-build-command: "apt-get update -y && apt-get install -y texlive-latex-basic dvipng"
-        build-command: "make html"
+        python-version: '3.9'
+    - name: Update pip and install python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+    - name: Build html docs
+      working-directory: 'docs/'
+      run: |
+        make html
     - name: Deploy
       uses: JamesIves/github-pages-deploy-action@4.1.4
       with:
