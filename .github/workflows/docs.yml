@@ -10,7 +10,11 @@ jobs:
     steps:
     - name: Install pandoc
       run: |
-        sudo apt-get update -y && sudo apt-get install -y pandoc
+        sudo apt-get update -y && sudo apt-get install -y pandoc texlive-latex-extra dvipng
+    - name: Can we find latex
+      run: |
+        which latex
+        dpkg -L latex
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with:
