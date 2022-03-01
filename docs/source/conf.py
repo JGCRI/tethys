@@ -50,6 +50,9 @@ extensions = [
     'sphinx-mathjax-offline'
 ]
 
+# trying per https://www.sphinx-doc.org/en/master/usage/extensions/math.html#module-sphinx.ext.mathjax
+mathjax_path = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
