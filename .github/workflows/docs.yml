@@ -9,6 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+    - name: Install imgmath dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install texlive-latex-base dvipng
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "docs/"
