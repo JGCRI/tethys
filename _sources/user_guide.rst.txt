@@ -52,6 +52,15 @@ PerformDiagnostics	1 = perform diagnostics (default), 0 = don't
 PerformTemporal		0 = don't perform temporal downscaling (default), 1 = do
 ==================	=========================
 
+.. note::
+	**If you want to run consumption:**
+	
+	In order to run consumption using the built-in consumption query, you can add ``PerformConsumption = 1`` to this section (it is 0 by default). Output files for consumption will be written to a seperate folder, named like ``OutputFolder_C``.
+	
+	In order to suppress withdrawal and only run consumption, you need to explicitly set ``PerformWithdrawal = 0`` (since it is 1 by default), and remove ``GCAM_query`` from the ``[GCAM]`` section.
+	
+	You can also use the built-in query for withdrawal by specifying ``PerformWithdrawal = 1`` (it is 1 by default), but you must remove ``GCAM_query`` from the ``[GCAM]`` section, or it will override the built-in.
+
 ``[GCAM]``
 ^^^^^^^^^^
 This section indicates the GCAM database location, query, and options.
@@ -65,6 +74,16 @@ GCAM_DBfile			The name of the database folder, e.g. gcam5p1_ref_db
 GCAM_query			xml query file for GCAM database, e.g. *query_regbasin.xml*
 GCAM_Years			comma separated YYYY string, e.g. 2005,2010,2015,2020,2025
 ==================	=========================
+
+.. note::
+	**New: using built-in query**
+	
+	Rather than defining ``GCAM_query`` in this section, you can run Tethys using a built-in withdrawal query by adding ``PerformWithdrawal = 1`` to the ``[Project]`` section. Note that if ``GCAM_query`` is specified, it takes precedence over the built-in, and it will even override in the event that ``PerformWithdrawal = 0``
+	
+	In order to run consumption with a custom query, you can add ``GCAM_query_C = <your_directory>/query_consumption.xml`` to this section. Again, note that this will take precedence over the built-in, or the choice made in the ``[Project]`` section.
+	
+	These options are provided to preserve workflows reliant on existing config files, at least in the near future, but may become deprecated.
+
 
 ``[GriddedMap]``
 ^^^^^^^^^^^^^^^^
@@ -465,6 +484,11 @@ Livestock				liv
 ======================	============
 
 The abbreviation "nonag" is used for non-agricultural sectors (i.e. the total of all but irrigation and livestock).
+
+.. Note::
+	If you run Tethys for consumption, these outputs will be written to a seperate folder, and "wd" will be replaced with "cd" in the resulting file names.
+	
+	Be aware that at present the consumption output files are actually written with "wd" names first, and then renamed to "cd" names (hence why they are written to a separate folder). This means that if you do something like move withdrawal outputs into the consumption folder and then re-run consumption, or attempt to access consumption results after they have been written but before they have been renamed, unexpected behavior may occur.
 
 *wd(sector)_km3peryr.csv*
 """""""""""""""""""""""""

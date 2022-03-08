@@ -322,6 +322,13 @@
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>If you want to run consumption:</strong></p>
+<p>In order to run consumption using the built-in consumption query, you can add <code class="docutils literal notranslate"><span class="pre">PerformConsumption</span> <span class="pre">=</span> <span class="pre">1</span></code> to this section (it is 0 by default). Output files for consumption will be written to a seperate folder, named like <code class="docutils literal notranslate"><span class="pre">OutputFolder_C</span></code>.</p>
+<p>In order to suppress withdrawal and only run consumption, you need to explicitly set <code class="docutils literal notranslate"><span class="pre">PerformWithdrawal</span> <span class="pre">=</span> <span class="pre">0</span></code> (since it is 1 by default), and remove <code class="docutils literal notranslate"><span class="pre">GCAM_query</span></code> from the <code class="docutils literal notranslate"><span class="pre">[GCAM]</span></code> section.</p>
+<p>You can also use the built-in query for withdrawal by specifying <code class="docutils literal notranslate"><span class="pre">PerformWithdrawal</span> <span class="pre">=</span> <span class="pre">1</span></code> (it is 1 by default), but you must remove <code class="docutils literal notranslate"><span class="pre">GCAM_query</span></code> from the <code class="docutils literal notranslate"><span class="pre">[GCAM]</span></code> section, or it will override the built-in.</p>
+</div>
 </div>
 <div class="section" id="gcam">
 <h3><code class="docutils literal notranslate"><span class="pre">[GCAM]</span></code><a class="headerlink" href="#gcam" title="Permalink to this headline">¶</a></h3>
@@ -354,6 +361,13 @@
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>New: using built-in query</strong></p>
+<p>Rather than defining <code class="docutils literal notranslate"><span class="pre">GCAM_query</span></code> in this section, you can run Tethys using a built-in withdrawal query by adding <code class="docutils literal notranslate"><span class="pre">PerformWithdrawal</span> <span class="pre">=</span> <span class="pre">1</span></code> to the <code class="docutils literal notranslate"><span class="pre">[Project]</span></code> section. Note that if <code class="docutils literal notranslate"><span class="pre">GCAM_query</span></code> is specified, it takes precedence over the built-in, and it will even override in the event that <code class="docutils literal notranslate"><span class="pre">PerformWithdrawal</span> <span class="pre">=</span> <span class="pre">0</span></code></p>
+<p>In order to run consumption with a custom query, you can add <code class="docutils literal notranslate"><span class="pre">GCAM_query_C</span> <span class="pre">=</span> <span class="pre">&lt;your_directory&gt;/query_consumption.xml</span></code> to this section. Again, note that this will take precedence over the built-in, or the choice made in the <code class="docutils literal notranslate"><span class="pre">[Project]</span></code> section.</p>
+<p>These options are provided to preserve workflows reliant on existing config files, at least in the near future, but may become deprecated.</p>
+</div>
 </div>
 <div class="section" id="griddedmap">
 <h3><code class="docutils literal notranslate"><span class="pre">[GriddedMap]</span></code><a class="headerlink" href="#griddedmap" title="Permalink to this headline">¶</a></h3>
@@ -906,6 +920,11 @@ et al., 2017.</p>
 </tbody>
 </table>
 <p>The abbreviation “nonag” is used for non-agricultural sectors (i.e. the total of all but irrigation and livestock).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you run Tethys for consumption, these outputs will be written to a seperate folder, and “wd” will be replaced with “cd” in the resulting file names.</p>
+<p>Be aware that at present the consumption output files are actually written with “wd” names first, and then renamed to “cd” names (hence why they are written to a separate folder). This means that if you do something like move withdrawal outputs into the consumption folder and then re-run consumption, or attempt to access consumption results after they have been written but before they have been renamed, unexpected behavior may occur.</p>
+</div>
 <div class="section" id="wd-sector-km3peryr-csv">
 <h4><em>wd(sector)_km3peryr.csv</em><a class="headerlink" href="#wd-sector-km3peryr-csv" title="Permalink to this headline">¶</a></h4>
 <p>There are 8 spatial downscaling result files. One for each of the 6 sectors (dom/elec/mfg/min/irr/liv), combined results for the non-agricultural sectors (nonag), and the totals (total).</p>
