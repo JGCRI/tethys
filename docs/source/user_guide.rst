@@ -59,7 +59,7 @@ PerformTemporal		0 = don't perform temporal downscaling (default), 1 = do
 	
 	In order to suppress withdrawal and only run consumption, you need to explicitly set ``PerformWithdrawal = 0`` (since it is 1 by default), and remove ``GCAM_query`` from the ``[GCAM]`` section.
 	
-	You can also use the built-in query for withdrawal by specifying ``PerformWithdrawal = 1`` (it is 1 by default), but you must remove ``GCAM_query`` from the ``[GCAM]`` section, or it will override the built-in.
+	You can also use the built-in query for withdrawal by specifying ``PerformWithdrawal = 1``, but you must remove ``GCAM_query`` from the ``[GCAM]`` section, or it will override the built-in.
 
 ``[GCAM]``
 ^^^^^^^^^^

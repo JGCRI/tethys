@@ -74,7 +74,7 @@ class ReadConfig(Logger):
 
         self.GCAM_query_C = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_query_C', 'None'))
         if self.PerformConsumption == 1 and not self.GCAM_query_C.endswith('.xml'):
-            self.GCAM_query = pkg_resources.resource_filename('tethys', 'reference/query_consumption.xml')
+            self.GCAM_query_C = pkg_resources.resource_filename('tethys', 'reference/query_consumption.xml')
 
         self.subreg = int(self.gcam_config.get('GCAM_subreg', None))
 
