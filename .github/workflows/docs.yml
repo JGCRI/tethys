@@ -8,12 +8,9 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-    - name: Install pandoc
+    - name: Install latex
       run: |
-        sudo apt-get update -y && sudo apt-get install -y pandoc texlive-latex-extra dvipng
-    - name: Can we find latex
-      run: |
-        which latex
+        sudo apt-get update -y && sudo apt-get install -y texlive-latex-extra dvipng
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with:
