@@ -314,6 +314,12 @@
 <tr class="row-odd"><td><p>OutputUnit</p></td>
 <td><p>0 = cubic kilometers (default), 1 = mm</p></td>
 </tr>
+<tr class="row-even"><td><p>PerformWithdrawal</p></td>
+<td><p>1 = downscale withdrawal (default), 0 = skip</p></td>
+</tr>
+<tr class="row-odd"><td><p>PerformConsumption</p></td>
+<td><p>1 = downscale consumption, 0 = skip (default)</p></td>
+</tr>
 <tr class="row-even"><td><p>PerformDiagnostics</p></td>
 <td><p>1 = perform diagnostics (default), 0 = don’t</p></td>
 </tr>
@@ -325,7 +331,7 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>If you want to run consumption:</strong></p>
-<p>In order to run consumption using the built-in consumption query, you can add <code class="docutils literal notranslate"><span class="pre">PerformConsumption</span> <span class="pre">=</span> <span class="pre">1</span></code> to this section (it is 0 by default). Output files for consumption will be written to a seperate folder, named like <code class="docutils literal notranslate"><span class="pre">OutputFolder_C</span></code>.</p>
+<p>In order to run consumption using a built-in consumption query, you can add <code class="docutils literal notranslate"><span class="pre">PerformConsumption</span> <span class="pre">=</span> <span class="pre">1</span></code> to this section (it is 0 by default). Output files for consumption will be written to a separate folder, named <code class="docutils literal notranslate"><span class="pre">&lt;OutputFolder&gt;_C</span></code>.</p>
 <p>In order to suppress withdrawal and only run consumption, you need to explicitly set <code class="docutils literal notranslate"><span class="pre">PerformWithdrawal</span> <span class="pre">=</span> <span class="pre">0</span></code> (since it is 1 by default), and remove <code class="docutils literal notranslate"><span class="pre">GCAM_query</span></code> from the <code class="docutils literal notranslate"><span class="pre">[GCAM]</span></code> section.</p>
 <p>You can also use the built-in query for withdrawal by specifying <code class="docutils literal notranslate"><span class="pre">PerformWithdrawal</span> <span class="pre">=</span> <span class="pre">1</span></code>, but you must remove <code class="docutils literal notranslate"><span class="pre">GCAM_query</span></code> from the <code class="docutils literal notranslate"><span class="pre">[GCAM]</span></code> section, or it will override the built-in.</p>
 </div>
@@ -335,8 +341,8 @@
 <p>This section indicates the GCAM database location, query, and options.</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 21%" />
-<col style="width: 79%" />
+<col style="width: 19%" />
+<col style="width: 81%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Key Name</p></th>
@@ -354,19 +360,22 @@
 <td><p>The name of the database folder, e.g. gcam5p1_ref_db</p></td>
 </tr>
 <tr class="row-odd"><td><p>GCAM_query</p></td>
-<td><p>xml query file for GCAM database, e.g. <em>query_regbasin.xml</em></p></td>
+<td><p>xml query file for GCAM database withdrawals, e.g. <em>query_regbasin.xml</em></p></td>
 </tr>
-<tr class="row-even"><td><p>GCAM_Years</p></td>
+<tr class="row-even"><td><p>GCAM_query_C</p></td>
+<td><p>xml query file for consumption</p></td>
+</tr>
+<tr class="row-odd"><td><p>GCAM_Years</p></td>
 <td><p>comma separated YYYY string, e.g. 2005,2010,2015,2020,2025</p></td>
 </tr>
 </tbody>
 </table>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><strong>New: using built-in query</strong></p>
-<p>Rather than defining <code class="docutils literal notranslate"><span class="pre">GCAM_query</span></code> in this section, you can run Tethys using a built-in withdrawal query by adding <code class="docutils literal notranslate"><span class="pre">PerformWithdrawal</span> <span class="pre">=</span> <span class="pre">1</span></code> to the <code class="docutils literal notranslate"><span class="pre">[Project]</span></code> section. Note that if <code class="docutils literal notranslate"><span class="pre">GCAM_query</span></code> is specified, it takes precedence over the built-in, and it will even override in the event that <code class="docutils literal notranslate"><span class="pre">PerformWithdrawal</span> <span class="pre">=</span> <span class="pre">0</span></code></p>
-<p>In order to run consumption with a custom query, you can add <code class="docutils literal notranslate"><span class="pre">GCAM_query_C</span> <span class="pre">=</span> <span class="pre">&lt;your_directory&gt;/query_consumption.xml</span></code> to this section. Again, note that this will take precedence over the built-in, or the choice made in the <code class="docutils literal notranslate"><span class="pre">[Project]</span></code> section.</p>
-<p>These options are provided to preserve workflows reliant on existing config files, at least in the near future, but may become deprecated.</p>
+<p><strong>New: using built-in queries</strong></p>
+<p>Rather than defining <code class="docutils literal notranslate"><span class="pre">GCAM_query</span></code> in this section, you can run Tethys using a built-in withdrawal query by adding <code class="docutils literal notranslate"><span class="pre">PerformWithdrawal</span> <span class="pre">=</span> <span class="pre">1</span></code> to the <code class="docutils literal notranslate"><span class="pre">[Project]</span></code> section. Note that if <code class="docutils literal notranslate"><span class="pre">GCAM_query</span></code> is specified, it takes precedence over the built-in, and will cause withdrawals to be downscaled in the even if <code class="docutils literal notranslate"><span class="pre">PerformWithdrawal</span> <span class="pre">=</span> <span class="pre">0</span></code>.</p>
+<p>In order to run consumption with a custom query, you can add <code class="docutils literal notranslate"><span class="pre">GCAM_query_C</span> <span class="pre">=</span> <span class="pre">&lt;your_directory&gt;/query_consumption.xml</span></code> to this section. Again, note that this will take precedence over the built-in should <code class="docutils literal notranslate"><span class="pre">PerformConsumption</span> <span class="pre">=</span> <span class="pre">1</span></code>, and will cause consumption to run even if <code class="docutils literal notranslate"><span class="pre">PerformConsumption</span> <span class="pre">=</span> <span class="pre">0</span></code>.</p>
+<p>These options are provided for flexibility and to preserve workflows reliant on existing config files, at least in the near future.</p>
 </div>
 </div>
 <div class="section" id="griddedmap">

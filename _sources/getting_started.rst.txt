@@ -28,6 +28,10 @@ Installation
 Currently, tethys can be cloned from https://github.com/JGCRI/tethys using::
 
     $ git clone https://github.com/JGCRI/tethys
+	
+The next commands need to be run from within the tethys directory you just downloaded, so change directory with::
+
+	$ cd tethys
 
 To switch to the active development branch, use::
 
