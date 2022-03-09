@@ -48,6 +48,8 @@ OutputFolder		Folder where :ref:`Output files` will be created
 rgnmapdir			Path to :ref:`rgn32`
 OutputFormat		0 = create both (default), 1 = csv file, 2 = netcdf(nc) file
 OutputUnit			0 = cubic kilometers (default), 1 = mm
+PerformWithdrawal	1 = downscale withdrawal (default), 0 = skip
+PerformConsumption	1 = downscale consumption, 0 = skip (default)
 PerformDiagnostics	1 = perform diagnostics (default), 0 = don't
 PerformTemporal		0 = don't perform temporal downscaling (default), 1 = do
 ==================	=========================
@@ -55,7 +57,7 @@ PerformTemporal		0 = don't perform temporal downscaling (default), 1 = do
 .. note::
 	**If you want to run consumption:**
 	
-	In order to run consumption using the built-in consumption query, you can add ``PerformConsumption = 1`` to this section (it is 0 by default). Output files for consumption will be written to a seperate folder, named like ``OutputFolder_C``.
+	In order to run consumption using a built-in consumption query, you can add ``PerformConsumption = 1`` to this section (it is 0 by default). Output files for consumption will be written to a separate folder, named ``<OutputFolder>_C``.
 	
 	In order to suppress withdrawal and only run consumption, you need to explicitly set ``PerformWithdrawal = 0`` (since it is 1 by default), and remove ``GCAM_query`` from the ``[GCAM]`` section.
 	
@@ -71,18 +73,19 @@ Key Name			Value Description
 GCAM_subreg			GCAM version; 0 = regions/aez, 1= regions/basin 
 GCAM_DBpath			Path to the :ref:`GCAM` folder, e.g. Example/Input/GCAM
 GCAM_DBfile			The name of the database folder, e.g. gcam5p1_ref_db
-GCAM_query			xml query file for GCAM database, e.g. *query_regbasin.xml*
+GCAM_query			xml query file for GCAM database withdrawals, e.g. *query_regbasin.xml*
+GCAM_query_C		xml query file for consumption
 GCAM_Years			comma separated YYYY string, e.g. 2005,2010,2015,2020,2025
 ==================	=========================
 
 .. note::
-	**New: using built-in query**
+	**New: using built-in queries**
 	
-	Rather than defining ``GCAM_query`` in this section, you can run Tethys using a built-in withdrawal query by adding ``PerformWithdrawal = 1`` to the ``[Project]`` section. Note that if ``GCAM_query`` is specified, it takes precedence over the built-in, and it will even override in the event that ``PerformWithdrawal = 0``
+	Rather than defining ``GCAM_query`` in this section, you can run Tethys using a built-in withdrawal query by adding ``PerformWithdrawal = 1`` to the ``[Project]`` section. Note that if ``GCAM_query`` is specified, it takes precedence over the built-in, and will cause withdrawals to be downscaled in the even if ``PerformWithdrawal = 0``.
 	
-	In order to run consumption with a custom query, you can add ``GCAM_query_C = <your_directory>/query_consumption.xml`` to this section. Again, note that this will take precedence over the built-in, or the choice made in the ``[Project]`` section.
+	In order to run consumption with a custom query, you can add ``GCAM_query_C = <your_directory>/query_consumption.xml`` to this section. Again, note that this will take precedence over the built-in should ``PerformConsumption = 1``, and will cause consumption to run even if ``PerformConsumption = 0``.
 	
-	These options are provided to preserve workflows reliant on existing config files, at least in the near future, but may become deprecated.
+	These options are provided for flexibility and to preserve workflows reliant on existing config files, at least in the near future.
 
 
 ``[GriddedMap]``
