@@ -1,3 +1,5 @@
+example.py
+
 # OS-specific files
 .DS_Store
 
@@ -141,3 +143,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Example
+example/
