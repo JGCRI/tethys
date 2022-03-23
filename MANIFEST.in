@@ -1,4 +1,2 @@
-include tethys/reference/dist.csv
-include tethys/reference/obv_dom.csv
-include tethys/reference/IEA_9_Countries_Monthly_AvgElectricity_2000_2015.csv
 include tethys/data/*
+include tethys/reference/*
