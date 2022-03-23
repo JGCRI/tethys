@@ -33,9 +33,6 @@ The next commands need to be run from within the tethys directory you just downl
 
 	$ cd tethys
 
-To switch to the active development branch, use::
-
-	$ git checkout dev
 
 Once downloaded, install as a Python package by running *setup.py* from the command line::
 
