@@ -46,7 +46,17 @@ In the future, easy installation will be available via pip.
 
 Installing Package Data
 -----------------------------------
-Example data is available for download at https://zenodo.org/record/4780604#.YXGH8Z7MJPY. 
+Example data is available for download at https://zenodo.org/record/6399117/files/example_v1_3_1.zip?download=1. 
+
+The data can also be directly downloaded for the latest release version as follows::
+
+	import tethys
+    
+    # the directory that you want to download and extract the example data to
+    data_dir = "<my data download location>"
+    
+    # download and unzip the package data to your local machine
+    tethys.get_package_data(data_dir)
 
 .. note:: Although the download is 2.1 GB, the extracted data will require around **9.6 GB** of storage space.
 
