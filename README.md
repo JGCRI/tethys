@@ -29,9 +29,9 @@ Set up Tethys using the following steps:
     ```
 
 3.  Setup your configuration file (.ini).  Inside the "example" directory that you just downloaded (`data_dir` from step 2 above) there will be two example configuration files:
-- `data_dir`/example_1_3_0/config.ini
-- `data_dir`/example_1_3_0/configDemeter.ini
-Before you can run these examples please find and replace all absolute paths in each of these files from "C:/Z/models/tethysExampleFolders/example_v1_3_0/..." to "`data_dir`/example_1_3_0/...".
+- `data_dir`/example_1_3_1/config.ini
+- `data_dir`/example_1_3_1/configDemeter.ini
+Before you can run these examples please find and replace all absolute paths in each of these files from "C:/Z/models/tethysExampleFolders/example_v1_3_1/..." to "`data_dir`/example_1_3_1/...".
 
 4.  To run Tethys:
 
@@ -39,7 +39,7 @@ Before you can run these examples please find and replace all absolute paths in 
     import tethys
     
     # the path and file name that my example configuration (.ini) file was downloaded to
-    config_file = 'data_dir/example_1_3_0/config.ini'
+    config_file = 'data_dir/example_1_3_1/config.ini'
     
     # run Tethys 
     tethys.run_model(config_file=config_file)
