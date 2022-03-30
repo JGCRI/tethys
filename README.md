@@ -1,6 +1,7 @@
 [![build](https://github.com/JGCRI/tethys/actions/workflows/build.yml/badge.svg)](https://github.com/JGCRI/tethys/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/JGCRI/tethys/branch/master/graph/badge.svg?token=EzEcfk940f)](https://codecov.io/gh/JGCRI/tethys)
 [![docs](https://github.com/JGCRI/tethys/actions/workflows/docs.yml/badge.svg)](https://github.com/JGCRI/tethys/actions/workflows/docs.yml)
+[![DOI](https://zenodo.org/badge/104476654.svg)](https://zenodo.org/badge/latestdoi/104476654)
 
 # Model Documentation
 https://jgcri.github.io/tethys/index.html
@@ -28,9 +29,9 @@ Set up Tethys using the following steps:
     ```
 
 3.  Setup your configuration file (.ini).  Inside the "example" directory that you just downloaded (`data_dir` from step 2 above) there will be two example configuration files:
-- `data_dir`/example/config.ini
-- `data_dir`/example/configDemeter.ini
-Before you can run these examples please find and replace all absolute paths in each of these files from "C:/Z/models/tethysExampleFolders/example_v1_3_0/..." to "`data_dir`/example/...".
+- `data_dir`/example_1_3_0/config.ini
+- `data_dir`/example_1_3_0/configDemeter.ini
+Before you can run these examples please find and replace all absolute paths in each of these files from "C:/Z/models/tethysExampleFolders/example_v1_3_0/..." to "`data_dir`/example_1_3_0/...".
 
 4.  To run Tethys:
 
@@ -38,14 +39,11 @@ Before you can run these examples please find and replace all absolute paths in 
     import tethys
     
     # the path and file name that my example configuration (.ini) file was downloaded to
-    config_file = '<path to my example config file>/config.ini'
+    config_file = 'data_dir/example_1_3_0/config.ini'
     
     # run Tethys 
     tethys.run_model(config_file=config_file)
     ```
-
-# Citation
-Vernon, C.R.,  (2019, May 29). JGCRI/tethys: Tethys v2.0.0 (Version v1.3.0). Zenodo. UPDATE TO V2.0.0
 
 # Supporting Documents
 Li, X., Vernon, C.R., Hejazi, M.I., Link, R.P., Huang, Z., Liu, L. and Feng, L., 2018. Tethys – A Python Package for Spatial and Temporal Downscaling of Global Water Withdrawals. Journal of Open Research Software, 6(1), p.9. DOI: http://doi.org/10.5334/jors.197
