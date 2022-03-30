@@ -55,5 +55,5 @@ Zarrar Khan <zarrar.khan@pnnl.gov>
 Chris Vernon <chris.vernon@pnnl.gov>
 
 # Example Data
-Example data is available for download at https://zenodo.org/record/4780604#.YXGH8Z7MJPY.
+Example data is available for download at https://zenodo.org/record/6399117/files/example_v1_3_1.zip?download=1.
 Once extracted, change the paths in `config.ini` to point to the relevant files and directories on your machine.
