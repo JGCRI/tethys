@@ -76,6 +76,9 @@ class ReadConfig(Logger):
         if self.PerformConsumption == 1 and not self.GCAM_query_C.endswith('.xml'):
             self.GCAM_query_C = pkg_resources.resource_filename('tethys', 'reference/query_consumption.xml')
 
+        # Additional details for GCAM USA (Only if present)
+        self.GCAM_queryCore = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_query_Core', self.GCAM_query))
+
         self.subreg = int(self.gcam_config.get('GCAM_subreg', None))
 
         # a single year input will be string not list for self.years
@@ -111,6 +114,12 @@ class ReadConfig(Logger):
         self.buff_fract = os.path.join(self.InputFolder, self.map_params.get('Buffalo_Fraction'))
         self.goat_fract = os.path.join(self.InputFolder, self.map_params.get('Goat_Fraction'))
         self.irrigated_fract = os.path.join(self.InputFolder, self.map_params.get('Irrigated_Fract'))
+
+          # Additional details for GCAM USA (Only if present)
+        try:
+            self.basin_state_area = os.path.join(self.InputFolder, self.map_params.get('BasinStateArea'))
+        except:
+            self.basin_state_area = "placeholder string which will not be read"
 
         if self.PerformTemporal:
             self.temporal_params = self.config.get('TemporalDownscaling')

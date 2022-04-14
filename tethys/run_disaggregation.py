@@ -23,12 +23,12 @@ import tethys.temporal_downscaling.temporal_downscaling as TemporalDownscaling
 
 def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, PerformDiagnostics,
                        PerformTemporal, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCAM_DBpath,
-                       GCAM_DBfile, GCAM_query, OutputFolder, temporal_climate, Irr_MonthlyData,
+                       GCAM_DBfile, GCAM_query, GCAM_queryCore, OutputFolder, temporal_climate, Irr_MonthlyData,
                        TemporalInterpolation, Domestic_R, Elec_Building, Elec_Industry, Elec_Building_heat,
                        Elec_Building_cool, Elec_Building_others, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat,
                        Livestock_Sheep, Livestock_Poultry, Livestock_Pig, Coord, Area, InputBasinFile, BasinNames,
                        InputCountryFile, CountryNames,Irrigation_GMIA, Irrigation_HYDE, DemeterOutputFolder,
-                       Population_GPW, Population_HYDE, OutputUnit):
+                       Population_GPW, Population_HYDE, OutputUnit, basin_state_areas):
     """Main Function of Tethys Steps for water disaggregation
 
     :param x:    x description
@@ -69,7 +69,9 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
                              GCAM_DBpath=GCAM_DBpath,
                              GCAM_DBfile=GCAM_DBfile,
                              GCAM_query=GCAM_query,
-                             subreg=subreg)
+                             GCAM_queryCore=GCAM_queryCore,
+                             subreg=subreg,
+                             basin_state_area=basin_state_area)
     endtime1 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime1 - starttime1))
 

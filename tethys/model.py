@@ -60,6 +60,7 @@ class Tethys(ReadConfig):
                                                         GCAM_DBpath=self.GCAM_DBpath,
                                                         GCAM_DBfile=self.GCAM_DBfile,
                                                         GCAM_query=self.GCAM_query,
+                                                        GCAM_queryCore=self.GCAM_queryCore,
                                                         OutputFolder=self.OutputFolder,
                                                         temporal_climate=self.temporal_climate,
                                                         Irr_MonthlyData=self.Irr_MonthlyData,
@@ -87,7 +88,8 @@ class Tethys(ReadConfig):
                                                         Irrigation_GMIA=self.Irrigation_GMIA,
                                                         Irrigation_HYDE=self.Irrigation_HYDE,
                                                         DemeterOutputFolder=self.DemeterOutputFolder,
-                                                        OutputUnit=self.OutputUnit
+                                                        OutputUnit=self.OutputUnit,
+                                                        basin_state_area=self.basin_state_area
                                                         )
 
             print(gridded_data)
@@ -129,6 +131,7 @@ class Tethys(ReadConfig):
                                                                  GCAM_DBpath=self.GCAM_DBpath,
                                                                  GCAM_DBfile=self.GCAM_DBfile,
                                                                  GCAM_query=self.GCAM_query_C,
+                                                                 GCAM_queryCore=self.GCAM_queryCore,
                                                                  OutputFolder=self.OutputFolder + '_C',
                                                                  temporal_climate=self.temporal_climate,
                                                                  Irr_MonthlyData=self.Irr_MonthlyData,
@@ -156,7 +159,8 @@ class Tethys(ReadConfig):
                                                                  Irrigation_GMIA=self.Irrigation_GMIA,
                                                                  Irrigation_HYDE=self.Irrigation_HYDE,
                                                                  DemeterOutputFolder=self.DemeterOutputFolder,
-                                                                 OutputUnit=self.OutputUnit
+                                                                 OutputUnit=self.OutputUnit,
+                                                                 basin_state_area=self.basin_state_area
                                                                  )
 
             print(gridded_data)
