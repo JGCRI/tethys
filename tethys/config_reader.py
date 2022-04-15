@@ -77,7 +77,7 @@ class ReadConfig(Logger):
             self.GCAM_query_C = pkg_resources.resource_filename('tethys', 'reference/query_consumption.xml')
 
         # Additional details for GCAM USA (Only if present)
-        self.GCAM_queryCore = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_query_Core', self.GCAM_query))
+        self.GCAM_queryCore = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_queryCore', self.GCAM_query))
 
         self.subreg = int(self.gcam_config.get('GCAM_subreg', None))
 

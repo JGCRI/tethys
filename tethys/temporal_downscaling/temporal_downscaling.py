@@ -292,6 +292,8 @@ def Electricity_Temporal_Downscaling(data, W, years):
     
     for i in range(np.shape(W)[0]):
         ID = data['region'][i]-1
+        if ID > 31: # Use USA value for states
+            ID = 0
         if  ID >= 0:     
             for j in years:
                 N = years.index(j)

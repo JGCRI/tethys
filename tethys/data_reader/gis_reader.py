@@ -65,7 +65,7 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle,Livestock_Goat, L
     # Coordinates for flattened grd:  67420 x 5
     # The columns are ID#, lon, lat, ilon, ilat
     GISData['coord'] = ArrayCSVRead(Coord, 0)
-    coords = GISData['coord'][:, :]
+    #coords = GISData['coord'][:, :]
     # read area values for each land grid cell, convert from ha to km2
     GISData['area'] = ArrayCSVRead(Area, 0) * 0.01
     # read the latitude value for each cell [67420x1]

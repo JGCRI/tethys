@@ -637,12 +637,7 @@ def irr_water_demand_to_array(conn, conn_core, query, query_core, subreg, d_reg_
     # replace region name with region number
     df['region'] = df['region'].map(d_reg_name)
 
-    if subreg == 0:
-        # break out subregion number
-        df['subreg'] = df['subsector'].apply(lambda x: int(x.split('AEZ')[1]))
-
-    elif subreg == 1:
-        df['subreg'] = df['subsector'].apply(lambda x: x.split('_')[-1]).map(d_basin_name)
+    df['subreg'] = df['subsector'].apply(lambda x: x.split('_')[-1]).map(d_basin_name)
 
     # break out crop and map the id to it
     df['crop'] = df['sector'].apply(lambda x: 'biomass' if x in l_biomass else x)
