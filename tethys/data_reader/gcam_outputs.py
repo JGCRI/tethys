@@ -562,6 +562,12 @@ def land_to_array(conn, conn_core, query, query_core, subreg, basin_state_area, 
         df = df.groupby(['region', 'subreg', 'crop', 'use', 'Year']).sum()
         df = df.reset_index()
 
+    # some versions of GCAM use "RootTuber" instead of "Root_Tuber"
+    df['crop'] = df['crop'].apply(lambda x: 'Root_Tuber' if x == 'RootTuber' else x)
+
+    # some versions of GCAM use "biomassGrass" instead of "biomass_Grass"
+    df['crop'] = df['crop'].apply(lambda x: 'biomass' if x == 'biomassGrass' else x)
+
     # only keep crops in target list
     df['crop'] = df['crop'].apply(lambda x: 'Root_Tuber' if x == 'Root' else x)  # Correct "Root" back to crop name
     df = df.loc[df['crop'].isin(allpft)].copy()
@@ -641,6 +647,8 @@ def irr_water_demand_to_array(conn, conn_core, query, query_core, subreg, d_reg_
 
     # break out crop and map the id to it
     df['crop'] = df['sector'].apply(lambda x: 'biomass' if x in l_biomass else x)
+    # some versions of GCAM use "RootTuber" instead of "Root_Tuber"
+    df['crop'] = df['crop'].apply(lambda x: 'Root_Tuber' if x == 'RootTuber' else x)
     df['crop'] = df['crop'].map(d_crops)
 
     # drop sector
