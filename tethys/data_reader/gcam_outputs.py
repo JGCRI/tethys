@@ -506,6 +506,7 @@ def land_to_array(conn, conn_core, query, query_core, subreg, basin_state_area, 
         df_core_st_basin.rename(columns={"subsector": "region","sector":"basin"}, inplace=True)
         df_core_st_basin['basin'] = df_core_st_basin['basin'].str.replace("water_td_irr_", "")
         df_core_st_basin['basin'] = df_core_st_basin['basin'].str.replace("_W", "")
+        df_core_st_basin['basin'] = df_core_st_basin['basin'].str.replace("_C", "")  # added this to fix consumption
         # Make a copy of US values for each state by joining by basin
         df_us_new = pd.merge(df_us,df_core_st_basin, on=['basin'],how='left')
         df_area = pd.read_csv(basin_state_area) # Get area ratio of each state in basins

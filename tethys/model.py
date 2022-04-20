@@ -131,7 +131,7 @@ class Tethys(ReadConfig):
                                                                  GCAM_DBpath=self.GCAM_DBpath,
                                                                  GCAM_DBfile=self.GCAM_DBfile,
                                                                  GCAM_query=self.GCAM_query_C,
-                                                                 GCAM_queryCore=self.GCAM_queryCore,
+                                                                 GCAM_queryCore=self.GCAM_queryCore_C,
                                                                  OutputFolder=self.OutputFolder + '_C',
                                                                  temporal_climate=self.temporal_climate,
                                                                  Irr_MonthlyData=self.Irr_MonthlyData,
