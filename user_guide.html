@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/tethys.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/getting_started.css" type="text/css" />
@@ -287,8 +287,8 @@
 <p>This section defines project-level parameters.</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 23%" />
-<col style="width: 77%" />
+<col style="width: 24%" />
+<col style="width: 76%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Key Name</p></th>
@@ -314,17 +314,26 @@
 <tr class="row-odd"><td><p>OutputUnit</p></td>
 <td><p>0 = cubic kilometers (default), 1 = mm</p></td>
 </tr>
-<tr class="row-even"><td><p>PerformWithdrawal</p></td>
+<tr class="row-even"><td><p>GCAMUSA</p></td>
+<td><p>0 = 32 region GCAM (default), 1 = GCAMUSA</p></td>
+</tr>
+<tr class="row-odd"><td><p>PerformWithdrawal</p></td>
 <td><p>1 = downscale withdrawal (default), 0 = skip</p></td>
 </tr>
-<tr class="row-odd"><td><p>PerformConsumption</p></td>
+<tr class="row-even"><td><p>PerformConsumption</p></td>
 <td><p>1 = downscale consumption, 0 = skip (default)</p></td>
 </tr>
-<tr class="row-even"><td><p>PerformDiagnostics</p></td>
+<tr class="row-odd"><td><p>PerformDiagnostics</p></td>
 <td><p>1 = perform diagnostics (default), 0 = don’t</p></td>
 </tr>
-<tr class="row-odd"><td><p>PerformTemporal</p></td>
+<tr class="row-even"><td><p>PerformTemporal</p></td>
 <td><p>0 = don’t perform temporal downscaling (default), 1 = do</p></td>
+</tr>
+<tr class="row-odd"><td><p>UseDemeter</p></td>
+<td><p>1 = use irrigated crop area from Demeter, 0 = don’t (default)</p></td>
+</tr>
+<tr class="row-even"><td><p>DemeterOutputFolder</p></td>
+<td><p>Path to folder with Demeter outputs</p></td>
 </tr>
 </tbody>
 </table>
@@ -381,6 +390,11 @@
 <div class="section" id="griddedmap">
 <h3><code class="docutils literal notranslate"><span class="pre">[GriddedMap]</span></code><a class="headerlink" href="#griddedmap" title="Permalink to this headline">¶</a></h3>
 <p>This section contains the paths to various files from <a class="reference internal" href="#example-input"><span class="std std-ref">Example/Input</span></a>, <a class="reference internal" href="#rgn32"><span class="std std-ref">rgn32</span></a>, and <a class="reference internal" href="#harmonized-inputs"><span class="std std-ref">harmonized_inputs</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Except for the “Population”, “Irrigation”, and “Livestock” files, tethys now includes built-din defaults for this section, selected according to the <code class="docutils literal notranslate"><span class="pre">GCAMUSA</span></code> option.</p>
+<p>These defaults can be overridden by simply providing the path to the desired file as before.</p>
+</div>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 19%" />

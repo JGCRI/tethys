@@ -39,20 +39,23 @@ Tethys uses an INI configuration file to specify the input data, options, and ou
 ^^^^^^^^^^^^^
 This section defines project-level parameters.
 
-==================	=========================
-Key Name			Value Description
-==================	=========================
-ProjectName			Name for the downscaling project
-InputFolder			Path to :ref:`Example/Input`
-OutputFolder		Folder where :ref:`Output files` will be created
-rgnmapdir			Path to :ref:`rgn32`
-OutputFormat		0 = create both (default), 1 = csv file, 2 = netcdf(nc) file
-OutputUnit			0 = cubic kilometers (default), 1 = mm
-PerformWithdrawal	1 = downscale withdrawal (default), 0 = skip
-PerformConsumption	1 = downscale consumption, 0 = skip (default)
-PerformDiagnostics	1 = perform diagnostics (default), 0 = don't
-PerformTemporal		0 = don't perform temporal downscaling (default), 1 = do
-==================	=========================
+===================     =========================
+Key Name		        Value Description
+===================     =========================
+ProjectName		        Name for the downscaling project
+InputFolder		        Path to :ref:`Example/Input`
+OutputFolder	        Folder where :ref:`Output files` will be created
+rgnmapdir		        Path to :ref:`rgn32`
+OutputFormat	        0 = create both (default), 1 = csv file, 2 = netcdf(nc) file
+OutputUnit		        0 = cubic kilometers (default), 1 = mm
+GCAMUSA                 0 = 32 region GCAM (default), 1 = GCAMUSA
+PerformWithdrawal       1 = downscale withdrawal (default), 0 = skip
+PerformConsumption      1 = downscale consumption, 0 = skip (default)
+PerformDiagnostics      1 = perform diagnostics (default), 0 = don't
+PerformTemporal	        0 = don't perform temporal downscaling (default), 1 = do
+UseDemeter              1 = use irrigated crop area from Demeter, 0 = don't (default)
+DemeterOutputFolder     Path to folder with Demeter outputs
+===================     =========================
 
 .. note::
 	**If you want to run consumption:**
@@ -91,6 +94,11 @@ GCAM_Years			comma separated YYYY string, e.g. 2005,2010,2015,2020,2025
 ``[GriddedMap]``
 ^^^^^^^^^^^^^^^^
 This section contains the paths to various files from :ref:`Example/Input`, :ref:`rgn32`, and :ref:`harmonized_inputs`.
+
+.. note::
+    Except for the "Population", "Irrigation", and "Livestock" files, tethys now includes built-din defaults for this section, selected according to the ``GCAMUSA`` option.
+
+    These defaults can be overridden by simply providing the path to the desired file as before.
 
 ==================	=========================
 Key Name			Value Description

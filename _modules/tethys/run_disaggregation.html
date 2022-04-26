@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/tethys.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/getting_started.css" type="text/css" />
@@ -192,12 +192,12 @@
 
 <div class="viewcode-block" id="run_disaggregation"><a class="viewcode-back" href="../../tethys.html#tethys.run_disaggregation.run_disaggregation">[docs]</a><span class="k">def</span> <span class="nf">run_disaggregation</span><span class="p">(</span><span class="n">years</span><span class="p">,</span> <span class="n">InputRegionFile</span><span class="p">,</span> <span class="n">mapsize</span><span class="p">,</span> <span class="n">subreg</span><span class="p">,</span> <span class="n">UseDemeter</span><span class="p">,</span> <span class="n">PerformDiagnostics</span><span class="p">,</span>
                        <span class="n">PerformTemporal</span><span class="p">,</span> <span class="n">RegionNames</span><span class="p">,</span> <span class="n">gcam_basin_lu</span><span class="p">,</span> <span class="n">buff_fract</span><span class="p">,</span> <span class="n">goat_fract</span><span class="p">,</span> <span class="n">GCAM_DBpath</span><span class="p">,</span>
-                       <span class="n">GCAM_DBfile</span><span class="p">,</span> <span class="n">GCAM_query</span><span class="p">,</span> <span class="n">OutputFolder</span><span class="p">,</span> <span class="n">temporal_climate</span><span class="p">,</span> <span class="n">Irr_MonthlyData</span><span class="p">,</span>
+                       <span class="n">GCAM_DBfile</span><span class="p">,</span> <span class="n">GCAM_query</span><span class="p">,</span> <span class="n">GCAM_queryCore</span><span class="p">,</span> <span class="n">OutputFolder</span><span class="p">,</span> <span class="n">temporal_climate</span><span class="p">,</span> <span class="n">Irr_MonthlyData</span><span class="p">,</span>
                        <span class="n">TemporalInterpolation</span><span class="p">,</span> <span class="n">Domestic_R</span><span class="p">,</span> <span class="n">Elec_Building</span><span class="p">,</span> <span class="n">Elec_Industry</span><span class="p">,</span> <span class="n">Elec_Building_heat</span><span class="p">,</span>
                        <span class="n">Elec_Building_cool</span><span class="p">,</span> <span class="n">Elec_Building_others</span><span class="p">,</span> <span class="n">Livestock_Buffalo</span><span class="p">,</span> <span class="n">Livestock_Cattle</span><span class="p">,</span> <span class="n">Livestock_Goat</span><span class="p">,</span>
                        <span class="n">Livestock_Sheep</span><span class="p">,</span> <span class="n">Livestock_Poultry</span><span class="p">,</span> <span class="n">Livestock_Pig</span><span class="p">,</span> <span class="n">Coord</span><span class="p">,</span> <span class="n">Area</span><span class="p">,</span> <span class="n">InputBasinFile</span><span class="p">,</span> <span class="n">BasinNames</span><span class="p">,</span>
                        <span class="n">InputCountryFile</span><span class="p">,</span> <span class="n">CountryNames</span><span class="p">,</span><span class="n">Irrigation_GMIA</span><span class="p">,</span> <span class="n">Irrigation_HYDE</span><span class="p">,</span> <span class="n">DemeterOutputFolder</span><span class="p">,</span>
-                       <span class="n">Population_GPW</span><span class="p">,</span> <span class="n">Population_HYDE</span><span class="p">,</span> <span class="n">OutputUnit</span><span class="p">):</span>
+                       <span class="n">Population_GPW</span><span class="p">,</span> <span class="n">Population_HYDE</span><span class="p">,</span> <span class="n">OutputUnit</span><span class="p">,</span> <span class="n">basin_state_area</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Main Function of Tethys Steps for water disaggregation</span>
 
 <span class="sd">    :param x:    x description</span>
@@ -238,7 +238,9 @@
                              <span class="n">GCAM_DBpath</span><span class="o">=</span><span class="n">GCAM_DBpath</span><span class="p">,</span>
                              <span class="n">GCAM_DBfile</span><span class="o">=</span><span class="n">GCAM_DBfile</span><span class="p">,</span>
                              <span class="n">GCAM_query</span><span class="o">=</span><span class="n">GCAM_query</span><span class="p">,</span>
-                             <span class="n">subreg</span><span class="o">=</span><span class="n">subreg</span><span class="p">)</span>
+                             <span class="n">GCAM_queryCore</span><span class="o">=</span><span class="n">GCAM_queryCore</span><span class="p">,</span>
+                             <span class="n">subreg</span><span class="o">=</span><span class="n">subreg</span><span class="p">,</span>
+                             <span class="n">basin_state_area</span><span class="o">=</span><span class="n">basin_state_area</span><span class="p">)</span>
     <span class="n">endtime1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------Time Cost: </span><span class="si">%s</span><span class="s2"> seconds ---&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endtime1</span> <span class="o">-</span> <span class="n">starttime1</span><span class="p">))</span>
 
