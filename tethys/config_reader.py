@@ -1,5 +1,4 @@
 import os
-import logging
 import pkg_resources
 import re
 
@@ -74,14 +73,16 @@ class ReadConfig(Logger):
         self.GCAM_query = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_query', 'None'))
         if self.PerformWithdrawal == 1 and not self.GCAM_query.endswith('.xml'):
             if self.GCAMUSA == 1:
-                self.GCAM_query = pkg_resources.resource_filename('tethys', 'reference/queries/query_withdrawal_GCAMUSA.xml')
+                self.GCAM_query = \
+                    pkg_resources.resource_filename('tethys', 'reference/queries/query_withdrawal_GCAMUSA.xml')
             else:
                 self.GCAM_query = pkg_resources.resource_filename('tethys', 'reference/queries/query_withdrawal.xml')
 
         self.GCAM_query_C = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_query_C', 'None'))
         if self.PerformConsumption == 1 and not self.GCAM_query_C.endswith('.xml'):
             if self.GCAMUSA == 1:
-                self.GCAM_query_C = pkg_resources.resource_filename('tethys', 'reference/queries/query_consumption_GCAMUSA.xml')
+                self.GCAM_query_C = \
+                    pkg_resources.resource_filename('tethys', 'reference/queries/query_consumption_GCAMUSA.xml')
             else:
                 self.GCAM_query_C = pkg_resources.resource_filename('tethys', 'reference/queries/query_consumption.xml')
 
@@ -127,9 +128,11 @@ class ReadConfig(Logger):
         self.InputRegionFile = os.path.join(self.InputFolder, self.map_params.get('RegionIDs', 'None'))
         if os.path.basename(self.InputRegionFile) == 'None':
             if self.GCAMUSA == 1:
-                self.InputRegionFile = pkg_resources.resource_filename('tethys', 'reference/grid_info/region32_grids_gcamUSA.csv')
+                self.InputRegionFile = \
+                    pkg_resources.resource_filename('tethys', 'reference/grid_info/region32_grids_gcamUSA.csv')
             else:
-                self.InputRegionFile = pkg_resources.resource_filename('tethys', 'reference/grid_info/region32_grids.csv')
+                self.InputRegionFile = \
+                    pkg_resources.resource_filename('tethys', 'reference/grid_info/region32_grids.csv')
 
         self.RegionNames = os.path.join(self.InputFolder, self.map_params.get('RegionNames', 'None'))
         if os.path.basename(self.RegionNames) == 'None':
@@ -162,28 +165,33 @@ class ReadConfig(Logger):
         self.buff_fract = os.path.join(self.InputFolder, self.map_params.get('Buffalo_Fraction', 'None'))
         if os.path.basename(self.buff_fract) == 'None':
             if self.GCAMUSA == 1:
-                self.buff_fract = pkg_resources.resource_filename('tethys', 'reference/grid_info/bfracFAO2005_gcamUSA.csv')
+                self.buff_fract = \
+                    pkg_resources.resource_filename('tethys', 'reference/grid_info/bfracFAO2005_gcamUSA.csv')
             else:
                 self.buff_fract = pkg_resources.resource_filename('tethys', 'reference/grid_info/bfracFAO2005.csv')
 
         self.goat_fract = os.path.join(self.InputFolder, self.map_params.get('Goat_Fraction', 'None'))
         if os.path.basename(self.goat_fract) == 'None':
             if self.GCAMUSA == 1:
-                self.goat_fract = pkg_resources.resource_filename('tethys', 'reference/grid_info/gfracFAO2005_gcamUSA.csv')
+                self.goat_fract = \
+                    pkg_resources.resource_filename('tethys', 'reference/grid_info/gfracFAO2005_gcamUSA.csv')
             else:
                 self.goat_fract = pkg_resources.resource_filename('tethys', 'reference/grid_info/gfracFAO2005.csv')
 
         self.irrigated_fract = os.path.join(self.InputFolder, self.map_params.get('Irrigated_Fract', 'None'))
         if os.path.basename(self.irrigated_fract) == 'None':
             if self.GCAMUSA == 1:
-                self.irrigated_fract = pkg_resources.resource_filename('tethys', 'reference/grid_info/irrigation-frac_gcamUSA.csv')
+                self.irrigated_fract = \
+                    pkg_resources.resource_filename('tethys', 'reference/grid_info/irrigation-frac_gcamUSA.csv')
             else:
-                self.irrigated_fract = pkg_resources.resource_filename('tethys', 'reference/grid_info/irrigation-frac.csv')
+                self.irrigated_fract = \
+                    pkg_resources.resource_filename('tethys', 'reference/grid_info/irrigation-frac.csv')
 
-          # Additional details for GCAM USA (Only if present)
+        # Additional details for GCAM USA (Only if present)
         self.basin_state_area = os.path.join(self.InputFolder, self.map_params.get('BasinStateArea', 'None'))
         if os.path.basename(self.basin_state_area) == 'None' and self.GCAMUSA == 1:
-            self.basin_state_area = pkg_resources.resource_filename('tethys', 'reference/grid_info/basin_state_area_ratio_gcamUSA.csv')
+            self.basin_state_area = \
+                pkg_resources.resource_filename('tethys', 'reference/grid_info/basin_state_area_ratio_gcamUSA.csv')
 
         if self.PerformTemporal:
             self.temporal_params = self.config.get('TemporalDownscaling')
@@ -202,20 +210,20 @@ class ReadConfig(Logger):
             self.TemporalInterpolation = int(self.temporal_params.get('TemporalInterpolation'))
 
         if self.UseDemeter:
-            D_years = []
+            demeter_years = []
             for filename in os.listdir(self.DemeterOutputFolder):  # Folder contains Demeter outputs
                 if filename.endswith('.csv'):
                     yearstr = re.sub("[^0-9]", "", filename)
-                    D_years.append(int(yearstr))
+                    demeter_years.append(int(yearstr))
 
             years = [int(x) for x in self.years]
 
-            # Subset D_years to match chosen years
-            D_years = [number for number in D_years if number in years]
-            D_years = sorted(D_years)
+            # Subset demeter_years to match chosen years
+            demeter_years = [number for number in demeter_years if number in years]
+            demeter_years = sorted(demeter_years)
 
             # If we use Demeter outputs, we will start from the beginning year in Demeter.
-            startindex = years.index(D_years[0])
+            startindex = years.index(demeter_years[0])
             self.years = years[startindex:]
 
     @staticmethod
