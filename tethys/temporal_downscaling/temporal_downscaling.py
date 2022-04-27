@@ -31,7 +31,7 @@ import calendar
 import numpy as np
 import scipy.io as spio
 
-from tethys.utils.data_parser import getContentArray as ArrayCSVRead
+from tethys.utils.data_parser import get_array_csv
 from tethys.temporal_downscaling.neighbor_basin import NeighborBasin
 
 
@@ -130,18 +130,18 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
     dom = {}
 
     dom['tas'] = tclim['tas'][:, Temp_TDMonths_Index]
-    dom['DomesticR'] = ArrayCSVRead(Domestic_R, 1)
+    dom['DomesticR'] = get_array_csv(Domestic_R, 1)
     
     ele = {}
     ele['hdd'] = tclim['hdd'][:, Temp_TDMonths_Index]
     ele['cdd'] = tclim['cdd'][:, Temp_TDMonths_Index]
 
     # The parameters pb, ph, pc, pu, pit are all obtained from GCAM.
-    ele['building']  = ArrayCSVRead(Elec_Building,0)[:,Temp_TDYears_Index]
-    ele['industry']  = ArrayCSVRead(Elec_Industry,0)[:,Temp_TDYears_Index]
-    ele['heating']   = ArrayCSVRead(Elec_Building_heat,0)[:,Temp_TDYears_Index]
-    ele['cooling']   = ArrayCSVRead(Elec_Building_cool,0)[:,Temp_TDYears_Index]
-    ele['others']    = ArrayCSVRead(Elec_Building_others,0)[:,Temp_TDYears_Index]
+    ele['building']  = get_array_csv(Elec_Building, 0)[:, Temp_TDYears_Index]
+    ele['industry']  = get_array_csv(Elec_Industry, 0)[:, Temp_TDYears_Index]
+    ele['heating']   = get_array_csv(Elec_Building_heat, 0)[:, Temp_TDYears_Index]
+    ele['cooling']   = get_array_csv(Elec_Building_cool, 0)[:, Temp_TDYears_Index]
+    ele['others']    = get_array_csv(Elec_Building_others, 0)[:, Temp_TDYears_Index]
     ele['region']    = regionID
 
     """Domestic"""

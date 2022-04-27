@@ -20,8 +20,7 @@ The second is the 'nonag' mapping, which covers everything else.
 import os
 import numpy as np
 from scipy import io as spio
-from tethys.utils.data_parser import GetArrayCSV, GetArrayTXT
-from tethys.utils.data_parser import getContentArray as ArrayCSVRead
+from tethys.utils.data_parser import get_array_csv, get_array_txt
 from tethys.data_reader.hist_pop_irr_data import getPopYearData as GetPopData
 from tethys.utils.exceptions import FileNotFoundError
 
@@ -55,19 +54,19 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle,Livestock_Goat, L
 
 
     # Livestock (heads) in year 2000: dim is 67420x1 
-    GISData['Buffalo'] = ArrayCSVRead(Livestock_Buffalo, 1)
-    GISData['Cattle'] = ArrayCSVRead(Livestock_Cattle, 1)
-    GISData['Goat'] = ArrayCSVRead(Livestock_Goat, 1)
-    GISData['Sheep'] = ArrayCSVRead(Livestock_Sheep, 1)
-    GISData['Poultry'] = ArrayCSVRead(Livestock_Poultry, 1)
-    GISData['Pig'] = ArrayCSVRead(Livestock_Pig, 1)
+    GISData['Buffalo'] = get_array_csv(Livestock_Buffalo, 1)
+    GISData['Cattle'] = get_array_csv(Livestock_Cattle, 1)
+    GISData['Goat'] = get_array_csv(Livestock_Goat, 1)
+    GISData['Sheep'] = get_array_csv(Livestock_Sheep, 1)
+    GISData['Poultry'] = get_array_csv(Livestock_Poultry, 1)
+    GISData['Pig'] = get_array_csv(Livestock_Pig, 1)
 
     # Coordinates for flattened grd:  67420 x 5
     # The columns are ID#, lon, lat, ilon, ilat
-    GISData['coord'] = ArrayCSVRead(Coord, 0)
+    GISData['coord'] = get_array_csv(Coord, 0)
     #coords = GISData['coord'][:, :]
     # read area values for each land grid cell, convert from ha to km2
-    GISData['area'] = ArrayCSVRead(Area, 0) * 0.01
+    GISData['area'] = get_array_csv(Area, 0) * 0.01
     # read the latitude value for each cell [67420x1]
 
     GISData['mapAreaExt'] = None
@@ -110,13 +109,13 @@ def load_const_griddata(fn, headerNum=0, key=" "):
 
     elif fn.endswith('.txt'):
         try:
-            data = GetArrayTXT(fn, headerNum)
+            data = get_array_txt(fn, headerNum)
         except:
             with open(fn, 'r') as f:
                 data = np.array(f.read().splitlines())
 
     elif fn.endswith('.csv'):
-        data = GetArrayCSV(fn, headerNum)
+        data = get_array_csv(fn, headerNum)
         all_zeros = not np.any(data)
         if all_zeros:
             try:
@@ -152,8 +151,8 @@ def getRegionMapData(rgnmapfile):
     # dictionary GISData{} saves the data related to region map data
     rgnmapData = {}
     # dim is 67420 x 2
-    rgnmapData['rgnmapAG'] = ArrayCSVRead(rgnmapfile, 1).astype(int)
-    rgnmapData['rgnmapNONAG'] = ArrayCSVRead(rgnmapfile, 1).astype(int)
+    rgnmapData['rgnmapAG'] = get_array_csv(rgnmapfile, 1).astype(int)
+    rgnmapData['rgnmapNONAG'] = get_array_csv(rgnmapfile, 1).astype(int)
     rgnmapData['nrgnAG'] = max(rgnmapData['rgnmapAG'][:])  # Number of regions
     rgnmapData['nrgnNONAG'] = max(rgnmapData['rgnmapNONAG'][:])  # Number of regions
     rgnmapData['map_rgn_nonag'] = None

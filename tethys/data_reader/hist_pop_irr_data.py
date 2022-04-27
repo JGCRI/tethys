@@ -14,8 +14,7 @@ import logging
 
 import csv
 import numpy as np
-from tethys.utils.data_parser import getContentArray as ArrayCSVReader
-from tethys.utils.data_parser import GetArrayCSV
+from tethys.utils.data_parser import get_array_csv
 
 
 def getIrrYearData(Irrigation_GMIA, years, Irrigation_HYDE):
@@ -25,8 +24,8 @@ def getIrrYearData(Irrigation_GMIA, years, Irrigation_HYDE):
     """
     
     irr = {}
-    GMIA_irr = ArrayCSVReader(Irrigation_GMIA,1)
-    HYDE_irr = ArrayCSVReader(Irrigation_HYDE,1)
+    GMIA_irr = get_array_csv(Irrigation_GMIA, 1)
+    HYDE_irr = get_array_csv(Irrigation_HYDE, 1)
     H_years  = [1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000]
     G_years  = [2005]
     years    = [int(x) for x in years]
@@ -91,7 +90,7 @@ def getIrrYearData_Crops(DemeterOutputFolder, years):
             yearstr = re.sub("[^0-9]", "", filename)
             if int(yearstr) in inter:
                 D_years.append(int(yearstr))
-                tmp = GetArrayCSV(os.path.join(folder, filename), 1)
+                tmp = get_array_csv(os.path.join(folder, filename), 1)
                 index = check_header_Demeter_outputs(os.path.join(folder, filename))
                 data = tmp[:,index] # irrigation fraction for 12 crops except biomass
                 # 0.5 degree total grid cell square kilometers can be calculated using:  np.cos(np.radians(latitude)) * (111.32 * 110.57) * (0.5**2)
@@ -124,8 +123,8 @@ def getPopYearData(Population_GPW, Population_HYDE, years):
     """
 
     pop = {}
-    GPW_pop = ArrayCSVReader(Population_GPW, 1)
-    HYDE_pop = ArrayCSVReader(Population_HYDE, 1)
+    GPW_pop = get_array_csv(Population_GPW, 1)
+    HYDE_pop = get_array_csv(Population_HYDE, 1)
 
     H_years = [1750, 1760, 1770, 1780, 1790, 1800, 1810, 1820, 1830, 1840, 1850, 1860, 1870, 1880, 1890, 1900, 1910,
                1920, 1930, 1940, 1950, 1960, 1970, 1980]
