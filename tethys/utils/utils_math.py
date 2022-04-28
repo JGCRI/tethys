@@ -53,16 +53,3 @@ def sub2ind(arraySize,rowSub,colSub):
         linearInd.append(temp)
         
     return np.array(linearInd)
-
-
-# Convert linear indices to subscripts
-def ind2sub(arraySize,index):
-    ''' index is a list or 1d array'''
-
-    linearInd  = np.zeros((len(index),2),dtype = int)
-    arr = tuple(arraySize)
-    for i in range(0, len(index)):
-        temp = np.unravel_index(index[i], arr, order='F')
-        linearInd[i] = np.array(temp)
-
-    return linearInd
