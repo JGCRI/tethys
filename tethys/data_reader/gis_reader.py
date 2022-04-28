@@ -22,19 +22,16 @@ import numpy as np
 from scipy import io as spio
 from tethys.utils.data_parser import get_array_csv, get_array_txt
 from tethys.data_reader.hist_pop_irr_data import getPopYearData, getIrrYearData, getIrrYearData_Crops
+from tethys.utils.utils_math import sub2ind
 from tethys.utils.exceptions import FileNotFoundError
 
 
 def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle,Livestock_Goat, Livestock_Sheep,
                Livestock_Poultry, Livestock_Pig, Coord, Area, InputRegionFile, InputBasinFile, BasinNames,
                InputCountryFile, CountryNames, Irrigation_GMIA, Irrigation_HYDE, years, DemeterOutputFolder,
-               Population_GPW, Population_HYDE):
+               Population_GPW, Population_HYDE, mapsize):
     # dictionary GISData{} saves the data related to GIS data
     GISData = dict()
-
-    GISData['RegionIDs'] = get_array_csv(InputRegionFile, 1).astype(int)
-    GISData['nregions'] = GISData['RegionIDs'].max()  # Number of regions
-    GISData['map_rgn'] = None
 
     GISData['SubRegionString'] = 'Basin'
 
@@ -53,8 +50,6 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle,Livestock_Goat, L
                                         Irrigation_HYDE=Irrigation_HYDE,
                                         years=years)  # dictionary
 
-
-
     # Livestock (heads) in year 2000: dim is 67420x1 
     GISData['Buffalo'] = get_array_csv(Livestock_Buffalo, 1)
     GISData['Cattle'] = get_array_csv(Livestock_Cattle, 1)
@@ -66,12 +61,13 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle,Livestock_Goat, L
     # Coordinates for flattened grd:  67420 x 5
     # The columns are ID#, lon, lat, ilon, ilat
     GISData['coord'] = get_array_csv(Coord, 0)
-    #coords = GISData['coord'][:, :]
+    GISData['mapindex'] = sub2ind(mapsize, GISData['coord'][:, 4].astype(int)-1, GISData['coord'][:, 3].astype(int)-1)
+
     # read area values for each land grid cell, convert from ha to km2
     GISData['area'] = get_array_csv(Area, 0) * 0.01
-    # read the latitude value for each cell [67420x1]
-
-    GISData['mapAreaExt'] = None
+    # reorganize to 259200 possible lat-lon cells (but it's still 1D)
+    GISData['mapAreaExt'] = np.zeros(mapsize[0]*mapsize[1], dtype=float)
+    GISData['mapAreaExt'][GISData['mapindex']] = GISData['area']
 
     # Basin ID Map: 67420 x 1, 235 Basins
     GISData['BasinIDs'] = load_const_griddata(InputBasinFile, 1).astype(int)
@@ -86,6 +82,13 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle,Livestock_Goat, L
     with open(CountryNames, 'r') as f:
         temp = f.read().splitlines()
         GISData['CountryNames'] = np.array([i.split(',') for i in temp])[:, 1]
+
+    # 67420 valid "land cells"
+    GISData['RegionIDs'] = get_array_csv(InputRegionFile, 1).astype(int)
+    GISData['nregions'] = GISData['RegionIDs'].max()  # Number of regions
+    # reorganize to 259200 possible lat-lon cells (but it's still 1D)
+    GISData['map_rgn'] = np.zeros(mapsize[0]*mapsize[1], dtype=int)
+    GISData['map_rgn'][GISData['mapindex']] = GISData['RegionIDs']
 
     return GISData
 

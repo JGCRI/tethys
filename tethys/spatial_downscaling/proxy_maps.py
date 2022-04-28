@@ -21,32 +21,8 @@ import logging
 
 import numpy as np
 from tethys.utils.utils_math import SizeR, SizeC
-from tethys.utils.utils_math import ind2sub
-from tethys.utils.utils_math import sub2ind
 
 
-def Rearranging(mapsize, GISData):
-
-    nrow = mapsize[0]
-    ncol = mapsize[1]
-
-    # create various map structures: 1D
-    mapAreaExt     = np.zeros((nrow*ncol,), dtype=float)
-    # maps of the various GCAM region mappings: 1D
-    map_rgn  = np.zeros((nrow*ncol,), dtype=int)
-
-    # linear index of map cell for each grid cell with coordinates (67420 cells)
-    mapindex       = sub2ind(mapsize,GISData['coord'][:,4].astype(int)-1, GISData['coord'][:,3].astype(int)-1)
-    # unit in km2 (conversion was applied earlier, 1 ha = 0.01 km2)
-    mapAreaExt[mapindex]    = GISData['area']
-    map_rgn[mapindex] = GISData['RegionIDs']
-    
-    # Update classes GISData and GISData
-    GISData['mapAreaExt']       = mapAreaExt
-    GISData['mapindex']         = mapindex # mapindex is the most needed output variable
-    GISData['map_rgn'] = map_rgn
-
-    
 def PopulationMap(mapsize, GISData, GCAMData, OUT, NY):
     """
     :param withd_dom_map: waer withdrawal domestic map

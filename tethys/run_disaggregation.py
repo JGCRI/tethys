@@ -13,7 +13,6 @@ import logging
 from tethys.data_reader.gcam_outputs import get_gcam_data
 from tethys.data_reader import gis_reader
 from tethys.data_writer.outputs import OUTSettings
-from tethys.spatial_downscaling.proxy_maps import Rearranging
 import tethys.spatial_downscaling.proxy_maps as ProxyMaps
 import tethys.spatial_downscaling.total_water_use as TotalWaterUse
 import tethys.diagnostics.spatial_diagnostics as DiagnosticsSD
@@ -115,7 +114,8 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
                                     years=years,
                                     Irrigation_GMIA=Irrigation_GMIA,
                                     Irrigation_HYDE=Irrigation_HYDE,
-                                    DemeterOutputFolder=DemeterOutputFolder
+                                    DemeterOutputFolder=DemeterOutputFolder,
+                                    mapsize=mapsize
                                     )
     endtime2 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime2 - endtime1))
@@ -123,10 +123,8 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
 
     # 3. Rearranging data and map indices
     #    Rearrange all the input data into a common framework (from 2D to 1D)
-    logging.info('---Rearranging data and map indices')
-    Rearranging(mapsize, GISData)
+    #    has been added to step 2
     endtime3 = time.time()
-    logging.info("------Time Cost: %s seconds ---" % (endtime3 - endtime2))
 
     # 4. Create proxy maps and downscale non-Agriculture (domestic, electricity, manufacturing and mining) water
     #    withdrawals to grid scale
