@@ -14,27 +14,6 @@ import numpy as np
 from tethys.utils.exceptions import DataError
 
 
-# get the size of a 2D array
-def Size(l): 
-    nrow = len(l)
-    try:
-        ncol = len(l[0])
-    except:
-        ncol = 1
-    return nrow, ncol
-
-def SizeR(l):
-    nr = len(l)
-    return nr
-
-def SizeC(l):
-    try:
-        nc = len(l[0])
-    except:
-        nc = 1
-    return nc
-
-
 # Convert subscripts to linear indices
 def sub2ind(arraySize,rowSub,colSub):
 

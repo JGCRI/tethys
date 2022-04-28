@@ -20,7 +20,6 @@ This is the core of Water Disaggregation
 import logging
 
 import numpy as np
-from tethys.utils.utils_math import SizeR, SizeC
 
 
 def PopulationMap(mapsize, GISData, GCAMData, OUT, NY):
@@ -201,14 +200,12 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT, subreg):
     # 4 .. nyear+3: values for GCAM output years
     # We are going to reorganize this into irrArea(rgn,SubRegion,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
     nregions = GISData['nregions']
-    r1 = SizeR(GCAMData['irrArea'])
+    r1 = GCAMData['irrArea'].shape[0]
     try:
-        r2    = SizeR(GCAMData['irrShare'])
-        q2    = SizeC(GCAMData['irrShare'])
+        r2, q2 = GCAMData['irrShare'].shape
     except:
-        r2    = 0
-        q2    = 0    
-    r3        = SizeR(GCAMData['irrV'])
+        r2, q2 = 0, 0
+    r3 = GCAMData['irrV'].shape[0]
     ncrops    = max(max(GCAMData['irrArea'][:,2].astype(int)),max(GCAMData['irrV'][:,2].astype(int)))
     tempA_all = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
     tempS_all = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
@@ -433,14 +430,12 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT, subreg):
     # 4 .. nyear+3: values for GCAM output years
     # We are going to reorganize this into irrArea(rgn,SubRegion,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
     nregions = GISData['nregions']
-    r1 = SizeR(GCAMData['irrArea'])
+    r1 = GCAMData['irrArea'].shape[0]
     try:
-        r2    = SizeR(GCAMData['irrShare'])
-        q2    = SizeC(GCAMData['irrShare'])
+        r2, q2 = GCAMData['irrShare'].shape
     except:
-        r2    = 0
-        q2    = 0    
-    r3        = SizeR(GCAMData['irrV'])
+        r2, q2 = 0, 0
+    r3 = GCAMData['irrV'].shape[0]
     ncrops    = max(max(GCAMData['irrArea'][:,2].astype(int)),max(GCAMData['irrV'][:,2].astype(int)))
     tempA_all = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
     tempS_all = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
