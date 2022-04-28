@@ -26,11 +26,15 @@ from tethys.utils.exceptions import FileNotFoundError
 
 
 def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle,Livestock_Goat, Livestock_Sheep,
-               Livestock_Poultry, Livestock_Pig, Coord, Area, InputBasinFile, BasinNames, InputCountryFile,
-               CountryNames, Irrigation_GMIA, Irrigation_HYDE, years, DemeterOutputFolder, Population_GPW,
-               Population_HYDE):
+               Livestock_Poultry, Livestock_Pig, Coord, Area, InputRegionFile, InputBasinFile, BasinNames,
+               InputCountryFile, CountryNames, Irrigation_GMIA, Irrigation_HYDE, years, DemeterOutputFolder,
+               Population_GPW, Population_HYDE):
     # dictionary GISData{} saves the data related to GIS data
-    GISData = {}
+    GISData = dict()
+
+    GISData['RegionIDs'] = get_array_csv(InputRegionFile, 1).astype(int)
+    GISData['nregions'] = GISData['RegionIDs'].max()  # Number of regions
+    GISData['map_rgn'] = None
 
     GISData['SubRegionString'] = 'Basin'
 
@@ -139,23 +143,3 @@ def load_const_griddata(fn, headerNum=0, key=" "):
         datagrp.close()
 
     return data
-
-
-def getRegionMapData(rgnmapfile):
-    # read a table for looking up region by grid cell
-    # All of these are two-column comma-separated tables.  Unassigned grid cells are
-    # denoted by 0 in the second column.  Note we allow for (and in fact require) a single header line
-    #   rgnmap - the lookup table.  First column is grid cell id; second is region number.
-    #   nrgn   - the number of regions in this region mapping.
-
-    # dictionary GISData{} saves the data related to region map data
-    rgnmapData = {}
-    # dim is 67420 x 2
-    rgnmapData['rgnmapAG'] = get_array_csv(rgnmapfile, 1).astype(int)
-    rgnmapData['rgnmapNONAG'] = get_array_csv(rgnmapfile, 1).astype(int)
-    rgnmapData['nrgnAG'] = max(rgnmapData['rgnmapAG'][:])  # Number of regions
-    rgnmapData['nrgnNONAG'] = max(rgnmapData['rgnmapNONAG'][:])  # Number of regions
-    rgnmapData['map_rgn_nonag'] = None
-    rgnmapData['map_rgn_ag'] = None
-
-    return rgnmapData

@@ -105,6 +105,7 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
                                     Livestock_Pig=Livestock_Pig,
                                     Coord=Coord,
                                     Area=Area,
+                                    InputRegionFile=InputRegionFile,
                                     InputBasinFile=InputBasinFile,
                                     BasinNames=BasinNames,
                                     InputCountryFile=InputCountryFile,
@@ -116,7 +117,6 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
                                     Irrigation_HYDE=Irrigation_HYDE,
                                     DemeterOutputFolder=DemeterOutputFolder
                                     )
-    rgnmapData = gis_reader.getRegionMapData(InputRegionFile)
     endtime2 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime2 - endtime1))
     logging.info('---Mapsize: {}'.format(mapsize))
@@ -124,7 +124,7 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
     # 3. Rearranging data and map indices
     #    Rearrange all the input data into a common framework (from 2D to 1D)
     logging.info('---Rearranging data and map indices')
-    Rearranging(mapsize, GISData, rgnmapData)
+    Rearranging(mapsize, GISData)
     endtime3 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime3 - endtime2))
 
@@ -132,13 +132,13 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
     #    withdrawals to grid scale
     # a.    Create a population proxy map
     logging.info('---Create a population map as proxy of non-agricultural water withdrawals')
-    ProxyMaps.PopulationMap(mapsize, GISData, GCAMData, rgnmapData, OUT, NY)
+    ProxyMaps.PopulationMap(mapsize, GISData, GCAMData, OUT, NY)
     endtime4 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime4 - endtime3))
 
     # b.    Create a livestock proxy map and downscale livestock water withdrawal to grid scale
     logging.info('---Create an livestock map as proxy of livestock water withdrawal')
-    ProxyMaps.LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT)
+    ProxyMaps.LivestockMap(mapsize, GISData, GCAMData, NY, OUT)
     endtime5 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime5 - endtime4))
 
@@ -147,10 +147,10 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
         # Use Demeter outputs (irrigated cropland areas for each type of crops ) to replace the GMIA/HYSE data used in downscaling of irrigation water withdrawal
         # Additional gridded outputs: irrigation water withdrawal by 13 crop types
         logging.info('---Create an irrigation map as proxy of agricultural water withdrawal using Demeter outputs')
-        ProxyMaps.IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg)
+        ProxyMaps.IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT, subreg)
     else:
         logging.info('---Create an irrigation map as proxy of agricultural water withdrawal ')
-        ProxyMaps.IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg)
+        ProxyMaps.IrrigationMap(mapsize, GISData, GCAMData, NY, OUT, subreg)
 
     endtime6 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime6 - endtime5))
@@ -159,7 +159,6 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
     logging.info('---Aggregate to compute total water withdrawal at grid scale')
     TotalWaterUse.TotalWaterUse(OutputUnit=OutputUnit,
                                 GISData=GISData,
-                                rgnmapData=rgnmapData,
                                 OUT=OUT)
     endtime7 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime7 - endtime6))
@@ -199,7 +198,7 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
                                                            coords=GISData['coord'][:,:],
                                                            OUT=OUT,
                                                            mapindex=GISData['mapindex'],
-                                                           regionID=rgnmapData['rgnmapNONAG'],
+                                                           regionID=GISData['RegionIDs'],
                                                            basinID=GISData['BasinIDs'])
         print(f'TDyears = {TDYears}')
         endtime7 = time.time()

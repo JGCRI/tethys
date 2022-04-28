@@ -14,7 +14,7 @@ This is the core of Water Disaggregation
     - OUT         class OUTSettings(), data for output, gridded results for each withdrawal category
     - GISData     structure GISData{}, GIS data on grid map of 360*720
     - GCAMData    structure GCAMData{}, GCAM outputs with dimension: NRegions X NYears
-    - rgnmapData  structure rgnmapData{}, region names, region ID for each valid cell on grid map
+    - GISData  structure GISData{}, region names, region ID for each valid cell on grid map
 
 """
 import logging
@@ -25,37 +25,29 @@ from tethys.utils.utils_math import ind2sub
 from tethys.utils.utils_math import sub2ind
 
 
-def Rearranging(mapsize, GISData, rgnmapData):
+def Rearranging(mapsize, GISData):
 
-    row0      = SizeR(GISData['area']) # row  = 67420
-    # Create a matrix with all data 1. area 2 region #
-    data      = np.zeros((row0,2), dtype=float)
-    data[:,0] = GISData['area'] #1. Area of each grid
-    data[:,1] = rgnmapData['rgnmapNONAG'][:] #GCAM 'primary' region
-    
-    nrow      = mapsize[0]
-    ncol      = mapsize[1]
-        
+    nrow = mapsize[0]
+    ncol = mapsize[1]
+
     # create various map structures: 1D
     mapAreaExt     = np.zeros((nrow*ncol,), dtype=float)
     # maps of the various GCAM region mappings: 1D
-    map_rgn_nonag  = np.zeros((nrow*ncol,), dtype=int)
-    map_rgn_ag     = np.zeros((nrow*ncol,), dtype=int)
+    map_rgn  = np.zeros((nrow*ncol,), dtype=int)
+
     # linear index of map cell for each grid cell with coordinates (67420 cells)
     mapindex       = sub2ind(mapsize,GISData['coord'][:,4].astype(int)-1, GISData['coord'][:,3].astype(int)-1)
     # unit in km2 (conversion was applied earlier, 1 ha = 0.01 km2)
     mapAreaExt[mapindex]    = GISData['area']
-    map_rgn_nonag[mapindex] = rgnmapData['rgnmapNONAG'][:]
-    map_rgn_ag[mapindex]    = rgnmapData['rgnmapAG'][:]
+    map_rgn[mapindex] = GISData['RegionIDs']
     
-    # Update classes GISData and rgnmapData
+    # Update classes GISData and GISData
     GISData['mapAreaExt']       = mapAreaExt
     GISData['mapindex']         = mapindex # mapindex is the most needed output variable
-    rgnmapData['map_rgn_nonag'] = map_rgn_nonag
-    rgnmapData['map_rgn_ag']    = map_rgn_ag
+    GISData['map_rgn'] = map_rgn
 
     
-def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, OUT, NY):
+def PopulationMap(mapsize, GISData, GCAMData, OUT, NY):
     """
     :param withd_dom_map: waer withdrawal domestic map
     :type withd_dom_map: matrix
@@ -80,36 +72,30 @@ def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, OUT, NY):
         logging.info('{}'.format(GISData['pop']['years'][y]))
 
         yearstr = str(GISData['pop']['years_new'][y])
-        pop     = np.zeros(rgnmapData['map_rgn_nonag'].shape, dtype=float)
+        pop     = np.zeros(GISData['map_rgn'].shape, dtype=float)
         pop[GISData['mapindex']] = GISData['pop'][yearstr]
 
         # make some minor fixes to the region mapping
-        map_rgn_nonag  = rgnmapadjust(mapsize, pop, rgnmapData['map_rgn_nonag'], '------[Adjusting map_rgn_nonag with population]: ')
-        map_rgn_ag     = rgnmapadjust(mapsize, pop, rgnmapData['map_rgn_ag'], '------[Adjusting map_rgn_ag with population]: ')    
-        rgnmapData['map_rgn_nonag'] = np.copy(map_rgn_nonag)
-        rgnmapData['map_rgn_ag']    = np.copy(map_rgn_ag)
+        map_rgn = rgnmapadjust(mapsize, pop, GISData['map_rgn'], '------[Adjusting map_rgn with population]: ')
+        GISData['map_rgn'] = np.copy(map_rgn)
         # Adjust population map to be consistent with GCAM assumptions. We will use
         # the non-ag region map for this because in all current setups it is more detailed.
-        pop_fac_Ag    = np.zeros((rgnmapData['nrgnNONAG'],NY), dtype=float) 
-        pop_fac_nonAg = np.zeros((rgnmapData['nrgnNONAG'],NY), dtype=float)
+        pop_fac = np.zeros((GISData['nregions'], NY), dtype=float)
         # Correction to pop_fac`
 
-        for i in range(1, rgnmapData['nrgnNONAG']+1):
-            index1 = np.where(map_rgn_nonag == i)[0]
-            index2 = np.where(map_rgn_ag == i)[0]
-            pop_fac_nonAg[i-1,:] = GCAMData['pop_tot'][i-1,:NY]/np.sum(pop[index1])
-            pop_fac_Ag[i-1,:]    = GCAMData['pop_tot'][i-1,:NY]/np.sum(pop[index2])
-                
+        for i in range(GISData['nregions']):
+            index = np.where(map_rgn-1 == i)[0]
+            pop_fac[i] = GCAMData['pop_tot'][i]/np.sum(pop[index])
+
         # index of all cells that have valid regions
-        mapindex_valid    = np.where(map_rgn_nonag > 0)[0]
+        mapindex_valid = np.where(map_rgn > 0)[0]
             
-        pop_tot_y                          = GCAMData['pop_tot'][:,y]        # single time slice regional pop
-        pop_pro_rata                       = pop[mapindex_valid]*pop_fac_nonAg[map_rgn_nonag[mapindex_valid]-1,y] / pop_tot_y[map_rgn_nonag[mapindex_valid]-1] 
-        withd_dom_map[mapindex_valid,y]    = pop_scale_reshape(GCAMData['rgn_wddom'][:,y], pop_pro_rata, map_rgn_nonag, mapindex_valid)
-        withd_elec_map[mapindex_valid,y]   = pop_scale_reshape(GCAMData['rgn_wdelec'][:,y], pop_pro_rata, map_rgn_nonag, mapindex_valid)            
-        withd_mfg_map[mapindex_valid,y]    = pop_scale_reshape(GCAMData['rgn_wdmfg'][:,y], pop_pro_rata, map_rgn_nonag, mapindex_valid)
-        pop_pro_rata                       = pop[mapindex_valid]*pop_fac_Ag[map_rgn_ag[mapindex_valid]-1,y] / pop_tot_y[map_rgn_ag[mapindex_valid]-1]
-        withd_mining_map[mapindex_valid,y] = pop_scale_reshape(GCAMData['rgn_wdmining'][:,y], pop_pro_rata, map_rgn_ag, mapindex_valid)
+        pop_tot_y = GCAMData['pop_tot'][:, y]        # single time slice regional pop
+        pop_pro_rata = pop[mapindex_valid]*pop_fac[map_rgn[mapindex_valid]-1, y] / pop_tot_y[map_rgn[mapindex_valid]-1]
+        withd_dom_map[mapindex_valid, y] = pop_scale_reshape(GCAMData['rgn_wddom'][:, y], pop_pro_rata, map_rgn, mapindex_valid)
+        withd_elec_map[mapindex_valid, y] = pop_scale_reshape(GCAMData['rgn_wdelec'][:, y], pop_pro_rata, map_rgn, mapindex_valid)
+        withd_mfg_map[mapindex_valid, y] = pop_scale_reshape(GCAMData['rgn_wdmfg'][:, y], pop_pro_rata, map_rgn, mapindex_valid)
+        withd_mining_map[mapindex_valid, y] = pop_scale_reshape(GCAMData['rgn_wdmining'][:, y], pop_pro_rata, map_rgn, mapindex_valid)
 
     # total non-ag withdrawal can be computed from these four maps
     withd_nonAg_map = withd_dom_map + withd_elec_map + withd_mfg_map + withd_mining_map
@@ -130,23 +116,23 @@ def PopulationMap(mapsize, GISData, GCAMData, rgnmapData, OUT, NY):
     return withd_nonAg_map
 
 
-def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):     
+def LivestockMap(mapsize, GISData, GCAMData, NY, OUT):     
     """
     Livestock gridded GIS data maps by six types are used to downscale livestock Water withdrawal 
     """
 
     # count how many animals live in each GCAM region first    
-    map_rgn_ag = rgnmapData['map_rgn_ag']
-    nrgnAG     = rgnmapData['nrgnAG']
-    tot_livestock = np.zeros((nrgnAG,6), dtype=float) # Livestock totals at GCAM scale in year 2005
+    map_rgn = GISData['map_rgn']
+    nregions = GISData['nregions']
+    tot_livestock = np.zeros((nregions,6), dtype=float) # Livestock totals at GCAM scale in year 2005
     
     # 67420 -> 360*720   
-    buffalo  = np.zeros(map_rgn_ag.shape, dtype=float)
-    cattle   = np.zeros(map_rgn_ag.shape, dtype=float)
-    goat     = np.zeros(map_rgn_ag.shape, dtype=float)
-    sheep    = np.zeros(map_rgn_ag.shape, dtype=float)
-    poultry  = np.zeros(map_rgn_ag.shape, dtype=float)
-    pig      = np.zeros(map_rgn_ag.shape, dtype=float)
+    buffalo  = np.zeros(map_rgn.shape, dtype=float)
+    cattle   = np.zeros(map_rgn.shape, dtype=float)
+    goat     = np.zeros(map_rgn.shape, dtype=float)
+    sheep    = np.zeros(map_rgn.shape, dtype=float)
+    poultry  = np.zeros(map_rgn.shape, dtype=float)
+    pig      = np.zeros(map_rgn.shape, dtype=float)
         
     buffalo[GISData['mapindex']] = GISData['Buffalo']
     cattle[GISData['mapindex']]  = GISData['Cattle']
@@ -155,10 +141,10 @@ def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
     poultry[GISData['mapindex']] = GISData['Poultry']
     pig[GISData['mapindex']]     = GISData['Pig']     
     
-    ls = np.where(map_rgn_ag > 0)[0]
+    ls = np.where(map_rgn > 0)[0]
     
     for index in ls:
-        IN    = map_rgn_ag[index]                        
+        IN    = map_rgn[index]                        
         tot_livestock[IN-1,0] += buffalo[index]
         tot_livestock[IN-1,1] += cattle[index]
         tot_livestock[IN-1,2] += goat[index]
@@ -179,13 +165,13 @@ def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
     
     for y in range(0,NY):
         for index in ls:
-            IN    = map_rgn_ag[index]  
-            if buffalo[index] != 0: livestock[index,0] = GCAMData['wdliv'][0*nrgnAG+IN-1,y] * buffalo[index] / tot_livestock[IN-1,0]
-            if cattle[index]  != 0: livestock[index,1] = GCAMData['wdliv'][1*nrgnAG+IN-1,y] * cattle[index]  / tot_livestock[IN-1,1]                    
-            if goat[index]    != 0: livestock[index,2] = GCAMData['wdliv'][2*nrgnAG+IN-1,y] * goat[index]    / tot_livestock[IN-1,2]
-            if sheep[index]   != 0: livestock[index,3] = GCAMData['wdliv'][3*nrgnAG+IN-1,y] * sheep[index]   / tot_livestock[IN-1,3]
-            if poultry[index] != 0: livestock[index,4] = GCAMData['wdliv'][4*nrgnAG+IN-1,y] * poultry[index] / tot_livestock[IN-1,4]
-            if pig[index]     != 0: livestock[index,5] = GCAMData['wdliv'][5*nrgnAG+IN-1,y] * pig[index]     / tot_livestock[IN-1,5]
+            IN    = map_rgn[index]  
+            if buffalo[index] != 0: livestock[index,0] = GCAMData['wdliv'][0*nregions+IN-1,y] * buffalo[index] / tot_livestock[IN-1,0]
+            if cattle[index]  != 0: livestock[index,1] = GCAMData['wdliv'][1*nregions+IN-1,y] * cattle[index]  / tot_livestock[IN-1,1]
+            if goat[index]    != 0: livestock[index,2] = GCAMData['wdliv'][2*nregions+IN-1,y] * goat[index]    / tot_livestock[IN-1,2]
+            if sheep[index]   != 0: livestock[index,3] = GCAMData['wdliv'][3*nregions+IN-1,y] * sheep[index]   / tot_livestock[IN-1,3]
+            if poultry[index] != 0: livestock[index,4] = GCAMData['wdliv'][4*nregions+IN-1,y] * poultry[index] / tot_livestock[IN-1,4]
+            if pig[index]     != 0: livestock[index,5] = GCAMData['wdliv'][5*nregions+IN-1,y] * pig[index]     / tot_livestock[IN-1,5]
 
         withd_liv_map[:,y] = np.sum(livestock,axis = 1)        
 
@@ -194,29 +180,29 @@ def LivestockMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT):
     fmtstr = '[Year Index, Region ID, {:7s} from GCAM not assigned (no GIS data)]:  {}  {}  {}'
     dat = GCAMData['wdliv']
     for y in range(0,NY):
-        for IN in range(0,nrgnAG):
-            if GCAMData['wdliv'][0*nrgnAG+IN,y] > 0 and tot_livestock[IN,0] == 0:
-                logging.info(fmtstr.format('buffalo', y+1, IN+1, dat[0*nrgnAG+IN,y]))
+        for IN in range(0,nregions):
+            if GCAMData['wdliv'][0*nregions+IN,y] > 0 and tot_livestock[IN,0] == 0:
+                logging.info(fmtstr.format('buffalo', y+1, IN+1, dat[0*nregions+IN,y]))
 
-            if GCAMData['wdliv'][1*nrgnAG+IN,y] > 0 and tot_livestock[IN,1] == 0:
-                logging.info(fmtstr.format('cattle', y+1, IN+1, dat[1*nrgnAG+IN,y]))
+            if GCAMData['wdliv'][1*nregions+IN,y] > 0 and tot_livestock[IN,1] == 0:
+                logging.info(fmtstr.format('cattle', y+1, IN+1, dat[1*nregions+IN,y]))
 
-            if GCAMData['wdliv'][2*nrgnAG+IN,y] > 0 and tot_livestock[IN,2] == 0:
-                logging.info(fmtstr.format('goat', y+1, IN+1, dat[2*nrgnAG+IN,y]))
+            if GCAMData['wdliv'][2*nregions+IN,y] > 0 and tot_livestock[IN,2] == 0:
+                logging.info(fmtstr.format('goat', y+1, IN+1, dat[2*nregions+IN,y]))
 
-            if GCAMData['wdliv'][3*nrgnAG+IN,y] > 0 and tot_livestock[IN,3] == 0:
-                logging.info(fmtstr.format('sheep', y+1, IN+1, dat[3*nrgnAG+IN,y]))
+            if GCAMData['wdliv'][3*nregions+IN,y] > 0 and tot_livestock[IN,3] == 0:
+                logging.info(fmtstr.format('sheep', y+1, IN+1, dat[3*nregions+IN,y]))
 
-            if GCAMData['wdliv'][4*nrgnAG+IN,y] > 0 and tot_livestock[IN,4] == 0:
-                logging.info(fmtstr.format('poultry', y+1, IN+1, dat[4*nrgnAG+IN,y]))
+            if GCAMData['wdliv'][4*nregions+IN,y] > 0 and tot_livestock[IN,4] == 0:
+                logging.info(fmtstr.format('poultry', y+1, IN+1, dat[4*nregions+IN,y]))
 
-            if GCAMData['wdliv'][5*nrgnAG+IN,y] > 0 and tot_livestock[IN,5] == 0:
-                logging.info(fmtstr.format('pig', y+1, IN+1, dat[5*nrgnAG+IN,y]))
+            if GCAMData['wdliv'][5*nregions+IN,y] > 0 and tot_livestock[IN,5] == 0:
+                logging.info(fmtstr.format('pig', y+1, IN+1, dat[5*nregions+IN,y]))
 
     return withd_liv_map
 
     
-def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
+def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT, subreg):
 
     # Need to downscale the agricultural water withdrawal data for GCAM years
     # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
@@ -240,7 +226,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
     # 3: crops 1-17
     # 4 .. nyear+3: values for GCAM output years
     # We are going to reorganize this into irrArea(rgn,SubRegion,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
-    nrgnAG = rgnmapData['nrgnAG']
+    nregions = GISData['nregions']
     r1 = SizeR(GCAMData['irrArea'])
     try:
         r2    = SizeR(GCAMData['irrShare'])
@@ -250,9 +236,9 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
         q2    = 0    
     r3        = SizeR(GCAMData['irrV'])
     ncrops    = max(max(GCAMData['irrArea'][:,2].astype(int)),max(GCAMData['irrV'][:,2].astype(int)))
-    tempA_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
-    tempS_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
-    tempV_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
+    tempA_all = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
+    tempS_all = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
+    tempV_all = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
     
     for i in range(0, r1):
         for y in range(0, NY):
@@ -267,7 +253,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
             for y in range (0,NY):
                 tempS_all[GCAMData['irrShare'][i,0].astype(int)-1,GCAMData['irrShare'][i,1].astype(int)-1,GCAMData['irrShare'][i,2].astype(int)-1,y] = GCAMData['irrShare'][i,y+3]
     else:
-        tempS_all = np.ones((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
+        tempS_all = np.ones((nregions,nSubRegion,ncrops,NY), dtype = float)
 
     # Same reorganization for irrVolume. Result goes to tempV_all
     for i in range(0,r3):
@@ -276,10 +262,10 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
                
     # STEP 3: now that we have computed the total irrigated lands, we can aggregate all
     # the numbers for all the crops; we only keep the value per gcam region and SubRegion
-    irr_A = np.zeros((nrgnAG,nSubRegion,NY), dtype = float)
-    irr_V = np.zeros((nrgnAG,nSubRegion,NY), dtype = float)
+    irr_A = np.zeros((nregions,nSubRegion,NY), dtype = float)
+    irr_V = np.zeros((nregions,nSubRegion,NY), dtype = float)
     
-    for i in range (0,nrgnAG):
+    for i in range (0,nregions):
         for j in range(0,nSubRegion):
             for y in range(0,NY):
                 for k in range(0,ncrops):                            
@@ -297,37 +283,37 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
     for y in range (0,NY):
         logging.info('{}'.format(GISData['irr']['years'][y]))
         yearstr = str(GISData['irr']['years_new'][y])
-        irr     = np.zeros(rgnmapData['map_rgn_ag'].shape, dtype=float)
+        irr     = np.zeros(GISData['map_rgn'].shape, dtype=float)
         irr[GISData['mapindex']] = GISData['irr'][yearstr]
         # add GCAM-SubRegion labels to all cells with irrigation values
         # XXX maybe this should be done further up when we do the population adjustments
-        map_rgn_ag = rgnmapadjust(mapsize, irr, rgnmapData['map_rgn_ag'], '------[Adjusting map_rgn_ag with irr]: ')
+        map_rgn = rgnmapadjust(mapsize, irr, GISData['map_rgn'], '------[Adjusting map_rgn with irr]: ')
         mapSubRegion     = rgnmapadjust(mapsize, irr, mapSubRegion, '------[Adjusting map' + GISData['SubRegionString'] + ' with irr]: ') # if we need to do this step for mapSubRegion?
     
-        rgnmapData['map_rgn_ag'] = np.copy(map_rgn_ag)
+        GISData['map_rgn'] = np.copy(map_rgn)
         
         # STEP 5: calculate the total amount of irrigated lands from the GIS maps
     
-        irrAx   = np.zeros((nrgnAG,nSubRegion), dtype = float) # this is the max total available area of all grids with some irrigation
-        irrA    = np.zeros((nrgnAG,nSubRegion), dtype = float) # this is the existing area that is equipped with irrigation
-        totA    = np.zeros((nrgnAG,nSubRegion), dtype = float) # total land in each rgn, SubRegion combo
+        irrAx   = np.zeros((nregions,nSubRegion), dtype = float) # this is the max total available area of all grids with some irrigation
+        irrA    = np.zeros((nregions,nSubRegion), dtype = float) # this is the existing area that is equipped with irrigation
+        totA    = np.zeros((nregions,nSubRegion), dtype = float) # total land in each rgn, SubRegion combo
     
         for index in range(0,mapsize[0]*mapsize[1]):
-            temp  = mapAreaExt[index] > 0 and map_rgn_ag[index] > 0 and mapSubRegion[index] > 0
+            temp  = mapAreaExt[index] > 0 and map_rgn[index] > 0 and mapSubRegion[index] > 0
             if temp:
-                irrA[map_rgn_ag[index]-1,mapSubRegion[index]-1] += irr[index]
-                totA[map_rgn_ag[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
+                irrA[map_rgn[index]-1,mapSubRegion[index]-1] += irr[index]
+                totA[map_rgn[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
                 if irr[index] > 0:
-                    irrAx[map_rgn_ag[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
+                    irrAx[map_rgn[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
             else:
                 irr[index] = 0
             
             
         # STEP 6:        
-        for i in range(0,nrgnAG):
+        for i in range(0,nregions):
             for j in range(0,nSubRegion):
                 # To be efficient, the most important step in the loop is to identify the valid irr cell(index in 360*720 grid) for each region and each SubRegion
-                ls = np.where((map_rgn_ag - 1 == i) & (mapSubRegion - 1 == j))[0]
+                ls = np.where((map_rgn - 1 == i) & (mapSubRegion - 1 == j))[0]
                 if len(ls) > 0 and irr_A[i,j,y] > 0:                                    
                     ls1 = []
                     ls2 = []
@@ -452,7 +438,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
     
     return withd_irr_map
     
-def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
+def IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT, subreg):
 
 
     # Need to downscale the agricultural water withdrawal data for GCAM years
@@ -476,7 +462,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
     # 3: crops 1-17
     # 4 .. nyear+3: values for GCAM output years
     # We are going to reorganize this into irrArea(rgn,SubRegion,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
-    nrgnAG = rgnmapData['nrgnAG']
+    nregions = GISData['nregions']
     r1 = SizeR(GCAMData['irrArea'])
     try:
         r2    = SizeR(GCAMData['irrShare'])
@@ -486,9 +472,9 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
         q2    = 0    
     r3        = SizeR(GCAMData['irrV'])
     ncrops    = max(max(GCAMData['irrArea'][:,2].astype(int)),max(GCAMData['irrV'][:,2].astype(int)))
-    tempA_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
-    tempS_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
-    tempV_all = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
+    tempA_all = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
+    tempS_all = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
+    tempV_all = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
     
     for i in range(0, r1):
         for y in range(0, NY):
@@ -503,7 +489,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
             for y in range (0,NY):
                 tempS_all[GCAMData['irrShare'][i,0].astype(int)-1,GCAMData['irrShare'][i,1].astype(int)-1,GCAMData['irrShare'][i,2].astype(int)-1,y] = GCAMData['irrShare'][i,y+3]
     else:
-        tempS_all = np.ones((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
+        tempS_all = np.ones((nregions,nSubRegion,ncrops,NY), dtype = float)
 
     # Same reorganization for irrVolume. Result goes to tempV_all
     for i in range(0,r3):
@@ -511,9 +497,9 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
             tempV_all[GCAMData['irrV'][i,0].astype(int)-1,GCAMData['irrV'][i,1].astype(int)-1,GCAMData['irrV'][i,2].astype(int)-1,y] = GCAMData['irrV'][i,y+3]
                
     # STEP 3: now that we have computed the total irrigated lands
-    irr_A = np.zeros((nrgnAG,nSubRegion,ncrops,NY), dtype = float)
+    irr_A = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
     
-    for i in range (0,nrgnAG):
+    for i in range (0,nregions):
         for j in range(0,nSubRegion):
             for y in range(0,NY):
                 for k in range(0,ncrops):                            
@@ -532,37 +518,37 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, rgnmapData, NY, OUT, subreg):
         yearstr = str(GISData['irr']['years_new'][y])
         
         for k in range(0,ncrops): 
-            irr     = np.zeros(rgnmapData['map_rgn_ag'].shape, dtype=float)
+            irr     = np.zeros(GISData['map_rgn'].shape, dtype=float)
             irr[GISData['mapindex']] = GISData['irr'][yearstr][:,k]
             # add GCAM-SubRegion labels to all cells with irrigation values
             # XXX maybe this should be done further up when we do the population adjustments
-            map_rgn_ag = rgnmapadjust(mapsize, irr, rgnmapData['map_rgn_ag'], '------[Adjusting map_rgn_ag with irr crop # ' + str(k+1) + ']: ')
+            map_rgn = rgnmapadjust(mapsize, irr, GISData['map_rgn'], '------[Adjusting map_rgn with irr crop # ' + str(k+1) + ']: ')
             mapSubRegion     = rgnmapadjust(mapsize, irr, mapSubRegion, '------[Adjusting map' + GISData['SubRegionString'] + ' with irr crop # ' + str(k+1) + ']: ') # if we need to do this step for mapSubRegion?
     
-            rgnmapData['map_rgn_ag'] = np.copy(map_rgn_ag)
+            GISData['map_rgn'] = np.copy(map_rgn)
         
             # STEP 5: calculate the total amount of irrigated lands from the GIS maps
     
-            irrAx   = np.zeros((nrgnAG,nSubRegion), dtype = float) # this is the max total available area of all grids with some irrigation
-            irrA    = np.zeros((nrgnAG,nSubRegion), dtype = float) # this is the existing area that is equipped with irrigation
-            totA    = np.zeros((nrgnAG,nSubRegion), dtype = float) # total land in each rgn, SubRegion combo
+            irrAx   = np.zeros((nregions,nSubRegion), dtype = float) # this is the max total available area of all grids with some irrigation
+            irrA    = np.zeros((nregions,nSubRegion), dtype = float) # this is the existing area that is equipped with irrigation
+            totA    = np.zeros((nregions,nSubRegion), dtype = float) # total land in each rgn, SubRegion combo
         
             for index in range(0,mapsize[0]*mapsize[1]):
-                temp  = mapAreaExt[index] > 0 and map_rgn_ag[index] > 0 and mapSubRegion[index] > 0
+                temp  = mapAreaExt[index] > 0 and map_rgn[index] > 0 and mapSubRegion[index] > 0
                 if temp:
-                    irrA[map_rgn_ag[index]-1,mapSubRegion[index]-1] += irr[index]
-                    totA[map_rgn_ag[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
+                    irrA[map_rgn[index]-1,mapSubRegion[index]-1] += irr[index]
+                    totA[map_rgn[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
                     if irr[index] > 0:
-                        irrAx[map_rgn_ag[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
+                        irrAx[map_rgn[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
                 else:
                     irr[index] = 0
             
             
             # STEP 6:        
-            for i in range(0,nrgnAG):
+            for i in range(0,nregions):
                 for j in range(0,nSubRegion):
                     # To be efficient, the most important step in the loop is to identify the valid irr cell(index in 360*720 grid) for each region and each SubRegion
-                    ls = np.where((map_rgn_ag - 1 == i) & (mapSubRegion - 1 == j))[0]
+                    ls = np.where((map_rgn - 1 == i) & (mapSubRegion - 1 == j))[0]
                     if len(ls) > 0 and irr_A[i,j,k,y] > 0:                                    
                         ls1 = []
                         ls2 = []
