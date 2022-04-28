@@ -75,9 +75,7 @@ def PopulationMap(mapsize, GISData, GCAMData, OUT, NY):
         pop     = np.zeros(GISData['map_rgn'].shape, dtype=float)
         pop[GISData['mapindex']] = GISData['pop'][yearstr]
 
-        # make some minor fixes to the region mapping
-        map_rgn = rgnmapadjust(mapsize, pop, GISData['map_rgn'], '------[Adjusting map_rgn with population]: ')
-        GISData['map_rgn'] = np.copy(map_rgn)
+        map_rgn = GISData['map_rgn']
         # Adjust population map to be consistent with GCAM assumptions. We will use
         # the non-ag region map for this because in all current setups it is more detailed.
         pop_fac = np.zeros((GISData['nregions'], NY), dtype=float)
@@ -285,13 +283,9 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT, subreg):
         yearstr = str(GISData['irr']['years_new'][y])
         irr     = np.zeros(GISData['map_rgn'].shape, dtype=float)
         irr[GISData['mapindex']] = GISData['irr'][yearstr]
-        # add GCAM-SubRegion labels to all cells with irrigation values
-        # XXX maybe this should be done further up when we do the population adjustments
-        map_rgn = rgnmapadjust(mapsize, irr, GISData['map_rgn'], '------[Adjusting map_rgn with irr]: ')
-        mapSubRegion     = rgnmapadjust(mapsize, irr, mapSubRegion, '------[Adjusting map' + GISData['SubRegionString'] + ' with irr]: ') # if we need to do this step for mapSubRegion?
-    
-        GISData['map_rgn'] = np.copy(map_rgn)
-        
+
+        map_rgn = GISData['map_rgn']
+
         # STEP 5: calculate the total amount of irrigated lands from the GIS maps
     
         irrAx   = np.zeros((nregions,nSubRegion), dtype = float) # this is the max total available area of all grids with some irrigation
@@ -520,13 +514,9 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT, subreg):
         for k in range(0,ncrops): 
             irr     = np.zeros(GISData['map_rgn'].shape, dtype=float)
             irr[GISData['mapindex']] = GISData['irr'][yearstr][:,k]
-            # add GCAM-SubRegion labels to all cells with irrigation values
-            # XXX maybe this should be done further up when we do the population adjustments
-            map_rgn = rgnmapadjust(mapsize, irr, GISData['map_rgn'], '------[Adjusting map_rgn with irr crop # ' + str(k+1) + ']: ')
-            mapSubRegion     = rgnmapadjust(mapsize, irr, mapSubRegion, '------[Adjusting map' + GISData['SubRegionString'] + ' with irr crop # ' + str(k+1) + ']: ') # if we need to do this step for mapSubRegion?
-    
-            GISData['map_rgn'] = np.copy(map_rgn)
-        
+
+            map_rgn = GISData['map_rgn']
+
             # STEP 5: calculate the total amount of irrigated lands from the GIS maps
     
             irrAx   = np.zeros((nregions,nSubRegion), dtype = float) # this is the max total available area of all grids with some irrigation
@@ -697,69 +687,3 @@ def pop_scale_reshape(withd, pop_pro_rata, map_rgn, mapindex):
     scaled_map = pop_pro_rata * withd[map_rgn[mapindex]-1]
     
     return  scaled_map
-
-
-def rgnmapadjust(mapsize, map_pop, map_rgn, label):
-    """
-    function rgn_map_adjust in matlab code
-
-    Find unassigned grid cells with nonzero population and assign them to an adjacent region, if possible.
-
-    Arguments:
-    mapsize - Dimensions of the map array (typically [360, 720])
-    map_pop - Population map, dimensioned as mapsize
-    map_rgn - Region map, dimensioned as mapsize
-    label - String to prefix to diagnostic output
-
-    Return value:  adjusted region map.
-    """
-
-
-    new_map_rgn = np.copy(map_rgn)
-    #map_pop     = map_pop.reshape(map_rgn.shape, order='F')
-    map_pop[np.isnan(map_pop)]       = 0
-    
-# find problem cells
-    adjust = np.where((map_pop > 0) & (map_rgn == 0))[0]
-
-# adjust each cell if possible    
-    mapsub = ind2sub(mapsize,adjust)
-    row    = mapsub[:,0]
-    col    = mapsub[:,1]
-    
-# coordinates for adjacent cells, with protection for cells at the edges 
-    row0                                = row - 1
-    row0[np.where(row0 < 0)]            = 0
-    row1                                = row + 1
-    row1[np.where(row1 > mapsize[0]-1)] = mapsize[0]-1
-        
-# make columns wrap  
-    col0                                = col-1
-    col0[np.where(col0 < 0)]            = mapsize[1]-1
-    col1                                = col+1
-    col1[np.where(col1 > mapsize[1]-1)] = 0
-
-# Create a matrix where each column is the region mapping for the adjacent cells in each of the 8 directions.  
-# Then take the max along each row.  Assign the result to the corresponding center cell.    
-    I1 = sub2ind(mapsize, row,  col)
-    I2 = sub2ind(mapsize, row0, col0)
-    I3 = sub2ind(mapsize, row0, col)
-    I4 = sub2ind(mapsize, row0, col1)
-    I5 = sub2ind(mapsize, row,  col0)
-    I6 = sub2ind(mapsize, row,  col1)
-    I7 = sub2ind(mapsize, row1, col0)
-    I8 = sub2ind(mapsize, row1, col)
-    I9 = sub2ind(mapsize, row1, col1)
-
-    for i in range(0, len(I1)): 
-        new_map_rgn[I1[i]] = max(map_rgn[I2[i]], map_rgn[I3[i]],map_rgn[I4[i]],map_rgn[I5[i]],map_rgn[I6[i]],map_rgn[I7[i]],map_rgn[I8[i]],map_rgn[I9[i]])
-    
-    fixedcells = np.where((map_pop > 0) & (map_rgn == 0) & (new_map_rgn > 0))[0]
-    
-    ## log diagnostics 
-    logging.debug(label +   'Cells with pop/irr data but no region: {}'.format(len(adjust)))
-    logging.debug(label +   'Cells adjusted to an adjacent region: {}'.format(len(fixedcells)))
-    
-    logging.debug(label +   'Cells not adjusted: {}'.format(len(adjust) - len(fixedcells)))
-    
-    return new_map_rgn
