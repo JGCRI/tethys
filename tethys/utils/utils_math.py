@@ -8,27 +8,24 @@ Copyright (c) 2017, Battelle Memorial Institute
 
 """
 import logging
-
 import numpy as np
-
 from tethys.utils.exceptions import DataError
 
 
 # Convert subscripts to linear indices
-def sub2ind(arraySize,rowSub,colSub):
+def sub2ind(array_size, row_sub, col_sub):
 
-    linearInd  = []
-    if len(rowSub) != len(colSub):
-
-        msg = 'sub2ind: rowSub and colSub must have equal lengths.  len(rowSub) = {}  len(colSub) = {}'.format(
-            len(rowSub), len(colSub))
+    linear_ind = []
+    if len(row_sub) != len(col_sub):
+        msg = 'sub2ind: row_sub and col_sub must have equal lengths.  len(row_sub) = {}  len(col_sub) = {}'.format(
+            len(row_sub), len(col_sub))
         logging.error(msg)
 
         raise DataError(msg)
 
-    arr = tuple(arraySize)
-    for i in range(0, len(rowSub)):
-        temp = np.ravel_multi_index((rowSub[i],colSub[i]), arr, order='F')
-        linearInd.append(temp)
+    arr = tuple(array_size)
+    for i in range(0, len(row_sub)):
+        temp = np.ravel_multi_index((row_sub[i], col_sub[i]), arr, order='F')
+        linear_ind.append(temp)
         
-    return np.array(linearInd)
+    return np.array(linear_ind)
