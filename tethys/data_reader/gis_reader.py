@@ -21,7 +21,7 @@ import os
 import numpy as np
 from scipy import io as spio
 from tethys.utils.data_parser import get_array_csv, get_array_txt
-from tethys.data_reader.hist_pop_irr_data import getPopYearData as GetPopData
+from tethys.data_reader.hist_pop_irr_data import getPopYearData, getIrrYearData, getIrrYearData_Crops
 from tethys.utils.exceptions import FileNotFoundError
 
 
@@ -39,21 +39,19 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle,Livestock_Goat, L
     GISData['SubRegionString'] = 'Basin'
 
     # using finer resolution gridded population map (from HYDE or GPW) according to year availability
-    GISData['pop'] = GetPopData(Population_GPW=Population_GPW,
-                                Population_HYDE=Population_HYDE,
-                                years=years)  # dictionary
+    GISData['pop'] = getPopYearData(Population_GPW=Population_GPW,
+                                    Population_HYDE=Population_HYDE,
+                                    years=years)  # dictionary
 
     if UseDemeter:
-        # using finer resolution gridded Irrigation map (from HYDE or GMIA) according to year availability
-        from tethys.data_reader.hist_pop_irr_data import getIrrYearData_Crops as GetIrrData
-        GISData['irr'] = GetIrrData(DemeterOutputFolder=DemeterOutputFolder,
-                                    years=years)  # dictionary
-    else:
         # using finer resolution gridded Irrigation map (from demeter by individual crops) according to year availability
-        from tethys.data_reader.hist_pop_irr_data import getIrrYearData as GetIrrData
-        GISData['irr'] = GetIrrData(Irrigation_GMIA=Irrigation_GMIA,
-                                    Irrigation_HYDE=Irrigation_HYDE,
-                                    years=years)  # dictionary
+        GISData['irr'] = getIrrYearData_Crops(DemeterOutputFolder=DemeterOutputFolder,
+                                              years=years)  # dictionary
+    else:
+        # using finer resolution gridded Irrigation map (from HYDE or GMIA) according to year availability
+        GISData['irr'] = getIrrYearData(Irrigation_GMIA=Irrigation_GMIA,
+                                        Irrigation_HYDE=Irrigation_HYDE,
+                                        years=years)  # dictionary
 
 
 
