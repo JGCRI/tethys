@@ -20,7 +20,7 @@ import tethys.diagnostics.temporal_diagnostics as DiagnosticsTD
 import tethys.temporal_downscaling.temporal_downscaling as TemporalDownscaling
 
 
-def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, PerformDiagnostics,
+def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagnostics,
                        PerformTemporal, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCAM_DBpath,
                        GCAM_DBfile, GCAM_query, GCAM_queryCore, OutputFolder, temporal_climate, Irr_MonthlyData,
                        TemporalInterpolation, Domestic_R, Elec_Building, Elec_Industry, Elec_Building_heat,
@@ -69,7 +69,6 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
                              GCAM_DBfile=GCAM_DBfile,
                              GCAM_query=GCAM_query,
                              GCAM_queryCore=GCAM_queryCore,
-                             subreg=subreg,
                              basin_state_area=basin_state_area)
     endtime1 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime1 - starttime1))
@@ -145,10 +144,10 @@ def run_disaggregation(years, InputRegionFile, mapsize, subreg, UseDemeter, Perf
         # Use Demeter outputs (irrigated cropland areas for each type of crops ) to replace the GMIA/HYSE data used in downscaling of irrigation water withdrawal
         # Additional gridded outputs: irrigation water withdrawal by 13 crop types
         logging.info('---Create an irrigation map as proxy of agricultural water withdrawal using Demeter outputs')
-        ProxyMaps.IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT, subreg)
+        ProxyMaps.IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT)
     else:
         logging.info('---Create an irrigation map as proxy of agricultural water withdrawal ')
-        ProxyMaps.IrrigationMap(mapsize, GISData, GCAMData, NY, OUT, subreg)
+        ProxyMaps.IrrigationMap(mapsize, GISData, GCAMData, NY, OUT)
 
     endtime6 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime6 - endtime5))

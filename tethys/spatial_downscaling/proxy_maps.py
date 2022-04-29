@@ -175,7 +175,7 @@ def LivestockMap(mapsize, GISData, GCAMData, NY, OUT):
     return withd_liv_map
 
     
-def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT, subreg):
+def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
 
     # Need to downscale the agricultural water withdrawal data for GCAM years
     # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
@@ -405,7 +405,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT, subreg):
     
     return withd_irr_map
     
-def IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT, subreg):
+def IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT):
 
 
     # Need to downscale the agricultural water withdrawal data for GCAM years

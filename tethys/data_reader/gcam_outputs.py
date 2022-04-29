@@ -461,7 +461,7 @@ def livestock_water_demand_to_array(conn, conn_core, query, query_core, d_reg_na
     return piv.values
 
 
-def land_to_array(conn, conn_core, query, query_core, subreg, basin_state_area, d_reg_name, d_basin_name, d_crops, years):
+def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_name, d_basin_name, d_crops, years):
     """
     Query GCAM database for irrigated land area per region, subregion,
     and crop type.  Place in format required by Tethys.
@@ -470,7 +470,6 @@ def land_to_array(conn, conn_core, query, query_core, subreg, basin_state_area, 
     :param conn_core:     gcamreader database object core gcam
     :param query:         XPath Query
     :param query_core:    XPath Query for GCAM core
-    :param subreg:        Either 0 (AEZ) or 1 (BASIN)
     :param basin_state_area:  state basin area ratios for GCAM USA
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param d_basin_name:  A dictionary of 'basin_name' : basin_id
@@ -587,7 +586,7 @@ def land_to_array(conn, conn_core, query, query_core, subreg, basin_state_area, 
 
     return piv.values
 
-def irr_water_demand_to_array(conn, conn_core, query, query_core, subreg, d_reg_name, d_basin_name, d_crops, years):
+def irr_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_basin_name, d_crops, years):
     """
     Query GCAM database for irrigated water demand (billion m3).  Place
     in format required by Tethys.
@@ -596,7 +595,6 @@ def irr_water_demand_to_array(conn, conn_core, query, query_core, subreg, d_reg_
     :param conn_core:     gcam_reader database object core gcam
     :param query:         XPath Query
     :param query_core:    XPath Query for GCAM core
-    :param subreg:        Either 0 (AEZ) or 1 (BASIN)
     :param d_reg_name:    A dictionary of 'region_name': region_id
     :param d_crops:       A dictionary of 'crop_name': crop_id
     :param years:         list of years to use
@@ -671,7 +669,7 @@ def irr_water_demand_to_array(conn, conn_core, query, query_core, subreg, d_reg_
     return piv.values
 
 def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCAM_DBpath, GCAM_DBfile, GCAM_query,
-                  GCAM_queryCore, subreg, basin_state_area):
+                  GCAM_queryCore, basin_state_area):
     """
     Import and format GCAM data from database for use in Tethys.
 
@@ -711,8 +709,8 @@ def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCA
     d['rgn_wdmfg']    = manuf_water_demand_to_array(conn, queries[6], d_reg_name, years)
     d['rgn_wdmining'] = mining_water_demand_to_array(conn, queries[7], d_reg_name, years)
     d['wdliv']        = livestock_water_demand_to_array(conn, conn_core, queries[5], queries_core[5],d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years)
-    d['irrArea']      = land_to_array(conn, conn_core, queries[0], queries[2], subreg, basin_state_area, d_reg_name, d_basin_name, d_crops, years)
-    d['irrV']         = irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], subreg, d_reg_name, d_basin_name, d_crops, years)
+    d['irrArea']      = land_to_array(conn, conn_core, queries[0], queries[2], basin_state_area, d_reg_name, d_basin_name, d_crops, years)
+    d['irrV']         = irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], d_reg_name, d_basin_name, d_crops, years)
 
 #    for key, value in d.iteritems():
 #        np.savetxt(key + '.csv', d[key], delimiter=',')

@@ -94,8 +94,6 @@ class ReadConfig(Logger):
         if not self.GCAM_queryCore_C.endswith('.xml'):
             self.GCAM_queryCore_C = pkg_resources.resource_filename('tethys', 'reference/queries/query_consumption.xml')
 
-        self.subreg = int(self.gcam_config.get('GCAM_subreg', None))
-
         # a single year input will be string not list for self.years
         self.years = self.gcam_config.get('GCAM_Years', None)
 
