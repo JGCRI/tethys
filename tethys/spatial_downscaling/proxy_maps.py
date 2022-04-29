@@ -47,28 +47,24 @@ def PopulationMap(mapsize, GISData, GCAMData, OUT, NY):
         logging.info('{}'.format(GISData['pop']['years'][y]))
 
         yearstr = str(GISData['pop']['years_new'][y])
-        pop     = np.zeros(GISData['map_rgn'].shape, dtype=float)
-        pop[GISData['mapindex']] = GISData['pop'][yearstr]
+        pop = np.where(GISData['RegionIDs'] > 0, GISData['pop'][yearstr], 0)  # 67420 shape, filter out invalid regions
 
-        map_rgn = GISData['map_rgn']
         # Adjust population map to be consistent with GCAM assumptions. We will use
         # the non-ag region map for this because in all current setups it is more detailed.
         pop_fac = np.zeros((GISData['nregions'], NY), dtype=float)
         # Correction to pop_fac`
 
         for i in range(GISData['nregions']):
-            index = np.where(map_rgn-1 == i)[0]
-            pop_fac[i] = GCAMData['pop_tot'][i]/np.sum(pop[index])
+            index = np.where(GISData['RegionIDs'] == i + 1)[0]
+            pop_fac[i] = GCAMData['pop_tot'][i] / np.sum(pop[index])
 
-        # index of all cells that have valid regions
-        mapindex_valid = np.where(map_rgn > 0)[0]
-            
-        pop_tot_y = GCAMData['pop_tot'][:, y]        # single time slice regional pop
-        pop_pro_rata = pop[mapindex_valid]*pop_fac[map_rgn[mapindex_valid]-1, y] / pop_tot_y[map_rgn[mapindex_valid]-1]
-        withd_dom_map[mapindex_valid, y] = pop_scale_reshape(GCAMData['rgn_wddom'][:, y], pop_pro_rata, map_rgn, mapindex_valid)
-        withd_elec_map[mapindex_valid, y] = pop_scale_reshape(GCAMData['rgn_wdelec'][:, y], pop_pro_rata, map_rgn, mapindex_valid)
-        withd_mfg_map[mapindex_valid, y] = pop_scale_reshape(GCAMData['rgn_wdmfg'][:, y], pop_pro_rata, map_rgn, mapindex_valid)
-        withd_mining_map[mapindex_valid, y] = pop_scale_reshape(GCAMData['rgn_wdmining'][:, y], pop_pro_rata, map_rgn, mapindex_valid)
+        pop_tot_y = GCAMData['pop_tot'][:, y]  # single time slice regional pop
+        pop_pro_rata = pop * pop_fac[GISData['RegionIDs'] - 1, y] / pop_tot_y[GISData['RegionIDs'] - 1]
+
+        withd_dom_map[GISData['mapindex'], y] = pop_pro_rata * GCAMData['rgn_wddom'][:, y][GISData['RegionIDs'] - 1]
+        withd_elec_map[GISData['mapindex'], y] = pop_pro_rata * GCAMData['rgn_wdelec'][:, y][GISData['RegionIDs'] - 1]
+        withd_mfg_map[GISData['mapindex'], y] = pop_pro_rata * GCAMData['rgn_wdmfg'][:, y][GISData['RegionIDs'] - 1]
+        withd_mining_map[GISData['mapindex'], y] = pop_pro_rata * GCAMData['rgn_wdmining'][:, y][GISData['RegionIDs'] - 1]
 
     # total non-ag withdrawal can be computed from these four maps
     withd_nonAg_map = withd_dom_map + withd_elec_map + withd_mfg_map + withd_mining_map
@@ -635,26 +631,3 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT):
     
     return withd_irr_map
 
-def pop_scale_reshape(withd, pop_pro_rata, map_rgn, mapindex):
-    
-    """
-    scale the total withdrawal values for a region by the pro-rata population in each grid cell.
-  
-    Arguments:
-    withd - regional total withdrawal for a single time slice.
-    pop_pro_rata - pro-rata population for each grid cell.  This is in the "flattened" format; i.e., a single vector of ngrid values.
-    
-    map_rgn      - the 2-D map of grid cell region assignments
-    mapindex     - the mapping from 2-D grid to flattened grid (i.e., output of sub2ind)
-
-    Return value:
-    2D map of withdrawal scaled by pro-rata population.  Cells in the map that are not
-    'live' grid cells (i.e., not referenced by mapindex) will be set to NaN.
-    """
-    
-    #scaled_map = np.full(map_rgn.shape, np.NaN, dtype=float)
-    #scaled_map[mapindex] = pop_pro_rata * withd[map_rgn[mapindex]-1]
-    
-    scaled_map = pop_pro_rata * withd[map_rgn[mapindex]-1]
-    
-    return  scaled_map
