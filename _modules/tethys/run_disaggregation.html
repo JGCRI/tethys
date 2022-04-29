@@ -182,7 +182,6 @@
 <span class="kn">from</span> <span class="nn">tethys.data_reader.gcam_outputs</span> <span class="kn">import</span> <span class="n">get_gcam_data</span>
 <span class="kn">from</span> <span class="nn">tethys.data_reader</span> <span class="kn">import</span> <span class="n">gis_reader</span>
 <span class="kn">from</span> <span class="nn">tethys.data_writer.outputs</span> <span class="kn">import</span> <span class="n">OUTSettings</span>
-<span class="kn">from</span> <span class="nn">tethys.spatial_downscaling.proxy_maps</span> <span class="kn">import</span> <span class="n">Rearranging</span>
 <span class="kn">import</span> <span class="nn">tethys.spatial_downscaling.proxy_maps</span> <span class="k">as</span> <span class="nn">ProxyMaps</span>
 <span class="kn">import</span> <span class="nn">tethys.spatial_downscaling.total_water_use</span> <span class="k">as</span> <span class="nn">TotalWaterUse</span>
 <span class="kn">import</span> <span class="nn">tethys.diagnostics.spatial_diagnostics</span> <span class="k">as</span> <span class="nn">DiagnosticsSD</span>
@@ -190,7 +189,7 @@
 <span class="kn">import</span> <span class="nn">tethys.temporal_downscaling.temporal_downscaling</span> <span class="k">as</span> <span class="nn">TemporalDownscaling</span>
 
 
-<div class="viewcode-block" id="run_disaggregation"><a class="viewcode-back" href="../../tethys.html#tethys.run_disaggregation.run_disaggregation">[docs]</a><span class="k">def</span> <span class="nf">run_disaggregation</span><span class="p">(</span><span class="n">years</span><span class="p">,</span> <span class="n">InputRegionFile</span><span class="p">,</span> <span class="n">mapsize</span><span class="p">,</span> <span class="n">subreg</span><span class="p">,</span> <span class="n">UseDemeter</span><span class="p">,</span> <span class="n">PerformDiagnostics</span><span class="p">,</span>
+<div class="viewcode-block" id="run_disaggregation"><a class="viewcode-back" href="../../tethys.html#tethys.run_disaggregation.run_disaggregation">[docs]</a><span class="k">def</span> <span class="nf">run_disaggregation</span><span class="p">(</span><span class="n">years</span><span class="p">,</span> <span class="n">InputRegionFile</span><span class="p">,</span> <span class="n">mapsize</span><span class="p">,</span> <span class="n">UseDemeter</span><span class="p">,</span> <span class="n">PerformDiagnostics</span><span class="p">,</span>
                        <span class="n">PerformTemporal</span><span class="p">,</span> <span class="n">RegionNames</span><span class="p">,</span> <span class="n">gcam_basin_lu</span><span class="p">,</span> <span class="n">buff_fract</span><span class="p">,</span> <span class="n">goat_fract</span><span class="p">,</span> <span class="n">GCAM_DBpath</span><span class="p">,</span>
                        <span class="n">GCAM_DBfile</span><span class="p">,</span> <span class="n">GCAM_query</span><span class="p">,</span> <span class="n">GCAM_queryCore</span><span class="p">,</span> <span class="n">OutputFolder</span><span class="p">,</span> <span class="n">temporal_climate</span><span class="p">,</span> <span class="n">Irr_MonthlyData</span><span class="p">,</span>
                        <span class="n">TemporalInterpolation</span><span class="p">,</span> <span class="n">Domestic_R</span><span class="p">,</span> <span class="n">Elec_Building</span><span class="p">,</span> <span class="n">Elec_Industry</span><span class="p">,</span> <span class="n">Elec_Building_heat</span><span class="p">,</span>
@@ -239,7 +238,6 @@
                              <span class="n">GCAM_DBfile</span><span class="o">=</span><span class="n">GCAM_DBfile</span><span class="p">,</span>
                              <span class="n">GCAM_query</span><span class="o">=</span><span class="n">GCAM_query</span><span class="p">,</span>
                              <span class="n">GCAM_queryCore</span><span class="o">=</span><span class="n">GCAM_queryCore</span><span class="p">,</span>
-                             <span class="n">subreg</span><span class="o">=</span><span class="n">subreg</span><span class="p">,</span>
                              <span class="n">basin_state_area</span><span class="o">=</span><span class="n">basin_state_area</span><span class="p">)</span>
     <span class="n">endtime1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------Time Cost: </span><span class="si">%s</span><span class="s2"> seconds ---&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endtime1</span> <span class="o">-</span> <span class="n">starttime1</span><span class="p">))</span>
@@ -274,6 +272,7 @@
                                     <span class="n">Livestock_Pig</span><span class="o">=</span><span class="n">Livestock_Pig</span><span class="p">,</span>
                                     <span class="n">Coord</span><span class="o">=</span><span class="n">Coord</span><span class="p">,</span>
                                     <span class="n">Area</span><span class="o">=</span><span class="n">Area</span><span class="p">,</span>
+                                    <span class="n">InputRegionFile</span><span class="o">=</span><span class="n">InputRegionFile</span><span class="p">,</span>
                                     <span class="n">InputBasinFile</span><span class="o">=</span><span class="n">InputBasinFile</span><span class="p">,</span>
                                     <span class="n">BasinNames</span><span class="o">=</span><span class="n">BasinNames</span><span class="p">,</span>
                                     <span class="n">InputCountryFile</span><span class="o">=</span><span class="n">InputCountryFile</span><span class="p">,</span>
@@ -283,31 +282,29 @@
                                     <span class="n">years</span><span class="o">=</span><span class="n">years</span><span class="p">,</span>
                                     <span class="n">Irrigation_GMIA</span><span class="o">=</span><span class="n">Irrigation_GMIA</span><span class="p">,</span>
                                     <span class="n">Irrigation_HYDE</span><span class="o">=</span><span class="n">Irrigation_HYDE</span><span class="p">,</span>
-                                    <span class="n">DemeterOutputFolder</span><span class="o">=</span><span class="n">DemeterOutputFolder</span>
+                                    <span class="n">DemeterOutputFolder</span><span class="o">=</span><span class="n">DemeterOutputFolder</span><span class="p">,</span>
+                                    <span class="n">mapsize</span><span class="o">=</span><span class="n">mapsize</span>
                                     <span class="p">)</span>
-    <span class="n">rgnmapData</span> <span class="o">=</span> <span class="n">gis_reader</span><span class="o">.</span><span class="n">getRegionMapData</span><span class="p">(</span><span class="n">InputRegionFile</span><span class="p">)</span>
     <span class="n">endtime2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------Time Cost: </span><span class="si">%s</span><span class="s2"> seconds ---&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endtime2</span> <span class="o">-</span> <span class="n">endtime1</span><span class="p">))</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;---Mapsize: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mapsize</span><span class="p">))</span>
 
     <span class="c1"># 3. Rearranging data and map indices</span>
     <span class="c1">#    Rearrange all the input data into a common framework (from 2D to 1D)</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;---Rearranging data and map indices&#39;</span><span class="p">)</span>
-    <span class="n">Rearranging</span><span class="p">(</span><span class="n">mapsize</span><span class="p">,</span> <span class="n">GISData</span><span class="p">,</span> <span class="n">rgnmapData</span><span class="p">)</span>
+    <span class="c1">#    has been added to step 2</span>
     <span class="n">endtime3</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------Time Cost: </span><span class="si">%s</span><span class="s2"> seconds ---&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endtime3</span> <span class="o">-</span> <span class="n">endtime2</span><span class="p">))</span>
 
     <span class="c1"># 4. Create proxy maps and downscale non-Agriculture (domestic, electricity, manufacturing and mining) water</span>
     <span class="c1">#    withdrawals to grid scale</span>
     <span class="c1"># a.    Create a population proxy map</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;---Create a population map as proxy of non-agricultural water withdrawals&#39;</span><span class="p">)</span>
-    <span class="n">ProxyMaps</span><span class="o">.</span><span class="n">PopulationMap</span><span class="p">(</span><span class="n">mapsize</span><span class="p">,</span> <span class="n">GISData</span><span class="p">,</span> <span class="n">GCAMData</span><span class="p">,</span> <span class="n">rgnmapData</span><span class="p">,</span> <span class="n">OUT</span><span class="p">,</span> <span class="n">NY</span><span class="p">)</span>
+    <span class="n">ProxyMaps</span><span class="o">.</span><span class="n">PopulationMap</span><span class="p">(</span><span class="n">mapsize</span><span class="p">,</span> <span class="n">GISData</span><span class="p">,</span> <span class="n">GCAMData</span><span class="p">,</span> <span class="n">OUT</span><span class="p">,</span> <span class="n">NY</span><span class="p">)</span>
     <span class="n">endtime4</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------Time Cost: </span><span class="si">%s</span><span class="s2"> seconds ---&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endtime4</span> <span class="o">-</span> <span class="n">endtime3</span><span class="p">))</span>
 
     <span class="c1"># b.    Create a livestock proxy map and downscale livestock water withdrawal to grid scale</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;---Create an livestock map as proxy of livestock water withdrawal&#39;</span><span class="p">)</span>
-    <span class="n">ProxyMaps</span><span class="o">.</span><span class="n">LivestockMap</span><span class="p">(</span><span class="n">mapsize</span><span class="p">,</span> <span class="n">GISData</span><span class="p">,</span> <span class="n">GCAMData</span><span class="p">,</span> <span class="n">rgnmapData</span><span class="p">,</span> <span class="n">NY</span><span class="p">,</span> <span class="n">OUT</span><span class="p">)</span>
+    <span class="n">ProxyMaps</span><span class="o">.</span><span class="n">LivestockMap</span><span class="p">(</span><span class="n">mapsize</span><span class="p">,</span> <span class="n">GISData</span><span class="p">,</span> <span class="n">GCAMData</span><span class="p">,</span> <span class="n">NY</span><span class="p">,</span> <span class="n">OUT</span><span class="p">)</span>
     <span class="n">endtime5</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------Time Cost: </span><span class="si">%s</span><span class="s2"> seconds ---&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endtime5</span> <span class="o">-</span> <span class="n">endtime4</span><span class="p">))</span>
 
@@ -316,10 +313,10 @@
         <span class="c1"># Use Demeter outputs (irrigated cropland areas for each type of crops ) to replace the GMIA/HYSE data used in downscaling of irrigation water withdrawal</span>
         <span class="c1"># Additional gridded outputs: irrigation water withdrawal by 13 crop types</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;---Create an irrigation map as proxy of agricultural water withdrawal using Demeter outputs&#39;</span><span class="p">)</span>
-        <span class="n">ProxyMaps</span><span class="o">.</span><span class="n">IrrigationMapCrops</span><span class="p">(</span><span class="n">mapsize</span><span class="p">,</span> <span class="n">GISData</span><span class="p">,</span> <span class="n">GCAMData</span><span class="p">,</span> <span class="n">rgnmapData</span><span class="p">,</span> <span class="n">NY</span><span class="p">,</span> <span class="n">OUT</span><span class="p">,</span> <span class="n">subreg</span><span class="p">)</span>
+        <span class="n">ProxyMaps</span><span class="o">.</span><span class="n">IrrigationMapCrops</span><span class="p">(</span><span class="n">mapsize</span><span class="p">,</span> <span class="n">GISData</span><span class="p">,</span> <span class="n">GCAMData</span><span class="p">,</span> <span class="n">NY</span><span class="p">,</span> <span class="n">OUT</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;---Create an irrigation map as proxy of agricultural water withdrawal &#39;</span><span class="p">)</span>
-        <span class="n">ProxyMaps</span><span class="o">.</span><span class="n">IrrigationMap</span><span class="p">(</span><span class="n">mapsize</span><span class="p">,</span> <span class="n">GISData</span><span class="p">,</span> <span class="n">GCAMData</span><span class="p">,</span> <span class="n">rgnmapData</span><span class="p">,</span> <span class="n">NY</span><span class="p">,</span> <span class="n">OUT</span><span class="p">,</span> <span class="n">subreg</span><span class="p">)</span>
+        <span class="n">ProxyMaps</span><span class="o">.</span><span class="n">IrrigationMap</span><span class="p">(</span><span class="n">mapsize</span><span class="p">,</span> <span class="n">GISData</span><span class="p">,</span> <span class="n">GCAMData</span><span class="p">,</span> <span class="n">NY</span><span class="p">,</span> <span class="n">OUT</span><span class="p">)</span>
 
     <span class="n">endtime6</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------Time Cost: </span><span class="si">%s</span><span class="s2"> seconds ---&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endtime6</span> <span class="o">-</span> <span class="n">endtime5</span><span class="p">))</span>
@@ -328,7 +325,6 @@
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;---Aggregate to compute total water withdrawal at grid scale&#39;</span><span class="p">)</span>
     <span class="n">TotalWaterUse</span><span class="o">.</span><span class="n">TotalWaterUse</span><span class="p">(</span><span class="n">OutputUnit</span><span class="o">=</span><span class="n">OutputUnit</span><span class="p">,</span>
                                 <span class="n">GISData</span><span class="o">=</span><span class="n">GISData</span><span class="p">,</span>
-                                <span class="n">rgnmapData</span><span class="o">=</span><span class="n">rgnmapData</span><span class="p">,</span>
                                 <span class="n">OUT</span><span class="o">=</span><span class="n">OUT</span><span class="p">)</span>
     <span class="n">endtime7</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------Time Cost: </span><span class="si">%s</span><span class="s2"> seconds ---&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endtime7</span> <span class="o">-</span> <span class="n">endtime6</span><span class="p">))</span>
@@ -368,7 +364,7 @@
                                                            <span class="n">coords</span><span class="o">=</span><span class="n">GISData</span><span class="p">[</span><span class="s1">&#39;coord&#39;</span><span class="p">][:,:],</span>
                                                            <span class="n">OUT</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
                                                            <span class="n">mapindex</span><span class="o">=</span><span class="n">GISData</span><span class="p">[</span><span class="s1">&#39;mapindex&#39;</span><span class="p">],</span>
-                                                           <span class="n">regionID</span><span class="o">=</span><span class="n">rgnmapData</span><span class="p">[</span><span class="s1">&#39;rgnmapNONAG&#39;</span><span class="p">],</span>
+                                                           <span class="n">regionID</span><span class="o">=</span><span class="n">GISData</span><span class="p">[</span><span class="s1">&#39;RegionIDs&#39;</span><span class="p">],</span>
                                                            <span class="n">basinID</span><span class="o">=</span><span class="n">GISData</span><span class="p">[</span><span class="s1">&#39;BasinIDs&#39;</span><span class="p">])</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;TDyears = </span><span class="si">{</span><span class="n">TDYears</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">endtime7</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
