@@ -90,16 +90,13 @@ def write_outputs(OutputUnit, OutputFormat, OutputFolder, PerformTemporal, TDYea
             # gridded output from spatial downscaling
             elif attr[0] == "w":
 
-                # Only output 67420 cells (with coordinates)
-                newvalue   = value[GISData['mapindex'],:]
-                
                 if OutputFormat == 1:          
-                    writecsv(OutputFilename, newvalue, years, temp, GISData)
+                    writecsv(OutputFilename, value, years, temp, GISData)
                 elif OutputFormat == 2:
-                    writeNETCDF(OutputFilename + '.nc', newvalue, GISData, temp, years)
+                    writeNETCDF(OutputFilename + '.nc', value, GISData, temp, years)
                 else:
-                    writecsv(OutputFilename, newvalue, years, temp, GISData)
-                    writeNETCDF(OutputFilename + '.nc', newvalue, GISData, temp, years)
+                    writecsv(OutputFilename, value, years, temp, GISData)
+                    writeNETCDF(OutputFilename + '.nc', value, GISData, temp, years)
 
             #  gridded output from temporal downscaling
             elif attr[0] == "t":
@@ -128,8 +125,8 @@ def write_outputs(OutputUnit, OutputFormat, OutputFolder, PerformTemporal, TDYea
             # for outputs, divided wdirr by crops for additional files when using Demeter outputs
             elif attr[:7] == 'crops_w':
                 for i in range(value.shape[1]):
-                    newvalue   = value[GISData['mapindex'],i,:]
-                    if OutputFormat == 1:          
+                    newvalue = value[:, i, :]
+                    if OutputFormat == 1:
                         writecsv(OutputFilename + '_' + d_crops[i], newvalue, years, temp, GISData)
                     elif OutputFormat == 2:
                         writeNETCDF(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, years)

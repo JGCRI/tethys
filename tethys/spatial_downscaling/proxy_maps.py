@@ -34,15 +34,15 @@ def PopulationMap(mapsize, GISData, GCAMData, OUT, NY):
 
     # non-agricultural (dom, elec, mfg, mining) total water withdrawals in (km3/yr) for each of the GCAM regions
     # population map for all years 1990, 2005:2100
-    ms      = (mapsize[0]*mapsize[1],NY)
-    # withd_nonAg_map   = np.full(ms, np.NaN, dtype=float)
-    withd_dom_map     = np.full(ms, np.NaN, dtype=float)
-    withd_elec_map    = np.full(ms, np.NaN, dtype=float)
-    withd_mfg_map     = np.full(ms, np.NaN, dtype=float)
-    withd_mining_map  = np.full(ms, np.NaN, dtype=float)    
+    ms = (GISData['RegionIDs'].shape[0], NY)
+
+    withd_dom_map = np.zeros(ms, dtype=float)
+    withd_elec_map = np.zeros(ms, dtype=float)
+    withd_mfg_map = np.zeros(ms, dtype=float)
+    withd_mining_map = np.zeros(ms, dtype=float)
     
     # use historical population maps
-    for y in range (0,NY):
+    for y in range(0, NY):
         # population map
         logging.info('{}'.format(GISData['pop']['years'][y]))
 
@@ -61,26 +61,19 @@ def PopulationMap(mapsize, GISData, GCAMData, OUT, NY):
         pop_tot_y = GCAMData['pop_tot'][:, y]  # single time slice regional pop
         pop_pro_rata = pop * pop_fac[GISData['RegionIDs'] - 1, y] / pop_tot_y[GISData['RegionIDs'] - 1]
 
-        withd_dom_map[GISData['mapindex'], y] = pop_pro_rata * GCAMData['rgn_wddom'][:, y][GISData['RegionIDs'] - 1]
-        withd_elec_map[GISData['mapindex'], y] = pop_pro_rata * GCAMData['rgn_wdelec'][:, y][GISData['RegionIDs'] - 1]
-        withd_mfg_map[GISData['mapindex'], y] = pop_pro_rata * GCAMData['rgn_wdmfg'][:, y][GISData['RegionIDs'] - 1]
-        withd_mining_map[GISData['mapindex'], y] = pop_pro_rata * GCAMData['rgn_wdmining'][:, y][GISData['RegionIDs'] - 1]
+        withd_dom_map[:, y] = pop_pro_rata * GCAMData['rgn_wddom'][:, y][GISData['RegionIDs'] - 1]
+        withd_elec_map[:, y] = pop_pro_rata * GCAMData['rgn_wdelec'][:, y][GISData['RegionIDs'] - 1]
+        withd_mfg_map[:, y] = pop_pro_rata * GCAMData['rgn_wdmfg'][:, y][GISData['RegionIDs'] - 1]
+        withd_mining_map[:, y] = pop_pro_rata * GCAMData['rgn_wdmining'][:, y][GISData['RegionIDs'] - 1]
 
     # total non-ag withdrawal can be computed from these four maps
     withd_nonAg_map = withd_dom_map + withd_elec_map + withd_mfg_map + withd_mining_map
     
-    # The maps have the nan values replaced by zero, if we want to keep the nans (for plotting), comment the following 5 lines
-    withd_dom_map[np.isnan(withd_dom_map)]       = 0
-    withd_elec_map[np.isnan(withd_elec_map)]     = 0
-    withd_mfg_map[np.isnan(withd_mfg_map)]       = 0
-    withd_mining_map[np.isnan(withd_mining_map)] = 0
-    withd_nonAg_map[np.isnan(withd_nonAg_map)]   = 0
-    
-    OUT.wdnonag  = withd_nonAg_map
-    OUT.wddom    = withd_dom_map
-    OUT.wdelec   = withd_elec_map
-    OUT.wdmfg    = withd_mfg_map
-    OUT.wdmin    = withd_mining_map
+    OUT.wdnonag = withd_nonAg_map
+    OUT.wddom = withd_dom_map
+    OUT.wdelec = withd_elec_map
+    OUT.wdmfg = withd_mfg_map
+    OUT.wdmin = withd_mining_map
     
     return withd_nonAg_map
 
@@ -111,7 +104,7 @@ def LivestockMap(mapsize, GISData, GCAMData, NY, OUT):
     #  Next, we distribute those volumes using the spatial distribution of the gis maps
     # these will be the GIS downscaled matrices
 
-    withd_liv_map_LAND = np.zeros((GISData['RegionIDs'].shape[0], NY), dtype=float)
+    withd_liv_map = np.zeros((GISData['RegionIDs'].shape[0], NY), dtype=float)
     for y in range(0, NY):
         livestock = np.zeros((GISData['RegionIDs'].shape[0], 6), dtype=float)
         for i in np.where(GISData['RegionIDs'] > 0)[0]:
@@ -128,10 +121,8 @@ def LivestockMap(mapsize, GISData, GCAMData, NY, OUT):
                 livestock[i, 4] = GCAMData['wdliv'][4*nregions + region, y] * GISData['Poultry'][i] / tot_livestock[region, 4]
             if GISData['Pig'][i] != 0:
                 livestock[i, 5] = GCAMData['wdliv'][5*nregions + region, y] * GISData['Pig'][i] / tot_livestock[region, 5]
-        withd_liv_map_LAND[:, y] = np.sum(livestock, axis=1)
+        withd_liv_map[:, y] = np.sum(livestock, axis=1)
 
-    withd_liv_map = np.zeros((mapsize[0] * mapsize[1], NY), dtype=float)
-    withd_liv_map[GISData['mapindex']] = withd_liv_map_LAND
     OUT.wdliv = withd_liv_map
 
     # Diagnostic message
@@ -370,17 +361,14 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
                                         GISData['SubRegionString'],'ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
                                         y+1, i+1, j+1, irr_V[i,j,y]))
 
-    withd_irr_map_259200 = np.full(ms, np.NaN, dtype=float)
-    withd_irr_map_259200[GISData['mapindex']] = withd_irr_map
-
     # this loop will replace all the nan values with zeros to be able to take sums, if we want to keep the nans (for plotting), comment following 2 lines
     irrA_grid[np.isnan(irrA_grid)]         = 0
-    withd_irr_map_259200[np.isnan(withd_irr_map_259200)] = 0
+    withd_irr_map[np.isnan(withd_irr_map)] = 0
     
     # Total Agricultural Water withdrawal in years
-    OUT.wdirr    = withd_irr_map_259200
+    OUT.wdirr = withd_irr_map
     
-    return withd_irr_map_259200
+    return withd_irr_map
     
 def IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT):
 
@@ -595,13 +583,9 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT):
     # this loop will replace all the nan values with zeros to be able to take sums, if we want to keep the nans (for plotting), comment following 2 lines
     #irrA_grid[np.isnan(irrA_grid)]         = 0
     #withd_irr_map[np.isnan(withd_irr_map)] = 0
-
-    withd_irr_map_259200 = np.zeros(ms, dtype=float)
-    withd_irr_map_259200[GISData['mapindex']] = withd_irr_map
     
     # Total Agricultural Water withdrawal in years
-    OUT.wdirr       = np.sum(withd_irr_map_259200, axis=1)
-    OUT.crops_wdirr = withd_irr_map_259200
+    OUT.wdirr = np.sum(withd_irr_map, axis=1)
+    OUT.crops_wdirr = withd_irr_map
     
-    return withd_irr_map_259200
-
+    return withd_irr_map

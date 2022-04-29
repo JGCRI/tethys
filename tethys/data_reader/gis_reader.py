@@ -65,9 +65,6 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle,Livestock_Goat, L
 
     # read area values for each land grid cell, convert from ha to km2
     GISData['area'] = get_array_csv(Area, 0) * 0.01
-    # reorganize to 259200 possible lat-lon cells (but it's still 1D)
-    GISData['mapAreaExt'] = np.zeros(mapsize[0]*mapsize[1], dtype=float)
-    GISData['mapAreaExt'][GISData['mapindex']] = GISData['area']
 
     # Basin ID Map: 67420 x 1, 235 Basins
     GISData['BasinIDs'] = load_const_griddata(InputBasinFile, 1).astype(int)
@@ -86,9 +83,6 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle,Livestock_Goat, L
     # 67420 valid "land cells"
     GISData['RegionIDs'] = get_array_csv(InputRegionFile, 1).astype(int)
     GISData['nregions'] = GISData['RegionIDs'].max()  # Number of regions
-    # reorganize to 259200 possible lat-lon cells (but it's still 1D)
-    GISData['map_rgn'] = np.zeros(mapsize[0]*mapsize[1], dtype=int)
-    GISData['map_rgn'][GISData['mapindex']] = GISData['RegionIDs']
 
     return GISData
 

@@ -34,20 +34,19 @@ def TotalWaterUse(OutputUnit, GISData, OUT):
     for item in sectorstrs:
         outvars['r'+item] = np.zeros((GISData['nregions'], OUT.wdnonag.shape[1]), dtype=float)
     
-    ls = np.where(GISData['map_rgn'] > 0)[0]
+    ls = np.where(GISData['RegionIDs'] > 0)[0]
     for y in range(0,OUT.wdnonag.shape[1]):
         for index in ls:
             for item in sectorstrs:
                 outwd = outvars['wd'+item]
                 outrr = outvars['r'+item]
 
-                outrr[GISData['map_rgn'][index]-1,y] += outwd[index,y]
+                outrr[GISData['RegionIDs'][index]-1, y] += outwd[index, y]
     
-    if OutputUnit: # convert the original unit km3/yr to new unit mm
-        mapindex    = GISData['mapindex']
-        area        = GISData['mapAreaExt'][mapindex]
-        conversion  = 1e6 # km -> mm
+    if OutputUnit:  # convert the original unit km3/yr to new unit mm
+        area = GISData['area']
+        conversion = 1e6 # km -> mm
         
         for item in sectorstrs:
             outwd = outvars['wd'+item]
-            outwd[mapindex,:] = np.transpose(np.divide(np.transpose(outwd[mapindex,:]), area)*conversion)
+            outwd = np.divide(outwd, area) * conversion  # ignore grey in pycharm, this adjusts OUT.wd*

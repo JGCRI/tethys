@@ -56,29 +56,29 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
     
     if UseDemeter: # Calculated the fraction values of each crop in each year for each cell
         NC  = np.shape(OUT.crops_wdirr)[1]
-        NM  = np.shape(mapindex)[0]
+        NM  = np.shape(regionID)[0]
         NY  = np.shape(GCAM_TDYears_Index)[0]
         F   = np.zeros((NM,NC,NY),dtype = float) # Fraction of each crop for each cell and each year.
         for j in range(np.shape(OUT.crops_wdirr)[1]):
-            W    = OUT.wdirr[mapindex,:]
+            W    = OUT.wdirr
             W1   = W[:,GCAM_TDYears_Index]
-            W    = OUT.crops_wdirr[mapindex,j,:]
+            W    = OUT.crops_wdirr[:, j, :]
             W2   = W[:,GCAM_TDYears_Index]
             F[:,j,:] = np.divide(W2,W1, out=np.zeros_like(W2), where=W1!=0) # NY > 1
             
 
     if TemporalInterpolation and all(item > 1 for item in TDYearsD): # Linear interpolation to GCAM time periods
-        W    = OUT.wddom[mapindex,:]
+        W    = OUT.wddom
         OUT.WDom = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)
-        W    = OUT.wdelec[mapindex,:]
+        W    = OUT.wdelec
         OUT.WEle = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)
-        W    = OUT.wdirr[mapindex,:]
+        W    = OUT.wdirr
         OUT.WIrr = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)
-        W    = OUT.wdliv[mapindex,:]
+        W    = OUT.wdliv
         OUT.WLiv = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)
-        W    = OUT.wdmin[mapindex,:]
+        W    = OUT.wdmin
         OUT.WMin = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)
-        W    = OUT.wdmfg[mapindex,:]
+        W    = OUT.wdmfg
         OUT.WMfg = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)        
         
         if UseDemeter: # Linear interpolation to fraction matrix
@@ -91,17 +91,17 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
         TDYears = list(np.interp(np.arange(min(TDYears), max(TDYears) + 1), TDYears, TDYears).astype(int))    
 
     else:
-        W    = OUT.wddom[mapindex,:]
+        W    = OUT.wddom
         OUT.WDom = W[:,GCAM_TDYears_Index]
-        W    = OUT.wdelec[mapindex,:]
+        W    = OUT.wdelec
         OUT.WEle = W[:,GCAM_TDYears_Index]
-        W    = OUT.wdirr[mapindex,:]
+        W    = OUT.wdirr
         OUT.WIrr = W[:,GCAM_TDYears_Index]
-        W    = OUT.wdliv[mapindex,:]
+        W    = OUT.wdliv
         OUT.WLiv = W[:,GCAM_TDYears_Index]
-        W    = OUT.wdmin[mapindex,:]
+        W    = OUT.wdmin
         OUT.WMin = W[:,GCAM_TDYears_Index]
-        W    = OUT.wdmfg[mapindex,:]
+        W    = OUT.wdmfg
         OUT.WMfg = W[:,GCAM_TDYears_Index]
         
         if UseDemeter:
