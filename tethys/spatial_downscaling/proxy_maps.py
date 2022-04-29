@@ -165,17 +165,9 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
     # Need to downscale the agricultural water withdrawal data for GCAM years
     # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
     # SubRegion to grid scale CHALLENGE: where to add new agricultural lands
-    
-    mapAreaExt = GISData['mapAreaExt'] # float, unit is km2
 
-    # STEP 1: read in SubRegion grid map SubRegion map to match the aggregate withdrawal by GCAM, this loop reads
-    # the ascii data and rearranges in right format and omits missing data -9999
-    mapSubRegion = np.zeros(mapAreaExt.shape, dtype=int)
-
-
-    mapSubRegion[GISData['mapindex']] = GISData['BasinIDs']
-
-    nSubRegion = np.amax(mapSubRegion)
+    # STEP 1: read in Basin grid map
+    nSubRegion = np.amax(GISData['BasinIDs'])
 
     # STEP 2: calculate the total amount of irrigated lands in each GCAM region from the GCAM output files.
     # The irrArea file from GCAM has the format:
@@ -230,19 +222,17 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
                     
     
     ms            = (mapsize[0]*mapsize[1],NY)
-    irrA_grid     = np.full(ms, np.NaN, dtype = float)
+    ms67420 = (GISData['RegionIDs'].shape[0], NY)
+    irrA_grid     = np.full(ms67420, np.NaN, dtype = float)
     #irrA_frac     = np.full(ms, np.NaN, dtype = float)
-    withd_irr_map = np.full(ms, np.NaN, dtype = float) # GIS results
+    withd_irr_map = np.full(ms67420, np.NaN, dtype = float) # GIS results
     
     # use historical irrigation area maps
     # STEP 4: read a grid map of the irrigated area in km2 in a certain year
     for y in range (0,NY):
         logging.info('{}'.format(GISData['irr']['years'][y]))
         yearstr = str(GISData['irr']['years_new'][y])
-        irr     = np.zeros(GISData['map_rgn'].shape, dtype=float)
-        irr[GISData['mapindex']] = GISData['irr'][yearstr]
-
-        map_rgn = GISData['map_rgn']
+        irr = GISData['irr'][yearstr].copy()
 
         # STEP 5: calculate the total amount of irrigated lands from the GIS maps
     
@@ -250,13 +240,12 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
         irrA    = np.zeros((nregions,nSubRegion), dtype = float) # this is the existing area that is equipped with irrigation
         totA    = np.zeros((nregions,nSubRegion), dtype = float) # total land in each rgn, SubRegion combo
     
-        for index in range(0,mapsize[0]*mapsize[1]):
-            temp  = mapAreaExt[index] > 0 and map_rgn[index] > 0 and mapSubRegion[index] > 0
-            if temp:
-                irrA[map_rgn[index]-1,mapSubRegion[index]-1] += irr[index]
-                totA[map_rgn[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
+        for index in range(GISData['RegionIDs'].shape[0]):
+            if GISData['area'][index] > 0 and GISData['RegionIDs'][index] > 0 and GISData['BasinIDs'][index] > 0:
+                irrA[GISData['RegionIDs'][index]-1, GISData['BasinIDs'][index]-1] += irr[index]
+                totA[GISData['RegionIDs'][index]-1, GISData['BasinIDs'][index]-1] += GISData['area'][index]
                 if irr[index] > 0:
-                    irrAx[map_rgn[index]-1,mapSubRegion[index]-1] += mapAreaExt[index]
+                    irrAx[GISData['RegionIDs'][index]-1, GISData['BasinIDs'][index]-1] += GISData['area'][index]
             else:
                 irr[index] = 0
             
@@ -265,7 +254,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
         for i in range(0,nregions):
             for j in range(0,nSubRegion):
                 # To be efficient, the most important step in the loop is to identify the valid irr cell(index in 360*720 grid) for each region and each SubRegion
-                ls = np.where((map_rgn - 1 == i) & (mapSubRegion - 1 == j))[0]
+                ls = np.where((GISData['RegionIDs'] - 1 == i) & (GISData['BasinIDs'] - 1 == j))[0]
                 if len(ls) > 0 and irr_A[i,j,y] > 0:                                    
                     ls1 = []
                     ls2 = []
@@ -279,7 +268,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
                     # uniformly distributed irrigation area based on the total area               
                     if irrA[i,j] == 0 or irrAx[i,j] == 0:
                         for index in ls:                        
-                            irrA_grid[index, y] = mapAreaExt[index]/totA[i,j]*irr_A[i,j,y]
+                            irrA_grid[index, y] = GISData['area'][index]/totA[i,j]*irr_A[i,j,y]
                             #irrA_frac[index, y] = irr_A[i,j,y]/totA[i,j]                                
                     else:
                     # if irrigation area appears in both the GIS matrix and the GCAM output matrix, 
@@ -304,10 +293,10 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
                                 
                                 for index in ls2:
                                     z = irr[index]/irrA[i,j]*irr_A[i,j,y]
-                                    irrA_grid[index, y] = min(z,mapAreaExt[index])
+                                    irrA_grid[index, y] = min(z,GISData['area'][index])
                                     #irrA_frac[index, y] = irrA_grid[index, y]/mapAreaExt[index]
-                                    if z > mapAreaExt[index]:
-                                        cum_diff += z - mapAreaExt[index]
+                                    if z > GISData['area'][index]:
+                                        cum_diff += z - GISData['area'][index]
                                         counter1 += 1
                                     else:
                                         num  += 1
@@ -324,10 +313,10 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
                                     cum_diff0 = 0
                                     z = (irr_A[i,j,y] - cum_area1)/counter2
                                     for index in ls1:                                        
-                                        irrA_grid[index, y] = min(z,mapAreaExt[index])
+                                        irrA_grid[index, y] = min(z,GISData['area'][index])
                                         #irrA_frac[index, y] = irrA_grid[index, y]/mapAreaExt[index]
-                                        if z > mapAreaExt[index]:
-                                            cum_diff0 += z - mapAreaExt[index]                                            
+                                        if z > GISData['area'][index]:
+                                            cum_diff0 += z - GISData['area'][index]
                                         cum_area = cum_area1 + irrA_grid[index, y]
                                     if cum_diff0 > 0:
                                         # GCAM irr_A is too large, the redistributed ls1 still has grids that irrigated area > total area
@@ -344,12 +333,12 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
                                     
                                 counter3 = 0     
                                 for index in ls2:
-                                    if irrA_grid[index, y] < mapAreaExt[index]:
+                                    if irrA_grid[index, y] < GISData['area'][index]:
                                         z = irrA_grid[index, y] + diff/max(1,num)
-                                        irrA_grid[index, y] = min(z,mapAreaExt[index])
+                                        irrA_grid[index, y] = min(z,GISData['area'][index])
                                         #irrA_frac[index, y] = irrA_grid[index, y]/mapAreaExt[index]
-                                        if z > mapAreaExt[index]:
-                                            cum_diff += z - mapAreaExt[index]
+                                        if z > GISData['area'][index]:
+                                            cum_diff += z - GISData['area'][index]
                                             num_new  = num - 1
                                         cum_area += irrA_grid[index, y]   
                                     else:
@@ -380,15 +369,18 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
                     logging.warning('{}  {}  {}  {} {} {} {} '.format('[Year Index, Region ID,',
                                         GISData['SubRegionString'],'ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
                                         y+1, i+1, j+1, irr_V[i,j,y]))
-                                        
+
+    withd_irr_map_259200 = np.full(ms, np.NaN, dtype=float)
+    withd_irr_map_259200[GISData['mapindex']] = withd_irr_map
+
     # this loop will replace all the nan values with zeros to be able to take sums, if we want to keep the nans (for plotting), comment following 2 lines
     irrA_grid[np.isnan(irrA_grid)]         = 0
-    withd_irr_map[np.isnan(withd_irr_map)] = 0
+    withd_irr_map_259200[np.isnan(withd_irr_map_259200)] = 0
     
     # Total Agricultural Water withdrawal in years
-    OUT.wdirr    = withd_irr_map
+    OUT.wdirr    = withd_irr_map_259200
     
-    return withd_irr_map
+    return withd_irr_map_259200
     
 def IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT):
 
@@ -396,7 +388,7 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT):
     # Need to downscale the agricultural water withdrawal data for GCAM years
     # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
     # SubRegion to grid scale CHALLENGE: where to add new agricultural lands
-    
+
     mapAreaExt = GISData['mapAreaExt'] # float, unit is km2
 
     # STEP 1: read in SubRegion grid map SubRegion map to match the aggregate withdrawal by GCAM, this loop reads
