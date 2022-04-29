@@ -91,35 +91,17 @@ def LivestockMap(mapsize, GISData, GCAMData, NY, OUT):
     """
 
     # count how many animals live in each GCAM region first    
-    map_rgn = GISData['map_rgn']
     nregions = GISData['nregions']
-    tot_livestock = np.zeros((nregions,6), dtype=float) # Livestock totals at GCAM scale in year 2005
-    
-    # 67420 -> 360*720   
-    buffalo  = np.zeros(map_rgn.shape, dtype=float)
-    cattle   = np.zeros(map_rgn.shape, dtype=float)
-    goat     = np.zeros(map_rgn.shape, dtype=float)
-    sheep    = np.zeros(map_rgn.shape, dtype=float)
-    poultry  = np.zeros(map_rgn.shape, dtype=float)
-    pig      = np.zeros(map_rgn.shape, dtype=float)
-        
-    buffalo[GISData['mapindex']] = GISData['Buffalo']
-    cattle[GISData['mapindex']]  = GISData['Cattle']
-    goat[GISData['mapindex']]    = GISData['Goat']
-    sheep[GISData['mapindex']]   = GISData['Sheep']
-    poultry[GISData['mapindex']] = GISData['Poultry']
-    pig[GISData['mapindex']]     = GISData['Pig']     
-    
-    ls = np.where(map_rgn > 0)[0]
-    
-    for index in ls:
-        IN    = map_rgn[index]                        
-        tot_livestock[IN-1,0] += buffalo[index]
-        tot_livestock[IN-1,1] += cattle[index]
-        tot_livestock[IN-1,2] += goat[index]
-        tot_livestock[IN-1,3] += sheep[index]
-        tot_livestock[IN-1,4] += poultry[index]
-        tot_livestock[IN-1,5] += pig[index]
+    tot_livestock = np.zeros((nregions, 6), dtype=float)  # Livestock totals at GCAM scale in year 2005
+
+    for i in np.where(GISData['RegionIDs'] > 0)[0]:
+        region = GISData['RegionIDs'][i] - 1
+        tot_livestock[region, 0] += GISData['Buffalo'][i]
+        tot_livestock[region, 1] += GISData['Cattle'][i]
+        tot_livestock[region, 2] += GISData['Goat'][i]
+        tot_livestock[region, 3] += GISData['Sheep'][i]
+        tot_livestock[region, 4] += GISData['Poultry'][i]
+        tot_livestock[region, 5] += GISData['Pig'][i]
   
     #  now create a spatial distribution for each GCAM region
     #  withd_liv: these are the GCAM results of total volume of livestock water withdrawal in
@@ -129,23 +111,30 @@ def LivestockMap(mapsize, GISData, GCAMData, NY, OUT):
     #  Next, we distribute those volumes using the spatial distribution of the gis maps
     # these will be the GIS downscaled matrices
 
-    livestock      = np.zeros((mapsize[0]*mapsize[1],6), dtype = float) 
-    withd_liv_map  = np.zeros((mapsize[0]*mapsize[1],NY), dtype = float)
-    
-    for y in range(0,NY):
-        for index in ls:
-            IN    = map_rgn[index]  
-            if buffalo[index] != 0: livestock[index,0] = GCAMData['wdliv'][0*nregions+IN-1,y] * buffalo[index] / tot_livestock[IN-1,0]
-            if cattle[index]  != 0: livestock[index,1] = GCAMData['wdliv'][1*nregions+IN-1,y] * cattle[index]  / tot_livestock[IN-1,1]
-            if goat[index]    != 0: livestock[index,2] = GCAMData['wdliv'][2*nregions+IN-1,y] * goat[index]    / tot_livestock[IN-1,2]
-            if sheep[index]   != 0: livestock[index,3] = GCAMData['wdliv'][3*nregions+IN-1,y] * sheep[index]   / tot_livestock[IN-1,3]
-            if poultry[index] != 0: livestock[index,4] = GCAMData['wdliv'][4*nregions+IN-1,y] * poultry[index] / tot_livestock[IN-1,4]
-            if pig[index]     != 0: livestock[index,5] = GCAMData['wdliv'][5*nregions+IN-1,y] * pig[index]     / tot_livestock[IN-1,5]
+    withd_liv_map_LAND = np.zeros((GISData['RegionIDs'].shape[0], NY), dtype=float)
+    for y in range(0, NY):
+        livestock = np.zeros((GISData['RegionIDs'].shape[0], 6), dtype=float)
+        for i in np.where(GISData['RegionIDs'] > 0)[0]:
+            region = GISData['RegionIDs'][i] - 1
+            if GISData['Buffalo'][i] != 0:
+                livestock[i, 0] = GCAMData['wdliv'][0*nregions + region, y] * GISData['Buffalo'][i] / tot_livestock[region, 0]
+            if GISData['Cattle'][i] != 0:
+                livestock[i, 1] = GCAMData['wdliv'][1*nregions + region, y] * GISData['Cattle'][i] / tot_livestock[region, 1]
+            if GISData['Goat'][i] != 0:
+                livestock[i, 2] = GCAMData['wdliv'][2*nregions + region, y] * GISData['Goat'][i] / tot_livestock[region, 2]
+            if GISData['Sheep'][i] != 0:
+                livestock[i, 3] = GCAMData['wdliv'][3*nregions + region, y] * GISData['Sheep'][i] / tot_livestock[region, 3]
+            if GISData['Poultry'][i] != 0:
+                livestock[i, 4] = GCAMData['wdliv'][4*nregions + region, y] * GISData['Poultry'][i] / tot_livestock[region, 4]
+            if GISData['Pig'][i] != 0:
+                livestock[i, 5] = GCAMData['wdliv'][5*nregions + region, y] * GISData['Pig'][i] / tot_livestock[region, 5]
+        withd_liv_map_LAND[:, y] = np.sum(livestock, axis=1)
 
-        withd_liv_map[:,y] = np.sum(livestock,axis = 1)        
+    withd_liv_map = np.zeros((mapsize[0] * mapsize[1], NY), dtype=float)
+    withd_liv_map[GISData['mapindex']] = withd_liv_map_LAND
+    OUT.wdliv = withd_liv_map
 
-    OUT.wdliv    = withd_liv_map
-
+    # Diagnostic message
     fmtstr = '[Year Index, Region ID, {:7s} from GCAM not assigned (no GIS data)]:  {}  {}  {}'
     dat = GCAMData['wdliv']
     for y in range(0,NY):
