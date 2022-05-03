@@ -154,30 +154,15 @@ def IrrigationMap(GISData, GCAMData, NY, OUT):
     # We are going to reorganize this into irrArea(rgn,SubRegion,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
     nregions = GISData['nregions']
     r1 = GCAMData['irrArea'].shape[0]
-    try:
-        r2, q2 = GCAMData['irrShare'].shape
-    except:
-        r2, q2 = 0, 0
     r3 = GCAMData['irrV'].shape[0]
     ncrops    = max(max(GCAMData['irrArea'][:,2].astype(int)),max(GCAMData['irrV'][:,2].astype(int)))
     tempA_all = np.zeros((nregions, nbasins, ncrops, NY), dtype=float)
-    tempS_all = np.zeros((nregions, nbasins, ncrops, NY), dtype=float)
     tempV_all = np.zeros((nregions, nbasins, ncrops, NY), dtype=float)
     
     for i in range(0, r1):
         for y in range(0, NY):
             tempA_all[GCAMData['irrArea'][i, 0].astype(int)-1, GCAMData['irrArea'][i, 1].astype(int)-1, GCAMData['irrArea'][i, 2].astype(int)-1, y] = GCAMData['irrArea'][i, y+3]*1000
             # convert from thousands of km2 to km2
-            
-    # if irrShare was read in, then reorganize the same way we did with irrArea.
-    # Otherwise, set all irrigation shares to one (indicating that irrArea really is irrigated area,
-    # as calculated in GCAM, not total planted area, as in older versions of GCAM.)
-    if r2 > 1 or  q2 > 1:
-        for i in range(0,r2):
-            for y in range (0,NY):
-                tempS_all[GCAMData['irrShare'][i,0].astype(int)-1,GCAMData['irrShare'][i,1].astype(int)-1,GCAMData['irrShare'][i,2].astype(int)-1,y] = GCAMData['irrShare'][i,y+3]
-    else:
-        tempS_all = np.ones((nregions, nbasins, ncrops, NY), dtype = float)
 
     # Same reorganization for irrVolume. Result goes to tempV_all
     for i in range(0,r3):
@@ -193,7 +178,7 @@ def IrrigationMap(GISData, GCAMData, NY, OUT):
         for j in range(0,nbasins):
             for y in range(0,NY):
                 for k in range(0,ncrops):                            
-                    irr_A[i,j,y] += tempA_all[i,j,k,y]*tempS_all[i,j,k,y]
+                    irr_A[i,j,y] += tempA_all[i,j,k,y]
                     irr_V[i,j,y] += tempV_all[i,j,k,y]
                     
     
