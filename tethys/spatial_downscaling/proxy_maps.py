@@ -22,60 +22,45 @@ import logging
 import numpy as np
 
 
-def PopulationMap(GISData, GCAMData, OUT, NY):
+def PopulationMap(GISData, GCAMData, OUT, nyears):
     """
-    :param withd_dom_map: waer withdrawal domestic map
-    :type withd_dom_map: matrix
+    Population density map is used to downscale non-agricultural water withdrawal
 
-    # Total Non-Agricultural Water withdrawal in 1990, 2005, ... 2050, and 2010
-    # Population in millions in year 2000
-    # Population density map is used to downscale Non-Agricultural Water withdrawal 
+    :param GISData: dictionary with population arrays, region mappings, and other data
+    :param GCAMData: dictionary with GCAM water demand and population data
+    :param OUT: OUTSettings object that will hold downscaled results
+    :param nyears: number of years
     """
 
-    # non-agricultural (dom, elec, mfg, mining) total water withdrawals in (km3/yr) for each of the GCAM regions
-    # population map for all years 1990, 2005:2100
-    ms = (GISData['RegionIDs'].shape[0], NY)
-
-    withd_dom_map = np.zeros(ms, dtype=float)
-    withd_elec_map = np.zeros(ms, dtype=float)
-    withd_mfg_map = np.zeros(ms, dtype=float)
-    withd_mining_map = np.zeros(ms, dtype=float)
-    
-    # use historical population maps
-    for y in range(0, NY):
-        # population map
+    # build ncells x nyears population array
+    pop = np.zeros((len(GISData['RegionIDs']), nyears), dtype=float)
+    for y in range(nyears):
         logging.info('{}'.format(GISData['pop']['years'][y]))
 
         yearstr = str(GISData['pop']['years_new'][y])
-        pop = np.where(GISData['RegionIDs'] > 0, GISData['pop'][yearstr], 0)  # 67420 shape, filter out invalid regions
+        pop[:, y] = np.where(GISData['RegionIDs'] > 0, GISData['pop'][yearstr], 0)  # filter out invalid regions
 
-        # Adjust population map to be consistent with GCAM assumptions. We will use
-        # the non-ag region map for this because in all current setups it is more detailed.
-        pop_fac = np.zeros((GISData['nregions'], NY), dtype=float)
-        # Correction to pop_fac`
+    # Adjust population map to be consistent with GCAM assumptions.
+    # This adjustment is really unnecessary for calculating pro rata population
+    # since GCAMData['pop_tot'] terms cancel each other out,
+    # but removing intermediate calculations will slightly alter results
+    pop_fac = np.zeros((GISData['nregions'], nyears), dtype=float)
+    for i in range(GISData['nregions']):
+        index = np.where(GISData['RegionIDs'] == i + 1)[0]
+        for y in range(nyears):
+            pop_fac[i, y] = GCAMData['pop_tot'][i, y] / np.sum(pop[index, y])
 
-        for i in range(GISData['nregions']):
-            index = np.where(GISData['RegionIDs'] == i + 1)[0]
-            pop_fac[i] = GCAMData['pop_tot'][i] / np.sum(pop[index])
+    region_indices = GISData['RegionIDs'] - 1  # convert to 0 indexed values
 
-        pop_tot_y = GCAMData['pop_tot'][:, y]  # single time slice regional pop
-        pop_pro_rata = pop * pop_fac[GISData['RegionIDs'] - 1, y] / pop_tot_y[GISData['RegionIDs'] - 1]
+    # ratio of cell population to region population for all cells and years
+    pop_pro_rata = pop * pop_fac[region_indices] / GCAMData['pop_tot'][region_indices]
 
-        withd_dom_map[:, y] = pop_pro_rata * GCAMData['rgn_wddom'][:, y][GISData['RegionIDs'] - 1]
-        withd_elec_map[:, y] = pop_pro_rata * GCAMData['rgn_wdelec'][:, y][GISData['RegionIDs'] - 1]
-        withd_mfg_map[:, y] = pop_pro_rata * GCAMData['rgn_wdmfg'][:, y][GISData['RegionIDs'] - 1]
-        withd_mining_map[:, y] = pop_pro_rata * GCAMData['rgn_wdmining'][:, y][GISData['RegionIDs'] - 1]
-
-    # total non-ag withdrawal can be computed from these four maps
-    withd_nonAg_map = withd_dom_map + withd_elec_map + withd_mfg_map + withd_mining_map
-    
-    OUT.wdnonag = withd_nonAg_map
-    OUT.wddom = withd_dom_map
-    OUT.wdelec = withd_elec_map
-    OUT.wdmfg = withd_mfg_map
-    OUT.wdmin = withd_mining_map
-    
-    return withd_nonAg_map
+    # the actual downscaling calculations
+    OUT.wddom = pop_pro_rata * GCAMData['rgn_wddom'][region_indices]
+    OUT.wdelec = pop_pro_rata * GCAMData['rgn_wdelec'][region_indices]
+    OUT.wdmfg = pop_pro_rata * GCAMData['rgn_wdmfg'][region_indices]
+    OUT.wdmin = pop_pro_rata * GCAMData['rgn_wdmining'][region_indices]
+    OUT.wdnonag = OUT.wddom + OUT.wdelec + OUT.wdmfg + OUT.wdmin
 
 
 def LivestockMap(GISData, GCAMData, NY, OUT):
