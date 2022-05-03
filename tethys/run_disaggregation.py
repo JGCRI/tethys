@@ -129,13 +129,13 @@ def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagn
     #    withdrawals to grid scale
     # a.    Create a population proxy map
     logging.info('---Create a population map as proxy of non-agricultural water withdrawals')
-    ProxyMaps.PopulationMap(mapsize, GISData, GCAMData, OUT, NY)
+    ProxyMaps.PopulationMap(GISData, GCAMData, OUT, NY)
     endtime4 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime4 - endtime3))
 
     # b.    Create a livestock proxy map and downscale livestock water withdrawal to grid scale
     logging.info('---Create an livestock map as proxy of livestock water withdrawal')
-    ProxyMaps.LivestockMap(mapsize, GISData, GCAMData, NY, OUT)
+    ProxyMaps.LivestockMap(GISData, GCAMData, NY, OUT)
     endtime5 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime5 - endtime4))
 
@@ -144,10 +144,10 @@ def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagn
         # Use Demeter outputs (irrigated cropland areas for each type of crops ) to replace the GMIA/HYSE data used in downscaling of irrigation water withdrawal
         # Additional gridded outputs: irrigation water withdrawal by 13 crop types
         logging.info('---Create an irrigation map as proxy of agricultural water withdrawal using Demeter outputs')
-        ProxyMaps.IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT)
+        ProxyMaps.IrrigationMapCrops(GISData, GCAMData, NY, OUT)
     else:
         logging.info('---Create an irrigation map as proxy of agricultural water withdrawal ')
-        ProxyMaps.IrrigationMap(mapsize, GISData, GCAMData, NY, OUT)
+        ProxyMaps.IrrigationMap(GISData, GCAMData, NY, OUT)
 
     endtime6 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime6 - endtime5))

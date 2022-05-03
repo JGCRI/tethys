@@ -22,7 +22,7 @@ import logging
 import numpy as np
 
 
-def PopulationMap(mapsize, GISData, GCAMData, OUT, NY):
+def PopulationMap(GISData, GCAMData, OUT, NY):
     """
     :param withd_dom_map: waer withdrawal domestic map
     :type withd_dom_map: matrix
@@ -78,7 +78,7 @@ def PopulationMap(mapsize, GISData, GCAMData, OUT, NY):
     return withd_nonAg_map
 
 
-def LivestockMap(mapsize, GISData, GCAMData, NY, OUT):     
+def LivestockMap(GISData, GCAMData, NY, OUT):
     """
     Livestock gridded GIS data maps by six types are used to downscale livestock Water withdrawal 
     """
@@ -151,7 +151,7 @@ def LivestockMap(mapsize, GISData, GCAMData, NY, OUT):
     return withd_liv_map
 
     
-def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
+def IrrigationMap(GISData, GCAMData, NY, OUT):
 
     # Need to downscale the agricultural water withdrawal data for GCAM years
     # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
@@ -212,7 +212,6 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
                     irr_V[i,j,y] += tempV_all[i,j,k,y]
                     
     
-    ms            = (mapsize[0]*mapsize[1],NY)
     ms67420 = (GISData['RegionIDs'].shape[0], NY)
     irrA_grid     = np.full(ms67420, np.NaN, dtype = float)
     #irrA_frac     = np.full(ms, np.NaN, dtype = float)
@@ -370,7 +369,7 @@ def IrrigationMap(mapsize, GISData, GCAMData, NY, OUT):
     
     return withd_irr_map
     
-def IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT):
+def IrrigationMapCrops(GISData, GCAMData, NY, OUT):
 
 
     # Need to downscale the agricultural water withdrawal data for GCAM years
@@ -429,7 +428,6 @@ def IrrigationMapCrops(mapsize, GISData, GCAMData, NY, OUT):
                     irr_A[i,j,k,y] = tempA_all[i,j,k,y]*tempS_all[i,j,k,y]
                     
     
-    ms            = (mapsize[0]*mapsize[1],ncrops,NY)
     ms67420 = (GISData['RegionIDs'].shape[0], ncrops, NY)
     irrA_grid     = np.zeros(ms67420, dtype = float)
     #irrA_frac     = np.full(ms, np.NaN, dtype = float)
