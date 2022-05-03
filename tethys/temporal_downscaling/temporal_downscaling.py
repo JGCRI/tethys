@@ -37,7 +37,7 @@ from tethys.temporal_downscaling.neighbor_basin import NeighborBasin
 
 def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, TemporalInterpolation, Domestic_R,
                          Elec_Building, Elec_Industry, Elec_Building_heat, Elec_Building_cool, Elec_Building_others,
-                         coords, OUT, mapindex, regionID, basinID):
+                         coords, OUT, regionID, basinID):
     # Determine the temporal downscaling years
 
     # Determine the available temporal downscaling years according to other models and future years (not covered by other models)

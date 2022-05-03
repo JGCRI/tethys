@@ -194,7 +194,6 @@ def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagn
                                                            Elec_Building_others=Elec_Building_others,
                                                            coords=GISData['coord'][:,:],
                                                            OUT=OUT,
-                                                           mapindex=GISData['mapindex'],
                                                            regionID=GISData['RegionIDs'],
                                                            basinID=GISData['BasinIDs'])
         print(f'TDyears = {TDYears}')

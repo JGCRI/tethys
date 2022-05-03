@@ -25,13 +25,12 @@ def compare_temporal_downscaled(PerformDiagnostics, TDYears, OutputFolder, OUT, 
     if PerformDiagnostics != 1:
         return
 
-    mapindex   = GISData['mapindex']
     BasinIDs   = GISData['BasinIDs']
     BasinNames = GISData['BasinNames']
     NB         = np.max(BasinIDs)
     years      = TDYears
     NY         = len(years)
-    NM         = len(mapindex)
+    NM         = len(GISData['RegionIDs'])
     logging.info(f'Temporal Downscaling diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)')
 
     logging.info('------Irrigation------')
