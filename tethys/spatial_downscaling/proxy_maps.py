@@ -136,60 +136,40 @@ def LivestockMap(GISData, GCAMData, NY, OUT):
     return withd_liv_map
 
     
-def IrrigationMap(GISData, GCAMData, NY, OUT):
+def IrrigationMap(GISData, GCAMData, nyears, OUT):
 
     # Need to downscale the agricultural water withdrawal data for GCAM years
     # using the existing map of areas equipped with irrigation as a proxy for disaggregation from
     # SubRegion to grid scale CHALLENGE: where to add new agricultural lands
 
-    # STEP 1: read in Basin grid map
+    nregions = GISData['nregions']
     nbasins = np.amax(GISData['BasinIDs'])
 
-    # STEP 2: calculate the total amount of irrigated lands in each GCAM region from the GCAM output files.
-    # The irrArea file from GCAM has the format:
-    # 1: GCAM regions 1-nrgn
-    # 2: SubRegions 1-18
-    # 3: crops 1-17
-    # 4 .. nyear+3: values for GCAM output years
-    # We are going to reorganize this into irrArea(rgn,SubRegion,crop,year)(but the name irrArea is already taken, so we'll call it tempA_all)
-    nregions = GISData['nregions']
-    r1 = GCAMData['irrArea'].shape[0]
-    r3 = GCAMData['irrV'].shape[0]
-    ncrops    = max(max(GCAMData['irrArea'][:,2].astype(int)),max(GCAMData['irrV'][:,2].astype(int)))
-    tempA_all = np.zeros((nregions, nbasins, ncrops, NY), dtype=float)
-    tempV_all = np.zeros((nregions, nbasins, ncrops, NY), dtype=float)
-    
-    for i in range(0, r1):
-        for y in range(0, NY):
-            tempA_all[GCAMData['irrArea'][i, 0].astype(int)-1, GCAMData['irrArea'][i, 1].astype(int)-1, GCAMData['irrArea'][i, 2].astype(int)-1, y] = GCAMData['irrArea'][i, y+3]*1000
-            # convert from thousands of km2 to km2
+    # Removed "tempA_all", now these arrays are built directly.
+    # They are still mostly zeros, so should use change to a structure better suited to sparse data,
+    # or map region-basin intersection to unique id
+    irr_A = np.zeros((nregions, nbasins, nyears), dtype=float)
+    for i in range(len(GCAMData['irrArea'])):
+        for year in range(nyears):
+            region = int(GCAMData['irrArea'][i, 0]) - 1
+            basin = int(GCAMData['irrArea'][i, 1]) - 1
+            irr_A[region, basin, year] += GCAMData['irrArea'][i, year+3] * 1000  # convert from thousands of km2 to km2
 
-    # Same reorganization for irrVolume. Result goes to tempV_all
-    for i in range(0,r3):
-        for y in range(0,NY):
-            tempV_all[GCAMData['irrV'][i,0].astype(int)-1,GCAMData['irrV'][i,1].astype(int)-1,GCAMData['irrV'][i,2].astype(int)-1,y] = GCAMData['irrV'][i,y+3]
-               
-    # STEP 3: now that we have computed the total irrigated lands, we can aggregate all
-    # the numbers for all the crops; we only keep the value per gcam region and SubRegion
-    irr_A = np.zeros((nregions, nbasins, NY), dtype=float)
-    irr_V = np.zeros((nregions, nbasins, NY), dtype=float)
+    irr_V = np.zeros((nregions, nbasins, nyears), dtype=float)
+    for i in range(len(GCAMData['irrV'])):
+        for year in range(nyears):
+            region = int(GCAMData['irrV'][i, 0]) - 1
+            basin = int(GCAMData['irrV'][i, 1]) - 1
+            irr_V[region, basin, year] += GCAMData['irrV'][i, year+3]
     
-    for i in range (0,nregions):
-        for j in range(0,nbasins):
-            for y in range(0,NY):
-                for k in range(0,ncrops):                            
-                    irr_A[i,j,y] += tempA_all[i,j,k,y]
-                    irr_V[i,j,y] += tempV_all[i,j,k,y]
-                    
-    
-    ms67420 = (GISData['RegionIDs'].shape[0], NY)
+    ms67420 = (GISData['RegionIDs'].shape[0], nyears)
     irrA_grid     = np.full(ms67420, np.NaN, dtype = float)
     #irrA_frac     = np.full(ms, np.NaN, dtype = float)
     withd_irr_map = np.full(ms67420, np.NaN, dtype = float) # GIS results
     
     # use historical irrigation area maps
     # STEP 4: read a grid map of the irrigated area in km2 in a certain year
-    for y in range (0,NY):
+    for y in range(nyears):
         logging.info('{}'.format(GISData['irr']['years'][y]))
         yearstr = str(GISData['irr']['years_new'][y])
         irr = GISData['irr'][yearstr].copy()
