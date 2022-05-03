@@ -143,7 +143,7 @@ def IrrigationMap(GISData, GCAMData, NY, OUT):
     # SubRegion to grid scale CHALLENGE: where to add new agricultural lands
 
     # STEP 1: read in Basin grid map
-    nSubRegion = np.amax(GISData['BasinIDs'])
+    nbasins = np.amax(GISData['BasinIDs'])
 
     # STEP 2: calculate the total amount of irrigated lands in each GCAM region from the GCAM output files.
     # The irrArea file from GCAM has the format:
@@ -160,9 +160,9 @@ def IrrigationMap(GISData, GCAMData, NY, OUT):
         r2, q2 = 0, 0
     r3 = GCAMData['irrV'].shape[0]
     ncrops    = max(max(GCAMData['irrArea'][:,2].astype(int)),max(GCAMData['irrV'][:,2].astype(int)))
-    tempA_all = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
-    tempS_all = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
-    tempV_all = np.zeros((nregions,nSubRegion,ncrops,NY), dtype = float)
+    tempA_all = np.zeros((nregions, nbasins, ncrops, NY), dtype=float)
+    tempS_all = np.zeros((nregions, nbasins, ncrops, NY), dtype=float)
+    tempV_all = np.zeros((nregions, nbasins, ncrops, NY), dtype=float)
     
     for i in range(0, r1):
         for y in range(0, NY):
@@ -177,7 +177,7 @@ def IrrigationMap(GISData, GCAMData, NY, OUT):
             for y in range (0,NY):
                 tempS_all[GCAMData['irrShare'][i,0].astype(int)-1,GCAMData['irrShare'][i,1].astype(int)-1,GCAMData['irrShare'][i,2].astype(int)-1,y] = GCAMData['irrShare'][i,y+3]
     else:
-        tempS_all = np.ones((nregions,nSubRegion,ncrops,NY), dtype = float)
+        tempS_all = np.ones((nregions, nbasins, ncrops, NY), dtype = float)
 
     # Same reorganization for irrVolume. Result goes to tempV_all
     for i in range(0,r3):
@@ -186,11 +186,11 @@ def IrrigationMap(GISData, GCAMData, NY, OUT):
                
     # STEP 3: now that we have computed the total irrigated lands, we can aggregate all
     # the numbers for all the crops; we only keep the value per gcam region and SubRegion
-    irr_A = np.zeros((nregions,nSubRegion,NY), dtype = float)
-    irr_V = np.zeros((nregions,nSubRegion,NY), dtype = float)
+    irr_A = np.zeros((nregions, nbasins, NY), dtype=float)
+    irr_V = np.zeros((nregions, nbasins, NY), dtype=float)
     
     for i in range (0,nregions):
-        for j in range(0,nSubRegion):
+        for j in range(0,nbasins):
             for y in range(0,NY):
                 for k in range(0,ncrops):                            
                     irr_A[i,j,y] += tempA_all[i,j,k,y]*tempS_all[i,j,k,y]
@@ -211,9 +211,9 @@ def IrrigationMap(GISData, GCAMData, NY, OUT):
 
         # STEP 5: calculate the total amount of irrigated lands from the GIS maps
     
-        irrAx   = np.zeros((nregions,nSubRegion), dtype = float) # this is the max total available area of all grids with some irrigation
-        irrA    = np.zeros((nregions,nSubRegion), dtype = float) # this is the existing area that is equipped with irrigation
-        totA    = np.zeros((nregions,nSubRegion), dtype = float) # total land in each rgn, SubRegion combo
+        irrAx   = np.zeros((nregions, nbasins), dtype=float) # this is the max total available area of all grids with some irrigation
+        irrA    = np.zeros((nregions, nbasins), dtype=float) # this is the existing area that is equipped with irrigation
+        totA    = np.zeros((nregions, nbasins), dtype=float) # total land in each rgn, SubRegion combo
     
         for index in range(GISData['RegionIDs'].shape[0]):
             if GISData['area'][index] > 0 and GISData['RegionIDs'][index] > 0 and GISData['BasinIDs'][index] > 0:
@@ -226,8 +226,8 @@ def IrrigationMap(GISData, GCAMData, NY, OUT):
             
             
         # STEP 6:        
-        for i in range(0,nregions):
-            for j in range(0,nSubRegion):
+        for i in range(nregions):
+            for j in range(nbasins):
                 # To be efficient, the most important step in the loop is to identify the valid irr cell(index in 360*720 grid) for each region and each SubRegion
                 ls = np.where((GISData['RegionIDs'] - 1 == i) & (GISData['BasinIDs'] - 1 == j))[0]
                 if len(ls) > 0 and irr_A[i,j,y] > 0:                                    
