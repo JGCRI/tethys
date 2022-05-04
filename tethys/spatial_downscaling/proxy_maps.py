@@ -206,85 +206,85 @@ def IrrigationMap(GISData, GCAMData, nyears, OUT):
                         for index in ls:                        
                             irrA_grid[index, y] = GISData['area'][index]/total_area[i,j]*irr_area_gcam[i,j,y]
                     else:
-                    # if irrigation area appears in both the GIS matrix and the GCAM output matrix, 
-                    # then we need to scale up/down the values
-                    # in the GIS grid map values to match GCAM total values                                                
+                        # if irrigation area appears in both the GIS matrix and the GCAM output matrix,
+                        # then we need to scale up/down the values
+                        # in the GIS grid map values to match GCAM total values
                         diff = 99 
-                        counter = 0
-                        num_new = 0  
+                        num_new = 0
+
+                        cum_area = 0
+                        cum_diff = 0
+
+                        num = 0
+                        counter1 = 0
+                        counter2 = 0
+
+                        for index in ls1:
+                            irrA_grid[index, y] = np.NaN
+                            counter2 += 1
+
+                        for index in ls2:
+                            z = irr[index] / irr_area_gis[i, j] * irr_area_gcam[i, j, y]
+                            irrA_grid[index, y] = min(z, GISData['area'][index])
+                            if z > GISData['area'][index]:
+                                cum_diff += z - GISData['area'][index]
+                                counter1 += 1
+                            else:
+                                num += 1
+                            cum_area += irrA_grid[index, y]
+
+                        # if all irrigation grids (ls2) have irrigation area larger than total area (ls2)
+                        # and no-irrigation grids (ls1) existed
+                        # (total irrigation area (ls2) - total area) = irrigated areas are distributed uniformly over
+                        # non-irrigated grids (ls1)
+                        if num == 0 and counter2 > 0:
+                            cum_area1 = cum_area
+                            cum_diff = 0
+                            cum_area = 0
+                            cum_diff0 = 0
+                            z = (irr_area_gcam[i, j, y] - cum_area1) / counter2
+                            for index in ls1:
+                                irrA_grid[index, y] = min(z, GISData['area'][index])
+                                if z > GISData['area'][index]:
+                                    cum_diff0 += z - GISData['area'][index]
+                                cum_area = cum_area1 + irrA_grid[index, y]
+                            if cum_diff0 > 0:
+                                # GCAM irr_area_gcam is too large, the redistributed ls1 still has grids that irrigated area > total area
+                                logging.info('{}  {}  {}  {} {} {} {} '.format(
+                                    '[Year Index, Region ID,',
+                                    GISData['SubRegionString'],
+                                    'ID, irr from GCAM not assigned (km3) (condition 0)]         :',
+                                    y + 1, i + 1, j + 1,
+                                    cum_diff0 * irr_volume_gcam[i, j, y] / irr_area_gcam[i, j, y]))
+                        diff = cum_diff
                         while diff > 0.00001:                       
-                            # [i j counter diff]
                             cum_area = 0
                             cum_diff = 0
-                            if counter == 0:
-                                num = 0 
-                                counter1 = 0
-                                counter2 = 0
-                                
-                                for index in ls1:
-                                    irrA_grid[index, y] = np.NaN
-                                    counter2 += 1
-                                
-                                for index in ls2:
-                                    z = irr[index]/irr_area_gis[i,j]*irr_area_gcam[i,j,y]
+                            for index in ls1:
+                                irrA_grid[index, y] = np.NaN
+
+                            counter3 = 0
+                            for index in ls2:
+                                if irrA_grid[index, y] < GISData['area'][index]:
+                                    z = irrA_grid[index, y] + diff/max(1,num)
                                     irrA_grid[index, y] = min(z,GISData['area'][index])
                                     if z > GISData['area'][index]:
                                         cum_diff += z - GISData['area'][index]
-                                        counter1 += 1
-                                    else:
-                                        num  += 1
-                                    cum_area += irrA_grid[index, y]
-                                           
-                                # if all irrigation grids (ls2) have irrigation area larger than total area (ls2)
-                                # and no-irrigation grids (ls1) existed
-                                # (total irrigation area (ls2) - total area) = irrigated areas are distributed uniformly over
-                                # non-irrigated grids (ls1)
-                                if num == 0 and counter2 > 0:
-                                    cum_area1 = cum_area
-                                    cum_diff = 0
-                                    cum_area = 0
-                                    cum_diff0 = 0
-                                    z = (irr_area_gcam[i,j,y] - cum_area1)/counter2
-                                    for index in ls1:                                        
-                                        irrA_grid[index, y] = min(z,GISData['area'][index])
-                                        if z > GISData['area'][index]:
-                                            cum_diff0 += z - GISData['area'][index]
-                                        cum_area = cum_area1 + irrA_grid[index, y]
-                                    if cum_diff0 > 0:
-                                        # GCAM irr_area_gcam is too large, the redistributed ls1 still has grids that irrigated area > total area
-                                        logging.info('{}  {}  {}  {} {} {} {} '.format(
-                                            '[Year Index, Region ID,',
-                                            GISData['SubRegionString'],
-                                            'ID, irr from GCAM not assigned (km3) (condition 0)]         :',
-                                            y+1, i+1, j+1,
-                                            cum_diff0*irr_volume_gcam[i,j,y]/irr_area_gcam[i,j,y]))
-                            else: # if (num == 0 and counter2 == 0)  or num > 0 
-                                for index in ls1:
-                                    irrA_grid[index, y] = np.NaN
-
-                                counter3 = 0     
-                                for index in ls2:
-                                    if irrA_grid[index, y] < GISData['area'][index]:
-                                        z = irrA_grid[index, y] + diff/max(1,num)
-                                        irrA_grid[index, y] = min(z,GISData['area'][index])
-                                        if z > GISData['area'][index]:
-                                            cum_diff += z - GISData['area'][index]
-                                            num_new  = num - 1
-                                        cum_area += irrA_grid[index, y]   
-                                    else:
-                                        cum_area += irrA_grid[index, y]
                                         num_new  = num - 1
-                                        counter3 += 1                                                                       
-                                num = num_new
-                                if cum_diff == 0 and counter3 == len(ls2):
-                                    # GCAM irr_area_gcam is too large, the redistributed ls2 still has grids that irrigated area > total area
-                                    logging.warning('{}  {}  {}  {} {} {} {} '.format(
-                                        '[Year Index, Region ID,',
-                                        GISData['SubRegionString'],
-                                        'ID, irr from GCAM not assigned (km3) (condition 1)]         :',
-                                        y+1, i+1, j+1,
-                                        diff*irr_volume_gcam[i,j,y]/irr_area_gcam[i,j,y]))
-                            counter += 1
+                                    cum_area += irrA_grid[index, y]
+                                else:
+                                    cum_area += irrA_grid[index, y]
+                                    num_new  = num - 1
+                                    counter3 += 1
+                            num = num_new
+                            if cum_diff == 0 and counter3 == len(ls2):
+                                # GCAM irr_area_gcam is too large, the redistributed ls2 still has grids that irrigated area > total area
+                                logging.warning('{}  {}  {}  {} {} {} {} '.format(
+                                    '[Year Index, Region ID,',
+                                    GISData['SubRegionString'],
+                                    'ID, irr from GCAM not assigned (km3) (condition 1)]         :',
+                                    y+1, i+1, j+1,
+                                    diff*irr_volume_gcam[i,j,y]/irr_area_gcam[i,j,y]))
                             diff    = cum_diff
        
                     for index in ls:
