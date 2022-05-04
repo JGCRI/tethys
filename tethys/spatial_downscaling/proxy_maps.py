@@ -63,23 +63,21 @@ def PopulationMap(GISData, GCAMData, OUT, nyears):
     OUT.wdnonag = OUT.wddom + OUT.wdelec + OUT.wdmfg + OUT.wdmin
 
 
-def LivestockMap(GISData, GCAMData, NY, OUT):
+def LivestockMap(GISData, GCAMData, nyears, OUT):
     """
     Livestock gridded GIS data maps by six types are used to downscale livestock Water withdrawal 
     """
 
-    # count how many animals live in each GCAM region first    
+    # count how many animals live in each GCAM region first
     nregions = GISData['nregions']
-    tot_livestock = np.zeros((nregions, 6), dtype=float)  # Livestock totals at GCAM scale in year 2005
+    ncells = len(GISData['RegionIDs'])
+    animals = ['Buffalo', 'Cattle', 'Goat', 'Sheep', 'Poultry', 'Pig']
 
-    for i in np.where(GISData['RegionIDs'] > 0)[0]:
-        region = GISData['RegionIDs'][i] - 1
-        tot_livestock[region, 0] += GISData['Buffalo'][i]
-        tot_livestock[region, 1] += GISData['Cattle'][i]
-        tot_livestock[region, 2] += GISData['Goat'][i]
-        tot_livestock[region, 3] += GISData['Sheep'][i]
-        tot_livestock[region, 4] += GISData['Poultry'][i]
-        tot_livestock[region, 5] += GISData['Pig'][i]
+    tot_livestock = np.zeros((nregions, 6), dtype=float)  # Livestock totals at GCAM scale in year 2005
+    for i, region in enumerate(GISData['RegionIDs']):
+        if region > 0:
+            for a, animal in enumerate(animals):
+                tot_livestock[region - 1, a] += GISData[animal][i]
   
     #  now create a spatial distribution for each GCAM region
     #  withd_liv: these are the GCAM results of total volume of livestock water withdrawal in
@@ -89,49 +87,26 @@ def LivestockMap(GISData, GCAMData, NY, OUT):
     #  Next, we distribute those volumes using the spatial distribution of the gis maps
     # these will be the GIS downscaled matrices
 
-    withd_liv_map = np.zeros((GISData['RegionIDs'].shape[0], NY), dtype=float)
-    for y in range(0, NY):
-        livestock = np.zeros((GISData['RegionIDs'].shape[0], 6), dtype=float)
-        for i in np.where(GISData['RegionIDs'] > 0)[0]:
-            region = GISData['RegionIDs'][i] - 1
-            if GISData['Buffalo'][i] != 0:
-                livestock[i, 0] = GCAMData['wdliv'][0*nregions + region, y] * GISData['Buffalo'][i] / tot_livestock[region, 0]
-            if GISData['Cattle'][i] != 0:
-                livestock[i, 1] = GCAMData['wdliv'][1*nregions + region, y] * GISData['Cattle'][i] / tot_livestock[region, 1]
-            if GISData['Goat'][i] != 0:
-                livestock[i, 2] = GCAMData['wdliv'][2*nregions + region, y] * GISData['Goat'][i] / tot_livestock[region, 2]
-            if GISData['Sheep'][i] != 0:
-                livestock[i, 3] = GCAMData['wdliv'][3*nregions + region, y] * GISData['Sheep'][i] / tot_livestock[region, 3]
-            if GISData['Poultry'][i] != 0:
-                livestock[i, 4] = GCAMData['wdliv'][4*nregions + region, y] * GISData['Poultry'][i] / tot_livestock[region, 4]
-            if GISData['Pig'][i] != 0:
-                livestock[i, 5] = GCAMData['wdliv'][5*nregions + region, y] * GISData['Pig'][i] / tot_livestock[region, 5]
+    withd_liv_map = np.zeros((ncells, nyears), dtype=float)
+    for y in range(nyears):
+        livestock = np.zeros((ncells, 6), dtype=float)
+        for i, region in enumerate(GISData['RegionIDs']):
+            if region > 0:
+                for a, animal in enumerate(animals):
+                    if GISData[animal][i] != 0:
+                        livestock[i, a] = GCAMData['wdliv'][a*nregions + region - 1, y] * GISData[animal][i] \
+                                          / tot_livestock[region - 1, a]
         withd_liv_map[:, y] = np.sum(livestock, axis=1)
 
     OUT.wdliv = withd_liv_map
 
     # Diagnostic message
     fmtstr = '[Year Index, Region ID, {:7s} from GCAM not assigned (no GIS data)]:  {}  {}  {}'
-    dat = GCAMData['wdliv']
-    for y in range(0,NY):
-        for IN in range(0,nregions):
-            if GCAMData['wdliv'][0*nregions+IN,y] > 0 and tot_livestock[IN,0] == 0:
-                logging.info(fmtstr.format('buffalo', y+1, IN+1, dat[0*nregions+IN,y]))
-
-            if GCAMData['wdliv'][1*nregions+IN,y] > 0 and tot_livestock[IN,1] == 0:
-                logging.info(fmtstr.format('cattle', y+1, IN+1, dat[1*nregions+IN,y]))
-
-            if GCAMData['wdliv'][2*nregions+IN,y] > 0 and tot_livestock[IN,2] == 0:
-                logging.info(fmtstr.format('goat', y+1, IN+1, dat[2*nregions+IN,y]))
-
-            if GCAMData['wdliv'][3*nregions+IN,y] > 0 and tot_livestock[IN,3] == 0:
-                logging.info(fmtstr.format('sheep', y+1, IN+1, dat[3*nregions+IN,y]))
-
-            if GCAMData['wdliv'][4*nregions+IN,y] > 0 and tot_livestock[IN,4] == 0:
-                logging.info(fmtstr.format('poultry', y+1, IN+1, dat[4*nregions+IN,y]))
-
-            if GCAMData['wdliv'][5*nregions+IN,y] > 0 and tot_livestock[IN,5] == 0:
-                logging.info(fmtstr.format('pig', y+1, IN+1, dat[5*nregions+IN,y]))
+    for y in range(nyears):
+        for IN in range(nregions):
+            for a, animal in enumerate(animals):
+                if GCAMData['wdliv'][a*nregions + IN, y] > 0 and tot_livestock[IN, a] == 0:
+                    logging.info(fmtstr.format(animal.lower(), y+1, IN+1, GCAMData['wdliv'][a*nregions + IN, y]))
 
     return withd_liv_map
 
