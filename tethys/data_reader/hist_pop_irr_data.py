@@ -80,8 +80,8 @@ def getIrrYearData_Crops(DemeterOutputFolder, years):
                 index = check_header_Demeter_outputs(os.path.join(folder, filename))
                 data = tmp[:,index] # irrigation fraction for 12 crops except biomass
                 # 0.5 degree total grid cell square kilometers can be calculated using:  np.cos(np.radians(latitude)) * (111.32 * 110.57) * (0.5**2)
-                latitude = np.cos(np.radians(tmp[:,-1])) * (111.32 * 110.57) * (0.5**2);
-                newdata = data*latitude[:,np.newaxis] # The irrigated cropland area for each type of crop: total_grid_cell_square_kilometers * irrigated_crop_fraction
+                area = np.cos(np.radians(tmp[:, 1])) * (111.32 * 110.57) * (0.5**2)
+                newdata = data*area[:, np.newaxis]  # The irrigated cropland area for each type of crop: total_grid_cell_square_kilometers * irrigated_crop_fraction
                 newdata = np.insert(newdata,0,0, axis = 1) # no fraction data from Demeter for biomass, all zeros
                 D_irr[yearstr] = newdata
 
