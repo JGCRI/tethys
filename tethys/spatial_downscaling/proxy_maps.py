@@ -140,21 +140,17 @@ def IrrigationMap(GISData, GCAMData, nyears, OUT):
     # STEP 4: read a grid map of the irrigated area in km2 in a certain year
     for y in range(nyears):
         logging.info('{}'.format(GISData['irr']['years'][y]))
-        irr = GISData['irr']['array'][:, y]
 
         # STEP 5: calculate the total amount of irrigated lands from the GIS maps
     
         irr_area_gis = np.zeros((nregions, nbasins), dtype=float)  # this is the existing area that is equipped with irrigation
         total_area = np.zeros((nregions, nbasins), dtype=float)  # total land in each region-basin combo
     
-        for index in range(GISData['RegionIDs'].shape[0]):
-            if GISData['area'][index] > 0 and GISData['RegionIDs'][index] > 0 and GISData['BasinIDs'][index] > 0:
-                irr_area_gis[GISData['RegionIDs'][index]-1, GISData['BasinIDs'][index]-1] += irr[index]
-                total_area[GISData['RegionIDs'][index]-1, GISData['BasinIDs'][index]-1] += GISData['area'][index]
-            else:
-                irr[index] = 0
-            
-            
+        for i in range(len(GISData['RegionIDs'])):
+            if GISData['area'][i] > 0 and GISData['RegionIDs'][i] > 0 and GISData['BasinIDs'][i] > 0:
+                irr_area_gis[GISData['RegionIDs'][i]-1, GISData['BasinIDs'][i]-1] += GISData['irr']['array'][i, y]
+                total_area[GISData['RegionIDs'][i]-1, GISData['BasinIDs'][i]-1] += GISData['area'][i]
+
         # STEP 6:        
         for i in range(nregions):
             for j in range(nbasins):
@@ -175,7 +171,7 @@ def IrrigationMap(GISData, GCAMData, nyears, OUT):
                         ls1 = []
                         ls2 = []
                         for index in ls:
-                            if irr[index] == 0:
+                            if GISData['irr']['array'][index, y] == 0:
                                 ls1.append(index)
                             else:
                                 ls2.append(index)
@@ -186,7 +182,7 @@ def IrrigationMap(GISData, GCAMData, nyears, OUT):
 
                         # first attempt at assigning irrigation area
                         for index in ls2:
-                            z = irr[index] / irr_area_gis[i, j] * irr_area_gcam[i, j, y]
+                            z = GISData['irr']['array'][index, y] / irr_area_gis[i, j] * irr_area_gcam[i, j, y]
                             if z > GISData['area'][index]:
                                 irrA_grid[index, y] = GISData['area'][index]
                                 diff += z - GISData['area'][index]
