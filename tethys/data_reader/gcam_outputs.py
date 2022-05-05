@@ -676,11 +676,7 @@ def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCA
     :param s:               Settings object
     :return:                dictionary, {metric: numpy array, ...}
     """
-    
-    if type(years) is str: # a single year string, multiple years will be list
-        years = [years]
 
-    years = [int(i) for i in years]
 
     # get region info as dict
     d_reg_name = get_region_info(RegionNames)

@@ -27,8 +27,6 @@ def getIrrYearData(Irrigation_GMIA, Irrigation_HYDE, years):
     hyde_years = [1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000]
     gmia_years = [2005]
 
-    years = [int(x) for x in years]
-
     irr = {'years': years, 'array': np.zeros((len(gmia_irr), len(years)))}
 
     for y, year in enumerate(years):
@@ -109,7 +107,6 @@ def getPopYearData(Population_GPW, Population_HYDE, years):
     hyde_years = [1750, 1760, 1770, 1780, 1790, 1800, 1810, 1820, 1830, 1840, 1850, 1860, 1870, 1880, 1890,
                   1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980]
     gpw_years = [1990, 1995, 2000, 2005, 2010, 2015]
-    years = [int(x) for x in years]
 
     pop = np.zeros((len(gpw_pop), len(years)))
 
