@@ -99,6 +99,7 @@ class ReadConfig(Logger):
 
         if not isinstance(self.years, list):
             self.years = [self.years]
+        self.years = [int(i) for i in self.years]
 
         # update any default dictionary values with items specified as arguments by the user
         self.map_params.update(self.params)
@@ -214,15 +215,9 @@ class ReadConfig(Logger):
                     yearstr = re.sub("[^0-9]", "", filename)
                     demeter_years.append(int(yearstr))
 
-            years = [int(x) for x in self.years]
-
-            # Subset demeter_years to match chosen years
-            demeter_years = [number for number in demeter_years if number in years]
-            demeter_years = sorted(demeter_years)
-
             # If we use Demeter outputs, we will start from the beginning year in Demeter.
-            startindex = years.index(demeter_years[0])
-            self.years = years[startindex:]
+            self.years = [i for i in self.years if i >= min(demeter_years)]
+
 
     @staticmethod
     def validate_string(string):
