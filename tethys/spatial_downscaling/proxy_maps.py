@@ -32,13 +32,8 @@ def PopulationMap(GISData, GCAMData, OUT, nyears):
     :param nyears: number of years
     """
 
-    # build ncells x nyears population array
-    pop = np.zeros((len(GISData['RegionIDs']), nyears), dtype=float)
-    for y in range(nyears):
-        logging.info('{}'.format(GISData['pop']['years'][y]))
-
-        yearstr = str(GISData['pop']['years_new'][y])
-        pop[:, y] = np.where(GISData['RegionIDs'] > 0, GISData['pop'][yearstr], 0)  # filter out invalid regions
+    # ncells x nyears population array, filter to out invalid regions
+    pop = np.where(GISData['RegionIDs'][:, np.newaxis] > 0, GISData['pop'], 0)
 
     # Adjust population map to be consistent with GCAM assumptions.
     # This adjustment is really unnecessary for calculating pro rata population

@@ -122,44 +122,30 @@ def getPopYearData(Population_GPW, Population_HYDE, years):
     Update the population maps to include a unique map for each historical time period
     """
 
-    pop = {}
-    GPW_pop = get_array_csv(Population_GPW, 1)
-    HYDE_pop = get_array_csv(Population_HYDE, 1)
+    # could be rewritten to only load years/files that will be needed
+    hyde_pop = get_array_csv(Population_HYDE, 1)
+    gpw_pop = get_array_csv(Population_GPW, 1)
 
-    H_years = [1750, 1760, 1770, 1780, 1790, 1800, 1810, 1820, 1830, 1840, 1850, 1860, 1870, 1880, 1890, 1900, 1910,
-               1920, 1930, 1940, 1950, 1960, 1970, 1980]
-    G_years = [1990, 1995, 2000, 2005, 2010, 2015]
+    hyde_years = [1750, 1760, 1770, 1780, 1790, 1800, 1810, 1820, 1830, 1840, 1850, 1860, 1870, 1880, 1890,
+                  1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980]
+    gpw_years = [1990, 1995, 2000, 2005, 2010, 2015]
     years = [int(x) for x in years]
-    years_new = years[:]
 
-    for i in range(0, len(years)):
-        if years[i] < 1990:
-            if years[i] >= max(H_years):
-                years_new[i] = max(H_years)
-            else:
-                for j in range(0, len(H_years) - 1):
-                    if years[i] >= H_years[j] and years[i] < H_years[j + 1]:
-                        years_new[i] = H_years[j]  # use previous year
+    pop = np.zeros((len(gpw_pop), len(years)))
 
-            if not str(years_new[i]) in pop:
-                pop[str(years_new[i])] = HYDE_pop[:, H_years.index(years_new[i])]
-            logging.info('------Use HYDE ' + str(years_new[i]) + ' Population Data for ' + str(years[i]))
-
-        elif years[i] >= 1990:
-            if years[i] >= max(G_years):
-                years_new[i] = max(G_years)
-            else:
-                for j in range(0, len(G_years) - 1):
-                    if years[i] >= G_years[j] and years[i] < G_years[j + 1]:
-                        years_new[i] = G_years[j]  # use previous year
-
-            if not str(years_new[i]) in pop:
-                pop[str(years_new[i])] = GPW_pop[:, G_years.index(years_new[i])]
-            logging.info('------Use GPW ' + str(years_new[i]) + ' Population Data for ' +
-                          str(years[i]))
-
-    pop['years'] = years  # years (integer) from settings
-    pop['years_new'] = years_new  # years to import population data (integer) corresponding to years
+    # build the population array used by PopulationMap
+    for y, year in enumerate(years):
+        if year < min(hyde_years):
+            pop[:, y] = hyde_pop[:, 0]
+            logging.info('------Use HYDE {} Population Data for {}'.format(min(hyde_years), year))
+        elif year < min(gpw_years):
+            new_year = max(i for i in hyde_years if i <= year)
+            pop[:, y] = hyde_pop[:, hyde_years.index(new_year)]
+            logging.info('------Use HYDE {} Population Data for {}'.format(new_year, year))
+        else:
+            new_year = max(i for i in gpw_years if i <= year)
+            pop[:, y] = gpw_pop[:, gpw_years.index(new_year)]
+            logging.info('------Use GPW {} Population Data for {}'.format(new_year, year))
 
     return pop
 
