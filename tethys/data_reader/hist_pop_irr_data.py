@@ -17,47 +17,33 @@ import numpy as np
 from tethys.utils.data_parser import get_array_csv
 
 
-def getIrrYearData(Irrigation_GMIA, years, Irrigation_HYDE):
-    
+def getIrrYearData(Irrigation_GMIA, Irrigation_HYDE, years):
     """
     Update the irrigation maps to include a unique map for each historical time period
     """
     
-    irr = {}
-    GMIA_irr = get_array_csv(Irrigation_GMIA, 1)
-    HYDE_irr = get_array_csv(Irrigation_HYDE, 1)
-    H_years  = [1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000]
-    G_years  = [2005]
-    years    = [int(x) for x in years]
-    years_new= years[:]
-    
-    for i in range(0, len(years)):
-        if years[i] < 2005:
-            if years[i] >= max(H_years):
-                years_new[i] = max(H_years)
-            else:                
-                for j in range (0, len(H_years)-1):
-                    if years[i] >= H_years[j] and years[i] < H_years[j+1]:
-                        years_new[i] = H_years[j] # use previous year
-                        
-            if not str(years_new[i]) in irr:      
-                irr[str(years_new[i])] = HYDE_irr[:,H_years.index(years_new[i])]       
-            logging.info(f'------Use HYDE {years_new[i]} Irrigation Area Data for {years[i]}')
-                                                              
-        elif years[i] >= 2005:
-            if years[i] >= max(G_years):
-                years_new[i] = max(G_years)
-            else:
-                for j in range (0, len(G_years)-1):
-                    if years[i] >= G_years[j] and years[i] < G_years[j+1]:
-                        years_new[i] = G_years[j] # use previous year
-                        
-            if not str(years_new[i]) in irr:
-                irr[str(years_new[i])] = GMIA_irr[:]        
-            logging.info('------Use FAO-GMIA ' + str(years_new[i]) + ' Irrigation Area Data for ' + str(years[i]))
-                
-    irr['years'] = years # years (integer) from settings
-    irr['years_new'] = years_new # years to import irrigation data (integer) corresponding to years  
+    hyde_irr = get_array_csv(Irrigation_HYDE, 1)
+    gmia_irr = get_array_csv(Irrigation_GMIA, 1).reshape(-1, 1)  # with only 1 year, resulting array is 1D, so reshape
+
+    hyde_years = [1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000]
+    gmia_years = [2005]
+
+    years = [int(x) for x in years]
+
+    irr = {'years': years, 'array': np.zeros((len(gmia_irr), len(years)))}
+
+    for y, year in enumerate(years):
+        if year < min(hyde_years):
+            irr['array'][:, y] = hyde_irr[:, 0]
+            logging.info(f'------Use HYDE {min(hyde_years)} Irrigation Area Data for {year}')
+        elif year < min(gmia_years):
+            new_year = max(i for i in hyde_years if i <= year)
+            irr['array'][:, y] = hyde_irr[:, hyde_years.index(new_year)]
+            logging.info(f'------Use HYDE {new_year} Irrigation Area Data for {year}')
+        else:
+            new_year = max(i for i in gmia_years if i <= year)
+            irr['array'][:, y] = gmia_irr[:, gmia_years.index(new_year)]
+            logging.info(f'------Use FAO-GMIA {new_year} Irrigation Area Data for {year}')
 
     return irr
 
@@ -137,15 +123,15 @@ def getPopYearData(Population_GPW, Population_HYDE, years):
     for y, year in enumerate(years):
         if year < min(hyde_years):
             pop[:, y] = hyde_pop[:, 0]
-            logging.info('------Use HYDE {} Population Data for {}'.format(min(hyde_years), year))
+            logging.info(f'------Use HYDE {min(hyde_years)} Population Data for {year}')
         elif year < min(gpw_years):
             new_year = max(i for i in hyde_years if i <= year)
             pop[:, y] = hyde_pop[:, hyde_years.index(new_year)]
-            logging.info('------Use HYDE {} Population Data for {}'.format(new_year, year))
+            logging.info(f'------Use HYDE {new_year} Population Data for {year}')
         else:
             new_year = max(i for i in gpw_years if i <= year)
             pop[:, y] = gpw_pop[:, gpw_years.index(new_year)]
-            logging.info('------Use GPW {} Population Data for {}'.format(new_year, year))
+            logging.info(f'------Use GPW {new_year} Population Data for {year}')
 
     return pop
 

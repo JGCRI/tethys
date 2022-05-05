@@ -140,8 +140,7 @@ def IrrigationMap(GISData, GCAMData, nyears, OUT):
     # STEP 4: read a grid map of the irrigated area in km2 in a certain year
     for y in range(nyears):
         logging.info('{}'.format(GISData['irr']['years'][y]))
-        yearstr = str(GISData['irr']['years_new'][y])
-        irr = GISData['irr'][yearstr].copy()
+        irr = GISData['irr']['array'][:, y]
 
         # STEP 5: calculate the total amount of irrigated lands from the GIS maps
     
