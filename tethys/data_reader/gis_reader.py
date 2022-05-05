@@ -17,16 +17,13 @@ The second is the 'nonag' mapping, which covers everything else.
 
 """
 
-import os
 import numpy as np
-from scipy import io as spio
-from tethys.utils.data_parser import get_array_csv, get_array_txt
+from tethys.utils.data_parser import get_array_csv
 from tethys.data_reader.hist_pop_irr_data import getPopYearData, getIrrYearData, getIrrYearData_Crops
 from tethys.utils.utils_math import sub2ind
-from tethys.utils.exceptions import FileNotFoundError
 
 
-def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle,Livestock_Goat, Livestock_Sheep,
+def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, Livestock_Sheep,
                Livestock_Poultry, Livestock_Pig, Coord, Area, InputRegionFile, InputBasinFile, BasinNames,
                InputCountryFile, CountryNames, Irrigation_GMIA, Irrigation_HYDE, years, DemeterOutputFolder,
                Population_GPW, Population_HYDE, mapsize):
@@ -67,13 +64,14 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle,Livestock_Goat, L
     GISData['area'] = get_array_csv(Area, 0) * 0.01
 
     # Basin ID Map: 67420 x 1, 235 Basins
-    GISData['BasinIDs'] = load_const_griddata(InputBasinFile, 1).astype(int)
+    GISData['BasinIDs'] = get_array_csv(InputBasinFile, 1).astype(int)
 
     # Corresponding to Basin ID Map, 235 Basin Names: 1D String Array
-    GISData['BasinNames'] = load_const_griddata(BasinNames)
+    with open(BasinNames, 'r') as f:
+        GISData['BasinNames'] = f.read().splitlines()
 
     # Country ID Map : 67420 x 1 (249 countries: 1-249)
-    GISData['CountryIDs'] = load_const_griddata(InputCountryFile, 1).astype(int)
+    GISData['CountryIDs'] = get_array_csv(InputCountryFile, 1).astype(int)
 
     # Corresponding to Country ID Map, 1-249 index number and 249 Country Names: 2D String Array
     with open(CountryNames, 'r') as f:
@@ -85,56 +83,3 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle,Livestock_Goat, L
     GISData['nregions'] = GISData['RegionIDs'].max()  # Number of regions
 
     return GISData
-
-
-def load_mat_var(fn, varname):
-    if not os.path.isfile(fn):
-        raise FileNotFoundError(fn)
-
-    temp = spio.loadmat(fn)
-    data = temp[varname]
-
-    return data
-
-
-def load_const_griddata(fn, headerNum=0, key=" "):
-    # Load constant grid data stored in files defined in GRID_CONSTANTS.
-
-    if not os.path.isfile(fn):
-        raise FileNotFoundError(fn)
-
-    if fn.endswith('.mat'):
-        data = load_mat_var(fn, key)
-
-    elif fn.endswith('.txt'):
-        try:
-            data = get_array_txt(fn, headerNum)
-        except:
-            with open(fn, 'r') as f:
-                data = np.array(f.read().splitlines())
-
-    elif fn.endswith('.csv'):
-        data = get_array_csv(fn, headerNum)
-        all_zeros = not np.any(data)
-        if all_zeros:
-            try:
-                with open(fn, 'r') as f:
-                    data = np.array(f.read().splitlines())
-            except:
-                pass
-
-    elif fn.endswith('.nc'):
-        #        datagrp = Dataset(fn, 'r', format='NETCDF4')
-        datagrp = spio.netcdf.netcdf_file(fn, 'r')
-
-        # copy() added to handle numpy 'ValueError:assignment destination is read-only' related to non-contiguous memory
-        try:
-            #            data = datagrp[key][:, :]
-            data = datagrp.variables[key][:, :].copy()
-        except:
-            #            data = datagrp[key][:]
-            data = datagrp.variables[key][:].copy()
-
-        datagrp.close()
-
-    return data

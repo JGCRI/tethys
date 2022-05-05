@@ -12,7 +12,3 @@ import numpy as np
 
 def get_array_csv(filename, skip_header):
     return np.genfromtxt(filename, delimiter=',', skip_header=skip_header, filling_values='0')
-
-
-def get_array_txt(filename, skip_header):
-    return np.genfromtxt(filename, delimiter=' ', skip_header=skip_header, filling_values='0')
