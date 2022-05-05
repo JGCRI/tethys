@@ -30,8 +30,6 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, 
     # dictionary GISData{} saves the data related to GIS data
     GISData = dict()
 
-    GISData['SubRegionString'] = 'Basin'
-
     # using finer resolution gridded population map (from HYDE or GPW) according to year availability
     GISData['pop'] = getPopYearData(Population_GPW=Population_GPW,
                                     Population_HYDE=Population_HYDE,

@@ -215,12 +215,9 @@ def IrrigationMap(GISData, GCAMData, nyears, OUT):
                                     cum_diff0 += z - GISData['area'][index]
                             if cum_diff0 > 0:
                                 # irr_area_gcam is too large, the redistributed ls1 still has grids that irrigated area > total area
-                                logging.info('{}  {}  {}  {} {} {} {} '.format(
-                                    '[Year Index, Region ID,',
-                                    GISData['SubRegionString'],
-                                    'ID, irr from GCAM not assigned (km3) (condition 0)]         :',
-                                    y + 1, i + 1, j + 1,
-                                    cum_diff0 * irr_volume_gcam[i, j, y] / irr_area_gcam[i, j, y]))
+                                logging.info('{}  {} {} {} {} '.format(
+                                    '[Year Index, Region ID, Basin ID, irr from GCAM not assigned (km3) (condition 0)]:',
+                                    y + 1, i + 1, j + 1, cum_diff0 * irr_volume_gcam[i, j, y] / irr_area_gcam[i, j, y]))
                         num_new = 0
                         while diff > 0.00001:
                             cum_diff = 0
@@ -238,26 +235,23 @@ def IrrigationMap(GISData, GCAMData, nyears, OUT):
                             num = num_new  # not sure this logic works as intended. num will only decrease by at most 1
                             if counter3 == len(ls2):
                                 # GCAM irr_area_gcam is too large, the redistributed ls2 still has grids that irrigated area > total area
-                                logging.warning('{}  {}  {}  {} {} {} {} '.format(
-                                    '[Year Index, Region ID,',
-                                    GISData['SubRegionString'],
-                                    'ID, irr from GCAM not assigned (km3) (condition 1)]         :',
-                                    y+1, i+1, j+1,
-                                    diff*irr_volume_gcam[i,j,y]/irr_area_gcam[i,j,y]))
+                                logging.warning('{}  {} {} {} {} '.format(
+                                    '[Year Index, Region ID, Basin ID, irr from GCAM not assigned (km3) (condition 1)]:',
+                                    y + 1, i + 1, j + 1, diff * irr_volume_gcam[i, j, y] / irr_area_gcam[i, j, y]))
                             diff = cum_diff
        
                     for index in ls:
                         if not np.isnan(irrA_grid[index, y]):                                      
-                            withd_irr_map[index, y] = irrA_grid[index, y]*irr_volume_gcam[i,j,y]/irr_area_gcam[i,j,y]
+                            withd_irr_map[index, y] = irrA_grid[index, y]*irr_volume_gcam[i, j, y]/irr_area_gcam[i, j, y]
                                                       
-                elif len(ls) == 0 and irr_area_gcam[i,j,y] > 0 and irr_volume_gcam[i,j,y] > 0:
+                elif len(ls) == 0 and irr_area_gcam[i, j, y] > 0 and irr_volume_gcam[i, j, y] > 0:
                     # GCAM has irrigation data for a region and a SubRegion/basin.
                     # But from region map and SubRegion/basin map, there are no cells belong to both.
                     # Thus, GCAM data will not be included for downscaling.
                     # It will cause the difference in Spatial Downscaling diagnostics
-                    logging.warning('{}  {}  {}  {} {} {} {} '.format('[Year Index, Region ID,',
-                                        GISData['SubRegionString'],'ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
-                                        y+1, i+1, j+1, irr_volume_gcam[i,j,y]))
+                    logging.warning('{}  {} {} {} {} '.format(
+                        '[Year Index, Region ID, Basin ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
+                        y + 1, i + 1, j + 1, irr_volume_gcam[i, j, y]))
 
     # this loop will replace all the nan values with zeros to be able to take sums, if we want to keep the nans (for plotting), comment following 2 lines
     irrA_grid[np.isnan(irrA_grid)]         = 0
@@ -427,10 +421,8 @@ def IrrigationMapCrops(GISData, GCAMData, NY, OUT):
                                             cum_area = cum_area1 + irrA_grid[index, k, y]
                                         if cum_diff0 > 0:
                                             # GCAM irr_A is too large, the redistributed ls1 still has grids that irrigated area > total area
-                                            logging.warning('{}  {}  {}  {} {} {} {} {}'.format(
-                                                '[Year Index, Region ID,',
-                                                GISData['SubRegionString'],
-                                                'ID, Crop ID, irr from GCAM not assigned (km3) (condition 0)]         :',
+                                            logging.warning('{}  {} {} {} {} {}'.format(
+                                                '[Year Index, Region ID, Basin ID, Crop ID, irr from GCAM not assigned (km3) (condition 0)]         :',
                                                 y+1, i+1, j+1, k+1,
                                                 cum_diff0*tempV_all[i,j,k,y]/irr_A[i,j,k,y]))
                                 else: # if (num == 0 and counter2 == 0)  or num > 0 
@@ -455,10 +447,8 @@ def IrrigationMapCrops(GISData, GCAMData, NY, OUT):
                                     num = num_new
                                     if cum_diff == 0 and counter3 == len(ls2):
                                         # GCAM irr_A is too large, the redistributed ls2 still has grids that irrigated area > total area
-                                        logging.warning('{}  {}  {}  {} {} {} {} {}'.format(
-                                            '[Year Index, Region ID,',
-                                            GISData['SubRegionString'],
-                                            'ID, Crop ID, irr from GCAM not assigned (km3) (condition 1)]         :',
+                                        logging.warning('{}  {} {} {} {} {}'.format(
+                                            '[Year Index, Region ID, Basin ID, Crop ID, irr from GCAM not assigned (km3) (condition 1)]         :',
                                             y+1, i+1, j+1,  k+1,
                                             diff*tempV_all[i,j,k,y]/irr_A[i,j,k,y]))
                                 counter += 1
@@ -473,9 +463,9 @@ def IrrigationMapCrops(GISData, GCAMData, NY, OUT):
                         # But from region map and SubRegion/basin map, there are no cells belong to both.
                         # Thus, GCAM data will not be included for downscaling.
                         # It will cause the difference in Spatial Downscaling diagnostics
-                        logging.warning('{}  {}  {}  {} {} {} {} {}'.format('[Year Index, Region ID,',
-                                            GISData['SubRegionString'],'ID, Crop ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
-                                            y+1, i+1, j+1, k+1, tempV_all[i,j,k,y]))
+                        logging.warning('{}  {} {} {} {} {}'.format(
+                            '[Year Index, Region ID, Basin ID, Crop ID, irr from GCAM not assigned (km3) (No overlapping cells)]:',
+                            y+1, i+1, j+1, k+1, tempV_all[i,j,k,y]))
                                         
     # this loop will replace all the nan values with zeros to be able to take sums, if we want to keep the nans (for plotting), comment following 2 lines
     #irrA_grid[np.isnan(irrA_grid)]         = 0
