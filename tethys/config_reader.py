@@ -218,7 +218,6 @@ class ReadConfig(Logger):
             # If we use Demeter outputs, we will start from the beginning year in Demeter.
             self.years = [i for i in self.years if i >= min(demeter_years)]
 
-
     @staticmethod
     def validate_string(string):
         """Ensure that a string is all lower case and spaces are underscore separated.
