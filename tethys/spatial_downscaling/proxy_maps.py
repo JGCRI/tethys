@@ -32,23 +32,19 @@ def PopulationMap(GISData, GCAMData, OUT, nyears):
     :param nyears: number of years
     """
 
-    # ncells x nyears population array, filter to out invalid regions
+    # ncells x nyears population array, filter out invalid regions
     pop = np.where(GISData['RegionIDs'][:, np.newaxis] > 0, GISData['pop'], 0)
 
-    # Adjust population map to be consistent with GCAM assumptions.
-    # This adjustment is really unnecessary for calculating pro rata population
-    # since GCAMData['pop_tot'] terms cancel each other out,
-    # but removing intermediate calculations will slightly alter results
-    pop_fac = np.zeros((GISData['nregions'], nyears), dtype=float)
+    # calculate total region population according to gridded maps
+    pop_total = np.zeros((GISData['nregions'], nyears), dtype=float)
     for i in range(GISData['nregions']):
         index = np.where(GISData['RegionIDs'] == i + 1)[0]
-        for y in range(nyears):
-            pop_fac[i, y] = GCAMData['pop_tot'][i, y] / np.sum(pop[index, y])
+        pop_total[i] = np.sum(pop[index], axis=0)
 
     region_indices = GISData['RegionIDs'] - 1  # convert to 0 indexed values
 
     # ratio of cell population to region population for all cells and years
-    pop_pro_rata = pop * pop_fac[region_indices] / GCAMData['pop_tot'][region_indices]
+    pop_pro_rata = pop / pop_total[region_indices]
 
     # the actual downscaling calculations
     OUT.wddom = pop_pro_rata * GCAMData['rgn_wddom'][region_indices]
