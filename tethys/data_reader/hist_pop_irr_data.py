@@ -62,7 +62,17 @@ def getIrrYearData_Crops(DemeterOutputFolder, years):
                 # tmp[:, 1] is latitude
                 area = np.cos(np.radians(tmp[:, 1])) * (111.32 * 110.57) * (0.5**2)  # 0.5 hardcoded!
                 newdata = tmp[:, index] * area[:, np.newaxis]  # cell_crop_fraction * cell_area
-                newdata = np.insert(newdata, 0, 0, axis=1)  # no fraction data from Demeter for biomass, all zeros
+
+                # While Tethys contains code to aggregate numerous subsectors into the biomass category (see l_biomass),
+                # the only biomass outputs from GCAM databases I've seen are from biomass_grass and biomass_tree.
+                # In all Demeter outputs I've seen, biomass_tree_irr == biomass_grass_irr.
+                # As an initial method for downscaling the total biomass irrigation water demand,
+                # we use biomass grass irrigation area as the proxy.
+                # While this gives the correct total when biomass_tree_irr == biomass_grass_irr,
+                # (the raw cell irrigation area does not matter, only the proportion to the basin total)
+                # this may not always be guaranteed, or separate biomass_grass and biomass_tree outputs may be desired.
+                # A more robust solution will involve some reworking of gcam_outputs.py
+
                 irr[yearstr] = newdata
 
     years_new = years[:]
@@ -111,7 +121,7 @@ def getPopYearData(Population_GPW, Population_HYDE, years):
 
 def check_header_Demeter_outputs(filename):
     # check the header (order) of the Demeter outputs are consistent and corresponding to the crops used in GCAM
-    d_crops = ['corn_irr', 'fibercrop_irr', 'foddergrass_irr', 'fodderherb_irr',
+    d_crops = ['biomass_grass_irr', 'corn_irr', 'fibercrop_irr', 'foddergrass_irr', 'fodderherb_irr',
                'misccrop_irr', 'oilcrop_irr', 'othergrain_irr', 'palmfruit_irr',
                'rice_irr', 'root_tuber_irr', 'sugarcrop_irr', 'wheat_irr']
 
