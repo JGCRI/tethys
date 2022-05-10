@@ -207,6 +207,16 @@ class ReadConfig(Logger):
             self.Elec_Building_others = self.temporal_params.get('Elec_Building_others')
             self.Irr_MonthlyData = self.temporal_params.get('Irr_MonthlyData')
             self.TemporalInterpolation = int(self.temporal_params.get('TemporalInterpolation'))
+        else:  # quick fix to allow running spatial only
+            self.temporal_climate = None
+            self.Domestic_R = None
+            self.Elec_Building = None
+            self.Elec_Industry = None
+            self.Elec_Building_heat = None
+            self.Elec_Building_cool = None
+            self.Elec_Building_others = None
+            self.Irr_MonthlyData = None
+            self.TemporalInterpolation = None
 
         if self.UseDemeter:
             demeter_years = []
