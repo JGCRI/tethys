@@ -167,6 +167,8 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
     OUT.twdmin = AnnualtoMontlyUniform(OUT.WMin, TDYears)
     OUT.twdmfg = AnnualtoMontlyUniform(OUT.WMfg, TDYears)
 
+    OUT.twdtotal = OUT.twddom + OUT.twdelec + OUT.twdirr + OUT.twdliv + OUT.twdmin + OUT.twdmfg  # add to get total
+
     return(TDYears)
     
 
