@@ -84,7 +84,15 @@ def getIrrYearData_Crops(DemeterOutputFolder, years):
     irr['years'] = years  # years (integer) from settings
     irr['years_new'] = years_new  # years to import irrigation data (integer) corresponding to years
 
-    return irr
+    # reorganize into an an array (will rewrite above to build this directly)
+    nyears = len(years)
+    ncells, ncrops = irr[str(irr['years_new'][0])].shape
+
+    irr_new = {'array': np.zeros((ncells, ncrops, nyears), dtype=float)}
+    for y, year in enumerate(years_new):
+        irr_new['array'][:, :, y] = irr[str(year)]
+
+    return irr_new
 
 
 def getPopYearData(Population_GPW, Population_HYDE, years):

@@ -80,4 +80,13 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, 
     GISData['RegionIDs'] = get_array_csv(InputRegionFile, 1).astype(int)
     GISData['nregions'] = GISData['RegionIDs'].max()  # Number of regions
 
+    GISData['RegionBasins'] = dict()
+    for i, pair in enumerate(zip(GISData['RegionIDs'], GISData['BasinIDs'])):
+        if pair[0] != 0:
+            if pair not in GISData['RegionBasins']:
+                GISData['RegionBasins'][pair] = list()
+            GISData['RegionBasins'][pair].append(i)
+    for pair in GISData['RegionBasins']:
+        GISData['RegionBasins'][pair] = np.array(GISData['RegionBasins'][pair])
+
     return GISData

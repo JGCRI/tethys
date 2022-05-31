@@ -140,14 +140,10 @@ def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagn
     logging.info("------Time Cost: %s seconds ---" % (endtime5 - endtime4))
 
     # c.    Create an irrigation proxy map and downscale irrigation water withdrawal to grid scale
-    if UseDemeter:
-        # Use Demeter outputs (irrigated cropland areas for each type of crops ) to replace the GMIA/HYSE data used in downscaling of irrigation water withdrawal
-        # Additional gridded outputs: irrigation water withdrawal by 13 crop types
-        logging.info('---Create an irrigation map as proxy of agricultural water withdrawal using Demeter outputs')
-        ProxyMaps.IrrigationMapCrops(GISData, GCAMData, NY, OUT)
-    else:
-        logging.info('---Create an irrigation map as proxy of agricultural water withdrawal ')
-        ProxyMaps.IrrigationMap(GISData, GCAMData, NY, OUT)
+
+    logging.info('---Create an irrigation map as proxy of agricultural water withdrawal')
+    ProxyMaps.IrrigationMap(GISData, GCAMData, NY, UseDemeter, OUT)
+
 
     endtime6 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime6 - endtime5))
