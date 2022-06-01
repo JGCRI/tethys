@@ -163,16 +163,16 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
 
     """Livestock, Mining and Manufacturing"""
     
-    OUT.twdliv = AnnualtoMontlyUniform(OUT.WLiv, TDYears)
-    OUT.twdmin = AnnualtoMontlyUniform(OUT.WMin, TDYears)
-    OUT.twdmfg = AnnualtoMontlyUniform(OUT.WMfg, TDYears)
+    OUT.twdliv = AnnualtoMonthlyUniform(OUT.WLiv, TDYears)
+    OUT.twdmin = AnnualtoMonthlyUniform(OUT.WMin, TDYears)
+    OUT.twdmfg = AnnualtoMonthlyUniform(OUT.WMfg, TDYears)
 
     OUT.twdtotal = OUT.twddom + OUT.twdelec + OUT.twdirr + OUT.twdliv + OUT.twdmin + OUT.twdmfg  # add to get total
 
     return(TDYears)
     
 
-def AnnualtoMontlyUniform(WD, years):
+def AnnualtoMonthlyUniform(WD, years):
     """
     Global gridded annual water withdrawal to monthly water withdrawal
     For Livestock, Mining and Manufacturing: Uniform distribution
