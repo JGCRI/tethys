@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/tethys.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/getting_started.css" type="text/css" />
@@ -309,14 +309,10 @@
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------Time Cost: </span><span class="si">%s</span><span class="s2"> seconds ---&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endtime5</span> <span class="o">-</span> <span class="n">endtime4</span><span class="p">))</span>
 
     <span class="c1"># c.    Create an irrigation proxy map and downscale irrigation water withdrawal to grid scale</span>
-    <span class="k">if</span> <span class="n">UseDemeter</span><span class="p">:</span>
-        <span class="c1"># Use Demeter outputs (irrigated cropland areas for each type of crops ) to replace the GMIA/HYSE data used in downscaling of irrigation water withdrawal</span>
-        <span class="c1"># Additional gridded outputs: irrigation water withdrawal by 13 crop types</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;---Create an irrigation map as proxy of agricultural water withdrawal using Demeter outputs&#39;</span><span class="p">)</span>
-        <span class="n">ProxyMaps</span><span class="o">.</span><span class="n">IrrigationMapCrops</span><span class="p">(</span><span class="n">GISData</span><span class="p">,</span> <span class="n">GCAMData</span><span class="p">,</span> <span class="n">NY</span><span class="p">,</span> <span class="n">OUT</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;---Create an irrigation map as proxy of agricultural water withdrawal &#39;</span><span class="p">)</span>
-        <span class="n">ProxyMaps</span><span class="o">.</span><span class="n">IrrigationMap</span><span class="p">(</span><span class="n">GISData</span><span class="p">,</span> <span class="n">GCAMData</span><span class="p">,</span> <span class="n">NY</span><span class="p">,</span> <span class="n">OUT</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;---Create an irrigation map as proxy of agricultural water withdrawal&#39;</span><span class="p">)</span>
+    <span class="n">ProxyMaps</span><span class="o">.</span><span class="n">IrrigationMap</span><span class="p">(</span><span class="n">GISData</span><span class="p">,</span> <span class="n">GCAMData</span><span class="p">,</span> <span class="n">NY</span><span class="p">,</span> <span class="n">UseDemeter</span><span class="p">,</span> <span class="n">OUT</span><span class="p">)</span>
+
 
     <span class="n">endtime6</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------Time Cost: </span><span class="si">%s</span><span class="s2"> seconds ---&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">endtime6</span> <span class="o">-</span> <span class="n">endtime5</span><span class="p">))</span>
