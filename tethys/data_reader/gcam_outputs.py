@@ -674,7 +674,7 @@ def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCA
         'rgn_wdmfg': manuf_water_demand_to_array(conn, queries[6], d_reg_name, years),
         'rgn_wdmining': mining_water_demand_to_array(conn, queries[7], d_reg_name, years),
         'wdliv': livestock_water_demand_to_array(conn, conn_core, queries[5], queries_core[5], d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years),
-        'irrArea': land_to_array(conn, conn_core, queries[0], queries[2], basin_state_area, d_reg_name, d_basin_name, d_crops, years),
+        'irrArea': land_to_array(conn, conn_core, queries[0], queries_core[0], basin_state_area, d_reg_name, d_basin_name, d_crops, years),
         'irrV': irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], d_reg_name, d_basin_name, d_crops, years)
     }
 
