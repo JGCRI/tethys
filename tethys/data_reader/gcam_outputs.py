@@ -12,6 +12,14 @@ import numpy as np
 import pandas as pd
 
 
+# codes for 50 states + DC + PR
+states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL',
+          'GA', 'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA',
+          'MD', 'ME', 'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE',
+          'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'PR',
+          'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT', 'WA', 'WI',
+          'WV', 'WY']
+
 # crop name to crop_id
 d_crops = {'biomass': 1, 'Corn': 2, 'FiberCrop': 3, 'FodderGrass': 4, 'FodderHerb': 5,
            'MiscCrop': 6, 'OilCrop': 7, 'OtherGrain': 8, 'PalmFruit': 9, 'Rice': 10,
@@ -89,6 +97,7 @@ def get_gcam_queries(db_path, db_file, f_queries):
 
     return c, q
 
+
 def add_missing_regions(df, d_reg_name):
     """
     Checks a dataframe for missing regions and adds rows with 0 values
@@ -123,7 +132,8 @@ def add_missing_regions(df, d_reg_name):
                                                   'Year': year_i,
                                                   'region': region_i,
                                                   'value': 0}, ignore_index=True)
-    return (df1)
+    return df1
+
 
 def population_to_array(conn, query, d_reg_name, years):
     """
@@ -152,18 +162,14 @@ def population_to_array(conn, query, d_reg_name, years):
     df = df[df['region'].notnull()]
 
     # Remove USA if using GCAM USA
-    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
-              'IA', 'ID', 'IL', 'IN', 'KS','KY','LA', 'MA', 'MD', 'ME', 'MI', 'MN',
-              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY','OH',
-              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
-              'WA', 'WI', 'WV', 'WY']
     if any(item in d_reg_name for item in states):
-       df.loc[df.region == 1, 'value'] = 0
+        df.loc[df.region == 1, 'value'] = 0
 
     # convert shape for use in Tethys
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0)
 
     return piv.values * 1000
+
 
 def dom_water_demand_to_array(conn, query, d_reg_name, years):
     """
@@ -186,15 +192,10 @@ def dom_water_demand_to_array(conn, query, d_reg_name, years):
     # map region_id to region name
     df['region'] = df['region'].map(d_reg_name)
 
-   # Add missing regions
-    df = add_missing_regions(df,list(d_reg_name.values()))
+    # Add missing regions
+    df = add_missing_regions(df, list(d_reg_name.values()))
 
     # Remove USA if using GCAM USA
-    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
-              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
-              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
-              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
-              'WA', 'WI', 'WV', 'WY']
     if any(item in d_reg_name for item in states):
         df.loc[df.region == 1, 'value'] = 0
 
@@ -225,15 +226,10 @@ def elec_water_demand_to_array(conn, query, d_reg_name, years):
     # map region_id to region name
     df['region'] = df['region'].map(d_reg_name)
 
-   # Add missing regions
-    df = add_missing_regions(df,list(d_reg_name.values()))
+    # Add missing regions
+    df = add_missing_regions(df, list(d_reg_name.values()))
 
     # Remove USA if using GCAM USA
-    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
-              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
-              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
-              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
-              'WA', 'WI', 'WV', 'WY']
     if any(item in d_reg_name for item in states):
         df.loc[df.region == 1, 'value'] = 0
 
@@ -264,20 +260,15 @@ def manuf_water_demand_to_array(conn, query, d_reg_name, years):
     # map region_id to region name
     df['region'] = df['region'].map(d_reg_name)
 
-   # Add missing regions
-    df = add_missing_regions(df,list(d_reg_name.values()))
+    # Add missing regions
+    df = add_missing_regions(df, list(d_reg_name.values()))
 
     # Remove USA if using GCAM USA
-    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
-              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
-              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
-              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
-              'WA', 'WI', 'WV', 'WY']
     if any(item in d_reg_name for item in states):
         df.loc[df.region == 1, 'value'] = 0
 
     # convert shape for use in Tethys
-    piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0,aggfunc=np.sum)
+    piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
 
     return piv.values
 
@@ -309,15 +300,10 @@ def mining_water_demand_to_array(conn, query, d_reg_name, years):
     if 'output' in df.columns:
         df.rename(columns={"output": "input"}, inplace=True)
 
-   # Add missing regions
-    df = add_missing_regions(df,list(d_reg_name.values()))
+    # Add missing regions
+    df = add_missing_regions(df, list(d_reg_name.values()))
 
     # Remove USA if using GCAM USA
-    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
-              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
-              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
-              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
-              'WA', 'WI', 'WV', 'WY']
     if any(item in d_reg_name for item in states):
         df.loc[df.region == 1, 'value'] = 0
 
@@ -325,6 +311,7 @@ def mining_water_demand_to_array(conn, query, d_reg_name, years):
     piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
 
     return piv.values
+
 
 def livestock_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years):
     """
@@ -352,17 +339,17 @@ def livestock_water_demand_to_array(conn, conn_core, query, query_core, d_reg_na
     if 'output' in df.columns:
         df.rename(columns={"output": "input"}, inplace=True)
         df_core = conn_core.runQuery(query_core)
-        df_core_sum = df_core.groupby(['region','Year','sector','Units','scenario','input']).agg({'value': 'sum'}).reset_index()
+        df_core_sum = df_core.groupby(['region', 'Year', 'sector', 'Units', 'scenario', 'input']).agg({'value': 'sum'}).reset_index()
         df_core_non_us = df_core_sum[~df_core_sum['region'].str.contains("USA")]
         df_core_us = df_core_sum[df_core_sum['region'].str.contains("USA")]
         df_core_us_ratio = df_core_us.assign(
-            ratio    = lambda x: x['value'] / (x.groupby(['region','Year']).transform('sum')['value'])
+            ratio=lambda x: x['value'] / (x.groupby(['region', 'Year']).transform('sum')['value'])
         )
         d_reg_name_us = dict(filter(lambda elem: elem[1] > 32, d_reg_name.items()))
         search_list = '|'.join(d_reg_name_us.keys())
         df_us = df[df['region'].str.contains(search_list)]
         df_us_new = pd.merge(df_us[['Units', 'scenario', 'region', 'input', 'Year', 'value']],
-                          df_core_us_ratio[['Year','sector', 'ratio']], on=['Year'], how='left')
+                             df_core_us_ratio[['Year', 'sector', 'ratio']], on=['Year'], how='left')
         df_us_new['value'] = df_us_new['ratio']*df_us_new['value']
         df_us_new = df_us_new.drop('ratio', 1)
         df = df_us_new.append(df_core_non_us)
@@ -377,11 +364,6 @@ def livestock_water_demand_to_array(conn, conn_core, query, query_core, d_reg_na
     df['region'] = df['region'].map(d_reg_name)
 
     # Remove USA if using GCAM USA
-    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
-              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
-              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
-              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
-              'WA', 'WI', 'WV', 'WY']
     if any(item in d_reg_name for item in states):
         df.loc[df.region == 1, 'value'] = 0
 
@@ -488,9 +470,6 @@ def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_na
     # Restructure data (For GCAM USA queries) & also read in core GCAM values to distribute by basin
     # Check if length of d_reg_name are more than 33 which indicates it includes states from GCAM USA
     # Apply the distribution per basin to state/basin
-    states = ['AK','AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','HI','IA','ID','IL','IN','KS','KY',
-              'LA','MA','MD','ME','MI','MN','MO','MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH',
-              'OK','OR','PA','PR','RI','SC','SD','TN','TX','UT','VA','VT','WA','WI','WV','WY']
     if any(item in d_reg_name for item in states):
         # Get US land allocation by basin
         df_us = df[df['region'].str.contains("USA")].copy()
@@ -501,19 +480,19 @@ def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_na
         # Get US states and basins
         df_core = conn_core.runQuery(query_core)
         df_core_st_basin = df_core[df_core['region'].str.contains("USA")].copy()
-        df_core_st_basin = df_core_st_basin[['subsector','sector']].drop_duplicates().reset_index(drop=True)
-        df_core_st_basin.rename(columns={"subsector": "region","sector":"basin"}, inplace=True)
+        df_core_st_basin = df_core_st_basin[['subsector', 'sector']].drop_duplicates().reset_index(drop=True)
+        df_core_st_basin.rename(columns={"subsector": "region", "sector": "basin"}, inplace=True)
         df_core_st_basin['basin'] = df_core_st_basin['basin'].str.replace("water_td_irr_", "")
         df_core_st_basin['basin'] = df_core_st_basin['basin'].str.replace("_W", "")
         df_core_st_basin['basin'] = df_core_st_basin['basin'].str.replace("_C", "")  # added this to fix consumption
         # Make a copy of US values for each state by joining by basin
-        df_us_new = pd.merge(df_us,df_core_st_basin, on=['basin'],how='left')
-        df_area = pd.read_csv(basin_state_area) # Get area ratio of each state in basins
-        df_area = df_area[['basin','subRegion_State','area_ratio']]
+        df_us_new = pd.merge(df_us, df_core_st_basin, on=['basin'], how='left')
+        df_area = pd.read_csv(basin_state_area)  # Get area ratio of each state in basins
+        df_area = df_area[['basin', 'subRegion_State', 'area_ratio']]
         df_area.rename(columns={"subRegion_State": "region"}, inplace=True)
-        df_us_new_area = pd.merge(df_us_new,df_area, on=['basin','region'],how='left')
-        df_us_new_area['valueNew']=df_us_new_area['value']*df_us_new_area['area_ratio']
-        df_us_new_area = df_us_new_area.drop(['basin','value','area_ratio'],axis=1)
+        df_us_new_area = pd.merge(df_us_new, df_area, on=['basin', 'region'], how='left')
+        df_us_new_area['valueNew'] = df_us_new_area['value']*df_us_new_area['area_ratio']
+        df_us_new_area = df_us_new_area.drop(['basin', 'value', 'area_ratio'], axis=1)
         df_us_new_area.rename(columns={"valueNew": "value"}, inplace=True)
         df = df.append(df_us_new_area)
         # Check US Total
@@ -524,11 +503,6 @@ def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_na
     df = df.loc[df['Year'].isin(years)].copy()
 
     # Remove USA if using GCAM USA
-    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
-              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
-              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
-              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
-              'WA', 'WI', 'WV', 'WY']
     if any(item in d_reg_name for item in states):
         df.loc[df.region == 1, 'value'] = 0
 
@@ -543,7 +517,7 @@ def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_na
 
     temp = df['land-allocation'].apply(lambda x: x.split('_')[-1])
     if 'IRR' in temp.unique():
-        df['crop'] = df['land-allocation'].apply(lambda x: x.split('_')[:-2][0]) # 'Root_Tuber' will be 'Root'
+        df['crop'] = df['land-allocation'].apply(lambda x: x.split('_')[:-2][0])  # 'Root_Tuber' will be 'Root'
         df['subreg'] = df['land-allocation'].apply(lambda x: x.split('_')[-2]).map(d_basin_name)
         df['use'] = df['land-allocation'].apply(lambda x: x.split('_')[-1])
         df = df.loc[df['use'] == 'IRR'].copy()
@@ -551,14 +525,14 @@ def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_na
     else:
         # create management type column
         df['mgmt'] = df['land-allocation'].apply(lambda x: x.split('_')[-1])
-        df['crop'] = df['land-allocation'].apply(lambda x: x.split('_')[:-3][0]) # 'Root_Tuber' will be 'Root'
+        df['crop'] = df['land-allocation'].apply(lambda x: x.split('_')[:-3][0])  # 'Root_Tuber' will be 'Root'
         df['subreg'] = df['land-allocation'].apply(lambda x: x.split('_')[-3]).map(d_basin_name)
         df['use'] = df['land-allocation'].apply(lambda x: x.split('_')[-2])
         df = df.loc[df['use'] == 'IRR'].copy()
         df.drop('land-allocation', axis=1, inplace=True)
     
         # sum hi and lo management allocation
-        df = df.drop(['mgmt'],axis=1)
+        df = df.drop(['mgmt'], axis=1)
         df = df.groupby(['region', 'subreg', 'crop', 'use', 'Year']).sum()
         df = df.reset_index()
 
@@ -586,6 +560,7 @@ def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_na
 
     return piv.values
 
+
 def irr_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_basin_name, d_crops, years):
     """
     Query GCAM database for irrigated water demand (billion m3).  Place
@@ -611,10 +586,10 @@ def irr_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_
     # Check if column name "input" exists it means that the new GCAM USA queries were used.
     # Rename this to "output" to conform with original format
     if 'output' in df.columns:
-        df = df.drop(['region','output'],axis=1)
-        df.rename(columns={"sector": "input","subsector":"region"}, inplace=True)
+        df = df.drop(['region', 'output'], axis=1)
+        df.rename(columns={"sector": "input", "subsector": "region"}, inplace=True)
         df_core = conn_core.runQuery(query_core)
-        df_core_sum = df_core.groupby(['region', 'Year', 'sector','subsector', 'Units', 'scenario', 'input']).agg(
+        df_core_sum = df_core.groupby(['region', 'Year', 'sector', 'subsector', 'Units', 'scenario', 'input']).agg(
             {'value': 'sum'}).reset_index()
         df_core_non_us = df_core_sum[~df_core_sum['region'].str.contains("USA")]
         df_core_us = df_core_sum[df_core_sum['region'].str.contains("USA")]
@@ -625,7 +600,7 @@ def irr_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_
         search_list = '|'.join(d_reg_name_us.keys())
         df_us = df[df['region'].str.contains(search_list)]
         df_us_new = pd.merge(df_us[['Units', 'scenario', 'region', 'input', 'Year', 'value']],
-                             df_core_us_ratio[['Year', 'sector','subsector','input', 'ratio']], on=['Year','input'], how='left')
+                             df_core_us_ratio[['Year', 'sector', 'subsector', 'input', 'ratio']], on=['Year', 'input'], how='left')
         df_us_new['value'] = df_us_new['ratio'] * df_us_new['value']
         df_us_new = df_us_new.drop('ratio', 1)
         df = df_us_new.append(df_core_non_us)
@@ -654,29 +629,23 @@ def irr_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_
     df.drop('sector', axis=1, inplace=True)
 
     # Remove USA if using GCAM USA
-    states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI',
-              'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN',
-              'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH',
-              'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT',
-              'WA', 'WI', 'WV', 'WY']
     if any(item in d_reg_name for item in states):
         df.loc[df.region == 1, 'value'] = 0
 
     # convert shape for use in Tethys
-    piv = pd.pivot_table(df, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0,aggfunc=np.sum)
+    piv = pd.pivot_table(df, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0, aggfunc=np.sum)
     piv.reset_index(inplace=True)
 
     return piv.values
+
 
 def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCAM_DBpath, GCAM_DBfile, GCAM_query,
                   GCAM_queryCore, basin_state_area):
     """
     Import and format GCAM data from database for use in Tethys.
 
-    :param s:               Settings object
     :return:                dictionary, {metric: numpy array, ...}
     """
-
 
     # get region info as dict
     d_reg_name = get_region_info(RegionNames)
@@ -698,15 +667,16 @@ def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCA
 #         df = conn.runQuery(q)
 #         df.to_csv(q.title + ".csv", sep=',')
 
-    d = {}
-    d['pop_tot']      = population_to_array(conn, queries[1], d_reg_name, years)
-    d['rgn_wddom']    = dom_water_demand_to_array(conn, queries[3], d_reg_name, years)
-    d['rgn_wdelec']   = elec_water_demand_to_array(conn, queries[4], d_reg_name, years)
-    d['rgn_wdmfg']    = manuf_water_demand_to_array(conn, queries[6], d_reg_name, years)
-    d['rgn_wdmining'] = mining_water_demand_to_array(conn, queries[7], d_reg_name, years)
-    d['wdliv']        = livestock_water_demand_to_array(conn, conn_core, queries[5], queries_core[5],d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years)
-    d['irrArea']      = land_to_array(conn, conn_core, queries[0], queries[2], basin_state_area, d_reg_name, d_basin_name, d_crops, years)
-    d['irrV']         = irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], d_reg_name, d_basin_name, d_crops, years)
+    d = {
+        'pop_tot': population_to_array(conn, queries[1], d_reg_name, years),
+        'rgn_wddom': dom_water_demand_to_array(conn, queries[3], d_reg_name, years),
+        'rgn_wdelec': elec_water_demand_to_array(conn, queries[4], d_reg_name, years),
+        'rgn_wdmfg': manuf_water_demand_to_array(conn, queries[6], d_reg_name, years),
+        'rgn_wdmining': mining_water_demand_to_array(conn, queries[7], d_reg_name, years),
+        'wdliv': livestock_water_demand_to_array(conn, conn_core, queries[5], queries_core[5], d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years),
+        'irrArea': land_to_array(conn, conn_core, queries[0], queries[2], basin_state_area, d_reg_name, d_basin_name, d_crops, years),
+        'irrV': irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], d_reg_name, d_basin_name, d_crops, years)
+    }
 
 #    for key, value in d.iteritems():
 #        np.savetxt(key + '.csv', d[key], delimiter=',')
