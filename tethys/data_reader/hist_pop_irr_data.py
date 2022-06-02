@@ -134,7 +134,7 @@ def check_header_Demeter_outputs(filename):
                'rice_irr', 'root_tuber_irr', 'sugarcrop_irr', 'wheat_irr']
 
     with open(filename, 'r') as file:
-        headers = file.readline().strip().lower().split(',')
+        headers = file.readline().strip().lower().replace('"', '').split(',')
 
     index = [headers.index(crop) for crop in d_crops]
 
