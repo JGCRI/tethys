@@ -177,15 +177,6 @@ class ReadConfig(Logger):
             else:
                 self.goat_fract = pkg_resources.resource_filename('tethys', 'reference/grid_info/gfracFAO2005.csv')
 
-        self.irrigated_fract = os.path.join(self.InputFolder, self.map_params.get('Irrigated_Fract', 'None'))
-        if os.path.basename(self.irrigated_fract) == 'None':
-            if self.GCAMUSA == 1:
-                self.irrigated_fract = \
-                    pkg_resources.resource_filename('tethys', 'reference/grid_info/irrigation-frac_gcamUSA.csv')
-            else:
-                self.irrigated_fract = \
-                    pkg_resources.resource_filename('tethys', 'reference/grid_info/irrigation-frac.csv')
-
         # Additional details for GCAM USA (Only if present)
         self.basin_state_area = os.path.join(self.InputFolder, self.map_params.get('BasinStateArea', 'None'))
         if os.path.basename(self.basin_state_area) == 'None' and self.GCAMUSA == 1:
