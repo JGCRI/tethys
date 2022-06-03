@@ -36,7 +36,7 @@ from tethys.temporal_downscaling.neighbor_basin import NeighborBasin
 
 
 def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, TemporalInterpolation, Domestic_R,
-                         Elec_Building, Elec_Industry, Elec_Building_heat, Elec_Building_cool, Elec_Building_others,
+                         ele,
                          coords, OUT, regionID, basinID):
     # Determine the temporal downscaling years
 
@@ -132,16 +132,10 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
     dom['tas'] = tclim['tas'][:, Temp_TDMonths_Index]
     dom['DomesticR'] = get_array_csv(Domestic_R, 1)
     
-    ele = {}
     ele['hdd'] = tclim['hdd'][:, Temp_TDMonths_Index]
     ele['cdd'] = tclim['cdd'][:, Temp_TDMonths_Index]
 
     # The parameters pb, ph, pc, pu, pit are all obtained from GCAM.
-    ele['building']  = get_array_csv(Elec_Building, 0)[:, Temp_TDYears_Index]
-    ele['industry']  = get_array_csv(Elec_Industry, 0)[:, Temp_TDYears_Index]
-    ele['heating']   = get_array_csv(Elec_Building_heat, 0)[:, Temp_TDYears_Index]
-    ele['cooling']   = get_array_csv(Elec_Building_cool, 0)[:, Temp_TDYears_Index]
-    ele['others']    = get_array_csv(Elec_Building_others, 0)[:, Temp_TDYears_Index]
     ele['region']    = regionID
 
     """Domestic"""
@@ -294,8 +288,6 @@ def Electricity_Temporal_Downscaling(data, W, years):
     
     for i in range(np.shape(W)[0]):
         ID = data['region'][i]-1
-        if ID > 31: # Use USA value for states
-            ID = 0
         if  ID >= 0:     
             for j in years:
                 N = years.index(j)

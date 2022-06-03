@@ -191,21 +191,11 @@ class ReadConfig(Logger):
 
             self.temporal_climate = self.temporal_params.get('temporal_climate')
             self.Domestic_R = self.temporal_params.get('Domestic_R')
-            self.Elec_Building = self.temporal_params.get('Elec_Building')
-            self.Elec_Industry = self.temporal_params.get('Elec_Industry')
-            self.Elec_Building_heat = self.temporal_params.get('Elec_Building_heat')
-            self.Elec_Building_cool = self.temporal_params.get('Elec_Building_cool')
-            self.Elec_Building_others = self.temporal_params.get('Elec_Building_others')
             self.Irr_MonthlyData = self.temporal_params.get('Irr_MonthlyData')
             self.TemporalInterpolation = int(self.temporal_params.get('TemporalInterpolation'))
         else:  # quick fix to allow running spatial only
             self.temporal_climate = None
             self.Domestic_R = None
-            self.Elec_Building = None
-            self.Elec_Industry = None
-            self.Elec_Building_heat = None
-            self.Elec_Building_cool = None
-            self.Elec_Building_others = None
             self.Irr_MonthlyData = None
             self.TemporalInterpolation = None
 

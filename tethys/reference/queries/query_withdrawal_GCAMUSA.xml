@@ -89,4 +89,14 @@
       </supplyDemandQuery>
     </aQuery>
 
+    <!-- query-elec-demand -->
+    <aQuery>
+      <all-regions/>
+      <supplyDemandQuery title="elec consumption by demand sector">
+         <axis1 name="sector">sector</axis1>
+         <axis2 name="Year">demand-physical[@vintage]</axis2>
+         <xPath buildList="true" dataName="output" group="false" sumAll="false">*[@type='sector']//*[@type='input' and (@name='elect_td_bld' or @name='elect_td_ind' or @name='elect_td_trn')]/demand-physical/node()</xPath>
+      </supplyDemandQuery>
+    </aQuery>
+
 </queries>

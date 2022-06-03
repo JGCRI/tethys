@@ -639,6 +639,48 @@ def irr_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_
     return piv.values
 
 
+def elec_proportions_to_array(conn, query, d_reg_name, years):
+
+    # query content to data frame
+    df = conn.runQuery(query)
+
+    # get only target years
+    df = df.loc[df['Year'].isin(years)].copy()
+
+    # map region_id to region name
+    df['region'] = df['region'].map(d_reg_name)
+
+    # Add missing regions
+    df = add_missing_regions(df, list(d_reg_name.values()))
+
+    # Remove USA if using GCAM USA
+    if any(item in d_reg_name for item in states):
+        df.loc[df.region == 1, 'value'] = 0
+
+    # comm/resid heating/cooling is from regular GCAM, the rest is categories from states that might be equivalent
+    # "other" building elec sector is implicit by what's left
+    heating_sectors = ['comm heating', 'resid heating', 'comm hot water', 'resid furnace fans', 'resid hot water']
+    cooling_sectors = ['comm cooling', 'resid cooling', 'comm refrigeration', 'resid freezers', 'resid refrigerators']
+
+    df_bld = add_missing_regions(df[df.input == 'elect_td_bld'], list(d_reg_name.values()))
+    df_heating = add_missing_regions(df[df.sector.isin(heating_sectors)], list(d_reg_name.values()))
+    df_cooling = add_missing_regions(df[df.sector.isin(cooling_sectors)], list(d_reg_name.values()))
+
+    bld_array = pd.pivot_table(df_bld, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum).values
+    heating_array = pd.pivot_table(df_heating, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum).values
+    cooling_array = pd.pivot_table(df_cooling, values='value', index=['region'], columns='Year',  fill_value=0, aggfunc=np.sum).values
+    total_array = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum).values
+
+    ele = {'building': bld_array/total_array,
+           'heating': heating_array/bld_array,
+           'cooling': cooling_array/bld_array
+           }
+    ele['industry'] = 1 - ele['building']
+    ele['others'] = 1 - ele['heating'] - ele['cooling']
+
+    return ele
+
+
 def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCAM_DBpath, GCAM_DBfile, GCAM_query,
                   GCAM_queryCore, basin_state_area):
     """
@@ -674,8 +716,9 @@ def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCA
         'rgn_wdmfg': manuf_water_demand_to_array(conn, queries[6], d_reg_name, years),
         'rgn_wdmining': mining_water_demand_to_array(conn, queries[7], d_reg_name, years),
         'wdliv': livestock_water_demand_to_array(conn, conn_core, queries[5], queries_core[5], d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years),
-        'irrArea': land_to_array(conn, conn_core, queries[0], queries_core[0], basin_state_area, d_reg_name, d_basin_name, d_crops, years),
-        'irrV': irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], d_reg_name, d_basin_name, d_crops, years)
+        'irrArea': land_to_array(conn, conn_core, queries[0], queries[2], basin_state_area, d_reg_name, d_basin_name, d_crops, years),
+        'irrV': irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], d_reg_name, d_basin_name, d_crops, years),
+        'elec_p': elec_proportions_to_array(conn, queries[8], d_reg_name, years)
     }
 
 #    for key, value in d.iteritems():
