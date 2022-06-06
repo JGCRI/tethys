@@ -671,9 +671,10 @@ def elec_proportions_to_array(conn, query, d_reg_name, years):
     cooling_array = pd.pivot_table(df_cooling, values='value', index=['region'], columns='Year',  fill_value=0, aggfunc=np.sum).values
     total_array = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum).values
 
-    ele = {'building': bld_array/total_array,
-           'heating': heating_array/bld_array,
-           'cooling': cooling_array/bld_array
+    # build output dict of ratios, handle 0/0 case
+    ele = {'building': np.divide(bld_array, total_array, out=np.zeros_like(bld_array), where=total_array != 0),
+           'heating': np.divide(heating_array, bld_array, out=np.zeros_like(heating_array), where=bld_array != 0),
+           'cooling': np.divide(cooling_array, bld_array, out=np.zeros_like(cooling_array), where=bld_array != 0)
            }
     ele['industry'] = 1 - ele['building']
     ele['others'] = 1 - ele['heating'] - ele['cooling']
