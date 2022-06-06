@@ -41,68 +41,67 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
     # Determine the temporal downscaling years
 
     # Determine the available temporal downscaling years according to other models and future years (not covered by other models)
-    startyear  = int(temporal_climate.split("_")[-2][:4])
-    endyear    = int(temporal_climate.split("_")[-1][:4])
+    startyear = int(temporal_climate.split("_")[-2][:4])
+    endyear = int(temporal_climate.split("_")[-1][:4])
     startyear1 = int(Irr_MonthlyData.split("_")[-2][:4])
-    endyear1   = int(Irr_MonthlyData.split("_")[-1][:4])
-    TempYears  = list(range(max(startyear,startyear1), min(endyear,endyear1) + 1))
-    TDYears    = sorted(list(set(TempYears).intersection(years)))
-    TDYears    = sorted(TDYears + [i for i in years if int(i) > endyear])
+    endyear1 = int(Irr_MonthlyData.split("_")[-1][:4])
+    TempYears = list(range(max(startyear, startyear1), min(endyear, endyear1) + 1))
+    TDYears = sorted(list(set(TempYears).intersection(years)))
+    TDYears = sorted(TDYears + [i for i in years if int(i) > endyear])
     # TDYears    = [int(i) for i in TDYears] # Convert to array of integers
-    TDYearsD   = np.diff(TDYears) # Interval of TD Years
+    TDYearsD = np.diff(TDYears) # Interval of TD Years
     # print(f'TDYears: {TDYears}')
     # print(f'years: {years}')
-    GCAM_TDYears_Index  = [years.index(i) for i in TDYears]
+    GCAM_TDYears_Index = [years.index(i) for i in TDYears]
     
-    if UseDemeter: # Calculated the fraction values of each crop in each year for each cell
-        NC  = np.shape(OUT.crops_wdirr)[1]
-        NM  = np.shape(regionID)[0]
-        NY  = np.shape(GCAM_TDYears_Index)[0]
-        F   = np.zeros((NM,NC,NY),dtype = float) # Fraction of each crop for each cell and each year.
+    if UseDemeter:  # Calculated the fraction values of each crop in each year for each cell
+        NC = np.shape(OUT.crops_wdirr)[1]
+        NM = np.shape(regionID)[0]
+        NY = np.shape(GCAM_TDYears_Index)[0]
+        F = np.zeros((NM, NC, NY),dtype=float)  # Fraction of each crop for each cell and each year.
         for j in range(np.shape(OUT.crops_wdirr)[1]):
-            W    = OUT.wdirr
-            W1   = W[:,GCAM_TDYears_Index]
-            W    = OUT.crops_wdirr[:, j, :]
-            W2   = W[:,GCAM_TDYears_Index]
-            F[:,j,:] = np.divide(W2,W1, out=np.zeros_like(W2), where=W1!=0) # NY > 1
-            
+            W = OUT.wdirr
+            W1 = W[:, GCAM_TDYears_Index]
+            W = OUT.crops_wdirr[:, j, :]
+            W2 = W[:, GCAM_TDYears_Index]
+            F[:, j, :] = np.divide(W2, W1, out=np.zeros_like(W2), where=W1 != 0)  # NY > 1
 
-    if TemporalInterpolation and all(item > 1 for item in TDYearsD): # Linear interpolation to GCAM time periods
-        W    = OUT.wddom
-        OUT.WDom = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)
-        W    = OUT.wdelec
-        OUT.WEle = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)
-        W    = OUT.wdirr
-        OUT.WIrr = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)
-        W    = OUT.wdliv
-        OUT.WLiv = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)
-        W    = OUT.wdmin
-        OUT.WMin = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)
-        W    = OUT.wdmfg
-        OUT.WMfg = LinearInterpolationAnnually(W[:,GCAM_TDYears_Index],TDYears)        
+    if TemporalInterpolation and all(item > 1 for item in TDYearsD):  # Linear interpolation to GCAM time periods
+        W = OUT.wddom
+        OUT.WDom = LinearInterpolationAnnually(W[:, GCAM_TDYears_Index], TDYears)
+        W = OUT.wdelec
+        OUT.WEle = LinearInterpolationAnnually(W[:, GCAM_TDYears_Index], TDYears)
+        W = OUT.wdirr
+        OUT.WIrr = LinearInterpolationAnnually(W[:, GCAM_TDYears_Index], TDYears)
+        W = OUT.wdliv
+        OUT.WLiv = LinearInterpolationAnnually(W[:, GCAM_TDYears_Index], TDYears)
+        W = OUT.wdmin
+        OUT.WMin = LinearInterpolationAnnually(W[:, GCAM_TDYears_Index], TDYears)
+        W = OUT.wdmfg
+        OUT.WMfg = LinearInterpolationAnnually(W[:, GCAM_TDYears_Index], TDYears)
         
-        if UseDemeter: # Linear interpolation to fraction matrix
+        if UseDemeter:  # Linear interpolation to fraction matrix
             Nyears = np.interp(np.arange(min(TDYears), max(TDYears) + 1), TDYears, TDYears)
-            FNew = np.zeros((NM,NC,len(Nyears)),dtype = float)
+            FNew = np.zeros((NM, NC, len(Nyears)), dtype=float)
             for j in range(np.shape(OUT.crops_wdirr)[1]):
-                FNew[:,j,:]  = LinearInterpolationAnnually(F[:,j,:],TDYears)    
+                FNew[:, j, :] = LinearInterpolationAnnually(F[:, j, :], TDYears)
 
         # Update the TDYears to new values
         TDYears = list(np.interp(np.arange(min(TDYears), max(TDYears) + 1), TDYears, TDYears).astype(int))    
 
     else:
-        W    = OUT.wddom
-        OUT.WDom = W[:,GCAM_TDYears_Index]
-        W    = OUT.wdelec
-        OUT.WEle = W[:,GCAM_TDYears_Index]
-        W    = OUT.wdirr
-        OUT.WIrr = W[:,GCAM_TDYears_Index]
-        W    = OUT.wdliv
-        OUT.WLiv = W[:,GCAM_TDYears_Index]
-        W    = OUT.wdmin
-        OUT.WMin = W[:,GCAM_TDYears_Index]
-        W    = OUT.wdmfg
-        OUT.WMfg = W[:,GCAM_TDYears_Index]
+        W = OUT.wddom
+        OUT.WDom = W[:, GCAM_TDYears_Index]
+        W = OUT.wdelec
+        OUT.WEle = W[:, GCAM_TDYears_Index]
+        W = OUT.wdirr
+        OUT.WIrr = W[:, GCAM_TDYears_Index]
+        W = OUT.wdliv
+        OUT.WLiv = W[:, GCAM_TDYears_Index]
+        W = OUT.wdmin
+        OUT.WMin = W[:, GCAM_TDYears_Index]
+        W = OUT.wdmfg
+        OUT.WMfg = W[:, GCAM_TDYears_Index]
         
         if UseDemeter:
             FNew = np.copy(F)
@@ -115,7 +114,7 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
         else:
             Temp_TDYears_Index.append(TempYears.index(i))
         
-    Temp_TDMonths_Index = np.zeros((len(TDYears)*12,), dtype = int)
+    Temp_TDMonths_Index = np.zeros((len(TDYears)*12,), dtype=int)
     N = 0
 
     for i in Temp_TDYears_Index:
@@ -136,24 +135,21 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
     ele['cdd'] = tclim['cdd'][:, Temp_TDMonths_Index]
 
     # The parameters pb, ph, pc, pu, pit are all obtained from GCAM.
-    ele['region']    = regionID
+    ele['region'] = regionID
 
     """Domestic"""
     OUT.twddom = Domestic_Temporal_Downscaling(dom, OUT.WDom, TDYears)
     
     """Electricity"""
     OUT.twdelec = Electricity_Temporal_Downscaling(ele, OUT.WEle, TDYears)
-
-    # Monthly Irrigation Data from other models only available during 1971-2010
-    irr, irrprofile  = GetMonthlyIrrigationData(Irr_MonthlyData, Temp_TDMonths_Index, coords)
     
     # Monthly Irrigation Data from other models only available during 1971-2010
-    irr, irrprofile  = GetMonthlyIrrigationData(Irr_MonthlyData, Temp_TDMonths_Index, coords)
+    irr, irrprofile = GetMonthlyIrrigationData(Irr_MonthlyData, Temp_TDMonths_Index, coords)
     
     """Irrigation"""
     OUT.twdirr = Irrigation_Temporal_Downscaling(irr, irrprofile, OUT.WIrr, TDYears, basinID)
-    if UseDemeter: # Divide the temporal downscaled irrigation water demand ("twdirr") by crops
-        OUT.crops_twdirr = Irrigation_Temporal_Downscaling_Crops(OUT.twdirr,FNew)
+    if UseDemeter:  # Divide the temporal downscaled irrigation water demand ("twdirr") by crops
+        OUT.crops_twdirr = Irrigation_Temporal_Downscaling_Crops(OUT.twdirr, FNew)
 
     """Livestock, Mining and Manufacturing"""
     
@@ -163,7 +159,7 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
 
     OUT.twdtotal = OUT.twddom + OUT.twdelec + OUT.twdirr + OUT.twdliv + OUT.twdmin + OUT.twdmfg  # add to get total
 
-    return(TDYears)
+    return TDYears
     
 
 def AnnualtoMonthlyUniform(WD, years):
@@ -181,30 +177,33 @@ def AnnualtoMonthlyUniform(WD, years):
     for y in years:
         M = set_month_arrays(y)
         N = years.index(y)
-        WT[:,N*12:(N+1)*12] = get_monthly_data(WD[:,N], M)
+        WT[:, N*12:(N+1)*12] = get_monthly_data(WD[:, N], M)
         
     return WT
-    
+
+
 def set_month_arrays(Year):
     # Calculate the days in each month of a year
-    M  = np.zeros((12,), dtype=int) # year, month, number of days in month
+    M = np.zeros((12,), dtype=int)  # year, month, number of days in month
     M1 = [31,    28,    31,    30,    31,    30,    31,    31,    30,    31,    30,    31]
     M2 = [31,    29,    31,    30,    31,    30,    31,    31,    30,    31,    30,    31]
     
-    if calendar.isleap(Year): # leap year
+    if calendar.isleap(Year):  # leap year
         M = M2[:]
-    else: # regular year
+    else:  # regular year
         M = M1[:]        
     return M
 
+
 def get_monthly_data(data, M):
     # divide annual data into monthly data
-    out  = np.zeros((data.shape[0],12),dtype = float)
+    out = np.zeros((data.shape[0], 12), dtype=float)
     sumM = np.sum(M)
     for i in range(12):
-        out[:,i] = data[:]*M[i]/sumM
+        out[:, i] = data[:]*M[i]/sumM
     
     return out
+
 
 def GetMonthlyIrrigationData(filename, monthindex, coords):
     """
@@ -217,20 +216,20 @@ def GetMonthlyIrrigationData(filename, monthindex, coords):
 
     datagrp = spio.netcdf.netcdf_file(filename, 'r')
     
-    nm  = int(len(datagrp.variables['months'][:].copy()))
-    irrdataall = datagrp.variables['pirrww'][:,:].copy()
-    irrdata    = irrdataall[:,monthindex]
+    nm = int(len(datagrp.variables['months'][:].copy()))
+    irrdataall = datagrp.variables['pirrww'][:, :].copy()
+    irrdata = irrdataall[:, monthindex]
     
     datagrp.close()
     
     # Calculate the irr profile (Averaged monthly irrigation from historical data, e.g. averaged 1971-2010)
-    irrprofile = np.zeros((coords.shape[0],12),dtype = float)
+    irrprofile = np.zeros((coords.shape[0], 12), dtype=float)
     for m in range(12):
         mi = range(m, nm, 12)
         irrprofile[:, m] = np.mean(irrdataall[:, mi], 1)
-    
-    
+
     return irrdata, irrprofile
+
 
 def Domestic_Temporal_Downscaling(data, W, years):
     """
@@ -244,26 +243,27 @@ def Domestic_Temporal_Downscaling(data, W, years):
     TDW: Temporally Downscaled W, dimension: 67420, NY*12
     """
 
-    TDW = np.zeros((np.shape(data['tas'])[0],len(years)*12),dtype = float)
+    TDW = np.zeros((np.shape(data['tas'])[0], len(years)*12), dtype=float)
     
     for i in range(np.shape(data['tas'])[0]):
         R = data['DomesticR'][i]       
         for j in years:
             N = years.index(j)
-            monT = data['tas'][i,N*12:(N+1)*12]
-            monT[np.isnan(monT)]=0
-            if np.sum(monT) == 0: # if the tas data is not available for this gird, use neighbor grid with higher temp
-                monT1 = data['tas'][i-1,N*12:(N+1)*12]
-                monT2 = data['tas'][i+1,N*12:(N+1)*12]
+            monT = data['tas'][i, N*12:(N+1)*12]
+            monT[np.isnan(monT)] = 0
+            if np.sum(monT) == 0:  # if the tas data is not available for this gird, use neighbor grid with higher temp
+                monT1 = data['tas'][i-1, N*12:(N+1)*12]
+                monT2 = data['tas'][i+1, N*12:(N+1)*12]
                 if np.mean(monT1) >= np.mean(monT2):
                     tmp = (monT1-np.mean(monT1))/(np.max(monT1)-np.min(monT1))*R+1
                 else:
                     tmp = (monT2-np.mean(monT2))/(np.max(monT2)-np.min(monT2))*R+1
             else:
                 tmp = (monT-np.mean(monT))/(np.max(monT)-np.min(monT))*R+1
-            TDW[i,N*12:(N+1)*12] = W[i,N]*tmp/12
+            TDW[i, N*12:(N+1)*12] = W[i, N]*tmp/12
         
     return TDW
+
 
 def Electricity_Temporal_Downscaling(data, W, years):
     
@@ -284,24 +284,23 @@ def Electricity_Temporal_Downscaling(data, W, years):
     TDW: Temporally Downscaled W, dimension: 67420, NY*12
     """
     
-    TDW = np.zeros((np.shape(W)[0],len(years)*12),dtype = float)
+    TDW = np.zeros((W.shape[0], len(years)*12), dtype=float)
     
-    for i in range(np.shape(W)[0]):
+    for i in range(W.shape[0]):
         ID = data['region'][i]-1
-        if  ID >= 0:     
-            for j in years:
-                N = years.index(j)
-                HDD = data['hdd'][i,N*12:(N+1)*12]
-                CDD = data['cdd'][i,N*12:(N+1)*12]
+        if ID >= 0:
+            for N in range(years):
+                HDD = data['hdd'][i, N*12:(N+1)*12]
+                CDD = data['cdd'][i, N*12:(N+1)*12]
                 HDD[np.isnan(HDD)] = 0
                 CDD[np.isnan(CDD)] = 0
-                SH  = np.sum(HDD)
-                SC  = np.sum(CDD)
-                Bu  = data['building'][ID,N]
-                In  = data['industry'][ID,N]
-                He  = data['heating'][ID,N]
-                Co  = data['cooling'][ID,N]
-                Ot  = data['others'][ID,N]
+                SH = np.sum(HDD)
+                SC = np.sum(CDD)
+                Bu = data['building'][ID, N]
+                In = data['industry'][ID, N]
+                He = data['heating'][ID, N]
+                Co = data['cooling'][ID, N]
+                Ot = data['others'][ID, N]
                 
                 if SH >= 650 and SC >= 450:
                     P = Bu * (He*HDD/SH + Co*CDD/SC + Ot/12) + In/12
@@ -312,9 +311,10 @@ def Electricity_Temporal_Downscaling(data, W, years):
                 else:
                     P = (Bu + In) / 12 * np.ones(12)                
                 
-                TDW[i,N*12:(N+1)*12] = W[i,N]*P
+                TDW[i, N*12:(N+1)*12] = W[i, N]*P
         
     return TDW
+
 
 def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basins):
     
@@ -333,17 +333,17 @@ def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basins):
     NT = len(years)*12
     Ndata = data.shape[1]
     NY = len(years)
-    TDW = np.zeros((NM,NT),dtype = float)
-    data_basin = np.zeros((NB,NT),dtype = float)
-    W_basin = np.zeros((NB,NY),dtype = float)
+    TDW = np.zeros((NM, NT), dtype=float)
+    data_basin = np.zeros((NB, NT), dtype=float)
+    W_basin = np.zeros((NB, NY), dtype=float)
     
     # Aggregate data into basin scale
     for index in range(0, NM):
         for m in range(0, NT): 
-            if m >=  Ndata:  # For future years, use irr profile as weighting factors
+            if m >= Ndata:  # For future years, use irr profile as weighting factors
                 mi = m % 12
                 data_basin[basins[index] - 1, m] += dataprofile[index, mi]
-            else: # For available years, use irr data from other model as weighting factors
+            else:  # For available years, use irr data from other model as weighting factors
                 if not np.isnan(data[index, m]) and basins[index] > 0:
                     data_basin[basins[index] - 1, m] += data[index, m]
         for y in range(0, NY): 
@@ -352,7 +352,7 @@ def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basins):
                 
     # Downscale the W data
     dist_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'reference/dist.csv')
-    Neigbor = NeighborBasin(dist_file) # dist.csv is in the reference folder
+    Neighbor = NeighborBasin(dist_file)  # dist.csv is in the reference folder
     for i in range(NM):
         for j in years:
             N = years.index(j)
@@ -360,29 +360,30 @@ def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basins):
             monIrr = data_basin[BasinID, N*12:(N+1)*12]
             if W_basin[BasinID, N] > 0:
                 if monIrr.sum() > 0:
-                    TDW[i,N*12:(N+1)*12] = W[i,N]*monIrr/monIrr.sum()
+                    TDW[i, N*12:(N+1)*12] = W[i, N]*monIrr/monIrr.sum()
                 else:                    
-                    IDs     = Neigbor.d[str(basins[i])][1:]
-                    n       = 0
+                    IDs = Neighbor.d[str(basins[i])][1:]
+                    n = 0
                     for d in IDs:
                         monIrr = data_basin[d-1, N*12:(N+1)*12]
                         if monIrr.sum() > 0:
-                            TDW[i,N*12:(N+1)*12] = W[i,N]*monIrr/monIrr.sum()
+                            TDW[i, N*12:(N+1)*12] = W[i, N]*monIrr/monIrr.sum()
                             break
                         else:
                             n += 1
                             continue 
                     if n == len(IDs):
-                        AllIds = Neigbor.d_all[str(basins[i])][1]
+                        AllIds = Neighbor.d_all[str(basins[i])][1]
                         for d in AllIds:
                             monIrr = data_basin[d-1, N*12:(N+1)*12]
                             if monIrr.sum() > 0:
-                                TDW[i,N*12:(N+1)*12] = W[i,N]*monIrr/monIrr.sum()
+                                TDW[i, N*12:(N+1)*12] = W[i, N]*monIrr/monIrr.sum()
                                 break
                             else:
                                 continue
                                       
     return TDW
+
 
 def Irrigation_Temporal_Downscaling_Crops(twdirr,Fraction):
     
@@ -391,17 +392,18 @@ def Irrigation_Temporal_Downscaling_Crops(twdirr,Fraction):
     For each year, the fraction of a certain crop for each cell is stored in "Fraction"
     """
 
-    NC  = np.shape(Fraction)[1]
-    NT  = np.shape(twdirr)[1]
-    NM  = np.shape(twdirr)[0]
-    TDW = np.zeros((NM,NC,NT),dtype = float)
+    NC = np.shape(Fraction)[1]
+    NT = np.shape(twdirr)[1]
+    NM = np.shape(twdirr)[0]
+    TDW = np.zeros((NM, NC, NT), dtype=float)
 
     for i in range(NC):
         for j in range(NT):
             index = int(j/12)
-            TDW[:,i,j] = twdirr[:,j]*Fraction[:,i,index]
+            TDW[:, i, j] = twdirr[:, j]*Fraction[:, i, index]
     
     return TDW
+
 
 def LinearInterpolationAnnually(data,years):
     """
@@ -411,8 +413,8 @@ def LinearInterpolationAnnually(data,years):
     Out: dimension is [67420, NNY], for example, NNY is 21
     """
     Nyears = np.interp(np.arange(min(years), max(years) + 1), years, years)
-    NM     = np.shape(data)[0]
-    out    = np.zeros((NM,len(Nyears)),dtype = float)
+    NM = np.shape(data)[0]
+    out = np.zeros((NM, len(Nyears)), dtype=float)
     for i in range(NM):
         out[i, :] = np.interp(np.arange(min(years), max(years) + 1), years, data[i, :])
     
