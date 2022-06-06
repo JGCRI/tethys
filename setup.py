@@ -31,7 +31,7 @@ setup(
         'configobj~=5.0.6',
         'numpy~=1.21',
         'pandas~=1.2.4',
-        'scipy~=1.6.3',
+        'scipy~=1.7.2',
         'requests~=2.20.0',
         'gcamreader>=1.2.5'
     ],
