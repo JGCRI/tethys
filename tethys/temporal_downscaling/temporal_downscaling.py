@@ -283,35 +283,36 @@ def Electricity_Temporal_Downscaling(data, W, years):
     years: the list of years for temporal downscaling
     TDW: Temporally Downscaled W, dimension: 67420, NY*12
     """
-    
-    TDW = np.zeros((W.shape[0], len(years)*12), dtype=float)
-    
-    for i in range(W.shape[0]):
-        ID = data['region'][i]-1
-        if ID >= 0:
-            for N in range(years):
-                HDD = data['hdd'][i, N*12:(N+1)*12]
-                CDD = data['cdd'][i, N*12:(N+1)*12]
-                HDD[np.isnan(HDD)] = 0
-                CDD[np.isnan(CDD)] = 0
-                SH = np.sum(HDD)
-                SC = np.sum(CDD)
-                Bu = data['building'][ID, N]
-                In = data['industry'][ID, N]
-                He = data['heating'][ID, N]
-                Co = data['cooling'][ID, N]
-                Ot = data['others'][ID, N]
-                
-                if SH >= 650 and SC >= 450:
-                    P = Bu * (He*HDD/SH + Co*CDD/SC + Ot/12) + In/12
-                elif SH >= 650 and SC < 450:
-                    P = Bu * ((He+Co)*HDD/SH + Ot/12) + In/12
-                elif SH < 650 and SC >= 450:
-                    P = Bu * ((He+Co)*CDD/SC + Ot/12) + In/12
-                else:
-                    P = (Bu + In) / 12 * np.ones(12)                
-                
-                TDW[i, N*12:(N+1)*12] = W[i, N]*P
+
+    # reshape to ncells x nyears x 12 months
+    hdd_month = data['hdd'].reshape(W.shape[0], len(years), 12)
+    cdd_month = data['cdd'].reshape(W.shape[0], len(years), 12)
+    # replace nan with 0
+    hdd_month[np.isnan(hdd_month)] = 0
+    cdd_month[np.isnan(cdd_month)] = 0
+    # compute yearly sums, keep axis for broadcasting
+    hdd_year = np.sum(hdd_month, axis=2, keepdims=True)
+    cdd_year = np.sum(cdd_month, axis=2, keepdims=True)
+    # compute ratios
+    hdd_frac = np.divide(hdd_month, hdd_year, out=np.zeros_like(hdd_month), where=hdd_year != 0)
+    cdd_frac = np.divide(cdd_month, cdd_year, out=np.zeros_like(cdd_month), where=cdd_year != 0)
+
+    # expand from regions to cells, add extra axis for broadcasting
+    Bu = data['building'][data['region'] - 1, :, np.newaxis]
+    In = data['industry'][data['region'] - 1, :, np.newaxis]
+    He = data['heating'][data['region'] - 1, :, np.newaxis]
+    Co = data['cooling'][data['region'] - 1, :, np.newaxis]
+    Ot = data['others'][data['region'] - 1, :, np.newaxis]
+
+    # formula reduces to uniform when hdd_year < 650 & cdd_year < 450
+    P = np.ones((W.shape[0], len(years), 12)) / 12
+    P = np.where((hdd_year >= 650) & (cdd_year >= 450), Bu * (He*hdd_frac + Co*cdd_frac + Ot/12) + In/12, P)
+    P = np.where((hdd_year >= 650) & (cdd_year < 450), Bu * ((He+Co)*hdd_frac + Ot/12) + In/12, P)
+    P = np.where((hdd_year < 650) & (cdd_year >= 450), Bu * ((He+Co)*cdd_frac + Ot/12) + In/12, P)
+
+    # apply calculated monthly elec demand distribution to yearly elec water demand
+    TDW = W[:, :, np.newaxis] * P
+    TDW = TDW.reshape(W.shape[0], len(years)*12)
         
     return TDW
 
