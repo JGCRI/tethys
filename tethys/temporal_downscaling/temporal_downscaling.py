@@ -243,26 +243,17 @@ def Domestic_Temporal_Downscaling(data, W, years):
     TDW: Temporally Downscaled W, dimension: 67420, NY*12
     """
 
-    TDW = np.zeros((np.shape(data['tas'])[0], len(years)*12), dtype=float)
-    
-    for i in range(np.shape(data['tas'])[0]):
-        R = data['DomesticR'][i]       
-        for j in years:
-            N = years.index(j)
-            monT = data['tas'][i, N*12:(N+1)*12]
-            monT[np.isnan(monT)] = 0
-            if np.sum(monT) == 0:  # if the tas data is not available for this gird, use neighbor grid with higher temp
-                monT1 = data['tas'][i-1, N*12:(N+1)*12]
-                monT2 = data['tas'][i+1, N*12:(N+1)*12]
-                if np.mean(monT1) >= np.mean(monT2):
-                    tmp = (monT1-np.mean(monT1))/(np.max(monT1)-np.min(monT1))*R+1
-                else:
-                    tmp = (monT2-np.mean(monT2))/(np.max(monT2)-np.min(monT2))*R+1
-            else:
-                tmp = (monT-np.mean(monT))/(np.max(monT)-np.min(monT))*R+1
-            TDW[i, N*12:(N+1)*12] = W[i, N]*tmp/12
-        
-    return TDW
+    tas = data['tas'].reshape(-1, len(years), 12)
+    tas[np.isnan(tas)] = 0
+    tas_mean = np.mean(tas, axis=2, keepdims=True)
+    tas_range = np.max(tas, axis=2, keepdims=True) - np.min(tas, axis=2, keepdims=True)
+
+    # cells with no month temperature data are downscaled uniformly across months
+    temp = data['DomesticR'].reshape(-1, 1, 1) * np.divide(tas - tas_mean, tas_range,
+                                                           out=np.zeros_like(tas), where=tas_range != 0) + 1
+    TDW = W[:, :, np.newaxis] * temp / 12
+
+    return TDW.reshape(W.shape[0], len(years) * 12)
 
 
 def Electricity_Temporal_Downscaling(data, W, years):
@@ -312,9 +303,8 @@ def Electricity_Temporal_Downscaling(data, W, years):
 
     # apply calculated monthly elec demand distribution to yearly elec water demand
     TDW = W[:, :, np.newaxis] * P
-    TDW = TDW.reshape(W.shape[0], len(years)*12)
-        
-    return TDW
+
+    return TDW.reshape(W.shape[0], len(years)*12)
 
 
 def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basins):
