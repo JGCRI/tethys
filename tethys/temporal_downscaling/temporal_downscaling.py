@@ -48,37 +48,26 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
     TempYears = list(range(max(startyear, startyear1), min(endyear, endyear1) + 1))
     TDYears = sorted(list(set(TempYears).intersection(years)))
     TDYears = sorted(TDYears + [i for i in years if int(i) > endyear])
-    # TDYears    = [int(i) for i in TDYears] # Convert to array of integers
-    TDYearsD = np.diff(TDYears) # Interval of TD Years
-    # print(f'TDYears: {TDYears}')
-    # print(f'years: {years}')
+    TDYearsD = np.diff(TDYears)  # Interval of TD Years
     GCAM_TDYears_Index = [years.index(i) for i in TDYears]
     
     if UseDemeter:  # Calculated the fraction values of each crop in each year for each cell
         NC = np.shape(OUT.crops_wdirr)[1]
         NM = np.shape(regionID)[0]
         NY = np.shape(GCAM_TDYears_Index)[0]
-        F = np.zeros((NM, NC, NY),dtype=float)  # Fraction of each crop for each cell and each year.
+        F = np.zeros((NM, NC, NY), dtype=float)  # Fraction of each crop for each cell and each year.
         for j in range(np.shape(OUT.crops_wdirr)[1]):
-            W = OUT.wdirr
-            W1 = W[:, GCAM_TDYears_Index]
-            W = OUT.crops_wdirr[:, j, :]
-            W2 = W[:, GCAM_TDYears_Index]
+            W1 = OUT.wdirr[:, GCAM_TDYears_Index]
+            W2 = OUT.crops_wdirr[:, j, GCAM_TDYears_Index]
             F[:, j, :] = np.divide(W2, W1, out=np.zeros_like(W2), where=W1 != 0)  # NY > 1
 
     if TemporalInterpolation and all(item > 1 for item in TDYearsD):  # Linear interpolation to GCAM time periods
-        W = OUT.wddom
-        OUT.WDom = LinearInterpolationAnnually(W[:, GCAM_TDYears_Index], TDYears)
-        W = OUT.wdelec
-        OUT.WEle = LinearInterpolationAnnually(W[:, GCAM_TDYears_Index], TDYears)
-        W = OUT.wdirr
-        OUT.WIrr = LinearInterpolationAnnually(W[:, GCAM_TDYears_Index], TDYears)
-        W = OUT.wdliv
-        OUT.WLiv = LinearInterpolationAnnually(W[:, GCAM_TDYears_Index], TDYears)
-        W = OUT.wdmin
-        OUT.WMin = LinearInterpolationAnnually(W[:, GCAM_TDYears_Index], TDYears)
-        W = OUT.wdmfg
-        OUT.WMfg = LinearInterpolationAnnually(W[:, GCAM_TDYears_Index], TDYears)
+        OUT.WDom = LinearInterpolationAnnually(OUT.wddom[:, GCAM_TDYears_Index], TDYears)
+        OUT.WEle = LinearInterpolationAnnually(OUT.wdelec[:, GCAM_TDYears_Index], TDYears)
+        OUT.WIrr = LinearInterpolationAnnually(OUT.wdirr[:, GCAM_TDYears_Index], TDYears)
+        OUT.WLiv = LinearInterpolationAnnually(OUT.wdliv[:, GCAM_TDYears_Index], TDYears)
+        OUT.WMin = LinearInterpolationAnnually(OUT.wdmin[:, GCAM_TDYears_Index], TDYears)
+        OUT.WMfg = LinearInterpolationAnnually(OUT.wdmfg[:, GCAM_TDYears_Index], TDYears)
         
         if UseDemeter:  # Linear interpolation to fraction matrix
             Nyears = np.interp(np.arange(min(TDYears), max(TDYears) + 1), TDYears, TDYears)
@@ -90,18 +79,12 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
         TDYears = list(np.interp(np.arange(min(TDYears), max(TDYears) + 1), TDYears, TDYears).astype(int))    
 
     else:
-        W = OUT.wddom
-        OUT.WDom = W[:, GCAM_TDYears_Index]
-        W = OUT.wdelec
-        OUT.WEle = W[:, GCAM_TDYears_Index]
-        W = OUT.wdirr
-        OUT.WIrr = W[:, GCAM_TDYears_Index]
-        W = OUT.wdliv
-        OUT.WLiv = W[:, GCAM_TDYears_Index]
-        W = OUT.wdmin
-        OUT.WMin = W[:, GCAM_TDYears_Index]
-        W = OUT.wdmfg
-        OUT.WMfg = W[:, GCAM_TDYears_Index]
+        OUT.WDom = OUT.wddom[:, GCAM_TDYears_Index]
+        OUT.WEle = OUT.wdelec[:, GCAM_TDYears_Index]
+        OUT.WIrr = OUT.wdirr[:, GCAM_TDYears_Index]
+        OUT.WLiv = OUT.wdliv[:, GCAM_TDYears_Index]
+        OUT.WMin = OUT.wdmin[:, GCAM_TDYears_Index]
+        OUT.WMfg = OUT.wdmfg[:, GCAM_TDYears_Index]
         
         if UseDemeter:
             FNew = np.copy(F)
@@ -184,15 +167,11 @@ def AnnualtoMonthlyUniform(WD, years):
 
 def set_month_arrays(Year):
     # Calculate the days in each month of a year
-    M = np.zeros((12,), dtype=int)  # year, month, number of days in month
-    M1 = [31,    28,    31,    30,    31,    30,    31,    31,    30,    31,    30,    31]
-    M2 = [31,    29,    31,    30,    31,    30,    31,    31,    30,    31,    30,    31]
-    
+
     if calendar.isleap(Year):  # leap year
-        M = M2[:]
+        return [31,    29,    31,    30,    31,    30,    31,    31,    30,    31,    30,    31]
     else:  # regular year
-        M = M1[:]        
-    return M
+        return [31,    28,    31,    30,    31,    30,    31,    31,    30,    31,    30,    31]
 
 
 def get_monthly_data(data, M):
@@ -376,7 +355,7 @@ def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basins):
     return TDW
 
 
-def Irrigation_Temporal_Downscaling_Crops(twdirr,Fraction):
+def Irrigation_Temporal_Downscaling_Crops(twdirr, Fraction):
     
     """
     Divide the temporal downscaled irrigation water demand ("twdirr") by crops
@@ -396,17 +375,17 @@ def Irrigation_Temporal_Downscaling_Crops(twdirr,Fraction):
     return TDW
 
 
-def LinearInterpolationAnnually(data,years):
+def LinearInterpolationAnnually(data, years):
     """
     data: dimension is [67420, NY]
     years: the list of years, length is NY, for example: [1990, 2005, 2010]
     Interpolate values linearly between years to create annual results
     Out: dimension is [67420, NNY], for example, NNY is 21
     """
-    Nyears = np.interp(np.arange(min(years), max(years) + 1), years, years)
-    NM = np.shape(data)[0]
-    out = np.zeros((NM, len(Nyears)), dtype=float)
-    for i in range(NM):
+    nyears = 1 + max(years) - min(years)
+    ncells = np.shape(data)[0]
+    out = np.zeros((ncells, nyears), dtype=float)
+    for i in range(ncells):
         out[i, :] = np.interp(np.arange(min(years), max(years) + 1), years, data[i, :])
     
     return out
