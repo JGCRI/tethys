@@ -184,10 +184,8 @@ def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagn
                                                            Domestic_R=Domestic_R,
                                                            ele=GCAMData['elec_p'],
                                                            basinlookup=GISData['basinlookup'],
-                                                           coords=GISData['coord'][:, :],
                                                            OUT=OUT,
-                                                           regionID=GISData['RegionIDs'],
-                                                           basinID=GISData['BasinIDs'])
+                                                           regionID=GISData['RegionIDs'])
         print(f'TDyears = {TDYears}')
         endtime7 = time.time()
         logging.info("------Time Cost: %s seconds ---" % (endtime7 - endtime6))

@@ -24,7 +24,6 @@ Livestock, Mining and Manufacturing: Uniform distribution (based on days and lea
 Irrigation: Monthly Irrigation Data from other models as the weighting factor to downscale gridded annually irrigation water withdrawals, need input data 4
 """
 
-import os
 import logging
 import calendar
 
@@ -35,101 +34,76 @@ from tethys.utils.data_parser import get_array_csv
 
 
 def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, TemporalInterpolation, Domestic_R,
-                         ele, basinlookup,
-                         coords, OUT, regionID, basinID):
-    # Determine the temporal downscaling years
+                         ele, basinlookup, OUT, regionID):
 
-    # Determine the available temporal downscaling years according to other models and future years (not covered by other models)
-    startyear = int(temporal_climate.split("_")[-2][:4])
-    endyear = int(temporal_climate.split("_")[-1][:4])
-    startyear1 = int(Irr_MonthlyData.split("_")[-2][:4])
-    endyear1 = int(Irr_MonthlyData.split("_")[-1][:4])
-    TempYears = list(range(max(startyear, startyear1), min(endyear, endyear1) + 1))
-    TDYears = sorted(list(set(TempYears).intersection(years)))
-    TDYears = sorted(TDYears + [i for i in years if int(i) > endyear])
-    TDYearsD = np.diff(TDYears)  # Interval of TD Years
-    GCAM_TDYears_Index = [years.index(i) for i in TDYears]
-    
-    if UseDemeter:  # Calculated the fraction values of each crop in each year for each cell
-        NC = np.shape(OUT.crops_wdirr)[1]
-        NM = np.shape(regionID)[0]
-        NY = np.shape(GCAM_TDYears_Index)[0]
-        F = np.zeros((NM, NC, NY), dtype=float)  # Fraction of each crop for each cell and each year.
-        for j in range(np.shape(OUT.crops_wdirr)[1]):
-            W1 = OUT.wdirr[:, GCAM_TDYears_Index]
-            W2 = OUT.crops_wdirr[:, j, GCAM_TDYears_Index]
-            F[:, j, :] = np.divide(W2, W1, out=np.zeros_like(W2), where=W1 != 0)  # NY > 1
+    TDYears = years
 
-    if TemporalInterpolation and all(item > 1 for item in TDYearsD):  # Linear interpolation to GCAM time periods
-        OUT.WDom = LinearInterpolationAnnually(OUT.wddom[:, GCAM_TDYears_Index], TDYears)
-        OUT.WEle = LinearInterpolationAnnually(OUT.wdelec[:, GCAM_TDYears_Index], TDYears)
-        OUT.WIrr = LinearInterpolationAnnually(OUT.wdirr[:, GCAM_TDYears_Index], TDYears)
-        OUT.WLiv = LinearInterpolationAnnually(OUT.wdliv[:, GCAM_TDYears_Index], TDYears)
-        OUT.WMin = LinearInterpolationAnnually(OUT.wdmin[:, GCAM_TDYears_Index], TDYears)
-        OUT.WMfg = LinearInterpolationAnnually(OUT.wdmfg[:, GCAM_TDYears_Index], TDYears)
-        
-        if UseDemeter:  # Linear interpolation to fraction matrix
-            Nyears = np.interp(np.arange(min(TDYears), max(TDYears) + 1), TDYears, TDYears)
-            FNew = np.zeros((NM, NC, len(Nyears)), dtype=float)
-            for j in range(np.shape(OUT.crops_wdirr)[1]):
-                FNew[:, j, :] = LinearInterpolationAnnually(F[:, j, :], TDYears)
+    if TemporalInterpolation:  # Linear interpolation to GCAM time periods
+        OUT.WDom = LinearInterpolationAnnually(OUT.wddom, years)
+        OUT.WEle = LinearInterpolationAnnually(OUT.wdelec, years)
+        OUT.WIrr = LinearInterpolationAnnually(OUT.wdirr, years)
+        OUT.WLiv = LinearInterpolationAnnually(OUT.wdliv, years)
+        OUT.WMin = LinearInterpolationAnnually(OUT.wdmin, years)
+        OUT.WMfg = LinearInterpolationAnnually(OUT.wdmfg, years)
 
         # Update the TDYears to new values
-        TDYears = list(np.interp(np.arange(min(TDYears), max(TDYears) + 1), TDYears, TDYears).astype(int))    
+        TDYears = list(range(min(TDYears), max(TDYears) + 1))
 
     else:
-        OUT.WDom = OUT.wddom[:, GCAM_TDYears_Index]
-        OUT.WEle = OUT.wdelec[:, GCAM_TDYears_Index]
-        OUT.WIrr = OUT.wdirr[:, GCAM_TDYears_Index]
-        OUT.WLiv = OUT.wdliv[:, GCAM_TDYears_Index]
-        OUT.WMin = OUT.wdmin[:, GCAM_TDYears_Index]
-        OUT.WMfg = OUT.wdmfg[:, GCAM_TDYears_Index]
-        
-        if UseDemeter:
+        OUT.WDom = OUT.wddom
+        OUT.WEle = OUT.wdelec
+        OUT.WIrr = OUT.wdirr
+        OUT.WLiv = OUT.wdliv
+        OUT.WMin = OUT.wdmin
+        OUT.WMfg = OUT.wdmfg
+
+    if UseDemeter:  # Calculated the fraction values of each crop in each year for each cell
+        ncells = np.shape(OUT.crops_wdirr)[0]
+        ncrops = np.shape(OUT.crops_wdirr)[1]
+        W1 = OUT.wdirr.reshape(ncells, 1, -1)
+        F = np.divide(OUT.crops_wdirr, W1, out=np.zeros_like(OUT.crops_wdirr), where=W1 != 0)
+        if TemporalInterpolation:
+            FNew = np.zeros((ncells, ncrops, max(TDYears) - min(TDYears) + 1), dtype=float)
+            for j in range(ncrops):
+                FNew[:, j, :] = LinearInterpolationAnnually(F[:, j, :], years)
+        else:
             FNew = np.copy(F)
 
-    # Index of TDYears in Temperature data and GCAM
-    Temp_TDYears_Index = []
-    for i in TDYears:
-        if i > endyear:
-            Temp_TDYears_Index.append(TempYears.index(endyear))
-        else:
-            Temp_TDYears_Index.append(TempYears.index(i))
-        
-    Temp_TDMonths_Index = np.zeros((len(TDYears)*12,), dtype=int)
-    N = 0
+    # Determine the available temporal downscaling years according to other models and future years
+    temp_data_start = int(temporal_climate.split("_")[-2][:4])
+    temp_data_end = int(temporal_climate.split("_")[-1][:4])
+    irr_data_start = int(Irr_MonthlyData.split("_")[-2][:4])
+    irr_data_end = int(Irr_MonthlyData.split("_")[-1][:4])
 
-    for i in Temp_TDYears_Index:
-        Temp_TDMonths_Index[N*12:(N+1)*12] = np.arange(i*12, (i+1)*12)
-        N += 1
+    temp_indices = [max(min(i, temp_data_end) - temp_data_start, 0) for i in TDYears]
+    irr_indices = [max(min(i, irr_data_end) - irr_data_start, 0) for i in TDYears]
+
+    elec_param_indices = [years.index(max(j for j in years if j <= i)) for i in TDYears]
 
     logging.debug('------ Temporal downscaling is available for Year: {}'.format(TDYears))
 
     # load climate data
     tclim = np.load(temporal_climate)
     
-    dom = {}
-
-    dom['tas'] = tclim['tas'][:, Temp_TDMonths_Index]
-    dom['DomesticR'] = get_array_csv(Domestic_R, 1)
-    
-    ele['hdd'] = tclim['hdd'][:, Temp_TDMonths_Index]
-    ele['cdd'] = tclim['cdd'][:, Temp_TDMonths_Index]
+    dom = {'tas': tclim['tas'].reshape(tclim['tas'].shape[0], -1, 12)[:, temp_indices],
+           'DomesticR': get_array_csv(Domestic_R, 1).reshape(-1, 1, 1)}
 
     # The parameters pb, ph, pc, pu, pit are all obtained from GCAM.
+    ele['hdd'] = tclim['hdd'].reshape(tclim['hdd'].shape[0], -1, 12)[:, temp_indices]
+    ele['cdd'] = tclim['cdd'].reshape(tclim['cdd'].shape[0], -1, 12)[:, temp_indices]
     ele['region'] = regionID
 
     """Domestic"""
     OUT.twddom = Domestic_Temporal_Downscaling(dom, OUT.WDom, TDYears)
     
     """Electricity"""
-    OUT.twdelec = Electricity_Temporal_Downscaling(ele, OUT.WEle, TDYears)
+    OUT.twdelec = Electricity_Temporal_Downscaling(ele, OUT.WEle, elec_param_indices)
     
     # Monthly Irrigation Data from other models only available during 1971-2010
-    irr, irrprofile = GetMonthlyIrrigationData(Irr_MonthlyData, Temp_TDMonths_Index, coords)
+    irr, irrprofile = GetMonthlyIrrigationData(Irr_MonthlyData, irr_indices)
     
     """Irrigation"""
-    OUT.twdirr = Irrigation_Temporal_Downscaling(irr, irrprofile, OUT.WIrr, TDYears, basinID, basinlookup)
+    OUT.twdirr = Irrigation_Temporal_Downscaling(irr, irrprofile, OUT.WIrr, TDYears, basinlookup)
     if UseDemeter:  # Divide the temporal downscaled irrigation water demand ("twdirr") by crops
         OUT.crops_twdirr = Irrigation_Temporal_Downscaling_Crops(OUT.twdirr, FNew)
 
@@ -183,7 +157,7 @@ def get_monthly_data(data, M):
     return out
 
 
-def GetMonthlyIrrigationData(filename, monthindex, coords):
+def GetMonthlyIrrigationData(filename, yearindex):
     """
     Get the monthly irrigation Data (irrdata) from other model as weighting factors; 
     converted into the format (Year: 1971-2010; Unit: kg m-2 s-1; Dimension: 67420, number of TDYears*12)
@@ -193,18 +167,14 @@ def GetMonthlyIrrigationData(filename, monthindex, coords):
     """
 
     datagrp = spio.netcdf.netcdf_file(filename, 'r')
-    
-    nm = int(len(datagrp.variables['months'][:].copy()))
-    irrdataall = datagrp.variables['pirrww'][:, :].copy()
-    irrdata = irrdataall[:, monthindex]
-    
+    irrdataall = datagrp.variables['pirrww'][:].copy()
     datagrp.close()
+
+    irrdataall = irrdataall.reshape(irrdataall.shape[0], -1, 12)
+    irrdata = irrdataall[:, yearindex]
     
     # Calculate the irr profile (Averaged monthly irrigation from historical data, e.g. averaged 1971-2010)
-    irrprofile = np.zeros((coords.shape[0], 12), dtype=float)
-    for m in range(12):
-        mi = range(m, nm, 12)
-        irrprofile[:, m] = np.mean(irrdataall[:, mi], 1)
+    irrprofile = np.mean(irrdataall, axis=1, keepdims=True)
 
     return irrdata, irrprofile
 
@@ -221,20 +191,19 @@ def Domestic_Temporal_Downscaling(data, W, years):
     TDW: Temporally Downscaled W, dimension: 67420, NY*12
     """
 
-    tas = data['tas'].reshape(-1, len(years), 12)
+    tas = data['tas']
     tas[np.isnan(tas)] = 0
     tas_mean = np.mean(tas, axis=2, keepdims=True)
     tas_range = np.max(tas, axis=2, keepdims=True) - np.min(tas, axis=2, keepdims=True)
 
     # cells with no month temperature data are downscaled uniformly across months
-    temp = data['DomesticR'].reshape(-1, 1, 1) * np.divide(tas - tas_mean, tas_range,
-                                                           out=np.zeros_like(tas), where=tas_range != 0) + 1
+    temp = data['DomesticR'] * np.divide(tas - tas_mean, tas_range, out=np.zeros_like(tas), where=tas_range != 0) + 1
     TDW = W[:, :, np.newaxis] * temp / 12
 
     return TDW.reshape(W.shape[0], len(years) * 12)
 
 
-def Electricity_Temporal_Downscaling(data, W, years):
+def Electricity_Temporal_Downscaling(data, W, elec_param_indices):
     
     """
     data: structure:  'hdd', 'cdd','building','industry','heating','cooling','others'     
@@ -254,8 +223,8 @@ def Electricity_Temporal_Downscaling(data, W, years):
     """
 
     # reshape to ncells x nyears x 12 months
-    hdd_month = data['hdd'].reshape(W.shape[0], len(years), 12)
-    cdd_month = data['cdd'].reshape(W.shape[0], len(years), 12)
+    hdd_month = data['hdd']
+    cdd_month = data['cdd']
     # replace nan with 0
     hdd_month[np.isnan(hdd_month)] = 0
     cdd_month[np.isnan(cdd_month)] = 0
@@ -267,14 +236,14 @@ def Electricity_Temporal_Downscaling(data, W, years):
     cdd_frac = np.divide(cdd_month, cdd_year, out=np.zeros_like(cdd_month), where=cdd_year != 0)
 
     # expand from regions to cells, add extra axis for broadcasting
-    Bu = data['building'][data['region'] - 1, :, np.newaxis]
-    In = data['industry'][data['region'] - 1, :, np.newaxis]
-    He = data['heating'][data['region'] - 1, :, np.newaxis]
-    Co = data['cooling'][data['region'] - 1, :, np.newaxis]
-    Ot = data['others'][data['region'] - 1, :, np.newaxis]
+    Bu = data['building'][data['region'] - 1][:, elec_param_indices, np.newaxis]
+    In = data['industry'][data['region'] - 1][:, elec_param_indices, np.newaxis]
+    He = data['heating'][data['region'] - 1][:, elec_param_indices, np.newaxis]
+    Co = data['cooling'][data['region'] - 1][:, elec_param_indices, np.newaxis]
+    Ot = data['others'][data['region'] - 1][:, elec_param_indices, np.newaxis]
 
     # formula reduces to uniform when hdd_year < 650 & cdd_year < 450
-    P = np.ones((W.shape[0], len(years), 12)) / 12
+    P = np.ones((W.shape[0], len(elec_param_indices), 12)) / 12
     P = np.where((hdd_year >= 650) & (cdd_year >= 450), Bu * (He*hdd_frac + Co*cdd_frac + Ot/12) + In/12, P)
     P = np.where((hdd_year >= 650) & (cdd_year < 450), Bu * ((He+Co)*hdd_frac + Ot/12) + In/12, P)
     P = np.where((hdd_year < 650) & (cdd_year >= 450), Bu * ((He+Co)*cdd_frac + Ot/12) + In/12, P)
@@ -282,10 +251,10 @@ def Electricity_Temporal_Downscaling(data, W, years):
     # apply calculated monthly elec demand distribution to yearly elec water demand
     TDW = W[:, :, np.newaxis] * P
 
-    return TDW.reshape(W.shape[0], len(years)*12)
+    return TDW.reshape(W.shape[0], len(elec_param_indices)*12)
 
 
-def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basins, basinlookup):
+def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basinlookup):
     
     """
     data: Irrigation Data (Monthly) from other model as weighting factors; converted into the format 
