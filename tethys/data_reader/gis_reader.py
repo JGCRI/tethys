@@ -89,4 +89,12 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, 
     for pair in GISData['RegionBasins']:
         GISData['RegionBasins'][pair] = np.array(GISData['RegionBasins'][pair])
 
+    GISData['basinlookup'] = dict()
+    for i, basin in enumerate(GISData['BasinIDs']):
+        if basin not in GISData['basinlookup']:
+            GISData['basinlookup'][basin] = list()
+        GISData['basinlookup'][basin].append(i)
+    for basin in GISData['basinlookup']:
+        GISData['basinlookup'][basin] = np.array(GISData['basinlookup'][basin])
+
     return GISData

@@ -183,7 +183,8 @@ def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagn
                                                            TemporalInterpolation=TemporalInterpolation,
                                                            Domestic_R=Domestic_R,
                                                            ele=GCAMData['elec_p'],
-                                                           coords=GISData['coord'][:,:],
+                                                           basinlookup=GISData['basinlookup'],
+                                                           coords=GISData['coord'][:, :],
                                                            OUT=OUT,
                                                            regionID=GISData['RegionIDs'],
                                                            basinID=GISData['BasinIDs'])

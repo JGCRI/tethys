@@ -32,11 +32,10 @@ import numpy as np
 import scipy.io as spio
 
 from tethys.utils.data_parser import get_array_csv
-from tethys.temporal_downscaling.neighbor_basin import NeighborBasin
 
 
 def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, TemporalInterpolation, Domestic_R,
-                         ele,
+                         ele, basinlookup,
                          coords, OUT, regionID, basinID):
     # Determine the temporal downscaling years
 
@@ -130,7 +129,7 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
     irr, irrprofile = GetMonthlyIrrigationData(Irr_MonthlyData, Temp_TDMonths_Index, coords)
     
     """Irrigation"""
-    OUT.twdirr = Irrigation_Temporal_Downscaling(irr, irrprofile, OUT.WIrr, TDYears, basinID)
+    OUT.twdirr = Irrigation_Temporal_Downscaling(irr, irrprofile, OUT.WIrr, TDYears, basinID, basinlookup)
     if UseDemeter:  # Divide the temporal downscaled irrigation water demand ("twdirr") by crops
         OUT.crops_twdirr = Irrigation_Temporal_Downscaling_Crops(OUT.twdirr, FNew)
 
@@ -286,73 +285,32 @@ def Electricity_Temporal_Downscaling(data, W, years):
     return TDW.reshape(W.shape[0], len(years)*12)
 
 
-def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basins):
+def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basins, basinlookup):
     
     """
     data: Irrigation Data (Monthly) from other model as weighting factors; converted into the format 
            (Year: 1971-2010; Unit: kg m-2 s-1; Dimension: 67420, number of TDYears*12)
-    W: water withdrawal of irrigation sector, dimension: 67420,NY
+    W: water withdrawal of irrigation sector, dimension: 67420,nyears
     years: the list of years for temporal downscaling
-    The weighting factors will be aggregated and performed at basin scale (NB = 235)
+    The weighting factors will be aggregated and performed at basin scale (nbasins = 235)
     basins: the basin ID (1-235) for 67420 grids, 67420*1
-    TDW: Temporally Downscaled W, dimension: 67420, NY*12
+    TDW: Temporally Downscaled W, dimension: 67420, nyears*12
     """
     
-    NB = np.max(basins)
-    NM = np.shape(W)[0]
-    NT = len(years)*12
-    Ndata = data.shape[1]
-    NY = len(years)
-    TDW = np.zeros((NM, NT), dtype=float)
-    data_basin = np.zeros((NB, NT), dtype=float)
-    W_basin = np.zeros((NB, NY), dtype=float)
-    
-    # Aggregate data into basin scale
-    for index in range(0, NM):
-        for m in range(0, NT): 
-            if m >= Ndata:  # For future years, use irr profile as weighting factors
-                mi = m % 12
-                data_basin[basins[index] - 1, m] += dataprofile[index, mi]
-            else:  # For available years, use irr data from other model as weighting factors
-                if not np.isnan(data[index, m]) and basins[index] > 0:
-                    data_basin[basins[index] - 1, m] += data[index, m]
-        for y in range(0, NY): 
-            if not np.isnan(W[index, y]) and basins[index] > 0:
-                W_basin[basins[index] - 1, y] += W[index, y]   
-                
-    # Downscale the W data
-    dist_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'reference/dist.csv')
-    Neighbor = NeighborBasin(dist_file)  # dist.csv is in the reference folder
-    for i in range(NM):
-        for j in years:
-            N = years.index(j)
-            BasinID = basins[i] - 1
-            monIrr = data_basin[BasinID, N*12:(N+1)*12]
-            if W_basin[BasinID, N] > 0:
-                if monIrr.sum() > 0:
-                    TDW[i, N*12:(N+1)*12] = W[i, N]*monIrr/monIrr.sum()
-                else:                    
-                    IDs = Neighbor.d[str(basins[i])][1:]
-                    n = 0
-                    for d in IDs:
-                        monIrr = data_basin[d-1, N*12:(N+1)*12]
-                        if monIrr.sum() > 0:
-                            TDW[i, N*12:(N+1)*12] = W[i, N]*monIrr/monIrr.sum()
-                            break
-                        else:
-                            n += 1
-                            continue 
-                    if n == len(IDs):
-                        AllIds = Neighbor.d_all[str(basins[i])][1]
-                        for d in AllIds:
-                            monIrr = data_basin[d-1, N*12:(N+1)*12]
-                            if monIrr.sum() > 0:
-                                TDW[i, N*12:(N+1)*12] = W[i, N]*monIrr/monIrr.sum()
-                                break
-                            else:
-                                continue
-                                      
-    return TDW
+    ncells = W.shape[0]
+    nyears = len(years)
+    TDW = np.zeros((ncells, nyears, 12), dtype=float)
+
+    data2 = data.reshape(data.shape[0], -1, 12)
+
+    for basin, cells in basinlookup.items():
+        irr_basin_months = np.sum(data2[cells], axis=0, keepdims=True)
+        irr_basin_year = np.sum(irr_basin_months, axis=2, keepdims=True)
+        TDW[cells] = W[cells, :, np.newaxis] * np.divide(irr_basin_months, irr_basin_year,
+                                                         out=np.ones_like(irr_basin_months) / 12,
+                                                         where=irr_basin_year != 0)
+
+    return TDW.reshape(ncells, nyears * 12)
 
 
 def Irrigation_Temporal_Downscaling_Crops(twdirr, Fraction):
