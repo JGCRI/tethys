@@ -62,11 +62,11 @@ def write_outputs(OutputUnit, OutputFormat, OutputFolder, PerformTemporal, TDYea
         msg = f'Save the gridded water usage results for each withdrawal category in CSV and NetCDF format (Unit: {temp}/yr)'
 
     logging.info(msg)
-    
-    if PerformTemporal:
-        TDMonthStr = [str(y) + str(i).zfill(2) for y in TDYears for i in range(1, 13)]
 
+    if PerformTemporal:
         logging.info(f'Save the monthly water usage results for each withdrawal category (Unit: {temp}/month)')
+
+        TDMonthStr = [str(y) + str(i).zfill(2) for y in TDYears for i in range(1, 13)]
 
     for attr in list(OUT.__dict__.keys()):
         value = OUT.__dict__[attr]
@@ -74,54 +74,36 @@ def write_outputs(OutputUnit, OutputFormat, OutputFolder, PerformTemporal, TDYea
         if value is not None:
             OutputFilename = os.path.join(OutputFolder, attr)
 
-            if attr[0] == "r":  # regional output
-                newvalue = value[:, :]
-
             # gridded output from spatial downscaling
-            elif attr[0] == "w":
-
-                if OutputFormat == 1:
+            if attr[0] == 'w':
+                if OutputFormat == 1 or OutputFormat == 0:
                     write_csv(OutputFilename, value, years, temp, GISData)
-                elif OutputFormat == 2:
-                    write_netcdf(OutputFilename + '.nc', value, GISData, temp, years)
-                else:
-                    write_csv(OutputFilename, value, years, temp, GISData)
+                elif OutputFormat == 2 or OutputFormat == 0:
                     write_netcdf(OutputFilename + '.nc', value, GISData, temp, years)
 
             #  gridded output from temporal downscaling
-            elif attr[0] == "t":
-                if OutputFormat == 1:
+            elif attr[0] == 't':
+                if OutputFormat == 1 or OutputFormat == 0:
                     write_csv(OutputFilename, value, TDMonthStr, temp, GISData)
-
-                elif OutputFormat == 2:
-                    write_netcdf(OutputFilename + '.nc', value, GISData, temp, TDMonthStr, timestep='month')
-
-                else:
-                    write_csv(OutputFilename, value, TDMonthStr, temp, GISData)
+                elif OutputFormat == 2 or OutputFormat == 0:
                     write_netcdf(OutputFilename + '.nc', value, GISData, temp, TDMonthStr, timestep='month')
 
             # for outputs, divided twdirr by crops for additional files when using Demeter outputs
             elif attr[:7] == 'crops_t':
                 for i in range(value.shape[1]):
                     newvalue = value[:, i, :]
-                    if OutputFormat == 1:
+                    if OutputFormat == 1 or OutputFormat == 0:
                         write_csv(OutputFilename + '_' + d_crops[i], newvalue, TDMonthStr, temp, GISData)
-                    elif OutputFormat == 2:
-                        write_netcdf(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, TDMonthStr, timestep='month')
-                    else:
-                        write_csv(OutputFilename + '_' + d_crops[i], newvalue, TDMonthStr, temp, GISData)
+                    elif OutputFormat == 2 or OutputFormat == 0:
                         write_netcdf(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, TDMonthStr, timestep='month')
 
             # for outputs, divided wdirr by crops for additional files when using Demeter outputs
             elif attr[:7] == 'crops_w':
                 for i in range(value.shape[1]):
                     newvalue = value[:, i, :]
-                    if OutputFormat == 1:
+                    if OutputFormat == 1 or OutputFormat == 0:
                         write_csv(OutputFilename + '_' + d_crops[i], newvalue, years, temp, GISData)
-                    elif OutputFormat == 2:
-                        write_netcdf(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, years)
-                    else:
-                        write_csv(OutputFilename + '_' + d_crops[i], newvalue, years, temp, GISData)
+                    elif OutputFormat == 2 or OutputFormat == 0:
                         write_netcdf(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, years)
 
 
