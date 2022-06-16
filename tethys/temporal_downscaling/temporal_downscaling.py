@@ -39,6 +39,9 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
     TDYears = years
 
     if TemporalInterpolation:  # Linear interpolation to GCAM time periods
+
+        logging.info('Linearly interpolating from GCAM years to annual timesteps')
+
         OUT.WDom = LinearInterpolationAnnually(OUT.wddom, years)
         OUT.WEle = LinearInterpolationAnnually(OUT.wdelec, years)
         OUT.WIrr = LinearInterpolationAnnually(OUT.wdirr, years)
@@ -69,6 +72,8 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
         else:
             FNew = np.copy(F)
 
+    logging.info('Loading monthly proxies')
+
     # Determine the available temporal downscaling years according to other models and future years
     temp_data_start = int(temporal_climate.split("_")[-2][:4])
     temp_data_end = int(temporal_climate.split("_")[-1][:4])
@@ -77,10 +82,7 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
 
     temp_indices = [max(min(i, temp_data_end) - temp_data_start, 0) for i in TDYears]
     irr_indices = [max(min(i, irr_data_end) - irr_data_start, 0) for i in TDYears]
-
     elec_param_indices = [years.index(max(j for j in years if j <= i)) for i in TDYears]
-
-    logging.debug('------ Temporal downscaling is available for Year: {}'.format(TDYears))
 
     # load climate data
     tclim = np.load(temporal_climate)
@@ -93,26 +95,26 @@ def GetDownscaledResults(temporal_climate, Irr_MonthlyData, years, UseDemeter, T
     ele['cdd'] = tclim['cdd'].reshape(tclim['cdd'].shape[0], -1, 12)[:, temp_indices]
     ele['region'] = regionID
 
-    """Domestic"""
-    OUT.twddom = Domestic_Temporal_Downscaling(dom, OUT.WDom, TDYears)
-    
-    """Electricity"""
-    OUT.twdelec = Electricity_Temporal_Downscaling(ele, OUT.WEle, elec_param_indices)
-    
     # Monthly Irrigation Data from other models only available during 1971-2010
     irr, irrprofile = GetMonthlyIrrigationData(Irr_MonthlyData, irr_indices)
+
+    logging.info('Temporally downscaling domestic sector')
+    OUT.twddom = Domestic_Temporal_Downscaling(dom, OUT.WDom, TDYears)
     
-    """Irrigation"""
+    logging.info('Temporally downscaling electricity sector')
+    OUT.twdelec = Electricity_Temporal_Downscaling(ele, OUT.WEle, elec_param_indices)
+
+    logging.info('Temporally downscaling irrigation sector')
     OUT.twdirr = Irrigation_Temporal_Downscaling(irr, irrprofile, OUT.WIrr, TDYears, basinlookup)
     if UseDemeter:  # Divide the temporal downscaled irrigation water demand ("twdirr") by crops
         OUT.crops_twdirr = Irrigation_Temporal_Downscaling_Crops(OUT.twdirr, FNew)
 
-    """Livestock, Mining and Manufacturing"""
-    
+    logging.info('Temporally downscaling livestock, mining, and manufacturing sectors')
     OUT.twdliv = AnnualtoMonthlyUniform(OUT.WLiv, TDYears)
     OUT.twdmin = AnnualtoMonthlyUniform(OUT.WMin, TDYears)
     OUT.twdmfg = AnnualtoMonthlyUniform(OUT.WMfg, TDYears)
 
+    logging.info('Calculating total')
     OUT.twdtotal = OUT.twddom + OUT.twdelec + OUT.twdirr + OUT.twdliv + OUT.twdmin + OUT.twdmfg  # add to get total
 
     return TDYears
