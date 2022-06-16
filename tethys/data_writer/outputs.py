@@ -93,10 +93,10 @@ def write_outputs(OutputUnit, OutputFormat, OutputFolder, PerformTemporal, TDYea
                 if OutputFormat == 1:          
                     writecsv(OutputFilename, value, years, temp, GISData)
                 elif OutputFormat == 2:
-                    writeNETCDF(OutputFilename + '.nc', value, GISData, temp, years)
+                    write_netcdf(OutputFilename + '.nc', value, GISData, temp, years)
                 else:
                     writecsv(OutputFilename, value, years, temp, GISData)
-                    writeNETCDF(OutputFilename + '.nc', value, GISData, temp, years)
+                    write_netcdf(OutputFilename + '.nc', value, GISData, temp, years)
 
             #  gridded output from temporal downscaling
             elif attr[0] == "t":
@@ -104,11 +104,11 @@ def write_outputs(OutputUnit, OutputFormat, OutputFolder, PerformTemporal, TDYea
                     writecsvMonthly(OutputFilename, value, TDMonthStr, temp, GISData)
 
                 elif OutputFormat == 2:
-                    writeNETCDFmonthly(OutputFilename + '.nc', value, GISData, temp, TDMonthStr)
+                    write_netcdf(OutputFilename + '.nc', value, GISData, temp, TDMonthStr, timestep='month')
 
                 else:
                     writecsvMonthly(OutputFilename, value, TDMonthStr, temp, GISData)    
-                    writeNETCDFmonthly(OutputFilename + '.nc', value, GISData, temp, TDMonthStr)
+                    write_netcdf(OutputFilename + '.nc', value, GISData, temp, TDMonthStr, timestep='month')
 
             # for outputs, divided twdirr by crops for additional files when using Demeter outputs
             elif attr[:7] == 'crops_t':
@@ -117,10 +117,10 @@ def write_outputs(OutputUnit, OutputFormat, OutputFolder, PerformTemporal, TDYea
                     if OutputFormat == 1:          
                         writecsvMonthly(OutputFilename + '_' + d_crops[i], newvalue, TDMonthStr, temp, GISData)
                     elif OutputFormat == 2:
-                        writeNETCDFmonthly(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, TDMonthStr)
+                        write_netcdf(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, TDMonthStr, timestep='month')
                     else:
                         writecsvMonthly(OutputFilename + '_' + d_crops[i], newvalue, TDMonthStr, temp, GISData)
-                        writeNETCDFmonthly(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, TDMonthStr)
+                        write_netcdf(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, TDMonthStr, timestep='month')
 
             # for outputs, divided wdirr by crops for additional files when using Demeter outputs
             elif attr[:7] == 'crops_w':
@@ -129,10 +129,10 @@ def write_outputs(OutputUnit, OutputFormat, OutputFolder, PerformTemporal, TDYea
                     if OutputFormat == 1:
                         writecsv(OutputFilename + '_' + d_crops[i], newvalue, years, temp, GISData)
                     elif OutputFormat == 2:
-                        writeNETCDF(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, years)
+                        write_netcdf(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, years)
                     else:
                         writecsv(OutputFilename + '_' + d_crops[i], newvalue, years, temp, GISData)
-                        writeNETCDF(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, years)
+                        write_netcdf(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, GISData, temp, years)
 
 
 def writecsv(filename, data, years, unit, GISData):
@@ -157,7 +157,7 @@ def writecsvMonthly(filename, data, MonthStr, unit, GISData):
         np.savetxt(outfile, newdata, delimiter=',', header=headerline, comments='')
 
 
-def writeNETCDF(filename, data, GISData, unit, yearstrs):
+def write_netcdf(filename, data, GISData, unit, timestrs, timestep='year'):
     """
     Input:
     - filename    string, filename of netcdf file
@@ -165,82 +165,35 @@ def writeNETCDF(filename, data, GISData, unit, yearstrs):
     - GISData     structure, contains grid coordinates
     - unit        string, e.g. "mm" or 'km3'
     """
+
     datagrp = spio.netcdf.netcdf_file(filename, 'w')
-    (nrows,ncols) = data.shape
+    (nrows, ncols) = data.shape
 
     # dimensions
     datagrp.createDimension('index', nrows)
-    datagrp.createDimension('year', ncols)    
-    
-    # variables
+    datagrp.createDimension(timestep, ncols)
+
+    # create variables
     # Add the columns from coordinates: ID#, lon, lat, ilon, ilat
-    years     = datagrp.createVariable('years', 'i4', ('year',))
-    ID        = datagrp.createVariable('ID', 'i4', ('index',))
-    lon       = datagrp.createVariable('lon', 'f4', ('index',))
-    lat       = datagrp.createVariable('lat', 'f4', ('index',))
-    ilon      = datagrp.createVariable('ilon', 'i4', ('index',))
-    ilat      = datagrp.createVariable('ilat', 'i4', ('index',))
+    time = datagrp.createVariable(f'{timestep}s', 'i4', (timestep,))
+    ID = datagrp.createVariable('ID', 'i4', ('index',))
+    lon = datagrp.createVariable('lon', 'f4', ('index',))
+    lat = datagrp.createVariable('lat', 'f4', ('index',))
+    ilon = datagrp.createVariable('ilon', 'i4', ('index',))
+    ilat = datagrp.createVariable('ilat', 'i4', ('index',))
     map_index = datagrp.createVariable('mapindex', 'i4', ('index',))
-    griddata  = datagrp.createVariable('data', 'f4', ('index', 'year'))
-    griddata.units = unit + '/yr'
-    griddata.description = 'Downscaled Results: ' + str(nrows) + ' rows, ' + str(ncols) + ' columns (years)'    
-        
-    # data
-    years[:]      = np.array(yearstrs).astype(int)
-    ID[:]         = GISData['coord'][:,0].astype(int)
-    lon[:]        = GISData['coord'][:,1]
-    lat[:]        = GISData['coord'][:,2]
-    ilon[:]       = GISData['coord'][:,3].astype(int)
-    ilat[:]       = GISData['coord'][:,4].astype(int)
-    map_index[:]  = GISData['mapindex'].astype(int) + 1
+    griddata = datagrp.createVariable('data', 'f4', ('index', timestep))
+    griddata.units = f'{unit}/{"yr" if timestep == "year" else "month"}'
+    griddata.description = f'Downscaled Results: {nrows} rows, {ncols} columns ({timestep}s)'
 
-    # griddata[:, :] = data[:, :]
-    griddata[:, :] = data[:, :].copy()    
-    
-    # close
-    datagrp.close()
+    # write data to file variables
+    time[:] = np.array(timestrs).astype(int)
+    ID[:] = GISData['coord'][:, 0].astype(int)
+    lon[:] = GISData['coord'][:, 1]
+    lat[:] = GISData['coord'][:, 2]
+    ilon[:] = GISData['coord'][:, 3].astype(int)
+    ilat[:] = GISData['coord'][:, 4].astype(int)
+    map_index[:] = GISData['mapindex'].astype(int) + 1
+    griddata[:] = data[:].copy()
 
-
-def writeNETCDFmonthly(filename, data, GISData, unit, monthstrs):
-    """
-    Input:
-    - filename    string, filename of netcdf file
-    - data        2d array, row: number of cells (67420), col: number of months
-    - GISData     structure, contains grid coordinates
-    - unit        string, e.g. "mm" or 'km3'
-    """
-    
-    # open
-    datagrp = spio.netcdf.netcdf_file(filename, 'w')
-    (nrows,ncols) = data.shape
-
-    # dimensions
-    datagrp.createDimension('index', nrows)
-    datagrp.createDimension('month', ncols)    
-    
-    # variables
-    # Add the columns from coordinates: ID#, lon, lat, ilon, ilat
-    months    = datagrp.createVariable('months', 'i4', ('month',))
-    ID        = datagrp.createVariable('ID', 'i4', ('index',))
-    lon       = datagrp.createVariable('lon', 'f4', ('index',))
-    lat       = datagrp.createVariable('lat', 'f4', ('index',))
-    ilon      = datagrp.createVariable('ilon', 'i4', ('index',))
-    ilat      = datagrp.createVariable('ilat', 'i4', ('index',))
-    map_index = datagrp.createVariable('mapindex', 'i4', ('index',))
-    griddata  = datagrp.createVariable('data', 'f4', ('index', 'month'))
-    griddata.units = unit + '/month'
-    griddata.description = 'Downscaled Results: ' + str(nrows) + ' rows, ' + str(ncols) + ' columns (months)'
-     
-    # data
-    months[:]     = np.array(monthstrs).astype(int)
-    ID[:]         = GISData['coord'][:,0].astype(int)
-    lon[:]        = GISData['coord'][:,1]
-    lat[:]        = GISData['coord'][:,2]
-    ilon[:]       = GISData['coord'][:,3].astype(int)
-    ilat[:]       = GISData['coord'][:,4].astype(int)
-    map_index[:]  = GISData['mapindex'].astype(int) + 1
-    
-    griddata[:, :] = data[:, :].copy()
-    
-    # close
     datagrp.close()
