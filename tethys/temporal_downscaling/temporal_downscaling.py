@@ -125,36 +125,22 @@ def AnnualtoMonthlyUniform(WD, years):
     WD : spatially downscaled water withdrawal (dimension: 67420 x nyear)
     years : list of years for temporal downscaling
     """
-    
-    ny = len(years)
-    nm = ny*12
-    WT = np.zeros((np.shape(WD)[0],nm), dtype=float)
 
-    for y in years:
-        M = set_month_arrays(y)
-        N = years.index(y)
-        WT[:, N*12:(N+1)*12] = get_monthly_data(WD[:, N], M)
+    month_lens = np.asarray([month_lengths(year) for year in years]).reshape(1, len(years), 12)
+    year_lens = np.sum(month_lens, axis=2, keepdims=True)
+
+    WT = WD[:, :, np.newaxis] * month_lens / year_lens
         
-    return WT
+    return WT.reshape(-1, len(years) * 12)
 
 
-def set_month_arrays(Year):
-    # Calculate the days in each month of a year
+def month_lengths(year):
+    # return the days in each month of a year
 
-    if calendar.isleap(Year):  # leap year
-        return [31,    29,    31,    30,    31,    30,    31,    31,    30,    31,    30,    31]
+    if calendar.isleap(year):  # leap year
+        return [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     else:  # regular year
-        return [31,    28,    31,    30,    31,    30,    31,    31,    30,    31,    30,    31]
-
-
-def get_monthly_data(data, M):
-    # divide annual data into monthly data
-    out = np.zeros((data.shape[0], 12), dtype=float)
-    sumM = np.sum(M)
-    for i in range(12):
-        out[:, i] = data[:]*M[i]/sumM
-    
-    return out
+        return [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 
 def GetMonthlyIrrigationData(filename, yearindex):
@@ -283,23 +269,18 @@ def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basinlookup):
 
 
 def Irrigation_Temporal_Downscaling_Crops(twdirr, Fraction):
-    
     """
     Divide the temporal downscaled irrigation water demand ("twdirr") by crops
     For each year, the fraction of a certain crop for each cell is stored in "Fraction"
     """
 
-    NC = np.shape(Fraction)[1]
-    NT = np.shape(twdirr)[1]
-    NM = np.shape(twdirr)[0]
-    TDW = np.zeros((NM, NC, NT), dtype=float)
+    ncells = twdirr.shape[0]
+    ncrops = Fraction.shape[1]
 
-    for i in range(NC):
-        for j in range(NT):
-            index = int(j/12)
-            TDW[:, i, j] = twdirr[:, j]*Fraction[:, i, index]
-    
-    return TDW
+    # reshape to broadcast with common (cell, crop, year, month) dimensions
+    TDW = twdirr.reshape(ncells, 1, -1, 12) * Fraction.reshape(ncells, ncrops, -1, 1)
+
+    return TDW.reshape(ncells, ncrops, -1)
 
 
 def LinearInterpolationAnnually(data, years):
