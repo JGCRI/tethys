@@ -68,44 +68,29 @@ def write_outputs(OutputUnit, OutputFormat, OutputFolder, PerformTemporal, TDYea
 
         TDMonthStr = [str(y) + str(i).zfill(2) for y in TDYears for i in range(1, 13)]
 
-    for attr in list(OUT.__dict__.keys()):
-        value = OUT.__dict__[attr]
-
-        if value is not None:
+    for attr, value in OUT.__dict__.items():
+        # only want OUT.wd*, OUT.twd*, OUT.crops_wdirr, or OUT.crops_twdirr
+        if attr[0] in ('w', 't', 'c') and value is not None:
             OutputFilename = os.path.join(OutputFolder, attr)
 
-            # gridded output from spatial downscaling
-            if attr[0] == 'w':
-                if OutputFormat == 1 or OutputFormat == 0:
-                    write_csv(OutputFilename, value, years, unit, GISData)
-                if OutputFormat == 2 or OutputFormat == 0:
-                    write_netcdf(OutputFilename + '.nc', value, years, unit, GISData)
+            if attr.startswith('crops_t') or attr.startswith('t'):
+                timestep, timestr = 'month', TDMonthStr  # set monthly options
+            else:
+                timestep, timestr = 'year', years  # set year options
 
-            #  gridded output from temporal downscaling
-            elif attr[0] == 't':
-                if OutputFormat == 1 or OutputFormat == 0:
-                    write_csv(OutputFilename, value, TDMonthStr, unit, GISData)
-                if OutputFormat == 2 or OutputFormat == 0:
-                    write_netcdf(OutputFilename + '.nc', value, TDMonthStr, unit, GISData, timestep='month')
-
-            # for outputs, divided twdirr by crops for additional files when using Demeter outputs
-            elif attr[:7] == 'crops_t':
-                for i in range(value.shape[1]):
+            if attr.startswith('crops_'):
+                for i in range(value.shape[1]):  # iterate over crops
                     newvalue = value[:, i, :]
+                    filename = OutputFilename + '_' + d_crops[i]
                     if OutputFormat == 1 or OutputFormat == 0:
-                        write_csv(OutputFilename + '_' + d_crops[i], newvalue, TDMonthStr, unit, GISData)
+                        write_csv(filename, newvalue, timestr, unit, GISData)
                     if OutputFormat == 2 or OutputFormat == 0:
-                        write_netcdf(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, TDMonthStr, unit, GISData,
-                                     timestep='month')
-
-            # for outputs, divided wdirr by crops for additional files when using Demeter outputs
-            elif attr[:7] == 'crops_w':
-                for i in range(value.shape[1]):
-                    newvalue = value[:, i, :]
-                    if OutputFormat == 1 or OutputFormat == 0:
-                        write_csv(OutputFilename + '_' + d_crops[i], newvalue, years, unit, GISData)
-                    if OutputFormat == 2 or OutputFormat == 0:
-                        write_netcdf(OutputFilename + '_' + d_crops[i] + '.nc', newvalue, years, unit, GISData)
+                        write_netcdf(filename + '.nc', newvalue, timestr, unit, GISData, timestep=timestep)
+            else:  # non-crop output
+                if OutputFormat == 1 or OutputFormat == 0:
+                    write_csv(OutputFilename, value, timestr, unit, GISData)
+                if OutputFormat == 2 or OutputFormat == 0:
+                    write_netcdf(OutputFilename + '.nc', value, timestr, unit, GISData, timestep=timestep)
 
 
 def write_csv(filename, data, timestrs, unit, GISData):
