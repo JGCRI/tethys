@@ -68,7 +68,8 @@ def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagn
                              GCAM_DBfile=GCAM_DBfile,
                              GCAM_query=GCAM_query,
                              GCAM_queryCore=GCAM_queryCore,
-                             basin_state_area=basin_state_area)
+                             basin_state_area=basin_state_area,
+                             PerformTemporal=PerformTemporal)
     endtime1 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime1 - starttime1))
 

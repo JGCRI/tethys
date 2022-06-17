@@ -683,7 +683,7 @@ def elec_proportions_to_array(conn, query, d_reg_name, years):
 
 
 def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCAM_DBpath, GCAM_DBfile, GCAM_query,
-                  GCAM_queryCore, basin_state_area):
+                  GCAM_queryCore, basin_state_area, PerformTemporal):
     """
     Import and format GCAM data from database for use in Tethys.
 
@@ -706,10 +706,6 @@ def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCA
     conn, queries = get_gcam_queries(GCAM_DBpath, GCAM_DBfile, GCAM_query)
     conn_core, queries_core = get_gcam_queries(GCAM_DBpath, GCAM_DBfile, GCAM_queryCore)
 
-#     for q in queries:
-#         df = conn.runQuery(q)
-#         df.to_csv(q.title + ".csv", sep=',')
-
     d = {
         'pop_tot': population_to_array(conn, queries[1], d_reg_name, years),
         'rgn_wddom': dom_water_demand_to_array(conn, queries[3], d_reg_name, years),
@@ -718,11 +714,10 @@ def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCA
         'rgn_wdmining': mining_water_demand_to_array(conn, queries[7], d_reg_name, years),
         'wdliv': livestock_water_demand_to_array(conn, conn_core, queries[5], queries_core[5], d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years),
         'irrArea': land_to_array(conn, conn_core, queries[0], queries[2], basin_state_area, d_reg_name, d_basin_name, d_crops, years),
-        'irrV': irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], d_reg_name, d_basin_name, d_crops, years),
-        'elec_p': elec_proportions_to_array(conn, queries[8], d_reg_name, years)
+        'irrV': irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], d_reg_name, d_basin_name, d_crops, years)
     }
 
-#    for key, value in d.iteritems():
-#        np.savetxt(key + '.csv', d[key], delimiter=',')
+    if PerformTemporal:  # only query this if needed, otherwise save time
+        d['elec_p'] = elec_proportions_to_array(conn, queries[8], d_reg_name, years)
 
     return d
