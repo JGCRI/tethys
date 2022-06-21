@@ -171,109 +171,7 @@ def population_to_array(conn, query, d_reg_name, years):
     return piv.values * 1000
 
 
-def dom_water_demand_to_array(conn, query, d_reg_name, years):
-    """
-    Query GCAM database for domestic water demand (billion m3). Place in format
-    required by Tethys.
-
-    :param conn:          gcamreader database object
-    :param query:         XPath Query
-    :param d_reg_name:    A dictionary of 'region_name': region_id
-    :param years:         list of years to use
-
-    :return:              NumPy array of (regions, years) shape
-    """
-    # query content to data frame
-    df = conn.runQuery(query)
-
-    # get only target years
-    df = df.loc[df['Year'].isin(years)].copy()
-
-    # map region_id to region name
-    df['region'] = df['region'].map(d_reg_name)
-
-    # Add missing regions
-    df = add_missing_regions(df, list(d_reg_name.values()))
-
-    # Remove USA if using GCAM USA
-    if any(item in d_reg_name for item in states):
-        df.loc[df.region == 1, 'value'] = 0
-
-    # convert shape for use in Tethys
-    piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
-
-    return piv.values
-
-
-def elec_water_demand_to_array(conn, query, d_reg_name, years):
-    """
-    Query GCAM database for industrial electricity water demand (billion m3).
-    Place in format required by Tethys.
-
-    :param conn:          gcamreader database object
-    :param query:         XPath Query
-    :param d_reg_name:    A dictionary of 'region_name': region_id
-    :param years:         list of years to use
-
-    :return:              NumPy array of (regions, years) shape
-    """
-    # query content to data frame
-    df = conn.runQuery(query)
-
-    # get only target years
-    df = df.loc[df['Year'].isin(years)].copy()
-
-    # map region_id to region name
-    df['region'] = df['region'].map(d_reg_name)
-
-    # Add missing regions
-    df = add_missing_regions(df, list(d_reg_name.values()))
-
-    # Remove USA if using GCAM USA
-    if any(item in d_reg_name for item in states):
-        df.loc[df.region == 1, 'value'] = 0
-
-    # convert shape for use in Tethys
-    piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
-
-    return piv.values
-
-
-def manuf_water_demand_to_array(conn, query, d_reg_name, years):
-    """
-    Query GCAM database for industrical manufacturing water demand (billion m3).
-    Place in format required by Tethys.
-
-    :param conn:          gcamreader database object
-    :param query:         XPath Query
-    :param d_reg_name:    A dictionary of 'region_name': region_id
-    :param years:         list of years to use
-
-    :return:              NumPy array of (regions, years) shape
-    """
-    # query content to data frame
-    df = conn.runQuery(query)
-
-    # get only target years
-    df = df.loc[df['Year'].isin(years)].copy()
-
-    # map region_id to region name
-    df['region'] = df['region'].map(d_reg_name)
-
-    # Add missing regions
-    df = add_missing_regions(df, list(d_reg_name.values()))
-
-    # Remove USA if using GCAM USA
-    if any(item in d_reg_name for item in states):
-        df.loc[df.region == 1, 'value'] = 0
-
-    # convert shape for use in Tethys
-    piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
-
-    return piv.values
-
-
-def mining_water_demand_to_array(conn, query, d_reg_name, years):
+def nonag_water_demand_to_array(conn, query, d_reg_name, years):
     """
     Query GCAM database for industrical manufacturing water demand (billion m3).
     Place in format required by Tethys.
@@ -708,10 +606,10 @@ def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCA
 
     d = {
         'pop_tot': population_to_array(conn, queries[1], d_reg_name, years),
-        'rgn_wddom': dom_water_demand_to_array(conn, queries[3], d_reg_name, years),
-        'rgn_wdelec': elec_water_demand_to_array(conn, queries[4], d_reg_name, years),
-        'rgn_wdmfg': manuf_water_demand_to_array(conn, queries[6], d_reg_name, years),
-        'rgn_wdmining': mining_water_demand_to_array(conn, queries[7], d_reg_name, years),
+        'rgn_wddom': nonag_water_demand_to_array(conn, queries[3], d_reg_name, years),
+        'rgn_wdelec': nonag_water_demand_to_array(conn, queries[4], d_reg_name, years),
+        'rgn_wdmfg': nonag_water_demand_to_array(conn, queries[6], d_reg_name, years),
+        'rgn_wdmining': nonag_water_demand_to_array(conn, queries[7], d_reg_name, years),
         'wdliv': livestock_water_demand_to_array(conn, conn_core, queries[5], queries_core[5], d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years),
         'irrArea': land_to_array(conn, conn_core, queries[0], queries[2], basin_state_area, d_reg_name, d_basin_name, d_crops, years),
         'irrV': irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], d_reg_name, d_basin_name, d_crops, years)
