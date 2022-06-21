@@ -98,43 +98,6 @@ def get_gcam_queries(db_path, db_file, f_queries):
     return c, q
 
 
-def add_missing_regions(df, d_reg_name):
-    """
-    Checks a dataframe for missing regions and adds rows with 0 values
-    :df data frame
-    :d_reg_names list with regions names
-    :return dataframe
-    """
-
-    # Add missing regions to dataframe with value 0
-    units = (list(df.Units.unique()))
-    scenarios = (list(df.scenario.unique()))
-    sectors = (list(df.sector.unique()))
-    inputs = (list(df.input.unique()))
-    years = (list(df.Year.unique()))
-    names = list(d_reg_name)
-    df1 = df
-    for region_i in names:
-        if region_i in df1.region.values:
-            continue
-        else:
-            # print("*******Regions not in dataframe")
-            # print(region_i)
-            for units_i in units:
-                for scenario_i in scenarios:
-                    for sector_i in sectors:
-                        for input_i in inputs:
-                            for year_i in years:
-                                df1 = df1.append({'Units': units_i,
-                                                  'scenario': scenario_i,
-                                                  'sector': sector_i,
-                                                  'input': input_i,
-                                                  'Year': year_i,
-                                                  'region': region_i,
-                                                  'value': 0}, ignore_index=True)
-    return df1
-
-
 def population_to_array(conn, query, d_reg_name, years):
     """
     Query GCAM database for population. Place in format required by
@@ -171,6 +134,13 @@ def population_to_array(conn, query, d_reg_name, years):
     return piv.values * 1000
 
 
+def df_to_array(df, d_reg_name, years):
+    # pivot df to region - year array, then filter, expand, and order regions and years
+    pivot = pd.pivot_table(df, values='value', index='region', columns='Year', fill_value=0, aggfunc=np.sum)
+    pivot = pivot.reindex(index=sorted(d_reg_name.values()), columns=years, fill_value=0)
+    return pivot.to_numpy()
+
+
 def nonag_water_demand_to_array(conn, query, d_reg_name, years):
     """
     Query GCAM database for industrical manufacturing water demand (billion m3).
@@ -198,17 +168,11 @@ def nonag_water_demand_to_array(conn, query, d_reg_name, years):
     if 'output' in df.columns:
         df.rename(columns={"output": "input"}, inplace=True)
 
-    # Add missing regions
-    df = add_missing_regions(df, list(d_reg_name.values()))
-
     # Remove USA if using GCAM USA
     if any(item in d_reg_name for item in states):
         df.loc[df.region == 1, 'value'] = 0
 
-    # convert shape for use in Tethys
-    piv = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum)
-
-    return piv.values
+    return df_to_array(df, d_reg_name, years)
 
 
 def livestock_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years):
@@ -548,9 +512,6 @@ def elec_proportions_to_array(conn, query, d_reg_name, years):
     # map region_id to region name
     df['region'] = df['region'].map(d_reg_name)
 
-    # Add missing regions
-    df = add_missing_regions(df, list(d_reg_name.values()))
-
     # Remove USA if using GCAM USA
     if any(item in d_reg_name for item in states):
         df.loc[df.region == 1, 'value'] = 0
@@ -560,14 +521,10 @@ def elec_proportions_to_array(conn, query, d_reg_name, years):
     heating_sectors = ['comm heating', 'resid heating', 'comm hot water', 'resid furnace fans', 'resid hot water']
     cooling_sectors = ['comm cooling', 'resid cooling', 'comm refrigeration', 'resid freezers', 'resid refrigerators']
 
-    df_bld = add_missing_regions(df[df.input == 'elect_td_bld'], list(d_reg_name.values()))
-    df_heating = add_missing_regions(df[df.sector.isin(heating_sectors)], list(d_reg_name.values()))
-    df_cooling = add_missing_regions(df[df.sector.isin(cooling_sectors)], list(d_reg_name.values()))
-
-    bld_array = pd.pivot_table(df_bld, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum).values
-    heating_array = pd.pivot_table(df_heating, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum).values
-    cooling_array = pd.pivot_table(df_cooling, values='value', index=['region'], columns='Year',  fill_value=0, aggfunc=np.sum).values
-    total_array = pd.pivot_table(df, values='value', index=['region'], columns='Year', fill_value=0, aggfunc=np.sum).values
+    bld_array = df_to_array(df[df.input == 'elect_td_bld'], d_reg_name, years)
+    heating_array = df_to_array(df[df.sector.isin(heating_sectors)], d_reg_name, years)
+    cooling_array = df_to_array(df[df.sector.isin(cooling_sectors)], d_reg_name, years)
+    total_array = df_to_array(df, d_reg_name, years)
 
     # build output dict of ratios, handle 0/0 case
     ele = {'building': np.divide(bld_array, total_array, out=np.zeros_like(bld_array), where=total_array != 0),
