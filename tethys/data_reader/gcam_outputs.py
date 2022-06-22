@@ -276,31 +276,8 @@ def livestock_water_demand_to_array(conn, conn_core, query, query_core, d_reg_na
     # add livestock order number
     piv['sector'] = piv['sector'].map(d_liv_order)
 
-    # get set of expected regions
-    actual_regions = set(d_reg_name.values())
-
-    # create dict of regions in each sector from the data
-    d_chk_regions = piv.groupby('sector')['region'].apply(set).to_dict()
-
-    for sec in tuple(d_liv_order.values()):
-
-        # get set of missing regions in sector
-        miss_regions = actual_regions - d_chk_regions[sec]
-
-        # add data as zeros for missing regions in each sector
-        if len(miss_regions) > 0:
-            for reg in miss_regions:
-                d = {}
-                d['region'] = [reg]
-                d['sector'] = [sec]
-                for i in years:
-                    d[i] = [0.0]
-                piv = pd.concat([piv, pd.DataFrame(d)])
-
-    # sort outputs by region, sector
-    piv.sort_values(by=['sector', 'region'], inplace=True)
-
     piv.set_index(['sector', 'region'], inplace=True)
+    piv = piv.reindex(index=[(i, j) for i in range(6) for j in sorted(d_reg_name.values())], fill_value=0)
 
     return piv.values
 
