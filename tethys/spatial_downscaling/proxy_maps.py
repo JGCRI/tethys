@@ -59,47 +59,26 @@ def LivestockMap(GISData, GCAMData, nyears, OUT):
     Livestock gridded GIS data maps by six types are used to downscale livestock Water withdrawal 
     """
 
-    # count how many animals live in each GCAM region first
-    nregions = GISData['nregions']
     ncells = len(GISData['RegionIDs'])
-    animals = ['Buffalo', 'Cattle', 'Goat', 'Sheep', 'Poultry', 'Pig']
+    wdliv = GCAMData['wdliv'].reshape(6, -1, nyears)
 
-    tot_livestock = np.zeros((nregions, 6), dtype=float)  # Livestock totals at GCAM scale in year 2005
-    for i, region in enumerate(GISData['RegionIDs']):
-        if region > 0:
-            for a, animal in enumerate(animals):
-                tot_livestock[region - 1, a] += GISData[animal][i]
-  
-    #  now create a spatial distribution for each GCAM region
-    #  withd_liv: these are the GCAM results of total volume of livestock water withdrawal in
-    #  km3 in each GCAM region per animal type in the years 1990, 2005:5:2095
-    #  variables are nrgn GCAM regions x 6 animals (1:Buffalo, 2:Cattle, 3-Goat, 4-Sheep, 5-Poultry, 6-Pig)
-    # 
-    #  Next, we distribute those volumes using the spatial distribution of the gis maps
-    # these will be the GIS downscaled matrices
+    out_map = np.zeros((6, ncells, nyears), dtype=float)
+    for region, cells in GISData['regionlookup'].items():
+        cell_heads = GISData['Livestock'][:, cells]
+        region_heads = np.sum(cell_heads, axis=1, keepdims=True)
+        out_map[:, cells] = wdliv[:, np.newaxis, region-1] * \
+            np.divide(cell_heads, region_heads, out=np.zeros_like(cell_heads), where=region_heads != 0)
 
-    withd_liv_map = np.zeros((ncells, nyears), dtype=float)
-    for y in range(nyears):
-        livestock = np.zeros((ncells, 6), dtype=float)
-        for i, region in enumerate(GISData['RegionIDs']):
-            if region > 0:
-                for a, animal in enumerate(animals):
-                    if GISData[animal][i] != 0:
-                        livestock[i, a] = GCAMData['wdliv'][a*nregions + region - 1, y] * GISData[animal][i] \
-                                          / tot_livestock[region - 1, a]
-        withd_liv_map[:, y] = np.sum(livestock, axis=1)
-
-    OUT.wdliv = withd_liv_map
+    OUT.wdliv = np.sum(out_map, axis=0)
 
     # Diagnostic message
     fmtstr = '[Year Index, Region ID, {:7s} from GCAM not assigned (no GIS data)]:  {}  {}  {}'
-    for y in range(nyears):
-        for IN in range(nregions):
-            for a, animal in enumerate(animals):
-                if GCAMData['wdliv'][a*nregions + IN, y] > 0 and tot_livestock[IN, a] == 0:
-                    logging.info(fmtstr.format(animal.lower(), y+1, IN+1, GCAMData['wdliv'][a*nregions + IN, y]))
+    for region, cells in GISData['regionlookup'].items():
+        for y in range(nyears):
+            for a, animal in enumerate(['Buffalo', 'Cattle', 'Goat', 'Sheep', 'Poultry', 'Pig']):
+                if wdliv[a, region-1, y] > 0 and np.sum(GISData['Livestock'][a, cells]) == 0:
+                    logging.info(fmtstr.format(animal.lower(), y+1, region, wdliv[a, region, y]))
 
-    return withd_liv_map
 
 def IrrigationMap(GISData, GCAMData, nyears, UseDemeter, OUT):
 

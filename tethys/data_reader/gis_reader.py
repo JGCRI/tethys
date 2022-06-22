@@ -45,13 +45,13 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, 
                                         Irrigation_HYDE=Irrigation_HYDE,
                                         years=years)  # dictionary
 
-    # Livestock (heads) in year 2000: dim is 67420x1 
-    GISData['Buffalo'] = get_array_csv(Livestock_Buffalo, 1)
-    GISData['Cattle'] = get_array_csv(Livestock_Cattle, 1)
-    GISData['Goat'] = get_array_csv(Livestock_Goat, 1)
-    GISData['Sheep'] = get_array_csv(Livestock_Sheep, 1)
-    GISData['Poultry'] = get_array_csv(Livestock_Poultry, 1)
-    GISData['Pig'] = get_array_csv(Livestock_Pig, 1)
+    # Livestock (heads) in year 2000: dim is 6x67420x1
+    GISData['Livestock'] = np.stack([get_array_csv(Livestock_Buffalo, 1),
+                                     get_array_csv(Livestock_Cattle, 1),
+                                     get_array_csv(Livestock_Goat, 1),
+                                     get_array_csv(Livestock_Sheep, 1),
+                                     get_array_csv(Livestock_Poultry, 1),
+                                     get_array_csv(Livestock_Pig, 1)]).reshape(6, -1, 1)
 
     # Coordinates for flattened grd:  67420 x 5
     # The columns are ID#, lon, lat, ilon, ilat
@@ -96,5 +96,13 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, 
         GISData['basinlookup'][basin].append(i)
     for basin in GISData['basinlookup']:
         GISData['basinlookup'][basin] = np.array(GISData['basinlookup'][basin])
+
+    GISData['regionlookup'] = dict()
+    for i, region in enumerate(GISData['RegionIDs']):
+        if region not in GISData['regionlookup']:
+            GISData['regionlookup'][region] = list()
+        GISData['regionlookup'][region].append(i)
+    for region in GISData['regionlookup']:
+        GISData['regionlookup'][region] = np.array(GISData['regionlookup'][region])
 
     return GISData
