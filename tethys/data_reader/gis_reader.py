@@ -99,9 +99,10 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, 
 
     GISData['regionlookup'] = dict()
     for i, region in enumerate(GISData['RegionIDs']):
-        if region not in GISData['regionlookup']:
-            GISData['regionlookup'][region] = list()
-        GISData['regionlookup'][region].append(i)
+        if region != 0:
+            if region not in GISData['regionlookup']:
+                GISData['regionlookup'][region] = list()
+            GISData['regionlookup'][region].append(i)
     for region in GISData['regionlookup']:
         GISData['regionlookup'][region] = np.array(GISData['regionlookup'][region])
 

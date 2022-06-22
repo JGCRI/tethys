@@ -32,26 +32,20 @@ def PopulationMap(GISData, GCAMData, OUT, nyears):
     :param nyears: number of years
     """
 
-    # ncells x nyears population array, filter out invalid regions
-    pop = np.where(GISData['RegionIDs'][:, np.newaxis] > 0, GISData['pop'], 0)
+    nonag_demand = np.stack([GCAMData['rgn_wddom'],
+                             GCAMData['rgn_wdelec'],
+                             GCAMData['rgn_wdmfg'],
+                             GCAMData['rgn_wdmining']])
 
-    # calculate total region population according to gridded maps
-    pop_total = np.zeros((GISData['nregions'], nyears), dtype=float)
-    for i in range(GISData['nregions']):
-        index = np.where(GISData['RegionIDs'] == i + 1)[0]
-        pop_total[i] = np.sum(pop[index], axis=0)
+    out_map = np.zeros((4, len(GISData['RegionIDs']), nyears), dtype=float)
+    for region, cells in GISData['regionlookup'].items():
+        pop_cells = GISData['pop'][cells]
+        pop_region = np.sum(pop_cells, axis=0, keepdims=True)
+        out_map[:, cells] = nonag_demand[:, region - 1, np.newaxis] * \
+            np.divide(pop_cells, pop_region, out=np.zeros_like(pop_cells), where=pop_region != 0)
 
-    region_indices = GISData['RegionIDs'] - 1  # convert to 0 indexed values
-
-    # ratio of cell population to region population for all cells and years
-    pop_pro_rata = pop / pop_total[region_indices]
-
-    # the actual downscaling calculations
-    OUT.wddom = pop_pro_rata * GCAMData['rgn_wddom'][region_indices]
-    OUT.wdelec = pop_pro_rata * GCAMData['rgn_wdelec'][region_indices]
-    OUT.wdmfg = pop_pro_rata * GCAMData['rgn_wdmfg'][region_indices]
-    OUT.wdmin = pop_pro_rata * GCAMData['rgn_wdmining'][region_indices]
-    OUT.wdnonag = OUT.wddom + OUT.wdelec + OUT.wdmfg + OUT.wdmin
+    OUT.wddom, OUT.wdelec, OUT.wdmfg, OUT.wdmin = out_map  # unpack array
+    OUT.wdnonag = np.sum(out_map, axis=0)
 
 
 def LivestockMap(GISData, GCAMData, nyears, OUT):
@@ -66,7 +60,7 @@ def LivestockMap(GISData, GCAMData, nyears, OUT):
     for region, cells in GISData['regionlookup'].items():
         cell_heads = GISData['Livestock'][:, cells]
         region_heads = np.sum(cell_heads, axis=1, keepdims=True)
-        out_map[:, cells] = wdliv[:, np.newaxis, region-1] * \
+        out_map[:, cells] = wdliv[:, region - 1, np.newaxis] * \
             np.divide(cell_heads, region_heads, out=np.zeros_like(cell_heads), where=region_heads != 0)
 
     OUT.wdliv = np.sum(out_map, axis=0)
