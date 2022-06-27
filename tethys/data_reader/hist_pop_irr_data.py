@@ -135,7 +135,7 @@ def check_header_Demeter_outputs(filename):
 
     with open(filename, 'r') as file:
         headers = file.readline().strip().lower().replace('"', '').split(',')
-
+        headers = [i.replace('"','') for i in headers]
     index = [headers.index(crop) for crop in d_crops]
 
     return index

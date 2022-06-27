@@ -29,6 +29,7 @@ import calendar
 
 import numpy as np
 import scipy.io as spio
+import netCDF4 as nc4
 
 from tethys.utils.data_parser import get_array_csv
 
@@ -154,7 +155,7 @@ def GetMonthlyIrrigationData(filename, yearindex):
     as weighting factors for futures years
     """
 
-    datagrp = spio.netcdf.netcdf_file(filename, 'r')
+    datagrp = nc4.Dataset(filename,  format="NETCDF3_CLASSIC")
     irrdataall = datagrp.variables['pirrww'][:].copy()
     datagrp.close()
 
