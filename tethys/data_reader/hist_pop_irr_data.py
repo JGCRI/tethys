@@ -45,7 +45,7 @@ def getIrrYearData(Irrigation_GMIA, Irrigation_HYDE, years):
     return irr
 
 
-def getIrrYearData_Crops(DemeterOutputFolder, years):
+def getIrrYearData_Crops(DemeterOutputFolder, years, SpatialResolution):
     """
     Update the irrigation maps to include a unique map for each historical time period from Demeter outputs by crop types
     """
@@ -60,7 +60,7 @@ def getIrrYearData_Crops(DemeterOutputFolder, years):
                 tmp = get_array_csv(os.path.join(DemeterOutputFolder, filename), 1)
                 index = check_header_Demeter_outputs(os.path.join(DemeterOutputFolder, filename))
                 # tmp[:, 1] is latitude
-                area = np.cos(np.radians(tmp[:, 1])) * (111.32 * 110.57) * (0.5**2)  # 0.5 hardcoded!
+                area = np.cos(np.radians(tmp[:, 1])) * (111.32 * 110.57) * (SpatialResolution**2)
                 newdata = tmp[:, index] * area[:, np.newaxis]  # cell_crop_fraction * cell_area
 
                 # While Tethys contains code to aggregate numerous subsectors into the biomass category (see l_biomass),

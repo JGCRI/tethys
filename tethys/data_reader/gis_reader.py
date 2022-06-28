@@ -26,7 +26,7 @@ from tethys.utils.utils_math import sub2ind
 def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, Livestock_Sheep,
                Livestock_Poultry, Livestock_Pig, Coord, Area, InputRegionFile, InputBasinFile, BasinNames,
                InputCountryFile, CountryNames, Irrigation_GMIA, Irrigation_HYDE, years, DemeterOutputFolder,
-               Population_GPW, Population_HYDE, mapsize):
+               Population_GPW, Population_HYDE, mapsize, SpatialResolution):
     # dictionary GISData{} saves the data related to GIS data
     GISData = dict()
 
@@ -38,7 +38,8 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, 
     if UseDemeter:
         # using finer resolution gridded Irrigation map (from demeter by individual crops) according to year availability
         GISData['irr'] = getIrrYearData_Crops(DemeterOutputFolder=DemeterOutputFolder,
-                                              years=years)  # dictionary
+                                              years=years,
+                                              SpatialResolution=SpatialResolution)
     else:
         # using finer resolution gridded Irrigation map (from HYDE or GMIA) according to year availability
         GISData['irr'] = getIrrYearData(Irrigation_GMIA=Irrigation_GMIA,

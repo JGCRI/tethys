@@ -26,7 +26,7 @@ def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagn
                        TemporalInterpolation, Domestic_R, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat,
                        Livestock_Sheep, Livestock_Poultry, Livestock_Pig, Coord, Area, InputBasinFile, BasinNames,
                        InputCountryFile, CountryNames,Irrigation_GMIA, Irrigation_HYDE, DemeterOutputFolder,
-                       Population_GPW, Population_HYDE, OutputUnit, basin_state_area):
+                       Population_GPW, Population_HYDE, OutputUnit, basin_state_area, SpatialResolution):
     """Main Function of Tethys Steps for water disaggregation
 
     :param x:    x description
@@ -114,7 +114,8 @@ def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagn
                                     Irrigation_GMIA=Irrigation_GMIA,
                                     Irrigation_HYDE=Irrigation_HYDE,
                                     DemeterOutputFolder=DemeterOutputFolder,
-                                    mapsize=mapsize
+                                    mapsize=mapsize,
+                                    SpatialResolution=SpatialResolution
                                     )
     endtime2 = time.time()
     logging.info("------Time Cost: %s seconds ---" % (endtime2 - endtime1))

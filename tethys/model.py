@@ -83,7 +83,8 @@ class Tethys(ReadConfig):
                                                         Irrigation_HYDE=self.Irrigation_HYDE,
                                                         DemeterOutputFolder=self.DemeterOutputFolder,
                                                         OutputUnit=self.OutputUnit,
-                                                        basin_state_area=self.basin_state_area
+                                                        basin_state_area=self.basin_state_area,
+                                                        SpatialResolution=self.SpatialResolution
                                                         )
 
             print(gridded_data)
@@ -148,7 +149,8 @@ class Tethys(ReadConfig):
                                                                  Irrigation_HYDE=self.Irrigation_HYDE,
                                                                  DemeterOutputFolder=self.DemeterOutputFolder,
                                                                  OutputUnit=self.OutputUnit,
-                                                                 basin_state_area=self.basin_state_area
+                                                                 basin_state_area=self.basin_state_area,
+                                                                 SpatialResolution=self.SpatialResolution
                                                                  )
 
             print(gridded_data)
