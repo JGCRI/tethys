@@ -19,14 +19,6 @@ states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL',
           'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'PR',
           'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT', 'WA', 'WI',
           'WV', 'WY']
-
-# crop name to crop_id
-d_crops = {'biomass': 1, 'Corn': 2, 'FiberCrop': 3, 'FodderGrass': 4, 'FodderHerb': 5,
-           'MiscCrop': 6, 'OilCrop': 7, 'OtherGrain': 8, 'PalmFruit': 9, 'Rice': 10,
-           'Root_Tuber': 11, 'SugarCrop': 12, 'Wheat': 13}
-
-# list of functional types to be combined into biomass category
-l_biomass = ["eucalyptus", "Jatropha", "miscanthus", "willow", "biomassOil"]
     
 # set ordering of livestock
 d_liv_order = {'Buffalo': 0, 'Cattle': 1, 'Goat': 2, 'Sheep': 3, 'Poultry': 4, 'Pork': 5}
@@ -282,7 +274,7 @@ def livestock_water_demand_to_array(conn, conn_core, query, query_core, d_reg_na
     return piv.values
 
 
-def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_name, d_basin_name, d_crops, years):
+def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_name, d_basin_name, sub_to_sector, sector_to_id, years):
     """
     Query GCAM database for irrigated land area per region, subregion,
     and crop type.  Place in format required by Tethys.
@@ -345,9 +337,6 @@ def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_na
     if any(item in d_reg_name for item in states):
         df.loc[df.region == 1, 'value'] = 0
 
-    # keep types
-    allpft = list(d_crops.keys()) + l_biomass
-
     # drop unused columns
     df.drop(['Units', 'scenario'], axis=1, inplace=True)
 
@@ -375,23 +364,13 @@ def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_na
         df = df.groupby(['region', 'subreg', 'crop', 'use', 'Year']).sum()
         df = df.reset_index()
 
-    # some versions of GCAM use "RootTuber" instead of "Root_Tuber"
-    df['crop'] = df['crop'].apply(lambda x: 'Root_Tuber' if x == 'RootTuber' else x)
-
-    # some versions of GCAM use "biomassGrass" instead of "biomass_Grass"
-    df['crop'] = df['crop'].apply(lambda x: 'biomass' if x == 'biomassGrass' else x)
-
-    # only keep crops in target list
-    df['crop'] = df['crop'].apply(lambda x: 'Root_Tuber' if x == 'Root' else x)  # Correct "Root" back to crop name
-    df = df.loc[df['crop'].isin(allpft)].copy()
-
     # aggregate all biomass crops
-    df['crop'] = df['crop'].apply(lambda x: 'biomass' if x in l_biomass else x)
+    df['crop'] = df['crop'].map(sub_to_sector)
     grp = df.groupby(['region', 'subreg', 'crop', 'Year']).sum()
     grp.reset_index(inplace=True)
 
     # convert crop name to number reference
-    grp['crop'] = grp['crop'].map(d_crops)
+    grp['crop'] = grp['crop'].map(sector_to_id)
 
     # convert shape for use in Tethys
     piv = pd.pivot_table(grp, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0, aggfunc=np.sum)
@@ -400,7 +379,7 @@ def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_na
     return piv.values
 
 
-def irr_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_basin_name, d_crops, years):
+def irr_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_basin_name, years):
     """
     Query GCAM database for irrigated water demand (billion m3).  Place
     in format required by Tethys.
@@ -447,6 +426,12 @@ def irr_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_
         # df_us_new_check = df_us_new.groupby(['Year', 'region', 'Units', 'scenario', 'input']).agg(
         #    {'value': 'sum'}).reset_index()
 
+    df2 = df.loc[:, ['subsector', 'sector']]
+    df2['subsector'] = df2['subsector'].str.replace('_.*$', '', regex=True)
+    df2.set_index('subsector', inplace=True)
+    sub_to_sector = df2.to_dict()['sector']
+    sector_to_id = dict((k, v + 1) for v, k in enumerate(sorted(set(sub_to_sector.values()), key=str.upper)))
+
     # get only target years
     df = df.loc[df['Year'].isin(years)].copy()
 
@@ -458,11 +443,7 @@ def irr_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_
 
     df['subreg'] = df['subsector'].apply(lambda x: x.split('_')[-1]).map(d_basin_name)
 
-    # break out crop and map the id to it
-    df['crop'] = df['sector'].apply(lambda x: 'biomass' if x in l_biomass else x)
-    # some versions of GCAM use "RootTuber" instead of "Root_Tuber"
-    df['crop'] = df['crop'].apply(lambda x: 'Root_Tuber' if x == 'RootTuber' else x)
-    df['crop'] = df['crop'].map(d_crops)
+    df['crop'] = df['sector'].map(sector_to_id)
 
     # drop sector
     df.drop('sector', axis=1, inplace=True)
@@ -475,7 +456,7 @@ def irr_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_
     piv = pd.pivot_table(df, values='value', index=['region', 'subreg', 'crop'], columns='Year', fill_value=0, aggfunc=np.sum)
     piv.reset_index(inplace=True)
 
-    return piv.values
+    return piv.values, sub_to_sector, sector_to_id
 
 
 def elec_proportions_to_array(conn, query, d_reg_name, years):
@@ -538,16 +519,16 @@ def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCA
     conn, queries = get_gcam_queries(GCAM_DBpath, GCAM_DBfile, GCAM_query)
     conn_core, queries_core = get_gcam_queries(GCAM_DBpath, GCAM_DBfile, GCAM_queryCore)
 
-    d = {
-        'pop_tot': population_to_array(conn, queries[1], d_reg_name, years),
-        'rgn_wddom': nonag_water_demand_to_array(conn, queries[3], d_reg_name, years),
-        'rgn_wdelec': nonag_water_demand_to_array(conn, queries[4], d_reg_name, years),
-        'rgn_wdmfg': nonag_water_demand_to_array(conn, queries[6], d_reg_name, years),
-        'rgn_wdmining': nonag_water_demand_to_array(conn, queries[7], d_reg_name, years),
-        'wdliv': livestock_water_demand_to_array(conn, conn_core, queries[5], queries_core[5], d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years),
-        'irrArea': land_to_array(conn, conn_core, queries[0], queries[2], basin_state_area, d_reg_name, d_basin_name, d_crops, years),
-        'irrV': irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], d_reg_name, d_basin_name, d_crops, years)
-    }
+    d = {'pop_tot': population_to_array(conn, queries[1], d_reg_name, years),
+         'rgn_wddom': nonag_water_demand_to_array(conn, queries[3], d_reg_name, years),
+         'rgn_wdelec': nonag_water_demand_to_array(conn, queries[4], d_reg_name, years),
+         'rgn_wdmfg': nonag_water_demand_to_array(conn, queries[6], d_reg_name, years),
+         'rgn_wdmining': nonag_water_demand_to_array(conn, queries[7], d_reg_name, years),
+         'wdliv': livestock_water_demand_to_array(conn, conn_core, queries[5], queries_core[5], d_reg_name, d_buf_frac,
+                                                  d_goat_frac, d_liv_order, years)}
+
+    d['irrV'], sub_to_sector, sector_to_id = irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], d_reg_name, d_basin_name, years)
+    d['irrArea'] = land_to_array(conn, conn_core, queries[0], queries[2], basin_state_area, d_reg_name, d_basin_name, sub_to_sector, sector_to_id, years)
 
     if PerformTemporal:  # only query this if needed, otherwise save time
         d['elec_p'] = elec_proportions_to_array(conn, queries[8], d_reg_name, years)
