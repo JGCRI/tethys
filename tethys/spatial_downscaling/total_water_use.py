@@ -18,6 +18,7 @@ withd_nonAg_map, OUT.wdirr, OUT.wdliv have no nan
 
 import numpy as np
 
+
 def TotalWaterUse(OutputUnit, GISData, OUT):
     """"
     We use the grid-level representations of all the water withdrawal sources to aggregate them all into a total withdrawal. 
@@ -29,23 +30,15 @@ def TotalWaterUse(OutputUnit, GISData, OUT):
     OUT.wdtotal = OUT.wdnonag + OUT.wdirr + OUT.wdliv
     outvars = vars(OUT)
     sectorstrs = ['total', 'nonag', 'irr', 'liv', 'dom', 'elec', 'mfg', 'min']
-    
-    # 2.
-    for item in sectorstrs:
-        outvars['r'+item] = np.zeros((GISData['nregions'], OUT.wdnonag.shape[1]), dtype=float)
-    
-    ls = np.where(GISData['RegionIDs'] > 0)[0]
-    for y in range(0,OUT.wdnonag.shape[1]):
-        for index in ls:
-            for item in sectorstrs:
-                outwd = outvars['wd'+item]
-                outrr = outvars['r'+item]
 
-                outrr[GISData['RegionIDs'][index]-1, y] += outwd[index, y]
+    for item in sectorstrs:
+        outvars['r' + item] = np.zeros((GISData['nregions'], OUT.wdnonag.shape[1]), dtype=float)
+        for region, cells in GISData['regionlookup'].items():
+            outvars['r' + item][region - 1] = np.sum(outvars['wd' + item][cells], axis=0)
     
     if OutputUnit:  # convert the original unit km3/yr to new unit mm
         area = GISData['area']
-        conversion = 1e6 # km -> mm
+        conversion = 1e6  # km -> mm
         
         for item in sectorstrs:
             outwd = outvars['wd'+item]
