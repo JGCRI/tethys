@@ -155,7 +155,8 @@ def GetMonthlyIrrigationData(filename, yearindex):
     as weighting factors for futures years
     """
 
-    datagrp = nc4.Dataset(filename,  format="NETCDF3_CLASSIC")
+    datagrp = nc4.Dataset(filename, format="NETCDF3_CLASSIC")
+    datagrp.variables['pirrww'].set_auto_mask(False)  # masked array was gumming up the works
     irrdataall = datagrp.variables['pirrww'][:].copy()
     datagrp.close()
 
@@ -265,7 +266,7 @@ def Irrigation_Temporal_Downscaling(data, dataprofile, W, years, basinlookup):
         irr_basin_months = np.sum(data2[cells], axis=0, keepdims=True)
         irr_basin_year = np.sum(irr_basin_months, axis=2, keepdims=True)
         TDW[cells] = W[cells, :, np.newaxis] * np.divide(irr_basin_months, irr_basin_year,
-                                                         out=np.ones_like(irr_basin_months) / 12,
+                                                         out=np.full_like(irr_basin_months, 1/12, dtype=float),
                                                          where=irr_basin_year != 0)
 
     return TDW.reshape(ncells, nyears * 12)
