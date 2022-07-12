@@ -25,65 +25,45 @@ def compare_temporal_downscaled(PerformDiagnostics, TDYears, OutputFolder, OUT, 
     if PerformDiagnostics != 1:
         return
 
-    BasinIDs   = GISData['BasinIDs']
     BasinNames = GISData['BasinNames']
-    NB         = np.max(BasinIDs)
-    years      = TDYears
-    NY         = len(years)
-    NM         = len(GISData['RegionIDs'])
+    years = TDYears
     logging.info(f'Temporal Downscaling diagnostics (Global): downscaled results vs. results before temporal downscaling (Total Water, km3/yr)')
-
-    logging.info('------Irrigation------')
-    W = OUT.WIrr[:,:]
-    value   = np.zeros((NY,3), dtype=float)
-    for j in years: 
-        N = years.index(j)
-        value[N,0]  = np.sum(OUT.twdirr[:,N*12:(N+1)*12])
-        value[N,1]  = np.sum(W[:,N])
-        value[N,2]  = value[N,0] - value[N,1]
-
-        logging.info(f'Year {j:4d}:  {value[N,0]:.6f}  {value[N,1]:.6f}  Diff= {value[N,2]:.6e}')
     
     # Print out the basin level comparison
-    Sector   = ['Year', 'Basin ID', 'Basin Name', 'After Spatial Downscaling', 'After Temporal Downscaling', 'Diff']
-    Unit     = " (km3/yr)"
+    Sector = ['Year', 'Basin ID', 'Basin Name', 'After Spatial Downscaling', 'After Temporal Downscaling', 'Diff']
+    Unit = " (km3/yr)"
     headerline = ",".join(Sector) + Unit
-    
-    Wtd_basin = np.zeros((NB,NY),dtype = float)
-    W_basin = np.zeros((NB,NY),dtype = float)
-    for index in range(0, NM):
-        for y in range(0, NY): 
-            if not np.isnan(W[index, y]) and BasinIDs[index] > 0:
-                W_basin[BasinIDs[index] - 1, y]   += W[index, y]  
-                Wtd_basin[BasinIDs[index] - 1, y] += np.sum(OUT.twdirr[index,y*12:(y+1)*12])
-                
+
     values = []
-    for j in years:
-        N = years.index(j)
-        for i in range(0, NB):
-            data = [str(j), str(i+1), BasinNames[i]] + ["%.3f" % W_basin[i,N]] + ["%.3f" % Wtd_basin[i,N]] + ["%.3f" % (W_basin[i,N] - Wtd_basin[i,N])]
-            values.append(data) 
+    for i, name in enumerate(BasinNames):
+        cells = GISData['basinlookup'][i + 1]
+        year_values = np.sum(OUT.WIrr[cells], axis=0)
+        month_sums = np.sum(OUT.twdirr.reshape(-1, len(years), 12)[cells], axis=(0, 2))
+
+        for N, j in enumerate(years):
+            values.append([str(j), str(i + 1), name, "%.3f" % year_values[N], "%.3f" % month_sums[N],
+                           "%.3f" % (year_values[N] - month_sums[N])])
                 
     with open(os.path.join(OutputFolder, 'Diagnostics_Temporal_Downscaling_Irrigation.csv'), 'w') as outfile:
         np.savetxt(outfile, values, delimiter=',', header=headerline, fmt='%s', comments='')
 
+    logging.info('------Irrigation------')
+    for N, j in enumerate(years):
+        month_sum = np.sum(OUT.twdirr[:, N*12:(N+1)*12])
+        year_value = np.sum(OUT.WIrr[:, N])
+        diff = month_sum - year_value
+        logging.info(f'Year {j:4d}:   {month_sum:.6f}    {year_value:.6f}    Diff= {diff:.6e}')
+
     logging.info('------Domestic------')
-    W = OUT.WDom[:, :]
-    value   = np.zeros((NY,3), dtype=float)
-    for j in years: 
-        N = years.index(j)
-        value[N,0]  = np.sum(OUT.twddom[:,N*12:(N+1)*12])
-        value[N,1]  = np.sum(W[:,N])
-        value[N,2]  = value[N,0] - value[N,1]
-        logging.info(f'Year {j:4d}:   {value[N,0]:.6f}    {value[N,1]:.6f}    Diff= {value[N,2]:.6e}')
+    for N, j in enumerate(years):
+        month_sum = np.sum(OUT.twddom[:, N*12:(N+1)*12])
+        year_value = np.sum(OUT.WDom[:, N])
+        diff = month_sum - year_value
+        logging.info(f'Year {j:4d}:   {month_sum:.6f}    {year_value:.6f}    Diff= {diff:.6e}')
         
     logging.info('------Electricity Generation------')
-    W = OUT.WEle[:,:]
-    value   = np.zeros((NY,3), dtype=float)
-    for j in years: 
-        N = years.index(j)
-        value[N,0]  = np.sum(OUT.twdelec[:,N*12:(N+1)*12])
-        value[N,1]  = np.sum(W[:,N])
-        value[N,2]  = value[N,0] - value[N,1]         
-        logging.info(f'Year {j:4d}:   {value[N,0]:.6f}    {value[N,1]:.6f}    Diff= {value[N,2]:.6e}')
-
+    for N, j in enumerate(years):
+        month_sum = np.sum(OUT.twdelec[:, N*12:(N+1)*12])
+        year_value = np.sum(OUT.WEle[:, N])
+        diff = month_sum - year_value
+        logging.info(f'Year {j:4d}:   {month_sum:.6f}    {year_value:.6f}    Diff= {diff:.6e}')
