@@ -25,7 +25,7 @@ from tethys.utils.utils_math import sub2ind
 
 def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, Livestock_Sheep,
                Livestock_Poultry, Livestock_Pig, Coord, Area, InputRegionFile, InputBasinFile, BasinNames,
-               InputCountryFile, CountryNames, Irrigation_GMIA, Irrigation_HYDE, years, DemeterOutputFolder,
+               Irrigation_GMIA, Irrigation_HYDE, years, DemeterOutputFolder,
                Population_GPW, Population_HYDE, mapsize, SpatialResolution):
     # dictionary GISData{} saves the data related to GIS data
     GISData = dict()
@@ -68,14 +68,6 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, 
     # Corresponding to Basin ID Map, 235 Basin Names: 1D String Array
     with open(BasinNames, 'r') as f:
         GISData['BasinNames'] = f.read().splitlines()
-
-    # Country ID Map : 67420 x 1 (249 countries: 1-249)
-    GISData['CountryIDs'] = get_array_csv(InputCountryFile, 1).astype(int)
-
-    # Corresponding to Country ID Map, 1-249 index number and 249 Country Names: 2D String Array
-    with open(CountryNames, 'r') as f:
-        temp = f.read().splitlines()
-        GISData['CountryNames'] = np.array([i.split(',') for i in temp])[:, 1]
 
     # 67420 valid "land cells"
     GISData['RegionIDs'] = get_array_csv(InputRegionFile, 1).astype(int)

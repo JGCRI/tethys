@@ -25,7 +25,7 @@ def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagn
                        GCAM_DBfile, GCAM_query, GCAM_queryCore, OutputFolder, temporal_climate, Irr_MonthlyData,
                        TemporalInterpolation, Domestic_R, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat,
                        Livestock_Sheep, Livestock_Poultry, Livestock_Pig, Coord, Area, InputBasinFile, BasinNames,
-                       InputCountryFile, CountryNames,Irrigation_GMIA, Irrigation_HYDE, DemeterOutputFolder,
+                       Irrigation_GMIA, Irrigation_HYDE, DemeterOutputFolder,
                        Population_GPW, Population_HYDE, OutputUnit, basin_state_area, SpatialResolution):
     """Main Function of Tethys Steps for water disaggregation
 
@@ -106,8 +106,6 @@ def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagn
                                     InputRegionFile=InputRegionFile,
                                     InputBasinFile=InputBasinFile,
                                     BasinNames=BasinNames,
-                                    InputCountryFile=InputCountryFile,
-                                    CountryNames=CountryNames,
                                     Population_GPW=Population_GPW,
                                     Population_HYDE=Population_HYDE,
                                     years=years,

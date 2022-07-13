@@ -140,14 +140,6 @@ class ReadConfig(Logger):
             else:
                 self.RegionNames = pkg_resources.resource_filename('tethys', 'reference/grid_info/RgnNames.csv')
 
-        self.InputCountryFile = os.path.join(self.InputFolder, self.map_params.get('CountryIDs', 'None'))
-        if os.path.basename(self.InputCountryFile) == 'None':
-            self.InputCountryFile = pkg_resources.resource_filename('tethys', 'reference/grid_info/country.csv')
-
-        self.CountryNames = os.path.join(self.InputFolder, self.map_params.get('CountryNames', 'None'))
-        if os.path.basename(self.CountryNames) == 'None':
-            self.CountryNames = pkg_resources.resource_filename('tethys', 'reference/grid_info/country-names.csv')
-
         self.Population_GPW = os.path.join(self.InputFolder, self.map_params.get('Population_GPW'))
         self.Population_HYDE = os.path.join(self.InputFolder, self.map_params.get('Population_HYDE'))
 
