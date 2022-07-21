@@ -72,24 +72,6 @@ def get_basin_info(f):
     return pd.read_csv(f, usecols=['glu_name', 'basin_id'], index_col='glu_name').to_dict()['basin_id']
 
 
-def get_gcam_queries(db_path, db_file, f_queries):
-    """
-    Return available queries from GCAM database.
-
-    :param db_path:         full path to the directory containing the input GCAM database
-    :param db_file:         directory name of the GCAM database
-    :param f_queries:       full path to the XML query file
-    :return:                gcamreader db and queries objects
-    """
-    # instantiate GCAM db
-    c = gcamreader.LocalDBConn(db_path, db_file, suppress_gabble=False)
-
-    # get queries
-    q = gcamreader.parse_batch_query(f_queries)
-
-    return c, q
-
-
 def population_to_array(conn, query, d_reg_name, years):
     """
     Query GCAM database for population. Place in format required by
@@ -167,7 +149,7 @@ def nonag_water_demand_to_array(conn, query, d_reg_name, years):
     return df_to_array(df, d_reg_name, years)
 
 
-def livestock_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years):
+def livestock_water_demand_to_array(conn, query, query_core, d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years):
     """
     Query GCAM database for livestock water demand (billion m3).
     Place in format required by Tethys.
@@ -175,7 +157,6 @@ def livestock_water_demand_to_array(conn, conn_core, query, query_core, d_reg_na
     Outputs are ordered by region and then by [Buffalo, Cattle, Goat, Sheep, Poultry, Pig]
 
     :param conn:          gcamreader database object
-    :param conn_core:     gcamreader database object core gcam
     :param query:         XPath Query
     :param query_core:    XPath Query for GCAM core
     :param d_reg_name:    A dictionary of 'region_name': region_id
@@ -192,7 +173,7 @@ def livestock_water_demand_to_array(conn, conn_core, query, query_core, d_reg_na
     # Rename this to "output" to conform with original format
     if 'output' in df.columns:
         df.rename(columns={"output": "input"}, inplace=True)
-        df_core = conn_core.runQuery(query_core)
+        df_core = conn.runQuery(query_core)
         df_core_sum = df_core.groupby(['region', 'Year', 'sector', 'Units', 'scenario', 'input']).agg({'value': 'sum'}).reset_index()
         df_core_non_us = df_core_sum[~df_core_sum['region'].str.contains("USA")]
         df_core_us = df_core_sum[df_core_sum['region'].str.contains("USA")]
@@ -274,13 +255,12 @@ def livestock_water_demand_to_array(conn, conn_core, query, query_core, d_reg_na
     return piv.values
 
 
-def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_name, d_basin_name, sub_to_sector, sector_to_id, years):
+def land_to_array(conn, query, query_core, basin_state_area, d_reg_name, d_basin_name, sub_to_sector, sector_to_id, years):
     """
     Query GCAM database for irrigated land area per region, subregion,
     and crop type.  Place in format required by Tethys.
 
     :param conn:          gcamreader database object
-    :param conn_core:     gcamreader database object core gcam
     :param query:         XPath Query
     :param query_core:    XPath Query for GCAM core
     :param basin_state_area:  state basin area ratios for GCAM USA
@@ -309,7 +289,7 @@ def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_na
         df_us['basin'] = df_us['basin'].str.replace("_RFD.*$", "")
         df_us = df_us.drop('region', axis=1)
         # Get US states and basins
-        df_core = conn_core.runQuery(query_core)
+        df_core = conn.runQuery(query_core)
         df_core_st_basin = df_core[df_core['region'].str.contains("USA")].copy()
         df_core_st_basin = df_core_st_basin[['subsector', 'sector']].drop_duplicates().reset_index(drop=True)
         df_core_st_basin.rename(columns={"subsector": "region", "sector": "basin"}, inplace=True)
@@ -379,13 +359,12 @@ def land_to_array(conn, conn_core, query, query_core, basin_state_area, d_reg_na
     return piv.values
 
 
-def irr_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_basin_name, years):
+def irr_water_demand_to_array(conn, query, query_core, d_reg_name, d_basin_name, years):
     """
     Query GCAM database for irrigated water demand (billion m3).  Place
     in format required by Tethys.
 
     :param conn:          gcam_reader database object
-    :param conn_core:     gcam_reader database object core gcam
     :param query:         XPath Query
     :param query_core:    XPath Query for GCAM core
     :param d_reg_name:    A dictionary of 'region_name': region_id
@@ -406,7 +385,7 @@ def irr_water_demand_to_array(conn, conn_core, query, query_core, d_reg_name, d_
     if 'output' in df.columns:
         df = df.drop(['region', 'output'], axis=1)
         df.rename(columns={"sector": "input", "subsector": "region"}, inplace=True)
-        df_core = conn_core.runQuery(query_core)
+        df_core = conn.runQuery(query_core)
         df_core_sum = df_core.groupby(['region', 'Year', 'sector', 'subsector', 'Units', 'scenario', 'input']).agg(
             {'value': 'sum'}).reset_index()
         df_core_non_us = df_core_sum[~df_core_sum['region'].str.contains("USA")]
@@ -495,8 +474,8 @@ def elec_proportions_to_array(conn, query, d_reg_name, years):
     return ele
 
 
-def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCAM_DBpath, GCAM_DBfile, GCAM_query,
-                  GCAM_queryCore, basin_state_area, PerformTemporal):
+def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCAM_DBpath, GCAM_DBfile, query_file,
+                  basin_state_area, PerformTemporal, demand, variant):
     """
     Import and format GCAM data from database for use in Tethys.
 
@@ -516,21 +495,24 @@ def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCA
     d_goat_frac = get_goat_frac(goat_fract)
 
     # get GCAM database connection and queries objects
-    conn, queries = get_gcam_queries(GCAM_DBpath, GCAM_DBfile, GCAM_query)
-    conn_core, queries_core = get_gcam_queries(GCAM_DBpath, GCAM_DBfile, GCAM_queryCore)
+    conn = gcamreader.LocalDBConn(GCAM_DBpath, GCAM_DBfile, suppress_gabble=False)
+    queries = {i.title: i for i in gcamreader.parse_batch_query(query_file)}
 
-    d = {'pop_tot': population_to_array(conn, queries[1], d_reg_name, years),
-         'rgn_wddom': nonag_water_demand_to_array(conn, queries[3], d_reg_name, years),
-         'rgn_wdelec': nonag_water_demand_to_array(conn, queries[4], d_reg_name, years),
-         'rgn_wdmfg': nonag_water_demand_to_array(conn, queries[6], d_reg_name, years),
-         'rgn_wdmining': nonag_water_demand_to_array(conn, queries[7], d_reg_name, years),
-         'wdliv': livestock_water_demand_to_array(conn, conn_core, queries[5], queries_core[5], d_reg_name, d_buf_frac,
+    d = {'pop_tot': population_to_array(conn, queries['Population by region'], d_reg_name, years),
+         'rgn_wddom': nonag_water_demand_to_array(conn, queries[f'Water {demand} (Domestic)'], d_reg_name, years),
+         'rgn_wdelec': nonag_water_demand_to_array(conn, queries[f'Water {demand} (Industrial - Electricity)'], d_reg_name, years),
+         'rgn_wdmfg': nonag_water_demand_to_array(conn, queries[f'Water {demand} (Industrial-Manufacturing)'], d_reg_name, years),
+         'rgn_wdmining': nonag_water_demand_to_array(conn, queries[f'Water {demand} (Resource Extraction){variant}'], d_reg_name, years),
+         'wdliv': livestock_water_demand_to_array(conn, queries[f'Water {demand} (Livestock){variant}'],
+                                                  queries[f'Water {demand} (Livestock)'], d_reg_name, d_buf_frac,
                                                   d_goat_frac, d_liv_order, years)}
 
-    d['irrV'], sub_to_sector, sector_to_id = irr_water_demand_to_array(conn, conn_core, queries[2], queries_core[2], d_reg_name, d_basin_name, years)
-    d['irrArea'] = land_to_array(conn, conn_core, queries[0], queries[2], basin_state_area, d_reg_name, d_basin_name, sub_to_sector, sector_to_id, years)
+    d['irrV'], sub_to_sector, sector_to_id = irr_water_demand_to_array(conn, queries[f'Water {demand} (Agriculture by subsector){variant}'],
+                                                                       queries[f'Water {demand} (Agriculture by subsector)'],
+                                                                       d_reg_name, d_basin_name, years)
+    d['irrArea'] = land_to_array(conn, queries[f'Crop Land Allocation'], queries[f'Water {demand} (Agriculture by subsector){variant}'], basin_state_area, d_reg_name, d_basin_name, sub_to_sector, sector_to_id, years)
 
     if PerformTemporal:  # only query this if needed, otherwise save time
-        d['elec_p'] = elec_proportions_to_array(conn, queries[8], d_reg_name, years)
+        d['elec_p'] = elec_proportions_to_array(conn, queries['elec consumption by demand sector'], d_reg_name, years)
 
     return d

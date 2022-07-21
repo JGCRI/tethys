@@ -37,7 +37,7 @@ class Tethys(ReadConfig):
         t0 = time.time()
         logging.info('Start Disaggregation...')
 
-        if self.PerformWithdrawal == 1 or self.GCAM_query.endswith('.xml'):
+        if self.PerformWithdrawal == 1:
 
             # Create OutputFolder if doesn't exist
             # Check whether the specified path exists or not
@@ -58,8 +58,7 @@ class Tethys(ReadConfig):
                                                         goat_fract=self.goat_fract,
                                                         GCAM_DBpath=self.GCAM_DBpath,
                                                         GCAM_DBfile=self.GCAM_DBfile,
-                                                        GCAM_query=self.GCAM_query,
-                                                        GCAM_queryCore=self.GCAM_queryCore,
+                                                        query_file=self.query_file,
                                                         OutputFolder=self.OutputFolder,
                                                         temporal_climate=self.temporal_climate,
                                                         Irr_MonthlyData=self.Irr_MonthlyData,
@@ -82,7 +81,9 @@ class Tethys(ReadConfig):
                                                         DemeterOutputFolder=self.DemeterOutputFolder,
                                                         OutputUnit=self.OutputUnit,
                                                         basin_state_area=self.basin_state_area,
-                                                        SpatialResolution=self.SpatialResolution
+                                                        SpatialResolution=self.SpatialResolution,
+                                                        demand='Withdrawals',
+                                                        variant=' GCAMUSA' if self.GCAMUSA else ''
                                                         )
 
             print(gridded_data)
@@ -101,7 +102,7 @@ class Tethys(ReadConfig):
                           GISData=gis_data)
             logging.info(f"Outputs writen in: {(time.time() - t0)}")
 
-        if self.PerformConsumption == 1 or self.GCAM_query_C.endswith('.xml'):
+        if self.PerformConsumption == 1:
 
             # Create OutputFolder if doesn't exist
             # Check whether the specified path exists or not
@@ -122,8 +123,7 @@ class Tethys(ReadConfig):
                                                                  goat_fract=self.goat_fract,
                                                                  GCAM_DBpath=self.GCAM_DBpath,
                                                                  GCAM_DBfile=self.GCAM_DBfile,
-                                                                 GCAM_query=self.GCAM_query_C,
-                                                                 GCAM_queryCore=self.GCAM_queryCore_C,
+                                                                 query_file=self.query_file,
                                                                  OutputFolder=self.OutputFolder + '_C',
                                                                  temporal_climate=self.temporal_climate,
                                                                  Irr_MonthlyData=self.Irr_MonthlyData,
@@ -146,7 +146,9 @@ class Tethys(ReadConfig):
                                                                  DemeterOutputFolder=self.DemeterOutputFolder,
                                                                  OutputUnit=self.OutputUnit,
                                                                  basin_state_area=self.basin_state_area,
-                                                                 SpatialResolution=self.SpatialResolution
+                                                                 SpatialResolution=self.SpatialResolution,
+                                                                 demand='Consumption',
+                                                                 variant=' GCAMUSA' if self.GCAMUSA else ''
                                                                  )
 
             print(gridded_data)

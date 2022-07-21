@@ -68,31 +68,9 @@ class ReadConfig(Logger):
 
         self.GCAMUSA = int(self.project_config.get('GCAMUSA', 0))
 
-        # for backwards compatability, and allow for non-default query files
-        # this logic can be simplified considerably by ditching backwards compatibility
-        self.GCAM_query = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_query', 'None'))
-        if self.PerformWithdrawal == 1 and not self.GCAM_query.endswith('.xml'):
-            if self.GCAMUSA == 1:
-                self.GCAM_query = \
-                    pkg_resources.resource_filename('tethys', 'reference/queries/query_withdrawal_GCAMUSA.xml')
-            else:
-                self.GCAM_query = pkg_resources.resource_filename('tethys', 'reference/queries/query_withdrawal.xml')
-
-        self.GCAM_query_C = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_query_C', 'None'))
-        if self.PerformConsumption == 1 and not self.GCAM_query_C.endswith('.xml'):
-            if self.GCAMUSA == 1:
-                self.GCAM_query_C = \
-                    pkg_resources.resource_filename('tethys', 'reference/queries/query_consumption_GCAMUSA.xml')
-            else:
-                self.GCAM_query_C = pkg_resources.resource_filename('tethys', 'reference/queries/query_consumption.xml')
-
-        self.GCAM_queryCore = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_queryCore', 'None'))
-        if not self.GCAM_queryCore.endswith('.xml'):
-            self.GCAM_queryCore = pkg_resources.resource_filename('tethys', 'reference/queries/query_withdrawal.xml')
-
-        self.GCAM_queryCore_C = os.path.join(self.GCAM_DBpath, self.gcam_config.get('GCAM_queryCore_C', 'None'))
-        if not self.GCAM_queryCore_C.endswith('.xml'):
-            self.GCAM_queryCore_C = pkg_resources.resource_filename('tethys', 'reference/queries/query_consumption.xml')
+        self.query_file = self.gcam_config.get('GCAM_query', 'None')
+        if not self.query_file.endswith('.xml'):
+            self.query_file = pkg_resources.resource_filename('tethys', 'reference/queries/all_queries.xml')
 
         # a single year input will be string not list for self.years
         self.years = self.gcam_config.get('GCAM_Years', None)
