@@ -131,22 +131,6 @@ class ReadConfig(Logger):
         self.Livestock_Poultry = os.path.join(self.InputFolder, self.map_params.get('Livestock_Poultry'))
         self.Livestock_Pig = os.path.join(self.InputFolder, self.map_params.get('Livestock_Pig'))
 
-        self.buff_fract = os.path.join(self.InputFolder, self.map_params.get('Buffalo_Fraction', 'None'))
-        if os.path.basename(self.buff_fract) == 'None':
-            if self.GCAMUSA == 1:
-                self.buff_fract = \
-                    pkg_resources.resource_filename('tethys', 'reference/grid_info/bfracFAO2005_gcamUSA.csv')
-            else:
-                self.buff_fract = pkg_resources.resource_filename('tethys', 'reference/grid_info/bfracFAO2005.csv')
-
-        self.goat_fract = os.path.join(self.InputFolder, self.map_params.get('Goat_Fraction', 'None'))
-        if os.path.basename(self.goat_fract) == 'None':
-            if self.GCAMUSA == 1:
-                self.goat_fract = \
-                    pkg_resources.resource_filename('tethys', 'reference/grid_info/gfracFAO2005_gcamUSA.csv')
-            else:
-                self.goat_fract = pkg_resources.resource_filename('tethys', 'reference/grid_info/gfracFAO2005.csv')
-
         # Additional details for GCAM USA (Only if present)
         self.basin_state_area = os.path.join(self.InputFolder, self.map_params.get('BasinStateArea', 'None'))
         if os.path.basename(self.basin_state_area) == 'None' and self.GCAMUSA == 1:

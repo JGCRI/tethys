@@ -21,7 +21,7 @@ import tethys.temporal_downscaling.temporal_downscaling as TemporalDownscaling
 
 
 def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagnostics,
-                       PerformTemporal, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCAM_DBpath,
+                       PerformTemporal, RegionNames, gcam_basin_lu, GCAM_DBpath,
                        GCAM_DBfile, query_file, OutputFolder, temporal_climate, Irr_MonthlyData,
                        TemporalInterpolation, Domestic_R, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat,
                        Livestock_Sheep, Livestock_Poultry, Livestock_Pig, Coord, Area, InputBasinFile, BasinNames,
@@ -62,8 +62,6 @@ def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagn
     GCAMData = get_gcam_data(years=years,
                              RegionNames=RegionNames,
                              gcam_basin_lu=gcam_basin_lu,
-                             buff_fract=buff_fract,
-                             goat_fract=goat_fract,
                              GCAM_DBpath=GCAM_DBpath,
                              GCAM_DBfile=GCAM_DBfile,
                              query_file=query_file,

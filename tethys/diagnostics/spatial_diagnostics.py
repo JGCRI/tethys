@@ -37,7 +37,7 @@ def compare_downscaled_GCAMinput(PerformDiagnostics, NY, years, OutputFolder, Re
         # Global_GCAM   Global Total [km3/yr] from GCAM inputs
         value[y, 1] = sum(GCAMData['rgn_wddom'][:, y]) + sum(GCAMData['rgn_wdelec'][:, y]) + sum(
             GCAMData['rgn_wdmfg'][:, y]) + sum(GCAMData['rgn_wdmining'][:, y]) \
-                      + sum(GCAMData['irrV'][:, y + 3]) + sum(GCAMData['wdliv'][:, y])
+                      + sum(GCAMData['irrV'][:, y + 3]) + np.sum(GCAMData['wdliv'][:, :, y])
         value[y, 2] = value[y, 0] - value[y, 1]
         if years:
             yrout = years[y]
@@ -82,10 +82,7 @@ def compare_downscaled_GCAMinput(PerformDiagnostics, NY, years, OutputFolder, Re
     irrV = np.zeros((NR, NY), dtype=float)
 
     for IN in range(0, NR):
-        wdliv[IN, :] = GCAMData['wdliv'][0 * NR + IN, :] + GCAMData['wdliv'][1 * NR + IN, :] + GCAMData['wdliv'][
-                                                                                               2 * NR + IN, :] + \
-                       GCAMData['wdliv'][3 * NR + IN, :] + GCAMData['wdliv'][4 * NR + IN, :] + GCAMData['wdliv'][
-                                                                                               5 * NR + IN, :]
+        wdliv[IN, :] = np.sum(GCAMData['wdliv'][:, IN], axis=0)
 
         ls = np.where(GCAMData['irrV'][:, 0].astype(int) - 1 == IN)[0]
         irrV[IN, :] = sum(GCAMData['irrV'][ls, 3:])

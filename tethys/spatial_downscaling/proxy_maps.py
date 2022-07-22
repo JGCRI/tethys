@@ -54,9 +54,9 @@ def LivestockMap(GISData, GCAMData, nyears, OUT):
     """
 
     ncells = len(GISData['RegionIDs'])
-    wdliv = GCAMData['wdliv'].reshape(6, -1, nyears)
+    wdliv = GCAMData['wdliv']
 
-    out_map = np.zeros((6, ncells, nyears), dtype=float)
+    out_map = np.zeros((4, ncells, nyears), dtype=float)
     for region, cells in GISData['regionlookup'].items():
         cell_heads = GISData['Livestock'][:, cells]
         region_heads = np.sum(cell_heads, axis=1, keepdims=True)
@@ -69,7 +69,7 @@ def LivestockMap(GISData, GCAMData, nyears, OUT):
     fmtstr = '[Year Index, Region ID, {:7s} from GCAM not assigned (no GIS data)]:  {}  {}  {}'
     for region, cells in GISData['regionlookup'].items():
         for y in range(nyears):
-            for a, animal in enumerate(['Buffalo', 'Cattle', 'Goat', 'Sheep', 'Poultry', 'Pig']):
+            for a, animal in enumerate(['Bovine', 'SheepGoat', 'Poultry', 'Pig']):
                 if wdliv[a, region-1, y] > 0 and np.sum(GISData['Livestock'][a, cells]) == 0:
                     logging.info(fmtstr.format(animal.lower(), y+1, region, wdliv[a, region, y]))
 

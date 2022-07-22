@@ -46,13 +46,12 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, 
                                         Irrigation_HYDE=Irrigation_HYDE,
                                         years=years)  # dictionary
 
-    # Livestock (heads) in year 2000: dim is 6x67420x1
-    GISData['Livestock'] = np.stack([get_array_csv(Livestock_Buffalo, 1),
-                                     get_array_csv(Livestock_Cattle, 1),
-                                     get_array_csv(Livestock_Goat, 1),
-                                     get_array_csv(Livestock_Sheep, 1),
+    # Livestock (heads) in year 2000: dim is 4x67420x1  # TODO: update to latest version of dataset
+    GISData['Livestock'] = np.stack([get_array_csv(Livestock_Buffalo, 1) + get_array_csv(Livestock_Cattle, 1),
+                                     get_array_csv(Livestock_Goat, 1) + get_array_csv(Livestock_Sheep, 1),
                                      get_array_csv(Livestock_Poultry, 1),
-                                     get_array_csv(Livestock_Pig, 1)]).reshape(6, -1, 1)
+                                     get_array_csv(Livestock_Pig, 1)]).reshape(4, -1, 1)
+    # TODO: be explicit about array reshaping to catch errors rather than using -1 (dimension constants?)
 
     # Coordinates for flattened grd:  67420 x 5
     # The columns are ID#, lon, lat, ilon, ilat

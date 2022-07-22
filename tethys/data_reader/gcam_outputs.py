@@ -19,37 +19,6 @@ states = ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL',
           'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'PR',
           'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT', 'WA', 'WI',
           'WV', 'WY']
-    
-# set ordering of livestock
-d_liv_order = {'Buffalo': 0, 'Cattle': 1, 'Goat': 2, 'Sheep': 3, 'Poultry': 4, 'Pork': 5}
-
-
-def get_buffalo_frac(f):
-    """
-    Create a dictionary of buffalo fraction per region id.
-
-    :param f:           full path to CSV file containing buffalo fraction per region
-    :return:            dictionary; {region_id:  buffalo_fraction, ...}
-    """
-    df = pd.read_csv(f, usecols=['buffalo-fraction'])
-    df['region_id'] = df.index.copy() + 1
-    df.set_index('region_id', inplace=True)
-
-    return df.to_dict()['buffalo-fraction']
-
-
-def get_goat_frac(f):
-    """
-    Create a dictionary of goat fraction per region id.
-
-    :param f:           full path to CSV file containing goat fraction per region
-    :return:            dictionary; {region_id:  goat_fraction, ...}
-    """
-    df = pd.read_csv(f, usecols=['goat-fraction'])
-    df['region_id'] = df.index.copy() + 1
-    df.set_index('region_id', inplace=True)
-
-    return df.to_dict()['goat-fraction']
 
 
 def get_region_info(f):
@@ -149,12 +118,10 @@ def nonag_water_demand_to_array(conn, query, d_reg_name, years):
     return df_to_array(df, d_reg_name, years)
 
 
-def livestock_water_demand_to_array(conn, query, query_core, d_reg_name, d_buf_frac, d_goat_frac, d_liv_order, years):
+def livestock_water_demand_to_array(conn, query, query_core, d_reg_name, years):
     """
     Query GCAM database for livestock water demand (billion m3).
     Place in format required by Tethys.
-
-    Outputs are ordered by region and then by [Buffalo, Cattle, Goat, Sheep, Poultry, Pig]
 
     :param conn:          gcamreader database object
     :param query:         XPath Query
@@ -189,9 +156,6 @@ def livestock_water_demand_to_array(conn, query, query_core, d_reg_name, d_buf_f
         df_us_new = df_us_new.drop('ratio', 1)
         df = df_us_new.append(df_core_non_us)
 
-    # get only target years
-    df = df.loc[df['Year'].isin(years)].copy()
-
     # drop unneeded cols
     df.drop(['Units', 'scenario', 'input'], axis=1, inplace=True)
 
@@ -202,57 +166,16 @@ def livestock_water_demand_to_array(conn, query, query_core, d_reg_name, d_buf_f
     if any(item in d_reg_name for item in states):
         df.loc[df.region == 1, 'value'] = 0
 
-    # convert shape for use in Tethys
-    piv = pd.pivot_table(df, values='value', index=['region', 'sector'], columns='Year', fill_value=0, aggfunc=np.sum)
-    piv.reset_index(inplace=True)
+    # set ordering of livestock
+    # combine beef and dairy into "bovine" that will be proxied by buffalo + cattle
+    # keep sheepgoat and use sheep + goat as proxy
+    df['sector'] = df['sector'].map({'Beef': 0, 'Dairy': 0, 'SheepGoat': 1, 'Poultry': 2, 'Pork': 3})
 
-    # group beef and dairy
-    bovine = piv.loc[piv['sector'].isin(('Beef', 'Dairy'))].copy().groupby(['region']).sum()
-    bovine.reset_index(inplace=True)
-    bovine['b_frac'] = bovine['region'].map(d_buf_frac)
+    # convert shape for use in Tethys, handle order and filter years
+    piv = pd.pivot_table(df, values='value', index=['sector', 'region'], columns='Year', fill_value=0, aggfunc=np.sum)
+    piv = piv.reindex(index=[(i, j) for i in range(4) for j in sorted(d_reg_name.values())], columns=years, fill_value=0)
 
-    # break out fraction of buffalo
-    buffalo = bovine.copy()
-    buffalo['sector'] = 'Buffalo'
-    buffalo[years] = buffalo[years].multiply(buffalo['b_frac'], axis='index')
-    buffalo.drop('b_frac', axis=1, inplace=True)
-    piv = pd.concat([piv, buffalo], sort=True)
-
-    # break out fraction of cattle
-    cattle = bovine.copy()
-    cattle['sector'] = 'Cattle'
-    cattle[years] = cattle[years].multiply((1 - cattle['b_frac']), axis='index')
-    cattle.drop('b_frac', axis=1, inplace=True)
-    piv = pd.concat([piv, cattle], sort=True)
-
-    # extract sheepgoat and add goat fraction
-    sheepgoat = piv.loc[piv['sector'] == 'SheepGoat'].copy()
-    sheepgoat['g_frac'] = sheepgoat['region'].map(d_goat_frac)
-
-    # break out fraction of goat
-    goat = sheepgoat.copy()
-    goat['sector'] = 'Goat'
-    goat[years] = goat[years].multiply(goat['g_frac'], axis='index')
-    goat.drop('g_frac', axis=1, inplace=True)
-    piv = pd.concat([piv, goat], sort=True)
-
-    # break out fraction of sheep
-    sheep = sheepgoat.copy()
-    sheep['sector'] = 'Sheep'
-    sheep[years] = sheep[years].multiply((1 - sheep['g_frac']), axis='index')
-    sheep.drop('g_frac', axis=1, inplace=True)
-    piv = pd.concat([piv, sheep], sort=True)
-
-    # drop aggregated sectors
-    piv = piv.loc[piv['sector'].isin(tuple(d_liv_order))].copy()
-
-    # add livestock order number
-    piv['sector'] = piv['sector'].map(d_liv_order)
-
-    piv.set_index(['sector', 'region'], inplace=True)
-    piv = piv.reindex(index=[(i, j) for i in range(6) for j in sorted(d_reg_name.values())], fill_value=0)
-
-    return piv.values
+    return np.reshape(piv.to_numpy(), (4, len(d_reg_name), len(years)))
 
 
 def land_to_array(conn, query, query_core, basin_state_area, d_reg_name, d_basin_name, sub_to_sector, sector_to_id, years):
@@ -474,7 +397,7 @@ def elec_proportions_to_array(conn, query, d_reg_name, years):
     return ele
 
 
-def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCAM_DBpath, GCAM_DBfile, query_file,
+def get_gcam_data(years, RegionNames, gcam_basin_lu, GCAM_DBpath, GCAM_DBfile, query_file,
                   basin_state_area, PerformTemporal, demand, variant):
     """
     Import and format GCAM data from database for use in Tethys.
@@ -488,12 +411,6 @@ def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCA
     # get basin info as dict
     d_basin_name = get_basin_info(gcam_basin_lu)
 
-    # get buffalo fraction of region as dict
-    d_buf_frac = get_buffalo_frac(buff_fract)
-
-    # get goad fraction of region as dict
-    d_goat_frac = get_goat_frac(goat_fract)
-
     # get GCAM database connection and queries objects
     conn = gcamreader.LocalDBConn(GCAM_DBpath, GCAM_DBfile, suppress_gabble=False)
     queries = {i.title: i for i in gcamreader.parse_batch_query(query_file)}
@@ -504,8 +421,7 @@ def get_gcam_data(years, RegionNames, gcam_basin_lu, buff_fract, goat_fract, GCA
          'rgn_wdmfg': nonag_water_demand_to_array(conn, queries[f'Water {demand} (Industrial-Manufacturing)'], d_reg_name, years),
          'rgn_wdmining': nonag_water_demand_to_array(conn, queries[f'Water {demand} (Resource Extraction){variant}'], d_reg_name, years),
          'wdliv': livestock_water_demand_to_array(conn, queries[f'Water {demand} (Livestock){variant}'],
-                                                  queries[f'Water {demand} (Livestock)'], d_reg_name, d_buf_frac,
-                                                  d_goat_frac, d_liv_order, years)}
+                                                  queries[f'Water {demand} (Livestock)'], d_reg_name, years)}
 
     d['irrV'], sub_to_sector, sector_to_id = irr_water_demand_to_array(conn, queries[f'Water {demand} (Agriculture by subsector){variant}'],
                                                                        queries[f'Water {demand} (Agriculture by subsector)'],
