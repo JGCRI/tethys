@@ -28,7 +28,6 @@ import logging
 import calendar
 
 import numpy as np
-import scipy.io as spio
 import netCDF4 as nc4
 
 from tethys.utils.data_parser import get_array_csv

@@ -12,7 +12,7 @@ import os
 import logging
 
 import numpy as np
-from scipy import io as spio
+import netCDF4 as nc4
 
 
 class OUTSettings:
@@ -111,7 +111,7 @@ def write_netcdf(filename, data, timestrs, unit, GISData, timestep='year'):
     - unit        string, e.g. "mm" or 'km3'
     """
 
-    datagrp = spio.netcdf.netcdf_file(filename, 'w')
+    datagrp = nc4.Dataset(filename, 'w')
     (nrows, ncols) = data.shape
 
     # dimensions
