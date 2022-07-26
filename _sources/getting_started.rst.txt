@@ -83,12 +83,12 @@ Dependencies
 ===========	================
 Dependency	Minimum Version
 ===========	================
-configobj	5.0.6
-numpy		1.20.3
-pandas		1.2.4
-scipy		1.6.3
-requests	2.20.0
-gcamreader	1.2.5
+configobj   5.0.6
+numpy       1.21
+pandas      1.2.4
+requests    2.20.0
+gcamreader  1.2.5
+netCDF4     1.6
 ===========	================
 
 Optional Dependencies
