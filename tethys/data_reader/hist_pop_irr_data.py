@@ -11,18 +11,52 @@ Copyright (c) 2017, Battelle Memorial Institute
 import os
 import re
 import logging
+import pandas as pd
+from geocube.api.core import make_geocube
+import geopandas as gpd
 
 import numpy as np
 from tethys.utils.data_parser import get_array_csv
 
+def downscaleSpatialInputs(spatial_in, key_df, down_type, SpatialResolution, skip_header):
+    if skip_header == 0:
+        header_opt = None
+    else:
+        header_opt = 0
+    spatial_in = pd.read_csv(spatial_in, header=header_opt)
+    spatial_in = pd.DataFrame(spatial_in)
+    if(down_type == "dist"):
+        spatial_in = spatial_in/(.5**2 /SpatialResolution**2)
+    spatial_in['ID'] = spatial_in.index + 1
+    spatial_out = key_df[["ID"]].merge(spatial_in, how = 'left', on='ID')
+    spatial_out = spatial_out.drop(spatial_out.columns[[0]],axis = 1)
+    spatial_out = spatial_out.to_numpy()
+    if spatial_out.shape[1] == 1:
+        spatial_out = spatial_out[:, 0]    
+    return spatial_out
 
-def getIrrYearData(Irrigation_GMIA, Irrigation_HYDE, years):
+def getKeyCoordinates(Coord, SpatialResolution):
+    pointDf = pd.DataFrame(get_array_csv(Coord, 0))
+    pointDf.rename(columns = {0:'ID'}, inplace = True)
+    gdf = gpd.GeoDataFrame(pointDf, geometry=gpd.points_from_xy(pointDf[1], pointDf[2]), crs="epsg:4326")
+    gdf['geometry'] = gdf.geometry.buffer(.5, cap_style=3) 
+    geo_grid = make_geocube(vector_data=gdf, measurements=['ID'], resolution = (SpatialResolution, SpatialResolution))
+    grid_df = geo_grid.to_dataframe()
+    grid_df = grid_df.dropna()
+    grid_df = grid_df.reset_index()
+    grid_df['New_ID'] = grid_df.index + 1  
+    return grid_df
+
+def getIrrYearData(Irrigation_GMIA, Irrigation_HYDE, years, SpatialResolution, key_df):
     """
     Update the irrigation maps to include a unique map for each historical time period
     """
-    
-    hyde_irr = get_array_csv(Irrigation_HYDE, 1)
-    gmia_irr = get_array_csv(Irrigation_GMIA, 1).reshape(-1, 1)  # with only 1 year, resulting array is 1D, so reshape
+    if(SpatialResolution != .5):
+        hyde_irr = downscaleSpatialInputs(spatial_in = Irrigation_HYDE, key_df=key_df, down_type='eq', SpatialResolution=SpatialResolution, skip_header=1)
+        gmia_irr = downscaleSpatialInputs(spatial_in = Irrigation_GMIA, key_df=key_df, down_type='eq', SpatialResolution=SpatialResolution, skip_header=1).reshape(-1,1)
+    else:
+        hyde_irr = get_array_csv(Irrigation_HYDE, 1)
+        gmia_irr = get_array_csv(Irrigation_GMIA, 1).reshape(-1, 1)  # with only 1 year, resulting array is 1D, so reshape
 
     hyde_years = [1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000]
     gmia_years = [2005]
@@ -45,7 +79,7 @@ def getIrrYearData(Irrigation_GMIA, Irrigation_HYDE, years):
     return irr
 
 
-def getIrrYearData_Crops(DemeterOutputFolder, years, SpatialResolution):
+def getIrrYearData_Crops(DemeterOutputFolder, years, SpatialResolution, key_df):
     """
     Update the irrigation maps to include a unique map for each historical time period from Demeter outputs by crop types
     """
@@ -57,7 +91,10 @@ def getIrrYearData_Crops(DemeterOutputFolder, years, SpatialResolution):
             yearstr = re.sub("[^0-9]", "", filename)
             demeter_years.append(int(yearstr))
             if int(yearstr) in years:
-                tmp = get_array_csv(os.path.join(DemeterOutputFolder, filename), 1)
+                if(SpatialResolution!=0.5):
+                    tmp = downscaleSpatialInputs(spatial_in = os.path.join(DemeterOutputFolder, filename),key_df=key_df,down_type='dist', SpatialResolution=SpatialResolution,skip_header=1)
+                else:
+                    tmp = get_array_csv(os.path.join(DemeterOutputFolder, filename), 1)
                 index = check_header_Demeter_outputs(os.path.join(DemeterOutputFolder, filename))
                 # tmp[:, 1] is latitude
                 area = np.cos(np.radians(tmp[:, 1])) * (111.32 * 110.57) * (SpatialResolution**2)
@@ -95,14 +132,18 @@ def getIrrYearData_Crops(DemeterOutputFolder, years, SpatialResolution):
     return irr_new
 
 
-def getPopYearData(Population_GPW, Population_HYDE, years):
+def getPopYearData(Population_GPW, Population_HYDE, years, SpatialResolution, key_df):
     """"
     Update the population maps to include a unique map for each historical time period
     """
 
     # could be rewritten to only load years/files that will be needed
-    hyde_pop = get_array_csv(Population_HYDE, 1)
-    gpw_pop = get_array_csv(Population_GPW, 1)
+    if(SpatialResolution!=0.5):
+        hyde_pop = downscaleSpatialInputs(spatial_in = Population_HYDE, key_df = key_df, down_type='dist', SpatialResolution=SpatialResolution , skip_header=1)
+        gpw_pop = downscaleSpatialInputs(spatial_in = Population_GPW, key_df = key_df, down_type='dist', SpatialResolution=SpatialResolution, skip_header=1)
+    else:
+        hyde_pop = get_array_csv(Population_HYDE, 1)
+        gpw_pop = get_array_csv(Population_GPW, 1)
 
     hyde_years = [1750, 1760, 1770, 1780, 1790, 1800, 1810, 1820, 1830, 1840, 1850, 1860, 1870, 1880, 1890,
                   1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980]
