@@ -126,7 +126,6 @@ def write_netcdf(filename, data, timestrs, unit, GISData, timestep='year'):
     lat = datagrp.createVariable('lat', 'f4', ('index',))
     ilon = datagrp.createVariable('ilon', 'i4', ('index',))
     ilat = datagrp.createVariable('ilat', 'i4', ('index',))
-    map_index = datagrp.createVariable('mapindex', 'i4', ('index',))
     griddata = datagrp.createVariable('data', 'f4', ('index', timestep))
     griddata.units = f'{unit}/{"yr" if timestep == "year" else "month"}'
     griddata.description = f'Downscaled Results: {nrows} rows, {ncols} columns ({timestep}s)'
@@ -138,7 +137,6 @@ def write_netcdf(filename, data, timestrs, unit, GISData, timestep='year'):
     lat[:] = GISData['coord'][:, 2]
     ilon[:] = GISData['coord'][:, 3].astype(int)
     ilat[:] = GISData['coord'][:, 4].astype(int)
-    map_index[:] = GISData['mapindex'].astype(int) + 1
     griddata[:] = data[:].copy()
 
     datagrp.close()

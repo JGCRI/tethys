@@ -111,7 +111,6 @@ def run_disaggregation(years, InputRegionFile, mapsize, UseDemeter, PerformDiagn
                                     Irrigation_GMIA=Irrigation_GMIA,
                                     Irrigation_HYDE=Irrigation_HYDE,
                                     DemeterOutputFolder=DemeterOutputFolder,
-                                    mapsize=mapsize,
                                     SpatialResolution=SpatialResolution
                                     )
     endtime2 = time.time()

@@ -21,13 +21,12 @@ import numpy as np
 import pandas as pd
 from tethys.utils.data_parser import get_array_csv
 from tethys.data_reader.hist_pop_irr_data import getPopYearData, getIrrYearData, getIrrYearData_Crops, downscaleSpatialInputs, getKeyCoordinates
-from tethys.utils.utils_math import sub2ind
 
 
 def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, Livestock_Sheep,
                Livestock_Poultry, Livestock_Pig, Coord, Area, InputRegionFile, InputBasinFile, BasinNames,
                Irrigation_GMIA, Irrigation_HYDE, years, DemeterOutputFolder,
-               Population_GPW, Population_HYDE, mapsize, SpatialResolution):
+               Population_GPW, Population_HYDE, SpatialResolution):
     # dictionary GISData{} saves the data related to GIS data
     GISData = dict()
 
@@ -82,7 +81,6 @@ def getGISData(UseDemeter, Livestock_Buffalo, Livestock_Cattle, Livestock_Goat, 
         GISData['coord'] = coord_df.to_numpy()
     else:
         GISData['coord'] = get_array_csv(Coord, 0)
-    #GISData['mapindex'] = sub2ind(mapsize, GISData['coord'][:, 4].astype(int)-1, GISData['coord'][:, 3].astype(int)-1)
 
     # read area values for each land grid cell, convert from ha to km2
     if(SpatialResolution != .5):
