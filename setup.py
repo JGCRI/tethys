@@ -33,7 +33,10 @@ setup(
         'pandas~=1.2.4',
         'requests~=2.20.0',
         'gcamreader>=1.2.5',
-        'netCDF4~=1.6'
+        'netCDF4~=1.6',
+        'tifffile~=2022.5.4',
+        'Pillow~=8.4.0',
+        'setuptools~=57.0.0'
     ],
     extras_require={
         'dev': [

@@ -1,28 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <queries>
 
-    <!-- query-land-alloc -->
-    <aQuery>
-      <all-regions/>
-      <query title="Crop Land Allocation">
-         <axis1 name="land-allocation">LandLeaf</axis1>
-         <axis2 name="Year">land-allocation[@year]</axis2>
-         <xPath buildList="true" dataName="land-allocation" group="false" sumAll="false">/LandNode[@name='root' or @type='LandNode' (: collapse :)]//LandNode[starts-with(@name, 'CropLand')]//LandLeaf[not(starts-with(@name, 'OtherArableLand'))]/land-allocation/text()</xPath>
-         <comments/>
-      </query>
-    </aQuery>
-
-	<!-- query-population -->
-    <aQuery>
-      <all-regions/>
-      <demographicsQuery title="Population by region">
-         <axis1 name="region">region</axis1>
-         <axis2 name="Year">populationMiniCAM</axis2>
-         <xPath buildList="true" dataName="total-population" group="false" sumAll="false">demographics[not(contains(parent::region/@name, 'grid'))]/populationMiniCAM/total-population/node()</xPath>
-         <comments/>
-      </demographicsQuery>
-    </aQuery>
-
     <!-- query-elec-demand -->
     <aQuery>
       <all-regions/>
@@ -36,7 +14,7 @@
 	<!-- query-water-dom withdrawals -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Withdrawals (Domestic)">
+      <supplyDemandQuery title="Water Withdrawals Domestic Core">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">demand-physical[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="false">*[@type='sector' and (@name='domestic water' or @name='municipal water')]//*[@type='input' and contains(@name, 'water_td') and ends-with(@name, '_W')]/demand-physical/node()</xPath>
@@ -47,7 +25,7 @@
 	<!-- query-water-elec withdrawals -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Withdrawals (Industrial - Electricity)">
+      <supplyDemandQuery title="Water Withdrawals Electricity Core">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">demand-physical[@vintage]</axis2>
          <xPath buildList="false" dataName="input" group="false" sumAll="true">*[@type='sector' and not(local-name()='AgSupplySector') and not(@name='domestic water' or @name='municipal water') and not(@name='industrial energy use' or @name='industrial feedstocks' or @name='industry') and not(@name='Beef' or @name='Dairy' or @name='Pork' or @name='Poultry' or @name='SheepGoat') and not (contains(@name, 'regional coal') or contains(@name, 'nuclearFuelGenIII') or contains(@name, 'regional natural gas') or contains(@name, 'unconventional oil production') or contains(@name, 'regional oil') or contains(@name, 'nuclearFuelGenII'))]//*[@type='input' and contains(@name,'water_td') and ends-with(@name, '_W')]/demand-physical/node()</xPath>
@@ -58,7 +36,7 @@
 	<!-- query-water-mfg withdrawals -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Withdrawals (Industrial-Manufacturing)">
+      <supplyDemandQuery title="Water Withdrawals Manufacturing Core">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">demand-physical[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="true">*[@type='sector' and contains(@name, 'industr')]//*[@type='input' and contains(@name,'water_td') and ends-with(@name, '_W')]/demand-physical/node()</xPath>
@@ -69,7 +47,7 @@
 	<!-- query-water-min withdrawals -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Withdrawals (Resource Extraction)">
+      <supplyDemandQuery title="Water Withdrawals Mining Core">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">demand-physical[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="true">*[@type='sector' and (contains(@name, 'regional coal') or contains(@name, 'nuclearFuelGenIII') or contains(@name, 'regional natural gas') or contains(@name, 'unconventional oil production') or contains(@name, 'regional oil') or contains(@name, 'nuclearFuelGenII'))]//*[@type='input' and contains(@name,'water_td') and ends-with(@name, '_W')]/demand-physical/node()</xPath>
@@ -80,7 +58,7 @@
 	<!-- query-water-liv withdrawals -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Withdrawals (Livestock)">
+      <supplyDemandQuery title="Water Withdrawals Livestock Core">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">demand-physical[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="false">*[@type='sector' and (@name='Beef' or @name='Dairy' or @name='Pork' or @name='Poultry' or @name='SheepGoat')]//*[@type='input' and contains(@name,'water_td') and ends-with(@name, '_W')]/demand-physical/node()</xPath>
@@ -91,7 +69,7 @@
 	<!-- query-water-irr withdrawals -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Withdrawals (Agriculture by subsector)">
+      <supplyDemandQuery title="Water Withdrawals Irrigation Core">
          <axis1 name="subsector">subsector</axis1>
          <axis2 name="Year">demand-physical[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="false">AgSupplySector[@type='sector']//*[@type='input' and contains(@name, 'water_td') and ends-with(@name, '_W')]/demand-physical/node()</xPath>
@@ -102,7 +80,7 @@
     <!-- query-water-dom consumption -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Consumption (Domestic)">
+      <supplyDemandQuery title="Water Consumption Domestic Core">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">demand-physical[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="false">*[@type='sector' and (@name='domestic water' or @name='municipal water')]//*[@type='input' and contains(@name, 'water_td') and ends-with(@name, '_C')]/demand-physical/node()</xPath>
@@ -113,7 +91,7 @@
 	<!-- query-water-elec consumption -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Consumption (Industrial - Electricity)">
+      <supplyDemandQuery title="Water Consumption Electricity Core">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">demand-physical[@vintage]</axis2>
          <xPath buildList="false" dataName="input" group="false" sumAll="true">*[@type='sector' and not(local-name()='AgSupplySector') and not(@name='domestic water' or @name='municipal water') and not(@name='industrial energy use' or @name='industrial feedstocks' or @name='industry') and not(@name='Beef' or @name='Dairy' or @name='Pork' or @name='Poultry' or @name='SheepGoat') and not (contains(@name, 'regional coal') or contains(@name, 'nuclearFuelGenIII') or contains(@name, 'regional natural gas') or contains(@name, 'unconventional oil production') or contains(@name, 'regional oil') or contains(@name, 'nuclearFuelGenII'))]//*[@type='input' and contains(@name,'water_td') and ends-with(@name, '_C')]/demand-physical/node()</xPath>
@@ -124,7 +102,7 @@
 	<!-- query-water-mfg consumption -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Consumption (Industrial-Manufacturing)">
+      <supplyDemandQuery title="Water Consumption Manufacturing Core">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">demand-physical[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="true">*[@type='sector' and contains(@name, 'industr')]//*[@type='input' and contains(@name,'water_td') and ends-with(@name, '_C')]/demand-physical/node()</xPath>
@@ -135,7 +113,7 @@
 	<!-- query-water-min consumption -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Consumption (Resource Extraction)">
+      <supplyDemandQuery title="Water Consumption Mining Core">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">demand-physical[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="true">*[@type='sector' and (contains(@name, 'regional coal') or contains(@name, 'nuclearFuelGenIII') or contains(@name, 'regional natural gas') or contains(@name, 'unconventional oil production') or contains(@name, 'regional oil') or contains(@name, 'nuclearFuelGenII'))]//*[@type='input' and contains(@name,'water_td') and ends-with(@name, '_C')]/demand-physical/node()</xPath>
@@ -146,7 +124,7 @@
 	<!-- query-water-liv consumption -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Consumption (Livestock)">
+      <supplyDemandQuery title="Water Consumption Livestock Core">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">demand-physical[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="false">*[@type='sector' and (@name='Beef' or @name='Dairy' or @name='Pork' or @name='Poultry' or @name='SheepGoat')]//*[@type='input' and contains(@name,'water_td') and ends-with(@name, '_C')]/demand-physical/node()</xPath>
@@ -157,7 +135,7 @@
 	<!-- query-water-irr consumption -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Consumption (Agriculture by subsector)">
+      <supplyDemandQuery title="Water Consumption Irrigation Core">
          <axis1 name="subsector">subsector</axis1>
          <axis2 name="Year">demand-physical[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="false">AgSupplySector[@type='sector']//*[@type='input' and contains(@name, 'water_td') and ends-with(@name, '_C')]/demand-physical/node()</xPath>
@@ -168,7 +146,7 @@
     <!-- query-water-min withdrawals GCAMUSA -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Withdrawals (Resource Extraction) GCAMUSA">
+      <supplyDemandQuery title="Water Withdrawals Mining GCAMUSA">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">physical-output[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="true">*[@type='sector']//*[@type='output' and contains(@name,'water_td_pri') and ends-with(@name, '_W')]/physical-output/node()</xPath>
@@ -179,7 +157,7 @@
     <!-- query-water-liv withdrawals GCAMUSA -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Withdrawals (Livestock) GCAMUSA">
+      <supplyDemandQuery title="Water Withdrawals Livestock GCAMUSA">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">physical-output[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="false">*[@type='sector']//*[@type='output' and contains(@name,'water_td_an') and ends-with(@name, '_W')]/physical-output/node()</xPath>
@@ -190,7 +168,7 @@
     <!-- query-water-irr withdrawals GCAMUSA -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Withdrawals (Agriculture by subsector) GCAMUSA">
+      <supplyDemandQuery title="Water Withdrawals Irrigation GCAMUSA">
          <axis1 name="subsector">subsector</axis1>
          <axis2 name="Year">physical-output[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="false">*[@type='sector']//*[@type='output' and contains(@name, 'water_td_irr') and ends-with(@name, '_W')]/physical-output/node()</xPath>
@@ -201,7 +179,7 @@
     <!-- query-water-min consumption GCAMUSA -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Consumption (Resource Extraction) GCAMUSA">
+      <supplyDemandQuery title="Water Consumption Mining GCAMUSA">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">physical-output[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="true">*[@type='sector']//*[@type='output' and contains(@name,'water_td_pri') and ends-with(@name, '_C')]/physical-output/node()</xPath>
@@ -212,7 +190,7 @@
     <!-- query-water-liv consumption GCAMUSA -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Consumption (Livestock) GCAMUSA">
+      <supplyDemandQuery title="Water Consumption Livestock GCAMUSA">
          <axis1 name="sector">sector</axis1>
          <axis2 name="Year">physical-output[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="false">*[@type='sector']//*[@type='output' and contains(@name,'water_td_an') and ends-with(@name, '_C')]/physical-output/node()</xPath>
@@ -223,7 +201,7 @@
     <!-- query-water-irr consumption GCAMUSA -->
     <aQuery>
       <all-regions/>
-      <supplyDemandQuery title="Water Consumption (Agriculture by subsector) GCAMUSA">
+      <supplyDemandQuery title="Water Consumption Irrigation GCAMUSA">
          <axis1 name="subsector">subsector</axis1>
          <axis2 name="Year">physical-output[@vintage]</axis2>
          <xPath buildList="true" dataName="input" group="false" sumAll="false">*[@type='sector']//*[@type='output' and contains(@name, 'water_td_irr') and ends-with(@name, '_C')]/physical-output/node()</xPath>

@@ -1,204 +1,188 @@
-"""model.py which defines the Tethys class and calls the run_model() method to run remaining model.
 """
+@Date: 09/20/2022
+@author: Isaac Thompson (isaac.thompson@pnnl.gov)
+@Project: Tethys V2.0
 
-import logging
-import time
+License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
+Copyright (c) 2022, Battelle Memorial Institute
+
+"""
 import os
+from configobj import ConfigObj
 
-from tethys.config_reader import ReadConfig
-from tethys.run_disaggregation import run_disaggregation
-from tethys.data_writer.outputs import write_outputs
+import gcamreader
 
-class Tethys(ReadConfig):
-    """Model wrapper for Tethys.
-
-    :param config_file:                 Full path with file name and extension to a input config.ini file.  If not
-                                        passed, the default configuration will be used.
-    :type config_file:                  str
-
-    """
-
-    def __init__(self, config_file):
-
-        # start time for model run
-        self.start_time = time.time()
-
-        # initialize console handler for logger
-        self.console_handler()
-
-        logging.info("Starting Tethys model")
-
-        # inherit the configuration reader class attributes
-        super(Tethys, self).__init__(config_file=config_file)
-
-    def execute(self):
-        """Execute the model and save the outputs."""
-
-        t0 = time.time()
-        logging.info('Start Disaggregation...')
-
-        if self.PerformWithdrawal == 1:
-
-            # Create OutputFolder if doesn't exist
-            # Check whether the specified path exists or not
-            if not os.path.exists(self.OutputFolder):
-                # Create a new directory because it does not exist
-                os.makedirs(self.OutputFolder)
-                print(f"Output folder created: {self.OutputFolder}")
-
-            TDYears, gridded_data, gis_data = run_disaggregation(years=self.years,
-                                                                 InputRegionFile=self.InputRegionFile,
-                                                                 mapsize=self.mapsize,
-                                                                 UseDemeter=self.UseDemeter,
-                                                                 PerformDiagnostics=self.PerformDiagnostics,
-                                                                 PerformTemporal=self.PerformTemporal,
-                                                                 RegionNames=self.RegionNames,
-                                                                 gcam_basin_lu=self.gcam_basin_lu,
-                                                                 GCAM_DBpath=self.GCAM_DBpath,
-                                                                 GCAM_DBfile=self.GCAM_DBfile,
-                                                                 query_file=self.query_file,
-                                                                 OutputFolder=self.OutputFolder,
-                                                                 temporal_climate=self.temporal_climate,
-                                                                 Irr_MonthlyData=self.Irr_MonthlyData,
-                                                                 TemporalInterpolation=self.TemporalInterpolation,
-                                                                 Domestic_R=self.Domestic_R,
-                                                                 Livestock_Buffalo=self.Livestock_Buffalo,
-                                                                 Livestock_Cattle=self.Livestock_Cattle,
-                                                                 Livestock_Goat=self.Livestock_Goat,
-                                                                 Livestock_Sheep=self.Livestock_Sheep,
-                                                                 Livestock_Poultry=self.Livestock_Poultry,
-                                                                 Livestock_Pig=self.Livestock_Pig,
-                                                                 Coord=self.Coord,
-                                                                 Area=self.Area,
-                                                                 InputBasinFile=self.InputBasinFile,
-                                                                 BasinNames=self.BasinNames,
-                                                                 Population_GPW=self.Population_GPW,
-                                                                 Population_HYDE=self.Population_HYDE,
-                                                                 Irrigation_GMIA=self.Irrigation_GMIA,
-                                                                 Irrigation_HYDE=self.Irrigation_HYDE,
-                                                                 DemeterOutputFolder=self.DemeterOutputFolder,
-                                                                 OutputUnit=self.OutputUnit,
-                                                                 basin_state_area=self.basin_state_area,
-                                                                 SpatialResolution=self.SpatialResolution,
-                                                                 demand='Withdrawals',
-                                                                 variant=' GCAMUSA' if self.GCAMUSA else ''
-                                                                 )
-
-            print(gridded_data)
-
-            logging.info(f"Disaggregation completed in : {(time.time() - t0)} seconds")
-
-            t0 = time.time()
-            logging.info('Writing outputs...')
-            write_outputs(OutputUnit=self.OutputUnit,
-                          OutputFormat=self.OutputFormat,
-                          OutputFolder=self.OutputFolder,
-                          PerformTemporal=self.PerformTemporal,
-                          TDYears=TDYears,
-                          years=self.years,
-                          OUT=gridded_data,
-                          GISData=gis_data)
-            logging.info(f"Outputs writen in: {(time.time() - t0)}")
-
-        if self.PerformConsumption == 1:
-
-            # Create OutputFolder if doesn't exist
-            # Check whether the specified path exists or not
-            if not os.path.exists(self.OutputFolder + "_C"):
-                # Create a new directory because it does not exist
-                os.makedirs(self.OutputFolder + "_C")
-                print(f"Consumption Output folder created: {self.OutputFolder + '_C'}")
-
-            TDYears, gridded_data, gis_data = run_disaggregation(years=self.years,
-                                                                 InputRegionFile=self.InputRegionFile,
-                                                                 mapsize=self.mapsize,
-                                                                 UseDemeter=self.UseDemeter,
-                                                                 PerformDiagnostics=self.PerformDiagnostics,
-                                                                 PerformTemporal=self.PerformTemporal,
-                                                                 RegionNames=self.RegionNames,
-                                                                 gcam_basin_lu=self.gcam_basin_lu,
-                                                                 GCAM_DBpath=self.GCAM_DBpath,
-                                                                 GCAM_DBfile=self.GCAM_DBfile,
-                                                                 query_file=self.query_file,
-                                                                 OutputFolder=self.OutputFolder + '_C',
-                                                                 temporal_climate=self.temporal_climate,
-                                                                 Irr_MonthlyData=self.Irr_MonthlyData,
-                                                                 TemporalInterpolation=self.TemporalInterpolation,
-                                                                 Domestic_R=self.Domestic_R,
-                                                                 Livestock_Buffalo=self.Livestock_Buffalo,
-                                                                 Livestock_Cattle=self.Livestock_Cattle,
-                                                                 Livestock_Goat=self.Livestock_Goat,
-                                                                 Livestock_Sheep=self.Livestock_Sheep,
-                                                                 Livestock_Poultry=self.Livestock_Poultry,
-                                                                 Livestock_Pig=self.Livestock_Pig,
-                                                                 Coord=self.Coord,
-                                                                 Area=self.Area,
-                                                                 InputBasinFile=self.InputBasinFile,
-                                                                 BasinNames=self.BasinNames,
-                                                                 Population_GPW=self.Population_GPW,
-                                                                 Population_HYDE=self.Population_HYDE,
-                                                                 Irrigation_GMIA=self.Irrigation_GMIA,
-                                                                 Irrigation_HYDE=self.Irrigation_HYDE,
-                                                                 DemeterOutputFolder=self.DemeterOutputFolder,
-                                                                 OutputUnit=self.OutputUnit,
-                                                                 basin_state_area=self.basin_state_area,
-                                                                 SpatialResolution=self.SpatialResolution,
-                                                                 demand='Consumption',
-                                                                 variant=' GCAMUSA' if self.GCAMUSA else ''
-                                                                 )
-
-            print(gridded_data)
-
-            logging.info(f"Consumption Disaggregation completed in : {(time.time() - t0)} seconds")
-
-            t0 = time.time()
-            logging.info('Writing Consumption outputs...')
-            write_outputs(OutputUnit=self.OutputUnit,
-                          OutputFormat=self.OutputFormat,
-                          OutputFolder=self.OutputFolder + "_C",
-                          PerformTemporal=self.PerformTemporal,
-                          TDYears=TDYears,
-                          years=self.years,
-                          OUT=gridded_data,
-                          GISData=gis_data)
-
-            for filename in os.listdir(self.OutputFolder + '_C'): #TODO make write_outputs write these right instead
-                if 'wd' in filename:
-                    oldname = os.path.join(self.OutputFolder + '_C', filename)
-                    newname = os.path.join(self.OutputFolder + '_C', filename.replace('wd', 'cd', 1))
-                    try:
-                        os.rename(oldname, newname)
-                    except:
-                        os.remove(newname)
-                        os.rename(oldname, newname)
-
-            logging.info(f"Consumption Outputs writen in: {(time.time() - t0)}")
-
-        logging.info(f'Tethys model run completed in {round(time.time() - self.start_time, 7)}')
-
-        # clean up log
-        self.close_logger()
+from tethys.region_data import RegionData
+from tethys.region_map import RegionMap
+from tethys.gridded_data import GriddedData
 
 
-def run_model(config_file=None, **kwargs):
-    """Run the Tethys model based on a user-defined configuration.
+class Tethys:
+    """Model wrapper for Tethys"""
 
-    :param config_file:                 Full path with file name and extension to the input configuration file.
-    :type config_file:                  str
+    def __init__(self, cfg=None):
+        self.resolution = 0.125
+        self.nlat = int(180 / self.resolution)
+        self.nlon = int(360 / self.resolution)
+        self.years = []
+        self.nyears = len(self.years)
+        self.demand_types = []
+        self.sectors = []
+        self.gcam_db_path = None
+        self.gcam_db_file = None
+        self.query_file = None
+        self.gcam_usa = False
+        self.regionmaps = dict()
+        self.regiondata = dict()
+        self.proxies = None
+        self.outputs = dict()
+        if cfg is not None:
+            self.load_config(cfg)
 
-    :returns:                           model instance housing configuration and output data
+    def load_config(self, config_file):
+        self.config = ConfigObj(config_file)
 
-    """
+        project = self.config.get('Project')
+        self.outputfolder = project.get('OutputFolder')
+        self.sectors = project.get('Sectors', ['Domestic', 'Electricity', 'Manufacturing', 'Mining', 'Livestock', 'Irrigation'])
+        if isinstance(self.sectors, str):
+            self.sectors = [self.sectors]
+        self.resolution = float(project.get('Resolution', 0.125))
+        self.nlat = int(180 / self.resolution)
+        self.nlon = int(360 / self.resolution)
+        self.years = project.get('Years', range(2010, 2101, 5))
+        if isinstance(self.years, str):
+            self.years = [self.years]
+        self.years = [int(year) for year in self.years]
+        self.nyears = len(self.years)
+        self.demand_types = project.get('DemandTypes', 'Withdrawals')
+        if isinstance(self.demand_types, str):
+            self.demand_types = [self.demand_types]
+        self.perform_temporal = int(project.get('PerformTemporal', 0))
 
-    if config_file is not None:
-        config = config_file
+        self.mapfiles = self.config.get('RegionMaps').items()
 
-    print(f"kwargs:  {kwargs}")
+        # parse proxy files
+        self.proxyfiles = {}
+        for sectionname in self.config.sections:
+            if sectionname.startswith('Proxy'):
+                section = self.config.get(sectionname)
+                folder = section.get('Folder')
+                subsectors = section.get('Subsectors', None)
+                flags = section.get('Flags', None)
+                for key, value in section.items():
+                    if key not in ('Folder', 'Subsectors', 'Flags'):
+                        proxy, year = key.split('_')
+                        if proxy == 'Subsectors':  # reserve this as keyword for files with multiple proxies (demeter)
+                            for subsector in subsectors:
+                                if subsector not in self.proxyfiles:
+                                    self.proxyfiles[subsector] = {'flags': flags, 'years': {}}
+                                self.proxyfiles[subsector]['years'][int(year)] = os.path.join(folder, value)
+                        else:
+                            if proxy not in self.proxyfiles:
+                                self.proxyfiles[proxy] = {'flags': flags, 'years': {}}
+                            self.proxyfiles[proxy]['years'][int(year)] = os.path.join(folder, value)
 
-    config = kwargs.get('config', config)
+        gcaminputs = self.config.get('GCAMInputs')
+        self.gcam_db_path = gcaminputs.get('GCAM_DBpath', None)
+        self.gcam_db_file = gcaminputs.get('GCAM_DBfile', None)
+        self.query_file = gcaminputs.get('QueryFile', None)
+        self.gcam_usa = True if gcaminputs.get('GCAMUSA', 'False') == 'True' else False
 
-    model = Tethys(config)
+        # parse rules related to spatial proxies
+        self.rules = {}
+        for sector in self.sectors:
+            self.rules[sector] = {}
+            section = self.config.get(sector)
+            self.rules[sector]['subsectors'] = section.get('Subsectors', [sector])
+            self.rules[sector]['parts'] = []
+            for subsector in self.rules[sector]['subsectors']:
+                parts = section.get(subsector)
+                if isinstance(parts, str):
+                    parts = [parts]
+                self.rules[sector]['parts'].append(parts)
 
-    model.execute()
+            self.rules[sector]['map1'] = section.get('Map1', self.mapfiles[0][0])
+            self.rules[sector]['map2'] = section.get('Map2', None)
 
-    return model
+            self.rules[sector]['query1'] = section.get('Query1', None)
+            self.rules[sector]['query2'] = section.get('Query2', None)
+
+        if self.perform_temporal:
+            temporal_params = self.config.get('Temporal')
+            folder = temporal_params.get('Folder')
+            self.irr_file = os.path.join(folder, temporal_params.get('pirrww_file', ''))
+            self.temp_file = os.path.join(folder, temporal_params.get('temp_file', ''))
+            self.domr_file = os.path.join(folder, temporal_params.get('DomesticR', ''))
+
+    def load_maps(self):
+        self.regionmaps = {}
+        for mapname, filename in self.mapfiles:
+            self.regionmaps[mapname] = RegionMap(self.resolution, filename)
+
+    def load_proxies(self):
+        mask = self.regionmaps[self.mapfiles[0][0]].mask
+        self.proxies = GriddedData(list(self.proxyfiles.keys()), self.years, self.resolution, mask, self.proxyfiles)
+
+    def load_regiondata(self):
+        queries = {i.title: i for i in gcamreader.parse_batch_query(self.query_file)}
+        self.regiondata = {}
+        conn = gcamreader.LocalDBConn(self.gcam_db_path, self.gcam_db_file, suppress_gabble=False)
+        for sector in self.sectors:
+            self.regiondata[sector] = {}
+            subsectors = self.rules[sector]['subsectors']
+            for demand in self.demand_types:
+                print(f'Loading Region Data for {sector} Water {demand}')
+                regionmap = self.regionmaps[self.rules[sector]['map1']]
+                query = queries[self.rules[sector]['query1'].replace('Demand', demand)]
+                self.regiondata[sector][demand] = {'data1': RegionData(subsectors, regionmap, self.years, conn, query)}
+                if self.rules[sector]['query2'] is not None:
+                    regionmap = self.regionmaps[self.rules[sector]['map2']]
+                    query = queries[self.rules[sector]['query2'].replace('Demand', demand)]
+                    self.regiondata[sector][demand]['data2'] = RegionData([sector], regionmap, self.years, conn, query)
+        # weights for temporal downscaling of electricity
+        if self.perform_temporal and 'Electricity' in self.sectors:
+            subsectors = ('Heating', 'Cooling', 'Other')
+            regionmap = self.regionmaps['Regions']
+            query = queries['elec consumption by demand sector']
+            self.elecdemand = RegionData(subsectors, regionmap, self.years, conn, query)
+            self.elecdemand.subsector_ratio()
+
+    def downscale(self, sector, demand):
+        print(f'Downscaling {sector} water {demand}')
+        self.outputs[sector][demand] = self.proxies.extract(self.rules[sector]['subsectors'], self.rules[sector]['parts'])
+        self.outputs[sector][demand].harmonize(self.regiondata[sector][demand]['data1'])
+        if 'data2' in self.regiondata[sector][demand]:
+            self.outputs[sector][demand].harmonize(self.regiondata[sector][demand]['data2'])
+
+    def run_model(self):
+        self.load_maps()
+        self.load_proxies()
+        self.load_regiondata()
+        for sector in self.sectors:
+            self.outputs[sector] = {}
+            for demand in self.demand_types:
+                self.downscale(sector, demand)
+        if self.perform_temporal:
+            for demand in self.demand_types:
+                if 'Domestic' in self.sectors:
+                    self.outputs['Domestic'][demand].temp_dom(self.temp_file, self.domr_file)
+                if 'Electricity' in self.sectors:
+                    self.outputs['Electricity'][demand].temp_elec(self.temp_file, self.elecdemand)
+                if 'Irrigation' in self.sectors:
+                    regionmap = self.regionmaps[self.rules['Irrigation']['map1']]
+                    self.outputs['Irrigation'][demand].temp_irr(self.irr_file, regionmap)
+                if 'Manufacturing' in self.sectors:
+                    self.outputs['Manufacturing'][demand].temp_uniform()
+                if 'Mining' in self.sectors:
+                    self.outputs['Mining'][demand].temp_uniform()
+                if 'Livestock' in self.sectors:
+                    self.outputs['Livestock'][demand].temp_uniform()
+        # save outputs
+        for sector in self.sectors:
+            for demand in self.demand_types:
+                filename = os.path.join(self.outputfolder, f'{sector}{demand}.nc')
+                self.outputs[sector][demand].save(filename)
+                if self.perform_temporal:
+                    filename = os.path.join(self.outputfolder, f'{sector}{demand}Temporal.nc')
+                    self.outputs[sector][demand].save_temporal(filename)
