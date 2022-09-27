@@ -75,6 +75,7 @@ class GriddedData:
             np.multiply(self.flatarray, scale, out=self.flatarray, where=mask)
 
     def interp_annual(self):
+        """Interpolate from 5-year (or whatever interval) to annual timesteps"""
         summed = self.flatarray.sum(axis=0)
         nyears = self.years[-1] - self.years[0] + 1  # include endpoints
         out = np.zeros((nyears, self.nflat), dtype=np.float32)
@@ -87,8 +88,8 @@ class GriddedData:
         return out.reshape(nyears, 1, self.nflat)
 
     def temp_irr(self, pirrww_file, regionmap):
+        """Temporal downscaling of irrigation water demand"""
         self.temporal = from_monthly_npz(pirrww_file, 'pirrww', self.years[0], self.years[-1], self.resolution, self.mask)
-
         for i in range(len(regionmap.key)):
             mask = np.equal(regionmap.flatmap, regionmap.key['id'][i])
             if np.count_nonzero(mask) > 0:
@@ -96,28 +97,25 @@ class GriddedData:
                 yearsums = np.sum(monthsums, axis=1, keepdims=True)
                 yearsums[yearsums == 0] = 1
                 self.temporal[:, :, mask] = monthsums / yearsums
-
         self.temporal *= self.interp_annual()
 
-        return
-
     def temp_dom(self, tas_file, domr_file):
+        """Temporal downscaling for domestic water demand using algorithm from Wada et al. (2011)"""
         self.temporal = from_monthly_npz(tas_file, 'tas', self.years[0], self.years[-1], self.resolution, self.mask)
         ranges = np.max(self.temporal, axis=1, keepdims=True) - np.min(self.temporal, axis=1, keepdims=True)
         ranges[ranges == 0] = 1
         self.temporal -= np.mean(self.temporal, axis=1, keepdims=True)
         self.temporal /= ranges
-
         domr = np.load(domr_file)['R']
         domr[domr == -9999] = 0
         domr = regrid(domr, self.resolution, thematic=True)[self.mask]
         self.temporal *= domr
         self.temporal += 1
         self.temporal /= 12
-
         self.temporal *= self.interp_annual()
 
     def temp_elec(self, temp_file, elec_weights):
+        """Temporal downscaling of water demand for electricity generatin using algorithm from Voisin et al. (2013)"""
         hdd = from_monthly_npz(temp_file, 'hdd', self.years[0], self.years[-1], self.resolution, self.mask)
         cdd = from_monthly_npz(temp_file, 'cdd', self.years[0], self.years[-1], self.resolution, self.mask)
         hdd_sums = np.sum(hdd, axis=1, keepdims=True)
@@ -134,21 +132,18 @@ class GriddedData:
         cdd /= cdd_sums
 
         self.temporal = np.full_like(hdd, 1/12, dtype=np.float32)
-
         weights = elec_weights.interp_annual()
-
         for i in range(len(elec_weights.regionmap.key)):
             mask = np.equal(elec_weights.regionmap.flatmap, elec_weights.regionmap.key['id'][i])
             hdd[:, :, mask] *= weights[0, i].reshape(-1, 1, 1)
             cdd[:, :, mask] *= weights[1, i].reshape(-1, 1, 1)
             self.temporal[:, :, mask] *= weights[2, i].reshape(-1, 1, 1)
-
         self.temporal += hdd
         self.temporal += cdd
-
         self.temporal *= self.interp_annual()
 
     def temp_uniform(self):
+        """Divide demand evenly among months"""
         self.temporal = np.full((self.years[-1] - self.years[0] + 1, 12, self.nflat), 1/12, dtype=np.float32)
         self.temporal *= self.interp_annual()
 

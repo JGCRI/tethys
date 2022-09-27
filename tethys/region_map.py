@@ -54,6 +54,7 @@ class RegionMap:
         return out
 
     def extensify(self, n=1):
+        """Expand nonzero regions into cells without a region"""
         for i in range(n):
             for shift in ((0, 1), (0, -1), (1, 0), (-1, 0)):
                 self.map = np.where(self.map == 0, np.roll(self.map, shift, axis=(0, 1)), self.map)

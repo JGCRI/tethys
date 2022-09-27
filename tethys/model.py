@@ -40,6 +40,7 @@ class Tethys:
             self.load_config(cfg)
 
     def load_config(self, config_file):
+        """Load model parameters from a config.ini"""
         self.config = ConfigObj(config_file)
 
         project = self.config.get('Project')
@@ -60,6 +61,7 @@ class Tethys:
             self.demand_types = [self.demand_types]
         self.perform_temporal = int(project.get('PerformTemporal', 0))
 
+        # names and paths to region npz files
         self.mapfiles = self.config.get('RegionMaps').items()
 
         # parse proxy files
@@ -83,6 +85,7 @@ class Tethys:
                                 self.proxyfiles[proxy] = {'flags': flags, 'years': {}}
                             self.proxyfiles[proxy]['years'][int(year)] = os.path.join(folder, value)
 
+        # for parsing GCAM database
         gcaminputs = self.config.get('GCAMInputs')
         self.gcam_db_path = gcaminputs.get('GCAM_DBpath', None)
         self.gcam_db_file = gcaminputs.get('GCAM_DBfile', None)

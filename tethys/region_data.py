@@ -28,11 +28,13 @@ class RegionData:
         self.array = pivot.to_numpy().reshape(self.nsubsectors, self.nregions, self.nyears)
 
     def subsector_ratio(self):
+        """Set subsector values to fraction of total"""
         sums = self.array.sum(axis=0, keepdims=True)
         sums[sums == 0] = 1
         self.array /= sums
 
     def interp_annual(self):
+        """Convert from 5-year time steps to annual"""
         nyears = self.years[-1] - self.years[0] + 1  # include endpoints
         out = np.zeros((self.nsubsectors, self.nregions, nyears), dtype=np.float32)
         for i in range(len(self.years) - 1):
@@ -45,6 +47,7 @@ class RegionData:
 
 
 def elec_sector(x):
+    """Helper for electricity demand sectors"""
     if x in ('comm heating', 'resid heating', 'comm hot water', 'resid furnace fans', 'resid hot water'):
         return 'Heating'
     elif x in ('comm cooling', 'resid cooling', 'comm refrigeration', 'resid freezers', 'resid refrigerators'):
