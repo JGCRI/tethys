@@ -35,6 +35,7 @@ setup(
         'gcamreader>=1.2.5',
         'netCDF4~=1.6',
         'tifffile~=2022.5.4',
+        'imagecodecs~=2022.9.26',
         'Pillow~=8.4.0',
         'setuptools~=57.0.0'
     ],
