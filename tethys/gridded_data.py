@@ -31,7 +31,9 @@ class GriddedData:
             print(f'Loading Proxy Data for {subsector}')
             flags = files[subsector]['flags']
             # "round" down to earlier year if no exact match
-            datayears = [max(y for y in files[subsector]['years'].keys() if y <= year) for year in self.years]
+            datayears = [max(y for y in files[subsector]['years'].keys()
+                             if y <= year or y == min(files[subsector]['years'].keys()))
+                         for year in self.years]
             for year, filename in files[subsector]['years'].items():
                 if year in datayears:
                     temp = None
@@ -173,14 +175,16 @@ class GriddedData:
 
         datagrp = nc4.Dataset(filename, 'w')
 
-        datagrp.createDimension('time', self.nyears)
+        datagrp.createDimension('year', self.nyears)
         datagrp.createDimension('lat', self.nlat)
         datagrp.createDimension('lon', self.nlon)
 
-        year = datagrp.createVariable('year', 'i4', ('time',))
+        year = datagrp.createVariable('year', 'i4', ('year',))
+        year.units = 'Year'
         lat = datagrp.createVariable('lat', 'f4', ('lat',))
         lon = datagrp.createVariable('lon', 'f4', ('lon',))
-        data = datagrp.createVariable('value', 'f4', ('time', 'lat', 'lon'), compression='zlib')
+        demand = datagrp.createVariable('demand', 'f4', ('year', 'lat', 'lon'), compression='zlib')
+        demand.units = 'km^3/year'
 
         year[:] = np.asarray(self.years)
         lat[:] = np.arange(-90 + self.resolution/2, 90, self.resolution)
@@ -188,7 +192,7 @@ class GriddedData:
 
         unflattened = np.full((self.nyears, self.nlat, self.nlon), np.nan, dtype=np.float32)
         unflattened[:, self.mask] = np.sum(self.flatarray, axis=0)
-        data[:] = unflattened
+        demand[:] = unflattened
 
         datagrp.close()
 

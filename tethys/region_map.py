@@ -61,6 +61,14 @@ class RegionMap:
         self.mask = self.map != 0
         self.flatmap = self.map[self.mask]
 
+    def filter(self, region):
+        self.key = self.key[np.char.startswith(self.key['name'], region)]
+        for i in np.unique(self.map):
+            if i not in self.key['id']:
+                self.map[self.map == i] = 0
+        self.mask = self.map != 0
+        self.flatmap = self.map[self.mask]
+
     def show(self):
         temp = self.map.astype(np.float32)
         temp *= 255/temp.max()  # normalize to (0, 255)

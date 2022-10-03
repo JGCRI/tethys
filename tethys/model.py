@@ -71,22 +71,25 @@ class Tethys:
                 section = self.config.get(sectionname)
                 folder = section.get('Folder')
                 subsectors = section.get('Subsectors', None)
+                years = section.get('Years', None)
                 flags = section.get('Flags', None)
                 for key, value in section.items():
-                    if key not in ('Folder', 'Subsectors', 'Flags'):
+                    if key not in ('Folder', 'Subsectors', 'Years', 'Flags'):
                         proxy, year = key.split('_')
-                        if proxy == 'Subsectors':  # reserve this as keyword for files with multiple proxies (demeter)
-                            for subsector in subsectors:
-                                if subsector not in self.proxyfiles:
-                                    self.proxyfiles[subsector] = {'flags': flags, 'years': {}}
-                                self.proxyfiles[subsector]['years'][int(year)] = os.path.join(folder, value)
-                        else:
-                            if proxy not in self.proxyfiles:
-                                self.proxyfiles[proxy] = {'flags': flags, 'years': {}}
-                            self.proxyfiles[proxy]['years'][int(year)] = os.path.join(folder, value)
+                        if proxy != 'Subsectors':  # reserve this as keyword for files with multiple proxies (demeter)
+                            subsectors = [proxy]
+                        if year != 'Years':
+                            years = [year]
+                        for subsector in subsectors:
+                            if subsector not in self.proxyfiles:
+                                self.proxyfiles[subsector] = {'flags': flags, 'years': {}}
+                            for y in years:
+                                self.proxyfiles[subsector]['years'][int(y)] = \
+                                    os.path.join(folder, value.replace('YYYY', y))
 
         # for parsing GCAM database
         gcaminputs = self.config.get('GCAMInputs')
+        self.csv_file = gcaminputs.get('CSV_file', None)
         self.gcam_db_path = gcaminputs.get('GCAM_DBpath', None)
         self.gcam_db_file = gcaminputs.get('GCAM_DBfile', None)
         self.query_file = gcaminputs.get('QueryFile', None)
@@ -130,7 +133,9 @@ class Tethys:
     def load_regiondata(self):
         queries = {i.title: i for i in gcamreader.parse_batch_query(self.query_file)}
         self.regiondata = {}
-        conn = gcamreader.LocalDBConn(self.gcam_db_path, self.gcam_db_file, suppress_gabble=False)
+        conn = None
+        if self.gcam_db_path is not None:
+            conn = gcamreader.LocalDBConn(self.gcam_db_path, self.gcam_db_file, suppress_gabble=False)
         for sector in self.sectors:
             self.regiondata[sector] = {}
             subsectors = self.rules[sector]['subsectors']
@@ -138,17 +143,17 @@ class Tethys:
                 print(f'Loading Region Data for {sector} Water {demand}')
                 regionmap = self.regionmaps[self.rules[sector]['map1']]
                 query = queries[self.rules[sector]['query1'].replace('Demand', demand)]
-                self.regiondata[sector][demand] = {'data1': RegionData(subsectors, regionmap, self.years, conn, query)}
+                self.regiondata[sector][demand] = {'data1': RegionData(sector, subsectors, regionmap, self.years, conn, query, self.csv_file)}
                 if self.rules[sector]['query2'] is not None:
                     regionmap = self.regionmaps[self.rules[sector]['map2']]
                     query = queries[self.rules[sector]['query2'].replace('Demand', demand)]
-                    self.regiondata[sector][demand]['data2'] = RegionData([sector], regionmap, self.years, conn, query)
+                    self.regiondata[sector][demand]['data2'] = RegionData(sector, [sector], regionmap, self.years, conn, query, self.csv_file)
         # weights for temporal downscaling of electricity
         if self.perform_temporal and 'Electricity' in self.sectors:
             subsectors = ('Heating', 'Cooling', 'Other')
             regionmap = self.regionmaps['Regions']
             query = queries['elec consumption by demand sector']
-            self.elecdemand = RegionData(subsectors, regionmap, self.years, conn, query)
+            self.elecdemand = RegionData('elecdemand', subsectors, regionmap, self.years, conn, query)
             self.elecdemand.subsector_ratio()
 
     def downscale(self, sector, demand):
