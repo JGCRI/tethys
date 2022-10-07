@@ -6,8 +6,8 @@ from tethys.utils.data_parser import regrid
 class RegionMap:
     def __init__(self, resolution, npzfile=None):
         self.resolution = resolution
-        self.nlat = int(180 / resolution)
-        self.nlon = int(360 / resolution)
+        self.nlat = round(180 / resolution)
+        self.nlon = round(360 / resolution)
         self.map = None
         self.mask = None
         self.flatmap = None
@@ -41,7 +41,7 @@ class RegionMap:
         self.extensify(n=2)
 
     def intersection(self, other):
-        # assumes that regions are numbered 1 through n and sorted
+        # assumes that regions are numbered 1 through n and sorted, and same land mask
         # here for complete workflow to region-basin map
         # redo with pandas at some point
         out = RegionMap(self.resolution)
@@ -71,6 +71,7 @@ class RegionMap:
 
     def show(self):
         temp = self.map.astype(np.float32)
+        temp[temp == np.uint16(-1)] = 0
         temp *= 255/temp.max()  # normalize to (0, 255)
         temp = temp.repeat(4, axis=0).repeat(4, axis=1)  # make higher res so windows photos app shows more detail
         Image.fromarray(temp.astype(np.uint8), 'L').show()

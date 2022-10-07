@@ -22,8 +22,8 @@ class Tethys:
 
     def __init__(self, cfg=None):
         self.resolution = 0.125
-        self.nlat = int(180 / self.resolution)
-        self.nlon = int(360 / self.resolution)
+        self.nlat = round(180 / self.resolution)
+        self.nlon = round(360 / self.resolution)
         self.years = []
         self.nyears = len(self.years)
         self.demand_types = []
@@ -49,8 +49,8 @@ class Tethys:
         if isinstance(self.sectors, str):
             self.sectors = [self.sectors]
         self.resolution = float(project.get('Resolution', 0.125))
-        self.nlat = int(180 / self.resolution)
-        self.nlon = int(360 / self.resolution)
+        self.nlat = round(180 / self.resolution)
+        self.nlon = round(360 / self.resolution)
         self.years = project.get('Years', range(2010, 2101, 5))
         if isinstance(self.years, str):
             self.years = [self.years]

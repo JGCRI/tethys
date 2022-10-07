@@ -12,8 +12,8 @@ class GriddedData:
         self.years = years
         self.nyears = len(years)
         self.resolution = resolution
-        self.nlat = int(180 / resolution)
-        self.nlon = int(360 / resolution)
+        self.nlat = round(180 / resolution)
+        self.nlon = round(360 / resolution)
         # ~4x memory savings by only storing land cells, mask helps convert back to lat lon array
         self.mask = np.full((self.nlat, self.nlon), True) if mask is None else mask
         self.nflat = np.count_nonzero(self.mask)
@@ -117,7 +117,7 @@ class GriddedData:
         self.temporal *= self.interp_annual()
 
     def temp_elec(self, temp_file, elec_weights):
-        """Temporal downscaling of water demand for electricity generatin using algorithm from Voisin et al. (2013)"""
+        """Temporal downscaling of water demand for electricity generation using algorithm from Voisin et al. (2013)"""
         hdd = from_monthly_npz(temp_file, 'hdd', self.years[0], self.years[-1], self.resolution, self.mask)
         cdd = from_monthly_npz(temp_file, 'cdd', self.years[0], self.years[-1], self.resolution, self.mask)
         hdd_sums = np.sum(hdd, axis=1, keepdims=True)
@@ -187,7 +187,7 @@ class GriddedData:
         demand.units = 'km^3/year'
 
         year[:] = np.asarray(self.years)
-        lat[:] = np.arange(-90 + self.resolution/2, 90, self.resolution)
+        lat[:] = np.arange(90 - self.resolution/2, -90, -self.resolution)
         lon[:] = np.arange(-180 + self.resolution/2, 180, self.resolution)
 
         unflattened = np.full((self.nyears, self.nlat, self.nlon), np.nan, dtype=np.float32)
@@ -213,7 +213,7 @@ class GriddedData:
 
         year[:] = np.arange(self.years[0], self.years[-1] + 1).repeat(12)
         month[:] = np.tile(np.arange(12), self.temporal.shape[0])
-        lat[:] = np.arange(-90 + self.resolution/2, 90, self.resolution)
+        lat[:] = np.arange(90 - self.resolution/2, -90, -self.resolution)
         lon[:] = np.arange(-180 + self.resolution/2, 180, self.resolution)
 
         unflattened = np.full((self.temporal.shape[0], 12, self.nlat, self.nlon), np.nan, dtype=np.float32)

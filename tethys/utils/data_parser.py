@@ -25,22 +25,61 @@ def load_tiff(filename):
     y_offset = round((90 - metadata['ModelTiepoint'][4]) / resolution)
     x_offset = round((180 + metadata['ModelTiepoint'][3]) / resolution)
 
-    out = np.zeros((int(180 / resolution), int(360 / resolution)))
+    out = np.zeros((round(180 / resolution), round(360 / resolution)))
     out[y_offset:y_offset + temp.shape[0], x_offset:x_offset + temp.shape[1]] = temp
 
     return out
 
 
-def load_nc(filename, short_name):
-    grp = nc4.Dataset(filename, format='NETCDF3_CLASSIC')
+def load_nc(filename, name):
+    grp = nc4.Dataset(filename)
     grp.set_auto_mask(False)
-    var = grp.get_variables_by_attributes(short_name=short_name)[0]
+
+    if name in grp.variables.keys():
+        var = grp.variables[name]
+    else:  # check short name (for earlier versions of Demeter outputs)
+        var = grp.get_variables_by_attributes(short_name=name)[0]
+
     temp = var[:].copy()
-    temp[np.isnan(temp)] = 0
-    if 'lon' in var.dimensions[0]:
+    # handle different names
+
+    if 'lat' in grp.variables.keys():
+        lat = grp.variables['lat'][:].copy()
+        lon = grp.variables['lon'][:].copy()
+    else:
+        lat = grp.variables['latitude'][:].copy()
+        lon = grp.variables['longitude'][:].copy()
+
+    # handle swapped lat-lon dimension order
+    if var.dimensions[0].lower().startswith('lon'):
         temp = temp.T
+
     grp.close()
-    return temp
+
+    # handle ascending lat
+    if lat[0] < lat[1]:
+        lat = np.flip(lat, axis=0)
+        temp = np.flip(temp, axis=0)
+
+    # replace nans
+    temp[np.isnan(temp)] = 0
+
+    # remove indices of repeated latitudes
+    diffs = lat[:-1] - lat[1:]
+    avg_diff = (lat[0] - lat[-1]) / (len(lat) - 1)
+    valid = np.where(diffs > 0.5 * avg_diff)[0]
+    temp = temp[valid]
+    lat = lat[valid]
+
+    # place in global grid
+    resolution = (lat[0] - lat[-1])/(len(lat) - 1)  # assuming lat and lon same resolution
+    y_offset = round((90 - lat[0]) / resolution - 0.5)
+    x_offset = round((180 + lon[0]) / resolution - 0.5)
+
+    out = np.zeros((round(180 / resolution), round(360 / resolution)))
+    out[y_offset:y_offset + temp.shape[0], x_offset:x_offset + temp.shape[1]] = temp
+
+    return out
 
 
 def from_monthly_npz(filename, variable, firstyear, lastyear, resolution, mask):
@@ -67,7 +106,7 @@ def regrid(array, resolution, preserve_sum=True, thematic=False):
     # quick regridding of 2d input array to a close output resolution with reasonable lcm (e.g., 5 to 7.5 arcmins)
     # does not adjust weights for cell areas, but probably shouldn't be used for cases where that would matter
     iny, inx = array.shape
-    outy, outx = int(180 / resolution), int(360 / resolution)
+    outy, outx = round(180 / resolution), round(360 / resolution)
     lcm = np.lcm(iny, outy)
     r = lcm // iny
     s = lcm // outy
