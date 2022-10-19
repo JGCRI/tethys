@@ -62,7 +62,7 @@ class Tethys:
         self.perform_temporal = int(project.get('PerformTemporal', 0))
 
         # names and paths to region npz files
-        self.mapfiles = self.config.get('RegionMaps').items()
+        self.mapfiles = dict(self.config.get('RegionMaps'))
 
         # parse proxy files
         self.proxyfiles = {}
@@ -108,7 +108,7 @@ class Tethys:
                     parts = [parts]
                 self.rules[sector]['parts'].append(parts)
 
-            self.rules[sector]['map1'] = section.get('Map1', self.mapfiles[0][0])
+            self.rules[sector]['map1'] = section.get('Map1', 'Regions')
             self.rules[sector]['map2'] = section.get('Map2', None)
 
             self.rules[sector]['query1'] = section.get('Query1', None)
@@ -123,12 +123,13 @@ class Tethys:
 
     def load_maps(self):
         self.regionmaps = {}
-        for mapname, filename in self.mapfiles:
-            self.regionmaps[mapname] = RegionMap(self.resolution, filename)
+        self.landmask = RegionMap(self.resolution, self.mapfiles['Landmask']).mask
+        for mapname, filename in self.mapfiles.items():
+            if mapname != 'Landmask':
+                self.regionmaps[mapname] = RegionMap(self.resolution, filename, self.landmask)
 
     def load_proxies(self):
-        mask = self.regionmaps[self.mapfiles[0][0]].mask
-        self.proxies = GriddedData(list(self.proxyfiles.keys()), self.years, self.resolution, mask, self.proxyfiles)
+        self.proxies = GriddedData(list(self.proxyfiles.keys()), self.years, self.resolution, self.landmask, self.proxyfiles)
 
     def load_regiondata(self):
         queries = {i.title: i for i in gcamreader.parse_batch_query(self.query_file)}

@@ -4,16 +4,24 @@ from tethys.utils.data_parser import regrid
 
 
 class RegionMap:
-    def __init__(self, resolution, npzfile=None):
+
+    def __init__(self, resolution: float, npzfile=None, mask=None):
         self.resolution = resolution
         self.nlat = round(180 / resolution)
         self.nlon = round(360 / resolution)
         self.map = None
-        self.mask = None
-        self.flatmap = None
         self.key = None
+        self.mask = mask
+        self.flatmap = None
         if npzfile is not None:
             self.load_npz(npzfile)
+            self.extensify(n=2)
+            self.flatten()
+
+    def flatten(self):
+        if self.mask is None:
+            self.mask = self.map != 0
+        self.flatmap = self.map[self.mask]
 
     def load_bil_map(self, filename):
         # hardcoded to work with the moirai bil files
@@ -30,15 +38,17 @@ class RegionMap:
     def save_npz(self, filename):
         np.savez_compressed(filename, map=self.map, key=self.key)
 
-    def load_npz(self, filename):
+    def load_npz(self, filename: str):
+        """Load map and key from an npz file
+
+        :param filename: path to npz file
+        """
+
         data = np.load(filename)
         self.map = data['map']
         if self.map.shape != (self.nlat, self.nlon):
             self.map = regrid(self.map, self.resolution, thematic=True)
-        self.mask = self.map != 0
-        self.flatmap = self.map[self.mask]
         self.key = data['key']
-        self.extensify(n=2)
 
     def intersection(self, other):
         # assumes that regions are numbered 1 through n and sorted, and same land mask
@@ -58,20 +68,32 @@ class RegionMap:
         for i in range(n):
             for shift in ((0, 1), (0, -1), (1, 0), (-1, 0)):
                 self.map = np.where(self.map == 0, np.roll(self.map, shift, axis=(0, 1)), self.map)
-        self.mask = self.map != 0
-        self.flatmap = self.map[self.mask]
 
-    def filter(self, region):
-        self.key = self.key[np.char.startswith(self.key['name'], region)]
+    def filter(self, region=None, minid=0, maxid=65535):
+        if region is not None:
+            self.key = self.key[np.char.startswith(self.key['name'], region)]
+        else:
+            self.key = self.key[(self.key['id'] >= minid) & (self.key['id'] <= maxid)]
         for i in np.unique(self.map):
             if i not in self.key['id']:
                 self.map[self.map == i] = 0
-        self.mask = self.map != 0
-        self.flatmap = self.map[self.mask]
+
+    def reindex(self):
+        self.key.sort(order=['id'])
+        _, self.map = np.unique(self.map, return_inverse=True)
+        self.key['id'] = np.arange(len(self.key)) + 1
+
+    def get_bounds(self):
+        if self.mask is None:
+            self.mask = self.map != 0
+        indices = np.nonzero(self.mask)
+        min_row, min_col = np.min(indices, axis=0)
+        max_row, max_col = np.max(indices, axis=0)
+
+        return self.mask[min_row:max_row + 1, min_col:max_col + 1]
 
     def show(self):
         temp = self.map.astype(np.float32)
-        temp[temp == np.uint16(-1)] = 0
         temp *= 255/temp.max()  # normalize to (0, 255)
         temp = temp.repeat(4, axis=0).repeat(4, axis=1)  # make higher res so windows photos app shows more detail
         Image.fromarray(temp.astype(np.uint8), 'L').show()

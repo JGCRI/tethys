@@ -1,6 +1,7 @@
 import numpy as np
 import netCDF4 as nc4
 from PIL import Image
+from matplotlib import cm
 
 from tethys.utils.data_parser import regrid, load_tiff, load_nc, from_monthly_npz
 
@@ -157,18 +158,22 @@ class GriddedData:
             out[self.mask] = self.flatarray[self.subsectors.index(subsector), self.years.index(year)]
         return out
 
-    def show(self, subsector='Total', year=None):
+    def show(self, subsector='Total', year=None, mask=None):
         """Show plot of subsector during year"""
         if year is None:
             year = self.years[0]
         temp = self.unflatten(subsector, year)
-        m = np.max(temp)
-        if m != 0:
-            temp /= m  # normalize (0, 1)
+        maximum = np.max(temp)
+        if maximum != 0:
+            temp /= maximum  # normalize (0, 1)
         temp = np.sqrt(np.sqrt(temp))  # 4th root plots better (squishes large values)
+        temp = cm.YlOrRd(temp)
         temp *= 255  # normalize to (0, 255)
+        if mask is None:
+            mask = self.mask
+        temp[~mask] = (173, 216, 230, 255)
         temp = temp.repeat(4, axis=0).repeat(4, axis=1)  # make higher res so windows photos app shows more detail
-        Image.fromarray(temp.astype(np.uint8), 'L').show()  # show the image in system default viewer
+        Image.fromarray(temp.astype(np.uint8)).convert('RGB').show()  # show the image in system default viewer
 
     def save(self, filename):
         """Save array to NetCDF file"""
