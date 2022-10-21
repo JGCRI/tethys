@@ -4,6 +4,7 @@ from PIL import Image
 from matplotlib import cm
 
 from tethys.utils.data_parser import regrid, load_tiff, load_nc, from_monthly_npz
+from tethys.region_data import RegionData
 
 
 class GriddedData:
@@ -76,6 +77,17 @@ class GriddedData:
 
             scale = regiondata.array[:, i].reshape(-1, self.nyears, 1) / region_total
             np.multiply(self.flatarray, scale, out=self.flatarray, where=mask)
+
+    def reaggregate(self, regionmap):
+        """Reaggregate grids back to region scale, for comparing with input data"""
+
+        out = RegionData(None, self.subsectors, regionmap, self.years)
+
+        for i in range(len(regionmap.key)):
+            mask = np.equal(regionmap.flatmap, regionmap.key['id'][i])
+            out.array[:, i] = np.sum(self.flatarray, where=mask, axis=2)  # region totals for each subsector and year
+
+        return out
 
     def interp_annual(self):
         """Interpolate from 5-year (or whatever interval) to annual timesteps"""

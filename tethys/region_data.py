@@ -12,7 +12,7 @@ class RegionData:
         self.nregions = len(self.regions)
         self.years = years
         self.nyears = len(self.years)
-        self.array = None
+        self.array = np.zeros((self.nsubsectors, self.nregions, self.nyears), dtype=np.float32)
         if csv_file is not None:
             self.from_csv(csv_file)
         elif query is not None:
