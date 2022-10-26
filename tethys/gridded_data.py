@@ -46,7 +46,8 @@ class GriddedData:
                     else:
                         print('CANT HANDLE THIS FILE TYPE')
                     if temp.shape != (self.nlat, self.nlon):
-                        temp = regrid(temp, self.resolution, preserve_sum=flags != 'PCTAREA')
+                        method = 'intensive' if flags == 'PCTAREA' else 'extensive'
+                        temp = regrid(temp, self.resolution, method=method)
                     if flags == 'PCTAREA':
                         areas = np.cos(np.radians(np.arange(-90 + self.resolution/2, 90, self.resolution))) * \
                                 (111.32 * 110.57) * self.resolution * self.resolution
@@ -123,7 +124,7 @@ class GriddedData:
         self.temporal /= ranges
         domr = np.load(domr_file)['R']
         domr[domr == -9999] = 0
-        domr = regrid(domr, self.resolution, thematic=True)[self.mask]
+        domr = regrid(domr, self.resolution, method='thematic')[self.mask]
         self.temporal *= domr
         self.temporal += 1
         self.temporal /= 12

@@ -97,29 +97,47 @@ def from_monthly_npz(filename, variable, firstyear, lastyear, resolution, mask):
     out = np.zeros((lastyear - firstyear + 1, 12, np.count_nonzero(mask)))
     for i in range(lastyear - firstyear + 1):
         for j in range(12):
-            out[i, j] = regrid(temp[i, j], resolution, preserve_sum=False)[mask]
+            out[i, j] = regrid(temp[i, j], resolution, method='intensive')[mask]
 
     return out
 
 
-def regrid(array, resolution, preserve_sum=True, thematic=False):
-    # quick regridding of 2d input array to a close output resolution with reasonable lcm (e.g., 5 to 7.5 arcmins)
-    # does not adjust weights for cell areas, but probably shouldn't be used for cases where that would matter
+def regrid(array, out_resolution, in_resolution=None, method='extensive'):
+    """ quick regridding of 2d input array to an output resolution with reasonable lcm (e.g., 1/12 to 1/8 degrees)
+
+    :param array: 2d array to be regridded
+    :param out_resolution: desired output resolution
+    :param in_resolution: resolution of array. if None (default), will be assumed to be 180 / array.shape[0]
+    :param method: choice of 'extensive' (preserves sum, default), 'intensive' (average), or 'thematic' (categories)
+    :return: array regridded to output resolution
+    """
+
     iny, inx = array.shape
-    outy, outx = round(180 / resolution), round(360 / resolution)
+
+    if in_resolution is None:
+        in_resolution = 180 / iny
+
+    scale = in_resolution / out_resolution
+    outy, outx = round(iny * scale), round(inx * scale)
+
     lcm = np.lcm(iny, outy)
     r = lcm // iny
     s = lcm // outy
 
-    if thematic:  # take center
+    if method == 'thematic':  # take center
         temp = array.repeat(r, axis=1).reshape(iny, outx, s)[:, :, s//2]
         out = temp.repeat(r, axis=0).reshape(outy, s, outx)[:, s//2, :]
         return out
+
     else:
         temp = array.repeat(r, axis=1).reshape(iny, outx, s).sum(axis=2)
         out = temp.repeat(r, axis=0).reshape(outy, s, outx).sum(axis=1)
 
-        if preserve_sum:
+        if method == 'extensive':  # divide by repetitions to preserve sum
             return out / (r * r)
-        else:
+
+        elif method == 'intensive':  # take average within the output cells
             return out / (s * s)
+
+        else:
+            print('invalid method')

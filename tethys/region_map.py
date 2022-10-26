@@ -29,7 +29,7 @@ class RegionMap:
         temp = np.fromfile(filename, dtype=np.float32).reshape(2160, 4320)
         temp[temp == -9999] = 0
         if temp.shape != (self.nlat, self.nlon):
-            temp = regrid(temp, self.resolution, thematic=True)
+            temp = regrid(temp, self.resolution, method='thematic')
         self.map = temp.astype(np.uint16)
 
     def load_csv_key(self, filename, skiprows=1):
@@ -47,7 +47,7 @@ class RegionMap:
         data = np.load(filename)
         self.map = data['map']
         if self.map.shape != (self.nlat, self.nlon):
-            self.map = regrid(self.map, self.resolution, thematic=True)
+            self.map = regrid(self.map, self.resolution, method='thematic')
         self.key = data['key']
 
     def intersection(self, other):
