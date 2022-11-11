@@ -1,10 +1,11 @@
-configobj~=5.0.6
 numpy~=1.21
 pandas~=1.2.4
 requests~=2.20.0
 gcamreader>=1.2.5
+xarray~=2022.3.0
+sparse~=0.13.0
 netCDF4~=1.6
-tifffile~=2022.5.4
-imagecodecs~=2022.9.26
-Pillow~=8.4.0
+rioxarray~=0.12.4
 setuptools~=57.0.0
+PyYAML~=6.0
+matplotlib~=3.4.3

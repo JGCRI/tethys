@@ -8,136 +8,264 @@ Copyright (c) 2022, Battelle Memorial Institute
 
 """
 import numpy as np
-import tifffile as tf
-import netCDF4 as nc4
+import pandas as pd
+import gcamreader
+import xarray as xr
+import sparse
 
 
-def load_tiff(filename):
-    with tf.TiffFile(filename) as tif:
-        temp = tif.asarray()
-        nodata = tif.pages.first.nodata
-        metadata = tif.geotiff_metadata
+def downscale(df, proxies, regions):
+    """Actual downscaling here
 
-    temp[temp == nodata] = 0
+    :param df: pandas dataframe of region scale demand inputs, with columns 'region', 'sector', 'year', 'value'
+    :param proxies: xarray DataArray giving distribution of demand, with dimensions 'sector', 'year', 'lat', 'lon'
+    :param regions: xarray DataArray with labeled regions, dimensions 'lat', 'lon', and attribute names
+    :return: out: xarray DataArray with dimensions 'sector', 'year', 'lat', 'lon'
+    """
+    regionids = pd.Series(regions.names, name='regionid').astype(int).sort_index().rename_axis('region').to_xarray()
 
-    # place in global grid
-    resolution = metadata['ModelPixelScale'][0]  # assuming lat and lon same resolution
-    y_offset = round((90 - metadata['ModelTiepoint'][4]) / resolution)
-    x_offset = round((180 + metadata['ModelTiepoint'][3]) / resolution)
+    index = pd.MultiIndex.from_product([regionids.region.to_series(), proxies.sector.to_series(), proxies.year.to_series()])
+    input_data = df.set_index(['region', 'sector', 'year']).reindex(index, fill_value=0)['value'].to_xarray()
 
-    out = np.zeros((round(180 / resolution), round(360 / resolution)))
-    out[y_offset:y_offset + temp.shape[0], x_offset:x_offset + temp.shape[1]] = temp
+    # groupby was slow so we do this hack with sparse arrays
+    # multiply the proxy by a bool array region mask to group, then operate on each layer
+    groups = regions == regionids
+    out = proxies * groups
 
-    return out
+    sums = out.sum(dim=('lat', 'lon'))
+    sums.data.fill_value = 1  # avoid 0/0
 
+    out *= input_data / sums  # demand_cell = demand_region * (proxy_cell / proxy_region), but calculate efficiently
 
-def load_nc(filename, name):
-    grp = nc4.Dataset(filename)
-    grp.set_auto_mask(False)
-
-    if name in grp.variables.keys():
-        var = grp.variables[name]
-    else:  # check short name (for earlier versions of Demeter outputs)
-        var = grp.get_variables_by_attributes(short_name=name)[0]
-
-    temp = var[:].copy()
-    # handle different names
-
-    if 'lat' in grp.variables.keys():
-        lat = grp.variables['lat'][:].copy()
-        lon = grp.variables['lon'][:].copy()
-    else:
-        lat = grp.variables['latitude'][:].copy()
-        lon = grp.variables['longitude'][:].copy()
-
-    # handle swapped lat-lon dimension order
-    if var.dimensions[0].lower().startswith('lon'):
-        temp = temp.T
-
-    grp.close()
-
-    # handle ascending lat
-    if lat[0] < lat[1]:
-        lat = np.flip(lat, axis=0)
-        temp = np.flip(temp, axis=0)
-
-    # replace nans
-    temp[np.isnan(temp)] = 0
-
-    # remove indices of repeated latitudes
-    diffs = lat[:-1] - lat[1:]
-    avg_diff = (lat[0] - lat[-1]) / (len(lat) - 1)
-    valid = np.where(diffs > 0.5 * avg_diff)[0]
-    temp = temp[valid]
-    lat = lat[valid]
-
-    # place in global grid
-    resolution = (lat[0] - lat[-1])/(len(lat) - 1)  # assuming lat and lon same resolution
-    y_offset = round((90 - lat[0]) / resolution - 0.5)
-    x_offset = round((180 + lon[0]) / resolution - 0.5)
-
-    out = np.zeros((round(180 / resolution), round(360 / resolution)))
-    out[y_offset:y_offset + temp.shape[0], x_offset:x_offset + temp.shape[1]] = temp
+    out = out.sum(dim='region')
 
     return out
 
 
-def from_monthly_npz(filename, variable, firstyear, lastyear, resolution, mask):
-    file = np.load(filename)
-    years = file['years']
-    data = file[variable]
-    _, _, nlat, nlon = data.shape
-    temp = np.zeros((lastyear - firstyear + 1, 12, nlat, nlon), dtype=np.float32)
-    start = max(years[0], firstyear)
-    end = min(years[-1], lastyear)
-    temp[:start - firstyear] = data[start - years[0]]
-    temp[start - firstyear:end - firstyear] = data[start - years[0]:end - years[0]]
-    temp[end - firstyear:] = data[end - years[0]]
-
-    out = np.zeros((lastyear - firstyear + 1, 12, np.count_nonzero(mask)))
-    for i in range(lastyear - firstyear + 1):
-        for j in range(12):
-            out[i, j] = regrid(temp[i, j], resolution, method='intensive')[mask]
-
-    return out
+def rename_sector(x):
+    """Helper for converting full GCAM sector names to Tethys demand categories"""
+    if x in ('domestic water', 'municipal water') or x.startswith('water_td_dom_'):
+        return 'Domestic'
+    elif x.startswith('elec') or x.startswith('water_td_elec_'):
+        return 'Electricity'
+    elif x.startswith('industr') or x.startswith('water_td_ind_'):
+        return 'Manufacturing'
+    elif x in ('regional coal', 'nuclearFuelGenIII', 'regional natural gas', 'unconventional oil production', 'regional oil', 'nuclearFuelGenII') or x.startswith('water_td_pri_'):
+        return 'Mining'
+    elif x.startswith('water_td_irr_'):
+        return 'Irrigation'
+    elif x.startswith('water_td_an_'):
+        return 'Livestock'
+    return x
 
 
-def regrid(array, out_resolution, in_resolution=None, method='extensive'):
-    """ quick regridding of 2d input array to an output resolution with reasonable lcm (e.g., 1/12 to 1/8 degrees)
+def load_region_data(df=None, csv=None, query=None, query_file=None, query_title=None, conn=None, gcam_db_path=None, gcam_db_file=None, basin_column=None):
+    if csv is not None:
+        df = pd.read_csv(csv)
+    elif df is None:
+        if conn is None:
+            conn = gcamreader.LocalDBConn(gcam_db_path, gcam_db_file, suppress_gabble=False)
+        if query is None:
+            query = next(i for i in gcamreader.parse_batch_query(query_file) if i.title == query_title)
+        df = conn.runQuery(query)
+    df['sector'] = df['sector'].map(rename_sector)
+    if basin_column is not None:
+        df['region'] += df[basin_column].apply(lambda x: x.strip('_W').strip('_C').split('_')[-1])
+    df.columns = df.columns.str.lower()
+    df = df.groupby(['region', 'sector', 'year'])[['value']].sum().reset_index()
 
-    :param array: 2d array to be regridded
-    :param out_resolution: desired output resolution
-    :param in_resolution: resolution of array. if None (default), will be assumed to be 180 / array.shape[0]
-    :param method: choice of 'extensive' (preserves sum, default), 'intensive' (average), or 'thematic' (categories)
-    :return: array regridded to output resolution
+    return df
+
+
+def load_regionmap(mapfile, namefile=None, target_resolution=None, nodata=None, flip_lat=False):
+    """ Load region map
+
+    :param mapfile: path to map file
+    :param namefile: optional path to csv with region names
+    :param target_resolution: resolution to coerce map to. If None (default), use base resolution
     """
 
-    iny, inx = array.shape
+    da = xr.load_dataarray(mapfile, engine='rasterio')
 
-    if in_resolution is None:
-        in_resolution = 180 / iny
+    if nodata is not None:
+        da.data[da.data == nodata] = 0
 
-    scale = in_resolution / out_resolution
-    outy, outx = round(iny * scale), round(inx * scale)
+    da = da.astype(np.uint16)
 
-    lcm = np.lcm(iny, outy)
-    r = lcm // iny
-    s = lcm // outy
+    # coerce names
+    if 'y' in da.coords:
+        da = da.rename(y='lat')
+    if 'x' in da.coords:
+        da = da.rename(x='lon')
 
-    if method == 'thematic':  # take center
-        temp = array.repeat(r, axis=1).reshape(iny, outx, s)[:, :, s//2]
-        out = temp.repeat(r, axis=0).reshape(outy, s, outx)[:, s//2, :]
-        return out
+    # set dimension order
+    da = da.transpose(..., 'lat', 'lon')
 
+    # handle flipped latitudes
+    if flip_lat:
+        da['lat'] = -da.lat
+
+    # drop band
+    if 'band' in da.coords:
+        da = da.squeeze('band').drop_vars('band')
+
+    if target_resolution is not None:
+        lcm = np.lcm(da.lat.size, round(180 / target_resolution))
+        r = lcm // da.lat.size
+        s = lcm // round(180 / target_resolution)
+
+        da = da.isel(lon=np.arange(da.lon.size).repeat(r)).coarsen(lon=s).max()
+        da = da.isel(lat=np.arange(da.lat.size).repeat(r)).coarsen(lat=s).max()
     else:
-        temp = array.repeat(r, axis=1).reshape(iny, outx, s).sum(axis=2)
-        out = temp.repeat(r, axis=0).reshape(outy, s, outx).sum(axis=1)
+        target_resolution = 180 / da.lat.size
 
-        if method == 'extensive':  # divide by repetitions to preserve sum
-            return out / (r * r)
+    offset = target_resolution / 2
+    da['lat'] = np.linspace(90 - offset, -90 + offset, round(180 / target_resolution))
+    da['lon'] = np.linspace(-180 + offset, 180 - offset, round(360 / target_resolution))
 
-        elif method == 'intensive':  # take average within the output cells
-            return out / (s * s)
+    if namefile is not None:
+        df = pd.read_csv(namefile)
+        da = da.assign_attrs(names=dict(zip(df.iloc[:, 0], df.iloc[:, 1].astype(str))))
+    elif 'names' in da.attrs:
+        # ew
+        temp = da.attrs['names'].replace('{', '').replace('}', '').replace("'", '')
+        da.attrs['names'] = dict(i.split(': ') for i in temp.split(', '))
 
-        else:
-            print('invalid method')
+    da = da.rio.set_spatial_dims(x_dim='lon', y_dim='lat')
+    da.name = 'regionid'
+
+    da.data = sparse.COO(da.data)
+
+
+    return da
+
+
+def _preprocess(ds, catalog, target_resolution):
+    """ add missing metadata, filter
+
+    :type ds: xarray.Dataset
+    """
+    filename = ds.encoding['source']
+    variables = sorted(catalog[filename]['variables'])
+    years = sorted(catalog[filename]['years'])
+    flags = catalog[filename]['flags']
+
+    print(f'Loading {filename}\n\tVariables: {variables}\n\tYears: {years}\n')
+
+    # handle tif (can only handle single band single variable single year currently)
+    if 'band' in ds.coords:
+        ds = ds.squeeze('band').drop_vars('band')
+        ds = ds.rename(y='lat', x='lon', band_data=variables[0])
+
+    if 'short_name_as_name' in flags:
+        ds = ds.rename({i: ds.get(i).attrs['short_name'] for i in ds.data_vars})
+
+    ds = ds[variables]  # filter to desired variables
+
+    # pad year dimension if not existent
+    if 'year' not in ds.coords:
+        ds = ds.expand_dims(year=len(years)).assign_coords(year=('year', years))
+
+    ds = ds.isel(year=ds.year.isin(years))  # filter to desired years
+
+    # coerce names
+    if 'latitude' in ds.coords:
+        ds = ds.rename(latitude='lat')
+    if 'longitude' in ds.coords:
+        ds = ds.rename(longitude='lon')
+
+    # set dimension order
+    ds = ds.transpose(..., 'lat', 'lon')
+
+    # handle flipped latitudes
+    if ds.lat.data[0] < ds.lat.data[-1]:
+        ds = ds.isel(lat=slice(None, None, -1))
+
+    # drop repeated latitudes
+    ds['lat'] = ds.lat.round(10)  # 10 decimal-place tolerance
+    ds = ds.drop_duplicates(dim='lat')
+
+    ds = ds.fillna(0)
+
+    # regridding
+    source_resolution = (ds.lat.data[0] - ds.lat.data[-1])/(ds.lat.size - 1)
+
+    if 'cell_area_share' in flags:
+        areas = np.cos(np.radians(ds.lat)) * (111.32 * 110.57) * source_resolution * source_resolution
+        ds = ds * areas
+
+    lat_offset = round((90 - ds.lat.data[0]) / source_resolution - 0.5)
+    lon_offset = round((ds.lon.data[0] + 180) / source_resolution - 0.5)
+
+    ds = ds.pad(lat=(lat_offset, round(180 / source_resolution) - lat_offset - ds.lat.size),
+                lon=(lon_offset, round(360 / source_resolution) - lon_offset - ds.lon.size),
+                constant_values=0)
+
+    target_lat_size = round(180 / target_resolution)
+
+    lcm = np.lcm(ds.lat.size, target_lat_size)
+    r = lcm // ds.lat.size
+    s = lcm // target_lat_size
+
+    ds = ds.isel(lon=np.arange(ds.lon.size).repeat(r)).coarsen(lon=s).sum()
+    ds = ds.isel(lat=np.arange(ds.lat.size).repeat(r)).coarsen(lat=s).sum()
+    ds = ds / (r * r)  # correct for repetition
+
+    offset = target_resolution / 2
+    ds['lat'] = np.linspace(90 - offset, -90 + offset, round(180 / target_resolution))
+    ds['lon'] = np.linspace(-180 + offset, 180 - offset, round(360 / target_resolution))
+
+    for _, da in ds.items():
+        da.data = sparse.COO(da.data.astype(np.float32))
+
+    return ds
+
+
+def load_proxies(catalog, target_resolution, target_years):
+
+    print('Loading Proxy Data')
+    dataarrays = [da for i in catalog for da in _preprocess(xr.open_dataset(i), catalog, target_resolution).values()]
+
+    print('Interpolating Proxies')
+    ds = xr.merge(interp_sparse(xr.concat([da for da in dataarrays if da.name == variable], 'year'), target_years)
+                  for variable in set(da.name for da in dataarrays))
+
+    return ds
+
+
+def interp_sparse(da, target_years):
+    """Linearly interpolate da to target_years
+    scipy interp1d fails on sparse arrays so implement here by taking linear combinations of neighboring years
+
+    :param da: xarray DataArray with source years
+    :param target_years: list of target years to interpolate to
+    :return: da linearly interpolated to target_years
+    """
+
+    source_years = da.year.data
+    target_years = np.asarray(target_years)
+
+    # calculate indices of nearest data years above and below (or equal to) target years
+    # target years outside the available data are assigned the nearest (end point)
+    lower_idx = np.maximum(0, np.searchsorted(source_years, target_years, 'right') - 1)
+    upper_idx = np.minimum(np.searchsorted(source_years, target_years, 'left'), len(source_years) - 1)
+
+    # calculate weights of the upper and lower indices
+    # When the same, lower is given 1 and upper is 0
+    lower_weights = np.divide(source_years[upper_idx] - target_years, source_years[upper_idx] - source_years[lower_idx],
+                              where=upper_idx != lower_idx, out=np.ones_like(target_years, dtype=np.float32))
+    upper_weights = np.divide(target_years - source_years[lower_idx], source_years[upper_idx] - source_years[lower_idx],
+                              where=upper_idx != lower_idx, out=np.zeros_like(target_years, dtype=np.float32))
+
+    # convert weights and indices to a sparse backed DataArray
+    interpolator = xr.DataArray(data=sparse.COO(np.block([[np.arange(target_years.size), np.arange(target_years.size)],
+                                                          [lower_idx, upper_idx]]),
+                                                np.concatenate((lower_weights, upper_weights))),
+                                coords=dict(target_year=target_years, year=source_years),
+                                name=da.name)
+
+    # multiply by interpolator, sum by years, rename
+    da = interpolator * da
+    da = da.sum(dim='year').rename(target_year='year')
+
+    return da
