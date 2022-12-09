@@ -1,6 +1,5 @@
 import numpy as np
 import xarray as xr
-import sparse
 
 
 def load_proxies(catalog, target_resolution, target_years):
@@ -30,8 +29,6 @@ def _preprocess(ds, catalog, target_resolution):
     flags = catalog[filename]['flags']
 
     print(f'Loading {filename}\n\tVariables: {variables}\n\tYears: {years}\n')
-
-    ds = ds.astype(np.float32)
 
     # handle tif (can only handle single band single variable single year currently)
     if 'band' in ds.coords:
@@ -67,18 +64,15 @@ def _preprocess(ds, catalog, target_resolution):
     ds = ds.drop_duplicates(dim='lat')
 
     ds = ds.fillna(0)
+    ds = ds.astype(np.float32)
 
     if 'cell_area_share' in flags:
         ds = percent_to_area(ds)
 
     ds = pad_global(ds)
-
     ds = regrid(ds, target_resolution, method='extensive')
 
-    ds = ds.chunk(chunks=dict(lat=360, lon=360))
-
-    for _, da in ds.items():
-        pass #da.data = da.data.map_blocks(sparse.COO)
+    ds = ds.chunk(chunks=dict(lat=1440, lon=1440))
 
     return ds
 
@@ -92,14 +86,16 @@ def percent_to_area(ds):
 
 
 def pad_global(ds):
-    # pad inputs to global resolution using xarray functions that don't break with sparse arrays
+    # pad inputs to global resolution
 
     source_resolution = (ds.lat.data[0] - ds.lat.data[-1]) / (ds.lat.size - 1)
-    offset = source_resolution / 2
 
-    ds = ds.reindex(lat=np.linspace(90 - offset, -90 + offset, round(180 / source_resolution)),
-                    lon=np.linspace(-180 + offset, 180 - offset, round(360 / source_resolution)),
-                    method='nearest', tolerance=source_resolution/10, fill_value=0)
+    lat_offset = round((90 - ds.lat.data[0]) / source_resolution - 0.5)
+    lon_offset = round((ds.lon.data[0] + 180) / source_resolution - 0.5)
+
+    ds = ds.pad(lat=(lat_offset, round(180 / source_resolution) - lat_offset - ds.lat.size),
+                lon=(lon_offset, round(360 / source_resolution) - lon_offset - ds.lon.size),
+                constant_values=0)
 
     return ds
 
@@ -118,6 +114,8 @@ def regrid(ds, target_resolution, method='extensive'):
     lcm = np.lcm(ds.lat.size, target_lat_size)
     r = lcm // ds.lat.size
     s = lcm // target_lat_size
+
+    ds = ds.chunk(chunks=dict(lat=int(360*s/r), lon=int(720*s/r)))
 
     if method == 'label':
         ds = ds.isel(lon=np.arange(ds.lon.size).repeat(r)).coarsen(lon=s).max()
@@ -164,9 +162,10 @@ def interp_sparse(da, target_years=None):
     upper_weights = np.divide(target_years - source_years[lower_idx], source_years[upper_idx] - source_years[lower_idx],
                               where=upper_idx != lower_idx, out=np.zeros_like(target_years, dtype=np.float32))
 
-    lower = da.isel(year=lower_idx).assign_coords(year=target_years) * xr.DataArray(lower_weights, dict(year=target_years))
-    upper = da.isel(year=upper_idx).assign_coords(year=target_years) * xr.DataArray(upper_weights, dict(year=target_years))
-
+    lower = da.isel(year=lower_idx).assign_coords(year=target_years)
+    upper = da.isel(year=upper_idx).assign_coords(year=target_years)
     out = lower * xr.DataArray(lower_weights, dict(year=target_years)) + upper * xr.DataArray(upper_weights, dict(year=target_years))
 
-    return out.rename(da.name).chunk(chunks=dict(year=1))
+    out = out.rename(da.name).chunk(chunks=dict(year=1))
+
+    return out

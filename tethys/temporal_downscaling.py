@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
-import sparse
 
+from tethys.region_map import region_masks
 from tethys.spatial_proxies import pad_global, regrid
 
 
@@ -25,8 +25,6 @@ def load_monthly_data(filename, target_resolution, years=None, method='intensive
 
     da = da.chunk(chunks=dict(lat=360, lon=360))
 
-    #da.data = da.data.map_blocks(sparse.COO)
-
     return da
 
 
@@ -41,7 +39,7 @@ def monthly_distribution_domestic(tas, amplitude):
     return out
 
 
-def monthly_distribution_electricty(hdd, cdd, weights, regions):
+def monthly_distribution_electricty(hdd, cdd, weights, regionmap):
     """Temporal downscaling of water demand for electricity generation using algorithm from Voisin et al. (2013)"""
 
     hdd_sums = hdd.sum(dim='month')
@@ -60,31 +58,21 @@ def monthly_distribution_electricty(hdd, cdd, weights, regions):
     out = xr.concat([hdd, cdd, xr.full_like(hdd, 1/12)],
                     dim=pd.Series(['Heating', 'Cooling', 'Other'], name='sector'))
 
-    regionids = pd.Series(regions.names, name='regionid').astype(int).sort_index().rename_axis('region').to_xarray()
-
-    index = pd.MultiIndex.from_product([regionids.region.to_series(),
-                                        out.sector.to_series(),
-                                        out.year.to_series()])
-    input_data = weights.set_index(['region', 'sector', 'year']).reindex(index, fill_value=0)['value'].to_xarray()
-
-    groups = regions == regionids
-    out = out * groups
-
-    out = out * input_data
-    out = out.sum(dim=('sector', 'region'))
+    out = out.where(region_masks(regionmap), 0)
+    out = out.dot(weights, dims=('sector', 'region'))
 
     return out
 
 
-def monthly_distribution_irrigation(irr, regions):
+def monthly_distribution_irrigation(irr, regionmap):
     """Temporal downscaling of irrigation water demand"""
 
-    regionids = pd.Series(regions.names, name='regionid').astype(int).sort_index().rename_axis('region').to_xarray()
-    groups = regions == regionids
+    groups = region_masks(regionmap)
 
-    out = irr * groups
-    month_share_by_region = out.sum(dim=('lat', 'lon')) / out.sum(dim=('month', 'lat', 'lon'))
-    out = groups * month_share_by_region
-    out = out.sum(dim='region')
+    irr_grouped = irr.where(groups, 0)
+    month_sums = irr_grouped.sum(dim=('lat', 'lon'))
+    year_sums = month_sums.sum(dim='month').where(lambda x: x != 0, 1)  # avoid 0/0
+
+    out = groups.dot(month_sums / year_sums, dims='region')
 
     return out

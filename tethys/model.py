@@ -8,13 +8,13 @@ Copyright (c) 2022, Battelle Memorial Institute
 
 """
 import os
-os.environ['SPARSE_AUTO_DENSIFY'] = '1'  # so that outputs are written
 import yaml
-import xarray as xr
 from tethys.region_data import load_region_data
 from tethys.spatial_proxies import load_proxies, interp_sparse
 from tethys.region_map import load_regionmap
 from tethys.temporal_downscaling import *
+
+from numba import njit
 
 
 class Tethys:
@@ -99,40 +99,62 @@ class Tethys:
 
         self.proxies = load_proxies(self.proxy_catalog, self.resolution, self.years)
 
-        for sector in self.config['sectors']:
-            if 'csv' in sector:
-                df = load_region_data(csv=sector['csv'])
-            elif 'query' in sector:
-                df = load_region_data(gcam_db_path=self.gcam_db_path, gcam_db_file=self.gcam_db_file,
-                                      query_file=self.query_file, query_title=sector['query'])
-            else:
-                pass  # TODO: errors
+        for sector in self.sectors:
+            sector_config = self.config['sectors'][sector]
 
-            sector['proxies'] = {k: [v] if isinstance(v, str) else v for k, v in sector['proxies'].items()}
-            proxies = xr.Dataset({k: sum(self.proxies[i] for i in v) for k, v in sector['proxies'].items()})
-            proxies = proxies.to_array(dim='sector')
+            regionmap = self.regionmaps[sector_config['map']]
+            regions = list(regionmap.names)
+            sectors = list(sector_config['proxies'])
 
-            regions = self.regionmaps[sector['map']]
+            csv_file = sector_config['csv'] if 'csv' in sector_config else None
+            query_title = sector_config['query'] if 'query' in sector_config else None
+            basin_column = 'subsector' if sector == 'Irrigation' else None
 
-            downscaled = downscale(df, proxies, regions)
+            input_data = load_region_data(csv=csv_file, gcam_db_path=self.gcam_db_path, gcam_db_file=self.gcam_db_file,
+                                          query_file=self.query_file, query_title=query_title, basin_column=basin_column,
+                                          regions=regions, sectors=sectors, years=self.years)
+
+            sector_config['proxies'] = {k: [v] if isinstance(v, str) else v for k, v in sector_config['proxies'].items()}
+            proxies = xr.Dataset({k: sum(self.proxies[i] for i in v) for k, v in sector_config['proxies'].items()}).to_array(dim='sector')
+
+            downscaled = downscale(input_data, proxies, regionmap)
+
+            if 'total_map' in sector_config:
+                total_regionmap = self.regionmaps[sector_config['total_map']]
+                total_regions = list(total_regionmap.names)
+
+                total_csv_file = sector_config['total_csv'] if 'csv' in sector_config else None
+                total_query_title = sector_config['total_query'] if 'query' in sector_config else None
+
+                total_basin_column = 'output' if sector == 'Irrigation' else None
+
+                total_input_data = load_region_data(csv=total_csv_file, gcam_db_path=self.gcam_db_path, gcam_db_file=self.gcam_db_file,
+                                              query_file=self.query_file, query_title=total_query_title, basin_column=total_basin_column,
+                                              regions=total_regions, sectors=[sector], years=self.years)
+
+                downscaled = downscale(total_input_data, downscaled, total_regionmap)
 
             if self.perform_temporal:
                 # calculate the monthly distributions (share of annual) for each year
-                if sector['name'] == 'Domestic':
+                if sector == 'Domestic':
                     tas = load_monthly_data(self.temporal_files['tas'], self.resolution, range(self.years[0], self.years[-1] + 1))
                     amplitude = load_monthly_data(self.temporal_files['domr'], self.resolution, method='label')
                     distribution = monthly_distribution_domestic(tas, amplitude)
 
-                elif sector['name'] == 'Electricity':
+                elif sector == 'Electricity':
                     hdd = load_monthly_data(self.temporal_files['hdd'], self.resolution, range(self.years[0], self.years[-1] + 1))
                     cdd = load_monthly_data(self.temporal_files['cdd'], self.resolution, range(self.years[0], self.years[-1] + 1))
-                    weights = load_region_data(gcam_db_path=self.gcam_db_path, gcam_db_file=self.gcam_db_file,
-                                               query_file=self.query_file, query_title='elec consumption by demand sector')
-                    distribution = monthly_distribution_electricty(hdd, cdd, weights, regions)
 
-                elif sector['name'] == 'Irrigation':
+                    weights = load_region_data(gcam_db_path=self.gcam_db_path, gcam_db_file=self.gcam_db_file,
+                                               query_file=self.query_file, query_title='elec consumption by demand sector',
+                                               regions=regions, years=self.years, elec_weights=True)
+                    weights = interp_sparse(weights)
+
+                    distribution = monthly_distribution_electricty(hdd, cdd, weights, regionmap)
+
+                elif sector == 'Irrigation':
                     irr = load_monthly_data(self.temporal_files['irr'], self.resolution, range(self.years[0], self.years[-1] + 1), method='label')
-                    distribution = monthly_distribution_irrigation(irr, regions)
+                    distribution = monthly_distribution_irrigation(irr, regionmap)
 
                 else:
                     distribution = xr.DataArray(np.full(12, 1/12, np.float32), coords=dict(month=range(12)))
@@ -146,7 +168,7 @@ class Tethys:
         #self.outputs.to_netcdf(os.path.join(self.output_folder, 'tethys_outputs.nc'))
 
 
-def downscale(df, proxies, regions):
+def downscale(input_data, proxies, regions):
     """Actual downscaling here
 
     :param df: pandas dataframe of region scale demand inputs, with columns 'region', 'sector', 'year', 'value'
@@ -154,21 +176,14 @@ def downscale(df, proxies, regions):
     :param regions: xarray DataArray with labeled regions, dimensions 'lat', 'lon', and attribute names
     :return: out: xarray DataArray with dimensions 'sector', 'year', 'lat', 'lon'
     """
-    regionids = pd.Series(regions.names, name='regionid').astype(int).sort_index().rename_axis('region').to_xarray()
 
-    index = pd.MultiIndex.from_product([regionids.region.to_series(), proxies.sector.to_series(), proxies.year.to_series()])
-    input_data = df.set_index(['region', 'sector', 'year']).reindex(index, fill_value=0)['value'].to_xarray()
+    out = proxies.where(region_masks(regions), 0)
 
-    # groupby was slow so we do this hack with sparse arrays
-    # multiply the proxy by a bool array region mask to group, then operate on each layer
-    groups = regions == regionids
-    out = proxies * groups
+    # take total of proxy sectors when input condition is for total
+    if input_data.sector.size == 1:
+        input_data = input_data.squeeze('sector', drop=True)
+    sums = out.sum(dim=('lat', 'lon')).where(lambda x: x != 0, 1)  # avoid 0/0
 
-    sums = out.sum(dim=('lat', 'lon'))
-    sums = xr.where(sums != 0, sums, 1)  # avoid 0/0
-
-    out *= input_data / sums  # demand_cell = demand_region * (proxy_cell / proxy_region), but calculate efficiently
-
-    out = out.sum(dim='region')
+    out = out.dot(input_data / sums, dims='region')  # demand_cell = demand_region * (proxy_cell / proxy_region)
 
     return out

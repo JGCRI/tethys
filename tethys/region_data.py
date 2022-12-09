@@ -3,7 +3,11 @@ import pandas as pd
 import gcamreader
 
 
-def load_region_data(df=None, csv=None, query=None, query_file=None, query_title=None, conn=None, gcam_db_path=None, gcam_db_file=None, basin_column=None, elec_weights=False):
+def load_region_data(df=None, csv=None, query=None, query_file=None, query_title=None, conn=None,
+                     gcam_db_path=None, gcam_db_file=None, basin_column=None, elec_weights=False,
+                     regions=None, sectors=None, years=None):
+    # mess of a function
+
     if csv is not None:
         df = pd.read_csv(csv)
     elif df is None:
@@ -19,7 +23,7 @@ def load_region_data(df=None, csv=None, query=None, query_file=None, query_title
     df['value'] = df['value'].astype(np.float32)
 
     if basin_column is not None:
-        df['region'] += df[basin_column].apply(lambda x: x.strip('_W').strip('_C').split('_')[-1])
+        df['region'] += '_' + df[basin_column].apply(lambda x: x.strip('_W').strip('_C').split('_')[-1])
 
     df = df.groupby(['region', 'sector', 'year'])[['value']].sum().reset_index()
 
@@ -28,7 +32,17 @@ def load_region_data(df=None, csv=None, query=None, query_file=None, query_title
         df = df.groupby(['region', 'sector', 'year'])[['value']].sum() / df.groupby(['region', 'year'])[['value']].sum()
         df = df.reset_index()
 
-    return df
+    if regions is None:
+        regions = df['region'].unique()
+    if sectors is None:
+        sectors = df['sector'].unique()
+    if years is None:
+        years = df['year'].unique()
+
+    index = pd.MultiIndex.from_product([regions, sectors, years], names=['region', 'sector', 'year'])
+    out = df.set_index(['region', 'sector', 'year']).reindex(index, fill_value=0)['value'].to_xarray()
+
+    return out
 
 
 def rename_sector(x):

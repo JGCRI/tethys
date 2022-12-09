@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
-import sparse
 
 from tethys.spatial_proxies import regrid
 
@@ -40,6 +39,7 @@ def load_regionmap(mapfile, namefile=None, target_resolution=None, nodata=None, 
 
     if target_resolution is not None:
         da = regrid(da, target_resolution, method='label')
+        da = da.chunk(chunks=dict(lat=1440, lon=1440))
 
     if namefile is not None:
         df = pd.read_csv(namefile)
@@ -52,9 +52,23 @@ def load_regionmap(mapfile, namefile=None, target_resolution=None, nodata=None, 
     da = da.rio.set_spatial_dims(x_dim='lon', y_dim='lat')
     da.name = 'regionid'
 
-    da = da.chunk(chunks=dict(lat=360, lon=360))
-    #da.data = da.data.map_blocks(sparse.COO)
-
-    #da.data = sparse.COO(da.data)
-
     return da
+
+
+def region_masks(da):
+    mask = da == pd.Series(da.names, name='regionid').astype(int).sort_index().rename_axis('region').to_xarray()
+    return mask.chunk(chunks=dict(region=32))
+
+
+def intersection(da1, da2):
+    key, array = np.unique(np.stack((np.asarray(da1), np.asarray(da2))).reshape(2, -1), axis=1, return_inverse=True)
+
+    out = da1.copy(data=array.reshape(da1.shape).astype(np.uint16))
+
+    df = pd.DataFrame(key.T)
+    df[0] = df[0].map({int(v): k for k, v in da1.names.items()})
+    df[1] = df[1].map({int(v): k for k, v in da2.names.items()})
+    names = (df[0] + '_' + df[1]).to_dict()
+    out.attrs['names'] = {v: str(k) for k, v in names.items() if k != 0}
+
+    return out
