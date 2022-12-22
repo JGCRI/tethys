@@ -14,8 +14,6 @@ from tethys.spatial_proxies import load_proxies, interp_sparse
 from tethys.region_map import load_regionmap
 from tethys.temporal_downscaling import *
 
-from numba import njit
-
 
 class Tethys:
     """Model wrapper for Tethys"""
@@ -171,7 +169,7 @@ class Tethys:
 def downscale(input_data, proxies, regions):
     """Actual downscaling here
 
-    :param df: pandas dataframe of region scale demand inputs, with columns 'region', 'sector', 'year', 'value'
+    :param input_data: xarray DataArray of region scale demand inputs, with dimensions 'region', 'sector', 'year'
     :param proxies: xarray DataArray giving distribution of demand, with dimensions 'sector', 'year', 'lat', 'lon'
     :param regions: xarray DataArray with labeled regions, dimensions 'lat', 'lon', and attribute names
     :return: out: xarray DataArray with dimensions 'sector', 'year', 'lat', 'lon'
@@ -180,9 +178,9 @@ def downscale(input_data, proxies, regions):
     out = proxies.where(region_masks(regions), 0)
 
     # take total of proxy sectors when input condition is for total
-    if input_data.sector.size == 1:
-        input_data = input_data.squeeze('sector', drop=True)
-    sums = out.sum(dim=('lat', 'lon')).where(lambda x: x != 0, 1)  # avoid 0/0
+    dims = ('sector', 'lat', 'lon') if input_data.sector.size == 1 else ('lat', 'lon')
+
+    sums = out.sum(dim=dims).where(lambda x: x != 0, 1)  # avoid 0/0
 
     out = out.dot(input_data / sums, dims='region')  # demand_cell = demand_region * (proxy_cell / proxy_region)
 
