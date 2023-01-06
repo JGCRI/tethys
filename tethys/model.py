@@ -116,7 +116,10 @@ class Tethys:
 
         sums = out.sum(dim=dims).where(lambda x: x != 0, 1)  # avoid 0/0
 
-        out = out.dot(inputs / sums, dims='region')  # demand_cell = demand_region * (proxy_cell / proxy_region)
+        #out = out.dot(inputs / sums, dims='region')  # demand_cell = demand_region * (proxy_cell / proxy_region)
+
+        out *= inputs / sums
+        out = out.sum(dim='region')
 
         return out
 
@@ -127,6 +130,7 @@ class Tethys:
         self.inputs = load_region_data(self.dbpath, self.dbfile, self.rules, self.demand_type)
 
         for supersector, rules in self.rules.items():
+            print(f'Downscaling {supersector}')
             if not isinstance(rules, dict):
                 rules = {supersector: rules}
 

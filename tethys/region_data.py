@@ -1,3 +1,4 @@
+import numpy as np
 import gcamreader
 from tethys.utils.easy_query import easy_query
 
@@ -15,6 +16,8 @@ def load_region_data(dbpath, dbfile, rules, demand_type='withdrawals'):
     df['sector'] = df['sector'].apply(pretty_sector_name)
 
     df = df.groupby(['region', 'sector', 'year'])[['value']].sum().reset_index()
+
+    df['value'] = df['value'].astype(np.float32)
 
     return df
 

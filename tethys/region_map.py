@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
+import sparse
 
 from tethys.spatial_proxies import regrid
 
@@ -39,7 +40,7 @@ def load_regionmap(mapfile, namefile=None, target_resolution=None, nodata=None, 
 
     if target_resolution is not None:
         da = regrid(da, target_resolution, method='label')
-        da = da.chunk(chunks=dict(lat=1440, lon=1440))
+        da = da.chunk(chunks=dict(lat=-1, lon=-1))
 
     if namefile is not None:
         df = pd.read_csv(namefile)
@@ -57,7 +58,9 @@ def load_regionmap(mapfile, namefile=None, target_resolution=None, nodata=None, 
 
 def region_masks(da):
     mask = da == pd.Series(da.names, name='regionid').astype(int).sort_index().rename_axis('region').to_xarray()
-    return mask.chunk(chunks=dict(region=32))
+    mask = mask.chunk(chunks=dict(region=1))
+    mask.data = mask.data.map_blocks(sparse.COO)
+    return mask
 
 
 def intersection(da1, da2):

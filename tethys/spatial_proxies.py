@@ -1,5 +1,6 @@
 import numpy as np
 import xarray as xr
+import sparse
 
 
 def load_proxies(catalog, target_resolution, target_years):
@@ -72,7 +73,9 @@ def _preprocess(ds, catalog, target_resolution):
     ds = pad_global(ds)
     ds = regrid(ds, target_resolution, method='extensive')
 
-    ds = ds.chunk(chunks=dict(lat=1440, lon=1440))
+    ds = ds.chunk(chunks=dict(lat=-1, lon=-1))
+    for name, da in ds.items():
+        da.data = da.data.map_blocks(sparse.COO)
 
     return ds
 
@@ -162,10 +165,10 @@ def interp_sparse(da, target_years=None):
     upper_weights = np.divide(target_years - source_years[lower_idx], source_years[upper_idx] - source_years[lower_idx],
                               where=upper_idx != lower_idx, out=np.zeros_like(target_years, dtype=np.float32))
 
-    lower = da.isel(year=lower_idx).assign_coords(year=target_years)
-    upper = da.isel(year=upper_idx).assign_coords(year=target_years)
+    lower = da.isel(year=lower_idx).chunk(chunks=dict(year=1)).assign_coords(year=target_years)
+    upper = da.isel(year=upper_idx).chunk(chunks=dict(year=1)).assign_coords(year=target_years)
     out = lower * xr.DataArray(lower_weights, dict(year=target_years)) + upper * xr.DataArray(upper_weights, dict(year=target_years))
 
-    out = out.rename(da.name).chunk(chunks=dict(year=1))
+    out = out.rename(da.name)
 
     return out
