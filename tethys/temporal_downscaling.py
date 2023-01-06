@@ -39,7 +39,7 @@ def monthly_distribution_domestic(tas, amplitude):
     return out
 
 
-def monthly_distribution_electricty(hdd, cdd, weights, regionmap):
+def monthly_distribution_electricty(hdd, cdd, weights, regionmasks):
     """Temporal downscaling of water demand for electricity generation using algorithm from Voisin et al. (2013)"""
 
     hdd_sums = hdd.sum(dim='month')
@@ -58,21 +58,19 @@ def monthly_distribution_electricty(hdd, cdd, weights, regionmap):
     out = xr.concat([hdd, cdd, xr.full_like(hdd, 1/12)],
                     dim=pd.Series(['Heating', 'Cooling', 'Other'], name='sector'))
 
-    out = out.where(region_masks(regionmap), 0)
+    out = out.where(regionmasks, 0)
     out = out.dot(weights, dims=('sector', 'region'))
 
     return out
 
 
-def monthly_distribution_irrigation(irr, regionmap):
+def monthly_distribution_irrigation(irr, regionmasks):
     """Temporal downscaling of irrigation water demand"""
 
-    groups = region_masks(regionmap)
-
-    irr_grouped = irr.where(groups, 0)
+    irr_grouped = irr.where(regionmasks, 0)
     month_sums = irr_grouped.sum(dim=('lat', 'lon'))
     year_sums = month_sums.sum(dim='month').where(lambda x: x != 0, 1)  # avoid 0/0
 
-    out = groups.dot(month_sums / year_sums, dims='region')
+    out = regionmasks.dot(month_sums / year_sums, dims='region')
 
     return out

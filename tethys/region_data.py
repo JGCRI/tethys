@@ -1,68 +1,78 @@
-import numpy as np
-import pandas as pd
 import gcamreader
+from tethys.utils.easy_query import easy_query
 
 
-def load_region_data(df=None, csv=None, query=None, query_file=None, query_title=None, conn=None,
-                     gcam_db_path=None, gcam_db_file=None, basin_column=None, elec_weights=False,
-                     regions=None, sectors=None, years=None):
-    # mess of a function
+def load_region_data(dbpath, dbfile, rules, demand_type='withdrawals'):
 
-    if csv is not None:
-        df = pd.read_csv(csv)
-    elif df is None:
-        if conn is None:
-            conn = gcamreader.LocalDBConn(gcam_db_path, gcam_db_file, suppress_gabble=False)
-        if query is None:
-            query = next(i for i in gcamreader.parse_batch_query(query_file) if i.title == query_title)
-        df = conn.runQuery(query)
+    conn = gcamreader.LocalDBConn(dbpath, dbfile)
 
-    df.columns = df.columns.str.lower()
+    df = conn.runQuery(easy_query('demand-physical', sector=rules_to_sectors(rules), technology='!water_td_*',
+                                  input=[f'*_water {demand_type}', f'water_td_*_{demand_type[0].upper()}']))
 
-    df['sector'] = df['sector'].map(rename_sector)
-    df['value'] = df['value'].astype(np.float32)
+    # add '_BasinName' to region if exists
+    df['region'] += df['sector'].apply(extract_basin_name) + df['input'].apply(extract_basin_name)
 
-    if basin_column is not None:
-        df['region'] += '_' + df[basin_column].apply(lambda x: x.strip('_W').strip('_C').split('_')[-1])
+    df['sector'] = df['sector'].apply(pretty_sector_name)
 
     df = df.groupby(['region', 'sector', 'year'])[['value']].sum().reset_index()
 
-    if elec_weights:
-        df['sector'] = df['sector'].map(elec_sector)
-        df = df.groupby(['region', 'sector', 'year'])[['value']].sum() / df.groupby(['region', 'year'])[['value']].sum()
-        df = df.reset_index()
-
-    if regions is None:
-        regions = df['region'].unique()
-    if sectors is None:
-        sectors = df['sector'].unique()
-    if years is None:
-        years = df['year'].unique()
-
-    index = pd.MultiIndex.from_product([regions, sectors, years], names=['region', 'sector', 'year'])
-    out = df.set_index(['region', 'sector', 'year']).reindex(index, fill_value=0)['value'].to_xarray()
-
-    return out
+    return df
 
 
-def rename_sector(x):
-    """Helper for converting full GCAM sector names to Tethys demand categories"""
-    if x in ('domestic water', 'municipal water') or x.startswith('water_td_dom_'):
-        return 'Domestic'
-    elif x.startswith('elec') or x.startswith('water_td_elec_'):
-        return 'Electricity'
-    elif x.startswith('industr') or x.startswith('water_td_ind_'):
-        return 'Manufacturing'
-    elif x in ('regional coal', 'nuclearFuelGenIII', 'regional natural gas', 'unconventional oil production', 'regional oil', 'nuclearFuelGenII') or x.startswith('water_td_pri_'):
-        return 'Mining'
-    elif x.startswith('water_td_irr_'):
-        return 'Irrigation'
-    elif x.startswith('water_td_an_'):
-        return 'Livestock'
+def extract_basin_name(x):
+    """Maps 'water_td_irr_basin_C' to '_basin', and water_td_elec_C to ''"""
+    if x.startswith('water_td_irr_'):
+        return '_' + x.split('_')[3]
+    return ''
+
+
+sector_lookup = {'Domestic': 'water_td_dom_',
+                 'Municipal': 'water_td_muni_',
+                 'Electricity': 'water_td_elec_',
+                 'Manufacturing': 'water_td_ind_',
+                 'Mining': 'water_td_pri_',
+                 'Livestock': 'water_td_an_',
+                 'Irrigation': 'water_td_irr_'}
+
+
+def pretty_sector_name(x):
+
+    for k, v in sector_lookup.items():
+        if x.startswith(v):
+            return k
+
     return x
 
 
-def elec_sector(x):
+def ugly_sector_name(x):
+
+    if x in sector_lookup:
+        return sector_lookup[x] + '*'
+
+    return x
+
+
+def rules_to_sectors(rules):
+    sectors = []
+    for k, v in rules.items():
+        sectors.append(ugly_sector_name(k))
+        if isinstance(v, dict):
+            sectors.extend(v.keys())
+    return sectors
+
+
+def elec_sector_weights(dbpath, dbfile):
+
+    conn = gcamreader.LocalDBConn(dbpath, dbfile)
+
+    df = conn.runQuery(easy_query('demand-physical', input=['elect_td_bld', 'elect_td_ind', 'elect_td_trn']))
+    df['sector'] = df['sector'].apply(elec_sector_rename)
+    df = df.groupby(['region', 'sector', 'year'])[['value']].sum() / df.groupby(['region', 'year'])[['value']].sum()
+
+    return df.reset_index()
+
+
+def elec_sector_rename(x):
     """Helper for electricity demand sectors"""
     if x in ('comm heating', 'resid heating', 'comm hot water', 'resid furnace fans', 'resid hot water'):
         return 'Heating'

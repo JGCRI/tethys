@@ -9,7 +9,7 @@ def load_proxies(catalog, target_resolution, target_years):
 
     print('Interpolating Proxies')
     ds = xr.merge(interp_sparse(xr.concat([da for da in dataarrays if da.name == variable], 'year'), target_years)
-                  for variable in set(da.name for da in dataarrays))
+                  for variable in set(da.name for da in dataarrays)).to_array()
 
     return ds
 
