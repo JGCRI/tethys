@@ -56,12 +56,14 @@ def load_regionmap(mapfile, namefile=None, target_resolution=None, nodata=None, 
 
 
 def region_masks(da):
+    """Create region mask array"""
     mask = da == pd.Series(da.names, name='regionid').astype(int).sort_index().rename_axis('region').to_xarray()
     mask = mask.chunk(chunks=dict(region=1))
     return mask
 
 
 def intersection(da1, da2):
+    """Convenience function for producing a map of intersections"""
     key, array = np.unique(np.stack((np.asarray(da1), np.asarray(da2))).reshape(2, -1), axis=1, return_inverse=True)
 
     out = da1.copy(data=array.reshape(da1.shape).astype(np.uint16))

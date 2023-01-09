@@ -3,7 +3,13 @@ import xarray as xr
 
 
 def load_proxies(catalog, target_resolution, target_years):
+    """Load all proxies from the catalog, regrid to target spatial resolution, and interpolate to target years
 
+    :param catalog: dictionary of proxy file names, variables, years
+    :param target_resolution: resolution (in degrees) to regrid to
+    :param target_years: list of years to interpolate to
+    :return: big Dataset of proxies
+    """
     print('Loading Proxy Data')
     dataarrays = [da for i in catalog for da in _preprocess(xr.open_dataset(i, chunks='auto'), catalog, target_resolution).values()]
 
@@ -15,12 +21,17 @@ def load_proxies(catalog, target_resolution, target_years):
 
 
 def _preprocess(ds, catalog, target_resolution):
-    """ add missing metadata, filter
+    """Prepare a dataset from single file to be merged into a dataset of all proxies
 
-    :type ds: xarray.Dataset
+    handles many oddities found in proxies
+
+    :param ds: xarray Dataset opened from a file
+    :param catalog: dictionary of filenames and declared contents
+    :param target_resolution: resolution to regrid to (in degrees)
+    :return: preprocessed dataset
     """
 
-    # TODO: break out steps into functions as sensible (for testing)
+    # TODO: break into separate functions as sensible (for testing)
 
     # get details from files catalog
     filename = ds.encoding['source']
@@ -28,25 +39,28 @@ def _preprocess(ds, catalog, target_resolution):
     years = sorted(catalog[filename]['years'])
     flags = catalog[filename]['flags']
 
-    print(f'Loading {filename}\n\tVariables: {variables}\n\tYears: {years}\n')
+    print(f'Loading {filename}\n\tVariables: {variables}\n\tYears: {years}\n')  # TODO: logger
 
     # handle tif (can only handle single band single variable single year currently)
     if 'band' in ds.coords:
         ds = ds.squeeze('band').drop_vars('band')
         ds = ds.rename(y='lat', x='lon', band_data=variables[0])
 
+    # handle an option that lets us use netcdf short_name instead of name (handle "PFT0")
     if 'short_name_as_name' in flags:
         ds = ds.rename({i: ds.get(i).attrs['short_name'] for i in ds.data_vars})
 
-    ds = ds[variables]  # filter to desired variables
+    # filter to desired variables
+    ds = ds[variables]
 
-    # pad year dimension if not existent
+    # create a year dimension if missing, with the years reported for this file in the catalog
     if 'year' not in ds.coords:
         ds = ds.expand_dims(year=len(years)).assign_coords(year=('year', years))
 
-    ds = ds.isel(year=ds.year.isin(years))  # filter to desired years
+    # filter to desired years
+    ds = ds.isel(year=ds.year.isin(years))
 
-    # coerce names
+    # coerce spatial dimension names
     if 'latitude' in ds.coords:
         ds = ds.rename(latitude='lat')
     if 'longitude' in ds.coords:
@@ -63,12 +77,14 @@ def _preprocess(ds, catalog, target_resolution):
     ds['lat'] = ds.lat.round(10)  # 10 decimal-place tolerance
     ds = ds.drop_duplicates(dim='lat')
 
+    # numeric stuff
     ds = ds.fillna(0)
     ds = ds.astype(np.float32)
 
     if 'cell_area_share' in flags:
         ds = percent_to_area(ds)
 
+    # spatial aligning
     ds = pad_global(ds)
     ds = regrid(ds, target_resolution, method='extensive')
 
@@ -78,15 +94,27 @@ def _preprocess(ds, catalog, target_resolution):
 
 
 def percent_to_area(ds):
+    """Convert landcover dataset from cell proportion to area
+
+    :param ds: xarray Dataset where values represent proportion of grid cell
+    :return: xarray Dataset where values represent area in square kilometers
+    """
+
     source_resolution = (ds.lat.data[0] - ds.lat.data[-1]) / (ds.lat.size - 1)
+
+    # formula for total grid cell area (km^2) based on latitude and cell resolution
     cell_areas = xr.DataArray(np.cos(np.radians(ds.lat)) * (111.32 * 110.57) * source_resolution * source_resolution,
                               coords=dict(lat=ds.lat))
-    ds = ds * cell_areas
-    return ds
+
+    return ds * cell_areas
 
 
 def pad_global(ds):
-    # pad inputs to global resolution
+    """pad inputs to global resolution
+
+    :param ds: xarray Dataset
+    :return: xarray Dataset with global extent
+    """
 
     source_resolution = (ds.lat.data[0] - ds.lat.data[-1]) / (ds.lat.size - 1)
 
@@ -101,12 +129,12 @@ def pad_global(ds):
 
 
 def regrid(ds, target_resolution, method='extensive'):
-    """
+    """Simple regridding algorithm
 
-    :param ds: xarray Dataset or DataArray
+    :param ds: xarray Dataset or DataArray, needs lat and lon and global extent
     :param target_resolution: target resolution in degrees
     :param method: choice of 'extensive' (preserves sums, default), 'intensive' (take average), or 'label' (for maps)
-    :return:
+    :return: ds regridded to target_resolution
     """
 
     target_lat_size = round(180 / target_resolution)
@@ -115,7 +143,7 @@ def regrid(ds, target_resolution, method='extensive'):
     r = lcm // ds.lat.size
     s = lcm // target_lat_size
 
-    ds = ds.chunk(chunks=dict(lat=int(360*s/r), lon=int(720*s/r)))
+    ds = ds.chunk(chunks=dict(lat=int(360*s/r), lon=int(720*s/r)))  # prevent huge chunks when r is big
 
     if method == 'label':
         ds = ds.isel(lon=np.arange(ds.lon.size).repeat(r)).coarsen(lon=s).max()
@@ -124,7 +152,7 @@ def regrid(ds, target_resolution, method='extensive'):
         ds = ds.isel(lon=np.arange(ds.lon.size).repeat(r)).coarsen(lon=s).sum()
         ds = ds.isel(lat=np.arange(ds.lat.size).repeat(r)).coarsen(lat=s).sum()
         if method == 'extensive':
-            ds = ds / (r * r)  # correct for repetition
+            ds = ds / (r * r)  # preserve original sum
         elif method == 'intensive':
             ds = ds / (s * s)  # take average
 

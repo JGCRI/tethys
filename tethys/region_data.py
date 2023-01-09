@@ -4,7 +4,14 @@ from tethys.utils.easy_query import easy_query
 
 
 def load_region_data(dbpath, dbfile, rules, demand_type='withdrawals'):
+    """Load region-scale water demand from GCAM needed to carry out a configuration
 
+    :param dbpath: path to folder containing dbfile (see gcamreader docs)
+    :param dbfile: name of GCAM database (the folder containing the .basex files)
+    :param rules: # TODO: maybe replace with sectors
+    :param demand_type: 'withdrawals' or 'consumption'
+    :return: pandas dataframe with columns 'region', 'sector', 'year', 'value'
+    """
     conn = gcamreader.LocalDBConn(dbpath, dbfile)
 
     df = conn.runQuery(easy_query('demand-physical', sector=rules_to_sectors(rules), technology='!water_td_*',
@@ -13,7 +20,7 @@ def load_region_data(dbpath, dbfile, rules, demand_type='withdrawals'):
     # add '_BasinName' to region if exists
     df['region'] += df['sector'].apply(extract_basin_name) + df['input'].apply(extract_basin_name)
 
-    df['sector'] = df['sector'].apply(pretty_sector_name)
+    df['sector'] = df['sector'].apply(friendly_sector_name)
 
     df = df.groupby(['region', 'sector', 'year'])[['value']].sum().reset_index()
 
@@ -29,6 +36,7 @@ def extract_basin_name(x):
     return ''
 
 
+# mapping from GCAM water input friendly names to the start of their full names
 sector_lookup = {'Domestic': 'water_td_dom_',
                  'Municipal': 'water_td_muni_',
                  'Electricity': 'water_td_elec_',
@@ -38,7 +46,8 @@ sector_lookup = {'Domestic': 'water_td_dom_',
                  'Irrigation': 'water_td_irr_'}
 
 
-def pretty_sector_name(x):
+def friendly_sector_name(x):
+    """convert from GCAM water input name to friendly name"""
 
     for k, v in sector_lookup.items():
         if x.startswith(v):
@@ -47,7 +56,8 @@ def pretty_sector_name(x):
     return x
 
 
-def ugly_sector_name(x):
+def unfriendly_sector_name(x):
+    """convert from friendly name to start of GCAM name"""
 
     if x in sector_lookup:
         return sector_lookup[x] + '*'
@@ -56,15 +66,17 @@ def ugly_sector_name(x):
 
 
 def rules_to_sectors(rules):
+    """Convert rules dict from YAML config to a list of sectors to query GCAM for"""
     sectors = []
     for k, v in rules.items():
-        sectors.append(ugly_sector_name(k))
+        sectors.append(unfriendly_sector_name(k))
         if isinstance(v, dict):
             sectors.extend(v.keys())
     return sectors
 
 
 def elec_sector_weights(dbpath, dbfile):
+    """Get the electricity sector weights from GCAM database"""
 
     conn = gcamreader.LocalDBConn(dbpath, dbfile)
 
