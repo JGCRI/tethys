@@ -10,7 +10,7 @@ Copyright (c) 2022, Battelle Memorial Institute
 import os
 import yaml
 from tethys.region_data import load_region_data, elec_sector_weights
-from tethys.spatial_proxies import load_proxies, interp_sparse
+from tethys.spatial_proxies import load_proxies, interp_helper
 from tethys.region_map import load_regionmap, region_masks
 from tethys.temporal_downscaling import *
 
@@ -116,10 +116,7 @@ class Tethys:
 
         sums = out.sum(dim=dims).where(lambda x: x != 0, 1)  # avoid 0/0
 
-        #out = out.dot(inputs / sums, dims='region')  # demand_cell = demand_region * (proxy_cell / proxy_region)
-
-        out *= inputs / sums
-        out = out.sum(dim='region')
+        out = out.dot(inputs / sums, dims='region')  # demand_cell = demand_region * (proxy_cell / proxy_region)
 
         return out
 
@@ -163,7 +160,7 @@ class Tethys:
                                       (weights.region.isin(self.regionmaps.region.data)) &
                                       (weights.year.isin(self.years))].set_index(
                         ['region', 'sector', 'year'])['value'].to_xarray().fillna(0)
-                    weights = interp_sparse(weights)
+                    weights = interp_helper(weights)
                     regionmasks = self.regionmaps.sel(region=weights.region)
 
                     distribution = monthly_distribution_electricty(hdd, cdd, weights, regionmasks)
@@ -179,9 +176,7 @@ class Tethys:
                 else:
                     distribution = xr.DataArray(np.full(12, 1/12, np.float32), coords=dict(month=range(12)))
 
-                # interpolate
-                downscaled = interp_sparse(downscaled)
-                downscaled = downscaled * distribution
+                downscaled = interp_helper(downscaled) * distribution
 
             self.outputs.update(downscaled.to_dataset(dim='sector'))
 

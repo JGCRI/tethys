@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
-import sparse
 
 from tethys.spatial_proxies import regrid
 
@@ -59,7 +58,6 @@ def load_regionmap(mapfile, namefile=None, target_resolution=None, nodata=None, 
 def region_masks(da):
     mask = da == pd.Series(da.names, name='regionid').astype(int).sort_index().rename_axis('region').to_xarray()
     mask = mask.chunk(chunks=dict(region=1))
-    mask.data = mask.data.map_blocks(sparse.COO)
     return mask
 
 

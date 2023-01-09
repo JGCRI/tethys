@@ -1,6 +1,5 @@
 import numpy as np
 import xarray as xr
-import sparse
 
 
 def load_proxies(catalog, target_resolution, target_years):
@@ -9,7 +8,7 @@ def load_proxies(catalog, target_resolution, target_years):
     dataarrays = [da for i in catalog for da in _preprocess(xr.open_dataset(i, chunks='auto'), catalog, target_resolution).values()]
 
     print('Interpolating Proxies')
-    ds = xr.merge(interp_sparse(xr.concat([da for da in dataarrays if da.name == variable], 'year'), target_years)
+    ds = xr.merge(interp_helper(xr.concat([da for da in dataarrays if da.name == variable], 'year'), target_years)
                   for variable in set(da.name for da in dataarrays)).to_array()
 
     return ds
@@ -74,8 +73,6 @@ def _preprocess(ds, catalog, target_resolution):
     ds = regrid(ds, target_resolution, method='extensive')
 
     ds = ds.chunk(chunks=dict(lat=-1, lon=-1))
-    for name, da in ds.items():
-        da.data = da.data.map_blocks(sparse.COO)
 
     return ds
 
@@ -139,9 +136,9 @@ def regrid(ds, target_resolution, method='extensive'):
     return ds
 
 
-def interp_sparse(da, target_years=None):
+def interp_helper(da, target_years=None):
     """Linearly interpolate da to target_years
-    scipy interp1d fails on sparse arrays so implement here by taking linear combinations of neighboring years
+    more control over chunks, works with sparse
 
     :param da: xarray DataArray with source years
     :param target_years: list of target years to interpolate to. If None, then interpolate to annual

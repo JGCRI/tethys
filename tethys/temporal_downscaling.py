@@ -8,7 +8,7 @@ from tethys.spatial_proxies import pad_global, regrid
 
 def load_monthly_data(filename, target_resolution, years=None, method='intensive'):
 
-    da = xr.open_dataarray(filename, chunks=dict(year=1, month=12, lat=360, lon=360)).astype(np.float32)
+    da = xr.open_dataarray(filename, chunks=dict(year=1, month=1)).astype(np.float32)
 
     if years is not None and 'year' in da.coords:
         da = da.sel(year=years, method='nearest').chunk(chunks=dict(year=1))
@@ -24,6 +24,8 @@ def load_monthly_data(filename, target_resolution, years=None, method='intensive
     da = regrid(da, target_resolution, method)
 
     da = da.chunk(chunks=dict(lat=360, lon=360))
+    if 'month' in da.coords:
+        da = da.chunk(chunks=dict(month=12))
 
     return da
 
