@@ -30,11 +30,11 @@ setup(
     install_requires=[
         'PyYAML~=6.0',
         'gcamreader>=1.2.5',
-        'numpy~=1.22.4',
-        'pandas~=1.5.2',
+        'numpy>=1.22',
+        'pandas~=1.2.4',
         'netCDF4~=1.6',
         'dask~=2022.12.1',
-        'xarray~=2022.12.0',
+        'xarray==2022.09.0',
         'rioxarray~=0.12.4',
         'requests~=2.20.0',
         'setuptools~=57.0.0'
