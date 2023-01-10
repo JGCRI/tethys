@@ -1,21 +1,50 @@
-API reference
-=============
+Tethys package
+==============
 
-Subpackages
------------
+tethys.utils.easy_query
+-----------------------
 
-.. toctree::
-   :maxdepth: 4
+.. automodule:: tethys.utils.easy_query
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-   tethys.tests
+tethys.model module
+-------------------
 
-Submodules
-----------
+.. automodule:: tethys.model
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-tethys.run_disaggregation module
+tethys.spatial_proxies
+----------------------
+
+.. automodule:: tethys.spatial_proxies
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tethys.temporal_downscaling
 ---------------------------
 
-.. automodule:: tethys.run_disaggregation
+.. automodule:: tethys.temporal_downscaling
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tethys.region_data
+------------------
+
+.. automodule:: tethys.region_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tethys.region_map
+-----------------
+
+.. automodule:: tethys.region_map
    :members:
    :undoc-members:
    :show-inheritance:
