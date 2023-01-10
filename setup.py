@@ -28,15 +28,15 @@ setup(
     author_email='chris.vernon@pnnl.gov',
     include_package_data=True,
     install_requires=[
-        'configobj~=5.0.6',
-        'numpy~=1.21',
-        'pandas~=1.2.4',
-        'requests~=2.20.0',
+        'PyYAML~=6.0',
         'gcamreader>=1.2.5',
+        'numpy~=1.22.4',
+        'pandas~=1.5.2',
         'netCDF4~=1.6',
-        'tifffile~=2022.5.4',
-        'imagecodecs~=2022.9.26',
-        'Pillow~=8.4.0',
+        'dask~=2022.12.1',
+        'xarray~=2022.12.0',
+        'rioxarray~=0.12.4',
+        'requests~=2.20.0',
         'setuptools~=57.0.0'
     ],
     extras_require={
