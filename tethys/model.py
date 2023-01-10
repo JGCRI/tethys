@@ -104,7 +104,7 @@ class Tethys:
                 for year in proxy['years']:
 
                     name = proxy['name'].replace('[VAR]', abbreviation).replace('[YEAR]', str(year))
-                    filepath = os.path.join(proxy['folder'], name)
+                    filepath = os.path.abspath(os.path.join(proxy['folder'], name))
 
                     if filepath not in self.proxy_catalog:
                         self.proxy_catalog[filepath] = {'variables': set(), 'years': set(), 'flags': flags}
