@@ -18,64 +18,84 @@ from tethys.temporal_downscaling import *
 class Tethys:
     """Model wrapper for Tethys"""
 
-    def __init__(self, cfg=None):
-        self.config = None
+    def __init__(self, config_file=None, years=None, resolution=0.125, demand_type='withdrawals',
+                 perform_temporal=False, dbpath=None, dbfile=None, write_outputs=False, output_folder=None,
+                 output_file=None, compress_outputs=True, downscaling_rules=None, proxy_catalog=None, map_files=None,
+                 temporal_files=None):
+        """ # TODO
+        """
 
-        self.years = []
-        self.resolution = 0.125
-        self.sectors = []
-        self.demand_type = 'withdrawals'
-        self.perform_temporal = False
+        # YAML file
+        self.config_file = config_file
 
-        self.dbpath = None
-        self.dbfile = None
+        # project level settings
+        self.years = years
+        self.resolution = resolution
+        self.demand_type = demand_type
+        self.perform_temporal = perform_temporal
 
-        self.output_folder = None
-        self.output_format = None
-        self.reduce_precision = False
+        # GCAM database info
+        self.dbpath = dbpath
+        self.dbfile = dbfile
 
+        # TODO: re add support for csv input as alternative
+
+        # outputs
+        self.write_outputs = write_outputs
+        self.output_folder = output_folder
+        self.output_file = output_file
+        self.compress_outputs = compress_outputs
+
+        self.downscaling_rules = downscaling_rules
+
+        self.proxy_catalog = proxy_catalog
+        self.map_files = map_files
+        self.temporal_files = temporal_files
+
+        # data we'll load or generate later
         self.regionmaps = None
-        self.proxy_catalog = dict()
         self.proxies = None
-
+        self.inputs = None
         self.outputs = None
 
-        if cfg is not None:
-            self.load_config(cfg)
+        # settings in YAML override settings passed directly to __init__
+        if self.config_file is not None:
+            self.load_config(self.config_file)
 
     def load_config(self, config_file):
         """Load model parameters from a config.yml"""
+
         with open(config_file) as file:
-            self.config = yaml.safe_load(file)
+            config = yaml.safe_load(file)
 
-        project = self.config['project']
-        self.sectors = project['sectors']
-        self.years = project['years']
-        self.resolution = project['resolution']
-        self.perform_temporal = project['perform_temporal']
+        # project level settings
+        self.years = config['project']['years']
+        self.resolution = config['project']['resolution']
+        self.demand_type = config['project']['demand_type']
+        self.perform_temporal = config['project']['perform_temporal']
 
-        if self.perform_temporal:
-            self.temporal_files = self.config['temporal']
-
-        outputs = self.config['outputs']
-        self.output_folder = outputs['folder']
-        self.output_format = outputs['format']
-        self.reduce_precision = outputs['reduce_precision'] if 'reduce_precision' in outputs else False
-
-        self.regionmaps = xr.concat([region_masks(load_regionmap(target_resolution=self.resolution, mapfile=v))
-                                     for v in self.config['maps']], dim='region')
+        self.downscaling_rules = config['downscaling_rules']
 
         # for parsing GCAM database
-        if 'GCAM' in self.config:
-            gcaminputs = self.config['GCAM']
-            self.dbpath = gcaminputs['dbpath']
-            self.dbfile = gcaminputs['dbfile']
+        if 'GCAM' in config:
+            self.dbpath = config['GCAM']['dbpath']
+            self.dbfile = config['GCAM']['dbfile']
 
-        self.rules = self.config['rules']
+        if 'outputs' in config:
+            self.write_outputs = True
+            self.output_folder = config['outputs']['folder']
+            self.output_file = config['outputs']['file']
+            if 'compress_outputs' in config['outputs']:  # TODO: better to do something like self.__dict__.update()?
+                self.compress_outputs = config['outputs']['compress_outputs']
 
-        # parse proxy files
+        if self.perform_temporal:
+            self.temporal_files = config['temporal']
+
+        self.map_files = config['maps']
+
+        # parse proxy files structure from YAML
         self.proxy_catalog = {}
-        for proxy in self.config['proxies']:
+        for proxy in config['proxies']:
             flags = proxy['flags'] if 'flags' in proxy else []
             for variable in proxy['variables']:
 
@@ -93,6 +113,7 @@ class Tethys:
                     self.proxy_catalog[filepath]['years'].add(year)
 
     def harmonize(self, distribution, sectors=None):
+        """Actual spatial downscaling happens here"""
 
         if sectors is None:
             sectors = distribution.sector.data
@@ -103,6 +124,7 @@ class Tethys:
                              (self.inputs.sector.isin(sectors)) &
                              (self.inputs.year.isin(self.years))].set_index(['region', 'sector', 'year'])[
             'value'].to_xarray().fillna(0)
+
         regionmaps = self.regionmaps.sel(region=inputs.region)
 
         out = distribution.where(regionmaps, 0)
@@ -123,10 +145,13 @@ class Tethys:
     def run_model(self):
         self.outputs = xr.Dataset()
 
+        # TODO: reorganize these data opening functions as methods
         self.proxies = load_proxies(self.proxy_catalog, self.resolution, self.years)
-        self.inputs = load_region_data(self.dbpath, self.dbfile, self.rules, self.demand_type)
+        self.regionmaps = xr.concat([region_masks(load_regionmap(target_resolution=self.resolution, mapfile=i))
+                                     for i in self.map_files], dim='region')
+        self.inputs = load_region_data(self.dbpath, self.dbfile, self.downscaling_rules, self.demand_type)
 
-        for supersector, rules in self.rules.items():
+        for supersector, rules in self.downscaling_rules.items():
             print(f'Downscaling {supersector}')
             if not isinstance(rules, dict):
                 rules = {supersector: rules}
@@ -146,6 +171,7 @@ class Tethys:
 
             if self.perform_temporal:
                 # calculate the monthly distributions (share of annual) for each year
+
                 if supersector == 'Domestic' or supersector == 'Municipal':
                     tas = load_monthly_data(self.temporal_files['tas'], self.resolution, range(self.years[0], self.years[-1] + 1))
                     amplitude = load_monthly_data(self.temporal_files['domr'], self.resolution, method='label')
@@ -180,4 +206,10 @@ class Tethys:
 
             self.outputs.update(downscaled.to_dataset(dim='sector'))
 
-        #self.outputs.to_netcdf(os.path.join(self.output_folder, 'tethys_outputs.nc'))
+        if self.write_outputs:
+            if self.compress_outputs:
+                # TODO: could give users more control over this? or tell them to use self.outputs directly?
+                encoding = {variable: {'zlib': True, 'complevel': 5} for variable in self.outputs}
+                self.outputs.to_netcdf(os.path.join(self.output_folder, self.output_file), encoding=encoding)
+            else:
+                self.outputs.to_netcdf(os.path.join(self.output_folder, self.output_file))
