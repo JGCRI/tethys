@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>API reference &mdash; tethys 2.0.0 documentation</title>
+  <title>Tethys package &mdash; tethys 2.0.0 documentation</title>
   
 
   
@@ -46,8 +46,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="tethys.tests package" href="tethys.tests.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="modules.html" /> 
+    <link rel="next" title="Contributing to tethys" href="contributing.html" />
+    <link rel="prev" title="API reference" href="modules.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -99,13 +99,16 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">API reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tethys.tests.html">tethys.tests package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tethys package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-tethys.utils.easy_query">tethys.utils.easy_query</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tethys.model">tethys.model module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tethys.spatial_proxies">tethys.spatial_proxies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tethys.temporal_downscaling">tethys.temporal_downscaling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tethys.region_data">tethys.region_data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tethys.region_map">tethys.region_map</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#tethys-run-disaggregation-module">tethys.run_disaggregation module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to <strong>tethys</strong></a></li>
@@ -159,9 +162,9 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="modules.html">&lt;no title&gt;</a> &raquo;</li>
+          <li><a href="modules.html">API reference</a> &raquo;</li>
         
-      <li>API reference</li>
+      <li>Tethys package</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -180,24 +183,322 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="api-reference">
-<h1>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="tethys.tests.html">tethys.tests package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tethys.tests.html#testing-submodules">Testing Submodules</a></li>
+  <div class="section" id="tethys-package">
+<h1>Tethys package<a class="headerlink" href="#tethys-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-tethys.utils.easy_query">
+<span id="tethys-utils-easy-query"></span><h2>tethys.utils.easy_query<a class="headerlink" href="#module-tethys.utils.easy_query" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.utils.easy_query.easy_query">
+<span class="sig-prename descclassname"><span class="pre">tethys.utils.easy_query.</span></span><span class="sig-name descname"><span class="pre">easy_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/utils/easy_query.html#easy_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.utils.easy_query.easy_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a query for a GCAM database</p>
+<p>kwargs act as filters on nodes, eg. “sector=’Beef’” is converted to the xpath “[&#64;type=’sector’ and &#64;name=’Beef’]”
+Lists are also accepted, so “sector=[‘Beef’, ‘Dairy’]” matches ‘Beef’ or ‘Dairy’</p>
+<p>Order of kwargs must follow the sector -&gt; subsector -&gt; technology -&gt; input/output/etc hierarchy</p>
+<p>Some shortcuts are supported. ‘*’ can be used as a wildcard, so input=’water_td_irr_*_C’
+matches any input starting with ‘water_td_irr’ and ending with ‘_C’</p>
+<p>Starting a filter string with ‘!’ negates it, so sector=’!elec*’ will exclude any sector names
+that begin with ‘elec’.
+Combinations are allowed, so input=[‘water_td_irr_*_C’, ‘!water_td_irr_A*’] would select all input basins,
+except those beginning with the letter ‘A’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variable</strong> – name of variable in database, such as ‘demand-physical’ or ‘emissions’</p></li>
+<li><p><strong>year_axis</strong> – optional name of year axis (‘year’ or ‘vintage’). If None, will be inferred from variable</p></li>
+<li><p><strong>kwargs</strong> – refer to description for details</p></li>
 </ul>
-</li>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>gcamreader Query object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.utils.easy_query.get_year_axis">
+<span class="sig-prename descclassname"><span class="pre">tethys.utils.easy_query.</span></span><span class="sig-name descname"><span class="pre">get_year_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/utils/easy_query.html#get_year_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.utils.easy_query.get_year_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.utils.easy_query.handle_filter">
+<span class="sig-prename descclassname"><span class="pre">tethys.utils.easy_query.</span></span><span class="sig-name descname"><span class="pre">handle_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/utils/easy_query.html#handle_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.utils.easy_query.handle_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle a kwarg for build_query</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – xml node &#64;type attribute to match</p></li>
+<li><p><strong>value</strong> – string, or list of strings, indicating what the node &#64;name attribute must match or not match</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>xpath to filter nodes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.utils.easy_query.parse_name">
+<span class="sig-prename descclassname"><span class="pre">tethys.utils.easy_query.</span></span><span class="sig-name descname"><span class="pre">parse_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/utils/easy_query.html#parse_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.utils.easy_query.parse_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>convert a string to an xpath condition
+the basic case converts “foo” to “&#64;name=’foo’”</p>
+<p>‘*’ acts as a wildcard, so “foo*” is converted to “(starts-with(&#64;name, ‘foo’))”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> – the string to parse</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>xpath condition indicated by string</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
+<div class="section" id="module-tethys.model">
+<span id="tethys-model-module"></span><h2>tethys.model module<a class="headerlink" href="#module-tethys.model" title="Permalink to this headline">¶</a></h2>
+<p>&#64;Date: 09/20/2022
+&#64;author: Isaac Thompson (<a class="reference external" href="mailto:isaac&#46;thompson&#37;&#52;&#48;pnnl&#46;gov">isaac<span>&#46;</span>thompson<span>&#64;</span>pnnl<span>&#46;</span>gov</a>)
+&#64;Project: Tethys V2.0</p>
+<p>License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
+Copyright (c) 2022, Battelle Memorial Institute</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="tethys.model.Tethys">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tethys.model.</span></span><span class="sig-name descname"><span class="pre">Tethys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.125</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demand_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'withdrawals'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perform_temporal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbpath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_outputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress_outputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downscaling_rules</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxy_catalog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temporal_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/model.html#Tethys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.model.Tethys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Model wrapper for Tethys</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tethys.model.Tethys.harmonize">
+<span class="sig-name descname"><span class="pre">harmonize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/model.html#Tethys.harmonize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.model.Tethys.harmonize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actual spatial downscaling happens here</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tethys.model.Tethys.load_config">
+<span class="sig-name descname"><span class="pre">load_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/model.html#Tethys.load_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.model.Tethys.load_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load model parameters from a config.yml</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tethys.model.Tethys.run_model">
+<span class="sig-name descname"><span class="pre">run_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/model.html#Tethys.run_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.model.Tethys.run_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-tethys.spatial_proxies">
+<span id="tethys-spatial-proxies"></span><h2>tethys.spatial_proxies<a class="headerlink" href="#module-tethys.spatial_proxies" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.spatial_proxies.interp_helper">
+<span class="sig-prename descclassname"><span class="pre">tethys.spatial_proxies.</span></span><span class="sig-name descname"><span class="pre">interp_helper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_years</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/spatial_proxies.html#interp_helper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.spatial_proxies.interp_helper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linearly interpolate da to target_years
+more control over chunks, works with sparse</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>da</strong> – xarray DataArray with source years</p></li>
+<li><p><strong>target_years</strong> – list of target years to interpolate to. If None, then interpolate to annual</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>da linearly interpolated to target_years</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.spatial_proxies.load_proxies">
+<span class="sig-prename descclassname"><span class="pre">tethys.spatial_proxies.</span></span><span class="sig-name descname"><span class="pre">load_proxies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_years</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/spatial_proxies.html#load_proxies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.spatial_proxies.load_proxies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load all proxies from the catalog, regrid to target spatial resolution, and interpolate to target years</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>catalog</strong> – dictionary of proxy file names, variables, years</p></li>
+<li><p><strong>target_resolution</strong> – resolution (in degrees) to regrid to</p></li>
+<li><p><strong>target_years</strong> – list of years to interpolate to</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>big Dataset of proxies</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.spatial_proxies.pad_global">
+<span class="sig-prename descclassname"><span class="pre">tethys.spatial_proxies.</span></span><span class="sig-name descname"><span class="pre">pad_global</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/spatial_proxies.html#pad_global"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.spatial_proxies.pad_global" title="Permalink to this definition">¶</a></dt>
+<dd><p>pad inputs to global resolution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ds</strong> – xarray Dataset</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>xarray Dataset with global extent</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.spatial_proxies.percent_to_area">
+<span class="sig-prename descclassname"><span class="pre">tethys.spatial_proxies.</span></span><span class="sig-name descname"><span class="pre">percent_to_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/spatial_proxies.html#percent_to_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.spatial_proxies.percent_to_area" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert landcover dataset from cell proportion to area</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ds</strong> – xarray Dataset where values represent proportion of grid cell</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>xarray Dataset where values represent area in square kilometers</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.spatial_proxies.regrid">
+<span class="sig-prename descclassname"><span class="pre">tethys.spatial_proxies.</span></span><span class="sig-name descname"><span class="pre">regrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'extensive'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/spatial_proxies.html#regrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.spatial_proxies.regrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple regridding algorithm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray Dataset or DataArray, needs lat and lon and global extent</p></li>
+<li><p><strong>target_resolution</strong> – target resolution in degrees</p></li>
+<li><p><strong>method</strong> – choice of ‘extensive’ (preserves sums, default), ‘intensive’ (take average), or ‘label’ (for maps)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ds regridded to target_resolution</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
-<div class="section" id="tethys-run-disaggregation-module">
-<h2>tethys.run_disaggregation module<a class="headerlink" href="#tethys-run-disaggregation-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-tethys.temporal_downscaling">
+<span id="tethys-temporal-downscaling"></span><h2>tethys.temporal_downscaling<a class="headerlink" href="#module-tethys.temporal_downscaling" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.temporal_downscaling.load_monthly_data">
+<span class="sig-prename descclassname"><span class="pre">tethys.temporal_downscaling.</span></span><span class="sig-name descname"><span class="pre">load_monthly_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'intensive'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/temporal_downscaling.html#load_monthly_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.temporal_downscaling.load_monthly_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load and prepare files used in</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – file name</p></li>
+<li><p><strong>target_resolution</strong> – resoltion to regrid to (in degrees)</p></li>
+<li><p><strong>years</strong> – years to select</p></li>
+<li><p><strong>method</strong> – regridding method (see regrid function)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.temporal_downscaling.monthly_distribution_domestic">
+<span class="sig-prename descclassname"><span class="pre">tethys.temporal_downscaling.</span></span><span class="sig-name descname"><span class="pre">monthly_distribution_domestic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/temporal_downscaling.html#monthly_distribution_domestic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.temporal_downscaling.monthly_distribution_domestic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temporal downscaling for domestic water demand using algorithm from Wada et al. (2011)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.temporal_downscaling.monthly_distribution_electricty">
+<span class="sig-prename descclassname"><span class="pre">tethys.temporal_downscaling.</span></span><span class="sig-name descname"><span class="pre">monthly_distribution_electricty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hdd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cdd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regionmasks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/temporal_downscaling.html#monthly_distribution_electricty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.temporal_downscaling.monthly_distribution_electricty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temporal downscaling of water demand for electricity generation using algorithm from Voisin et al. (2013)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.temporal_downscaling.monthly_distribution_irrigation">
+<span class="sig-prename descclassname"><span class="pre">tethys.temporal_downscaling.</span></span><span class="sig-name descname"><span class="pre">monthly_distribution_irrigation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regionmasks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/temporal_downscaling.html#monthly_distribution_irrigation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.temporal_downscaling.monthly_distribution_irrigation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temporal downscaling of irrigation water demand</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tethys.region_data">
+<span id="tethys-region-data"></span><h2>tethys.region_data<a class="headerlink" href="#module-tethys.region_data" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.region_data.elec_sector_rename">
+<span class="sig-prename descclassname"><span class="pre">tethys.region_data.</span></span><span class="sig-name descname"><span class="pre">elec_sector_rename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_data.html#elec_sector_rename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_data.elec_sector_rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper for electricity demand sectors</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.region_data.elec_sector_weights">
+<span class="sig-prename descclassname"><span class="pre">tethys.region_data.</span></span><span class="sig-name descname"><span class="pre">elec_sector_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_data.html#elec_sector_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_data.elec_sector_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the electricity sector weights from GCAM database</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.region_data.extract_basin_name">
+<span class="sig-prename descclassname"><span class="pre">tethys.region_data.</span></span><span class="sig-name descname"><span class="pre">extract_basin_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_data.html#extract_basin_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_data.extract_basin_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps ‘water_td_irr_basin_C’ to ‘_basin’, and water_td_elec_C to ‘’</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.region_data.friendly_sector_name">
+<span class="sig-prename descclassname"><span class="pre">tethys.region_data.</span></span><span class="sig-name descname"><span class="pre">friendly_sector_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_data.html#friendly_sector_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_data.friendly_sector_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>convert from GCAM water input name to friendly name</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.region_data.load_region_data">
+<span class="sig-prename descclassname"><span class="pre">tethys.region_data.</span></span><span class="sig-name descname"><span class="pre">load_region_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demand_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'withdrawals'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_data.html#load_region_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_data.load_region_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load region-scale water demand from GCAM needed to carry out a configuration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dbpath</strong> – path to folder containing dbfile (see gcamreader docs)</p></li>
+<li><p><strong>dbfile</strong> – name of GCAM database (the folder containing the .basex files)</p></li>
+<li><p><strong>rules</strong> – # TODO: maybe replace with sectors</p></li>
+<li><p><strong>demand_type</strong> – ‘withdrawals’ or ‘consumption’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>pandas dataframe with columns ‘region’, ‘sector’, ‘year’, ‘value’</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.region_data.rules_to_sectors">
+<span class="sig-prename descclassname"><span class="pre">tethys.region_data.</span></span><span class="sig-name descname"><span class="pre">rules_to_sectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rules</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_data.html#rules_to_sectors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_data.rules_to_sectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert rules dict from YAML config to a list of sectors to query GCAM for</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.region_data.unfriendly_sector_name">
+<span class="sig-prename descclassname"><span class="pre">tethys.region_data.</span></span><span class="sig-name descname"><span class="pre">unfriendly_sector_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_data.html#unfriendly_sector_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_data.unfriendly_sector_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>convert from friendly name to start of GCAM name</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tethys.region_map">
+<span id="tethys-region-map"></span><h2>tethys.region_map<a class="headerlink" href="#module-tethys.region_map" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.region_map.intersection">
+<span class="sig-prename descclassname"><span class="pre">tethys.region_map.</span></span><span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">da2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_map.html#intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_map.intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience function for producing a map of intersections</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.region_map.load_regionmap">
+<span class="sig-prename descclassname"><span class="pre">tethys.region_map.</span></span><span class="sig-name descname"><span class="pre">load_regionmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namefile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip_lat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_map.html#load_regionmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_map.load_regionmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load region map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mapfile</strong> – path to map file</p></li>
+<li><p><strong>namefile</strong> – optional path to csv with region names</p></li>
+<li><p><strong>target_resolution</strong> – resolution to coerce map to. If None (default), use base resolution</p></li>
+<li><p><strong>nodata</strong> – nodata value (like 9999), will be replaced with 0</p></li>
+<li><p><strong>flip_lat</strong> – bool, whether the map is “upside down”</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.region_map.region_masks">
+<span class="sig-prename descclassname"><span class="pre">tethys.region_map.</span></span><span class="sig-name descname"><span class="pre">region_masks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_map.html#region_masks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_map.region_masks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create region mask array</p>
+</dd></dl>
+
 </div>
 </div>
 
@@ -207,8 +508,8 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="tethys.tests.html" class="btn btn-neutral float-right" title="tethys.tests package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="modules.html" class="btn btn-neutral float-left" title="&lt;no title&gt;" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing to tethys" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="modules.html" class="btn btn-neutral float-left" title="API reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

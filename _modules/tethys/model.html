@@ -1,0 +1,430 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>tethys.model &mdash; tethys 2.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/tethys.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/getting_started.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> tethys
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <strong>tethys</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../footer.html">Acknowledgement</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">tethys</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>tethys.model</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for tethys.model</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@Date: 09/20/2022</span>
+<span class="sd">@author: Isaac Thompson (isaac.thompson@pnnl.gov)</span>
+<span class="sd">@Project: Tethys V2.0</span>
+
+<span class="sd">License:  BSD 2-Clause, see LICENSE and DISCLAIMER files</span>
+<span class="sd">Copyright (c) 2022, Battelle Memorial Institute</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">tethys.region_data</span> <span class="kn">import</span> <span class="n">load_region_data</span><span class="p">,</span> <span class="n">elec_sector_weights</span>
+<span class="kn">from</span> <span class="nn">tethys.spatial_proxies</span> <span class="kn">import</span> <span class="n">load_proxies</span><span class="p">,</span> <span class="n">interp_helper</span>
+<span class="kn">from</span> <span class="nn">tethys.region_map</span> <span class="kn">import</span> <span class="n">load_regionmap</span><span class="p">,</span> <span class="n">region_masks</span>
+<span class="kn">from</span> <span class="nn">tethys.temporal_downscaling</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="Tethys"><a class="viewcode-back" href="../../tethys.html#tethys.model.Tethys">[docs]</a><span class="k">class</span> <span class="nc">Tethys</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Model wrapper for Tethys&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">years</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.125</span><span class="p">,</span> <span class="n">demand_type</span><span class="o">=</span><span class="s1">&#39;withdrawals&#39;</span><span class="p">,</span>
+                 <span class="n">perform_temporal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dbpath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dbfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">write_outputs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">output_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">output_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compress_outputs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">downscaling_rules</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">proxy_catalog</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">map_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">temporal_files</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; # TODO</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># YAML file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">config_file</span>
+
+        <span class="c1"># project level settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">years</span> <span class="o">=</span> <span class="n">years</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">demand_type</span> <span class="o">=</span> <span class="n">demand_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perform_temporal</span> <span class="o">=</span> <span class="n">perform_temporal</span>
+
+        <span class="c1"># GCAM database info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbpath</span> <span class="o">=</span> <span class="n">dbpath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbfile</span> <span class="o">=</span> <span class="n">dbfile</span>
+
+        <span class="c1"># TODO: re add support for csv input as alternative</span>
+
+        <span class="c1"># outputs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_outputs</span> <span class="o">=</span> <span class="n">write_outputs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span> <span class="o">=</span> <span class="n">output_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">=</span> <span class="n">output_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compress_outputs</span> <span class="o">=</span> <span class="n">compress_outputs</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">downscaling_rules</span> <span class="o">=</span> <span class="n">downscaling_rules</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxy_catalog</span> <span class="o">=</span> <span class="n">proxy_catalog</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">map_files</span> <span class="o">=</span> <span class="n">map_files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temporal_files</span> <span class="o">=</span> <span class="n">temporal_files</span>
+
+        <span class="c1"># data we&#39;ll load or generate later</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regionmaps</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxies</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># settings in YAML override settings passed directly to __init__</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Tethys.load_config"><a class="viewcode-back" href="../../tethys.html#tethys.model.Tethys.load_config">[docs]</a>    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load model parameters from a config.yml&quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+        <span class="c1"># project level settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">years</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">][</span><span class="s1">&#39;years&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">][</span><span class="s1">&#39;resolution&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">demand_type</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">][</span><span class="s1">&#39;demand_type&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perform_temporal</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">][</span><span class="s1">&#39;perform_temporal&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">downscaling_rules</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;downscaling_rules&#39;</span><span class="p">]</span>
+
+        <span class="c1"># for parsing GCAM database</span>
+        <span class="k">if</span> <span class="s1">&#39;GCAM&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dbpath</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;GCAM&#39;</span><span class="p">][</span><span class="s1">&#39;dbpath&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dbfile</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;GCAM&#39;</span><span class="p">][</span><span class="s1">&#39;dbfile&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="s1">&#39;outputs&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_outputs</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">][</span><span class="s1">&#39;folder&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;compress_outputs&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">]:</span>  <span class="c1"># TODO: better to do something like self.__dict__.update()?</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">compress_outputs</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">][</span><span class="s1">&#39;compress_outputs&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">perform_temporal</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">temporal_files</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;temporal&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">map_files</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;maps&#39;</span><span class="p">]</span>
+
+        <span class="c1"># parse proxy files structure from YAML</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxy_catalog</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">proxy</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;proxies&#39;</span><span class="p">]:</span>
+            <span class="n">flags</span> <span class="o">=</span> <span class="n">proxy</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;flags&#39;</span> <span class="ow">in</span> <span class="n">proxy</span> <span class="k">else</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">proxy</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">]:</span>
+
+                <span class="n">abbreviation</span> <span class="o">=</span> <span class="n">proxy</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">][</span><span class="n">variable</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proxy</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">variable</span>
+
+                <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">proxy</span><span class="p">[</span><span class="s1">&#39;years&#39;</span><span class="p">]:</span>
+
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">proxy</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[VAR]&#39;</span><span class="p">,</span> <span class="n">abbreviation</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[YEAR]&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">))</span>
+                    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">proxy</span><span class="p">[</span><span class="s1">&#39;folder&#39;</span><span class="p">],</span> <span class="n">name</span><span class="p">))</span>
+
+                    <span class="k">if</span> <span class="n">filepath</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy_catalog</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">proxy_catalog</span><span class="p">[</span><span class="n">filepath</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;variables&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">&#39;years&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="n">flags</span><span class="p">}</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">proxy_catalog</span><span class="p">[</span><span class="n">filepath</span><span class="p">][</span><span class="s1">&#39;variables&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">proxy_catalog</span><span class="p">[</span><span class="n">filepath</span><span class="p">][</span><span class="s1">&#39;years&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">year</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tethys.harmonize"><a class="viewcode-back" href="../../tethys.html#tethys.model.Tethys.harmonize">[docs]</a>    <span class="k">def</span> <span class="nf">harmonize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">,</span> <span class="n">sectors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Actual spatial downscaling happens here&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">sectors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sectors</span> <span class="o">=</span> <span class="n">distribution</span><span class="o">.</span><span class="n">sector</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sectors</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">sectors</span> <span class="o">=</span> <span class="p">[</span><span class="n">sectors</span><span class="p">]</span>
+
+        <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regionmaps</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">data</span><span class="p">))</span> <span class="o">&amp;</span>
+                             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">sector</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">sectors</span><span class="p">))</span> <span class="o">&amp;</span>
+                             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">))]</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">])[</span>
+            <span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">regionmaps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regionmaps</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">inputs</span><span class="o">.</span><span class="n">region</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">distribution</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">regionmaps</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># take total of proxy sectors when input condition is for total</span>
+        <span class="k">if</span> <span class="n">inputs</span><span class="o">.</span><span class="n">sector</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">)</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">)</span>
+
+        <span class="n">sums</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">dims</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># avoid 0/0</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">inputs</span> <span class="o">/</span> <span class="n">sums</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s1">&#39;region&#39;</span><span class="p">)</span>  <span class="c1"># demand_cell = demand_region * (proxy_cell / proxy_region)</span>
+
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="Tethys.run_model"><a class="viewcode-back" href="../../tethys.html#tethys.model.Tethys.run_model">[docs]</a>    <span class="k">def</span> <span class="nf">run_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
+
+        <span class="c1"># TODO: reorganize these data opening functions as methods</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxies</span> <span class="o">=</span> <span class="n">load_proxies</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proxy_catalog</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regionmaps</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">region_masks</span><span class="p">(</span><span class="n">load_regionmap</span><span class="p">(</span><span class="n">target_resolution</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">mapfile</span><span class="o">=</span><span class="n">i</span><span class="p">))</span>
+                                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">map_files</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="s1">&#39;region&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">load_region_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">downscaling_rules</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">demand_type</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">supersector</span><span class="p">,</span> <span class="n">rules</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">downscaling_rules</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Downscaling </span><span class="si">{</span><span class="n">supersector</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rules</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">rules</span> <span class="o">=</span> <span class="p">{</span><span class="n">supersector</span><span class="p">:</span> <span class="n">rules</span><span class="p">}</span>
+
+            <span class="n">proxies</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+                <span class="p">{</span><span class="n">sector</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxies</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">variable</span><span class="o">=</span><span class="n">proxy</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">proxy</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="s1">&#39;variable&#39;</span><span class="p">)</span>
+                 <span class="k">for</span> <span class="n">sector</span><span class="p">,</span> <span class="n">proxy</span> <span class="ow">in</span> <span class="n">rules</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;sector&#39;</span><span class="p">)</span>
+
+            <span class="n">downscaled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">harmonize</span><span class="p">(</span><span class="n">proxies</span><span class="p">)</span>
+
+            <span class="c1"># handle constraint for entire supersector</span>
+            <span class="k">if</span> <span class="n">supersector</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rules</span> <span class="ow">and</span> <span class="n">supersector</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">sector</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">region</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">sector</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">downscaled</span><span class="o">.</span><span class="n">sector</span><span class="o">.</span><span class="n">data</span><span class="p">)])</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
+                        <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">region</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">sector</span> <span class="o">==</span> <span class="n">supersector</span><span class="p">])):</span>
+                    <span class="n">downscaled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">harmonize</span><span class="p">(</span><span class="n">downscaled</span><span class="p">,</span> <span class="n">supersector</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">perform_temporal</span><span class="p">:</span>
+                <span class="c1"># calculate the monthly distributions (share of annual) for each year</span>
+
+                <span class="k">if</span> <span class="n">supersector</span> <span class="o">==</span> <span class="s1">&#39;Domestic&#39;</span> <span class="ow">or</span> <span class="n">supersector</span> <span class="o">==</span> <span class="s1">&#39;Municipal&#39;</span><span class="p">:</span>
+                    <span class="n">tas</span> <span class="o">=</span> <span class="n">load_monthly_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temporal_files</span><span class="p">[</span><span class="s1">&#39;tas&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                    <span class="n">amplitude</span> <span class="o">=</span> <span class="n">load_monthly_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temporal_files</span><span class="p">[</span><span class="s1">&#39;domr&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;label&#39;</span><span class="p">)</span>
+                    <span class="n">distribution</span> <span class="o">=</span> <span class="n">monthly_distribution_domestic</span><span class="p">(</span><span class="n">tas</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">supersector</span> <span class="o">==</span> <span class="s1">&#39;Electricity&#39;</span><span class="p">:</span>
+                    <span class="n">hdd</span> <span class="o">=</span> <span class="n">load_monthly_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temporal_files</span><span class="p">[</span><span class="s1">&#39;hdd&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                    <span class="n">cdd</span> <span class="o">=</span> <span class="n">load_monthly_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temporal_files</span><span class="p">[</span><span class="s1">&#39;cdd&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+                    <span class="n">weights</span> <span class="o">=</span> <span class="n">elec_sector_weights</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbfile</span><span class="p">)</span>
+                    <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[(</span><span class="n">weights</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">region</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">sector</span> <span class="o">==</span> <span class="s1">&#39;Electricity&#39;</span><span class="p">]))</span> <span class="o">&amp;</span>
+                                      <span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regionmaps</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">data</span><span class="p">))</span> <span class="o">&amp;</span>
+                                      <span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">))]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span>
+                        <span class="p">[</span><span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">])[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">weights</span> <span class="o">=</span> <span class="n">interp_helper</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+                    <span class="n">regionmasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regionmaps</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">weights</span><span class="o">.</span><span class="n">region</span><span class="p">)</span>
+
+                    <span class="n">distribution</span> <span class="o">=</span> <span class="n">monthly_distribution_electricty</span><span class="p">(</span><span class="n">hdd</span><span class="p">,</span> <span class="n">cdd</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">regionmasks</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">supersector</span> <span class="o">==</span> <span class="s1">&#39;Irrigation&#39;</span><span class="p">:</span>
+                    <span class="n">irr</span> <span class="o">=</span> <span class="n">load_monthly_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temporal_files</span><span class="p">[</span><span class="s1">&#39;irr&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">years</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;label&#39;</span><span class="p">)</span>
+                    <span class="n">irr_regions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">region</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">sector</span> <span class="o">==</span> <span class="s1">&#39;Irrigation&#39;</span><span class="p">)</span> <span class="o">&amp;</span>
+                                                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regionmaps</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+                                                     <span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+                    <span class="n">regionmasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regionmaps</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">irr_regions</span><span class="p">)</span>
+                    <span class="n">distribution</span> <span class="o">=</span> <span class="n">monthly_distribution_irrigation</span><span class="p">(</span><span class="n">irr</span><span class="p">,</span> <span class="n">regionmasks</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">distribution</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">12</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">coords</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">month</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">)))</span>
+
+                <span class="n">downscaled</span> <span class="o">=</span> <span class="n">interp_helper</span><span class="p">(</span><span class="n">downscaled</span><span class="p">)</span> <span class="o">*</span> <span class="n">distribution</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">downscaled</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;sector&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_outputs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress_outputs</span><span class="p">:</span>
+                <span class="c1"># TODO: could give users more control over this? or tell them to use self.outputs directly?</span>
+                <span class="n">encoding</span> <span class="o">=</span> <span class="p">{</span><span class="n">variable</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;zlib&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;complevel&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span> <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span><span class="p">))</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Battelle Memorial Institute.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>tethys.region_data &mdash; tethys 2.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/tethys.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/getting_started.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> tethys
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <strong>tethys</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../footer.html">Acknowledgement</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">tethys</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>tethys.region_data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for tethys.region_data</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">gcamreader</span>
+<span class="kn">from</span> <span class="nn">tethys.utils.easy_query</span> <span class="kn">import</span> <span class="n">easy_query</span>
+
+
+<div class="viewcode-block" id="load_region_data"><a class="viewcode-back" href="../../tethys.html#tethys.region_data.load_region_data">[docs]</a><span class="k">def</span> <span class="nf">load_region_data</span><span class="p">(</span><span class="n">dbpath</span><span class="p">,</span> <span class="n">dbfile</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">demand_type</span><span class="o">=</span><span class="s1">&#39;withdrawals&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load region-scale water demand from GCAM needed to carry out a configuration</span>
+
+<span class="sd">    :param dbpath: path to folder containing dbfile (see gcamreader docs)</span>
+<span class="sd">    :param dbfile: name of GCAM database (the folder containing the .basex files)</span>
+<span class="sd">    :param rules: # TODO: maybe replace with sectors</span>
+<span class="sd">    :param demand_type: &#39;withdrawals&#39; or &#39;consumption&#39;</span>
+<span class="sd">    :return: pandas dataframe with columns &#39;region&#39;, &#39;sector&#39;, &#39;year&#39;, &#39;value&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">gcamreader</span><span class="o">.</span><span class="n">LocalDBConn</span><span class="p">(</span><span class="n">dbpath</span><span class="p">,</span> <span class="n">dbfile</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">runQuery</span><span class="p">(</span><span class="n">easy_query</span><span class="p">(</span><span class="s1">&#39;demand-physical&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="n">rules_to_sectors</span><span class="p">(</span><span class="n">rules</span><span class="p">),</span> <span class="n">technology</span><span class="o">=</span><span class="s1">&#39;!water_td_*&#39;</span><span class="p">,</span>
+                                  <span class="nb">input</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;*_water </span><span class="si">{</span><span class="n">demand_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;water_td_*_</span><span class="si">{</span><span class="n">demand_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]))</span>
+
+    <span class="c1"># add &#39;_BasinName&#39; to region if exists</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;region&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">extract_basin_name</span><span class="p">)</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">extract_basin_name</span><span class="p">)</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">friendly_sector_name</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">])[[</span><span class="s1">&#39;value&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="extract_basin_name"><a class="viewcode-back" href="../../tethys.html#tethys.region_data.extract_basin_name">[docs]</a><span class="k">def</span> <span class="nf">extract_basin_name</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maps &#39;water_td_irr_basin_C&#39; to &#39;_basin&#39;, and water_td_elec_C to &#39;&#39;&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;water_td_irr_&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
+
+
+<span class="c1"># mapping from GCAM water input friendly names to the start of their full names</span>
+<span class="n">sector_lookup</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Domestic&#39;</span><span class="p">:</span> <span class="s1">&#39;water_td_dom_&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Municipal&#39;</span><span class="p">:</span> <span class="s1">&#39;water_td_muni_&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Electricity&#39;</span><span class="p">:</span> <span class="s1">&#39;water_td_elec_&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Manufacturing&#39;</span><span class="p">:</span> <span class="s1">&#39;water_td_ind_&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Mining&#39;</span><span class="p">:</span> <span class="s1">&#39;water_td_pri_&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Livestock&#39;</span><span class="p">:</span> <span class="s1">&#39;water_td_an_&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Irrigation&#39;</span><span class="p">:</span> <span class="s1">&#39;water_td_irr_&#39;</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="friendly_sector_name"><a class="viewcode-back" href="../../tethys.html#tethys.region_data.friendly_sector_name">[docs]</a><span class="k">def</span> <span class="nf">friendly_sector_name</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;convert from GCAM water input name to friendly name&quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sector_lookup</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">k</span>
+
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="unfriendly_sector_name"><a class="viewcode-back" href="../../tethys.html#tethys.region_data.unfriendly_sector_name">[docs]</a><span class="k">def</span> <span class="nf">unfriendly_sector_name</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;convert from friendly name to start of GCAM name&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sector_lookup</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sector_lookup</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span>
+
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="rules_to_sectors"><a class="viewcode-back" href="../../tethys.html#tethys.region_data.rules_to_sectors">[docs]</a><span class="k">def</span> <span class="nf">rules_to_sectors</span><span class="p">(</span><span class="n">rules</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert rules dict from YAML config to a list of sectors to query GCAM for&quot;&quot;&quot;</span>
+    <span class="n">sectors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">rules</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">sectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unfriendly_sector_name</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">sectors</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">sectors</span></div>
+
+
+<div class="viewcode-block" id="elec_sector_weights"><a class="viewcode-back" href="../../tethys.html#tethys.region_data.elec_sector_weights">[docs]</a><span class="k">def</span> <span class="nf">elec_sector_weights</span><span class="p">(</span><span class="n">dbpath</span><span class="p">,</span> <span class="n">dbfile</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the electricity sector weights from GCAM database&quot;&quot;&quot;</span>
+
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">gcamreader</span><span class="o">.</span><span class="n">LocalDBConn</span><span class="p">(</span><span class="n">dbpath</span><span class="p">,</span> <span class="n">dbfile</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">runQuery</span><span class="p">(</span><span class="n">easy_query</span><span class="p">(</span><span class="s1">&#39;demand-physical&#39;</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;elect_td_bld&#39;</span><span class="p">,</span> <span class="s1">&#39;elect_td_ind&#39;</span><span class="p">,</span> <span class="s1">&#39;elect_td_trn&#39;</span><span class="p">]))</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">elec_sector_rename</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">])[[</span><span class="s1">&#39;value&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">])[[</span><span class="s1">&#39;value&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="elec_sector_rename"><a class="viewcode-back" href="../../tethys.html#tethys.region_data.elec_sector_rename">[docs]</a><span class="k">def</span> <span class="nf">elec_sector_rename</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper for electricity demand sectors&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;comm heating&#39;</span><span class="p">,</span> <span class="s1">&#39;resid heating&#39;</span><span class="p">,</span> <span class="s1">&#39;comm hot water&#39;</span><span class="p">,</span> <span class="s1">&#39;resid furnace fans&#39;</span><span class="p">,</span> <span class="s1">&#39;resid hot water&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Heating&#39;</span>
+    <span class="k">elif</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;comm cooling&#39;</span><span class="p">,</span> <span class="s1">&#39;resid cooling&#39;</span><span class="p">,</span> <span class="s1">&#39;comm refrigeration&#39;</span><span class="p">,</span> <span class="s1">&#39;resid freezers&#39;</span><span class="p">,</span> <span class="s1">&#39;resid refrigerators&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Cooling&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;Other&#39;</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Battelle Memorial Institute.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

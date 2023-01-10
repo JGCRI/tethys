@@ -1,0 +1,334 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>tethys.utils.easy_query &mdash; tethys 2.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/tethys.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/getting_started.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> tethys
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to <strong>tethys</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../footer.html">Acknowledgement</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tethys</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>tethys.utils.easy_query</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for tethys.utils.easy_query</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">gcamreader</span>
+
+
+<div class="viewcode-block" id="easy_query"><a class="viewcode-back" href="../../../tethys.html#tethys.utils.easy_query.easy_query">[docs]</a><span class="k">def</span> <span class="nf">easy_query</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">year_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a query for a GCAM database</span>
+
+<span class="sd">    kwargs act as filters on nodes, eg. &quot;sector=&#39;Beef&#39;&quot; is converted to the xpath &quot;[@type=&#39;sector&#39; and @name=&#39;Beef&#39;]&quot;</span>
+<span class="sd">    Lists are also accepted, so &quot;sector=[&#39;Beef&#39;, &#39;Dairy&#39;]&quot; matches &#39;Beef&#39; or &#39;Dairy&#39;</span>
+
+<span class="sd">    Order of kwargs must follow the sector -&gt; subsector -&gt; technology -&gt; input/output/etc hierarchy</span>
+
+<span class="sd">    Some shortcuts are supported. &#39;*&#39; can be used as a wildcard, so input=&#39;water_td_irr_*_C&#39;</span>
+<span class="sd">    matches any input starting with &#39;water_td_irr&#39; and ending with &#39;_C&#39;</span>
+
+<span class="sd">    Starting a filter string with &#39;!&#39; negates it, so sector=&#39;!elec*&#39; will exclude any sector names</span>
+<span class="sd">    that begin with &#39;elec&#39;.</span>
+<span class="sd">    Combinations are allowed, so input=[&#39;water_td_irr_*_C&#39;, &#39;!water_td_irr_A*&#39;] would select all input basins,</span>
+<span class="sd">    except those beginning with the letter &#39;A&#39;.</span>
+
+<span class="sd">    :param variable: name of variable in database, such as &#39;demand-physical&#39; or &#39;emissions&#39;</span>
+<span class="sd">    :param year_axis: optional name of year axis (&#39;year&#39; or &#39;vintage&#39;). If None, will be inferred from variable</span>
+<span class="sd">    :param kwargs: refer to description for details</span>
+
+<span class="sd">    :return: gcamreader Query object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">filters</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># match nodes where @type=&#39;sector&#39; by default</span>
+    <span class="n">filters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># update the filters with user-provided kwargs</span>
+
+    <span class="c1"># filters are separated by &quot;//*&quot; to match any descendant</span>
+    <span class="n">xpath</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span> <span class="o">+</span> <span class="s2">&quot;//*&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">handle_filter</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">filters</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;//</span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2">/node()&quot;</span>
+
+    <span class="k">if</span> <span class="n">year_axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">year_axis</span> <span class="o">=</span> <span class="n">get_year_axis</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+
+    <span class="c1"># query template</span>
+    <span class="n">querystr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;aQuery&gt;&lt;dummyQuery title=&quot;&quot;&gt;</span>
+<span class="s2">    &lt;axis1 name=&quot;axis&quot;&gt;axis&lt;/axis1&gt;</span>
+<span class="s2">    &lt;axis2 name=&quot;year&quot;&gt;</span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2">[@</span><span class="si">{</span><span class="n">year_axis</span><span class="si">}</span><span class="s2">]&lt;/axis2&gt;</span>
+<span class="s2">    &lt;xPath&gt;</span><span class="si">{</span><span class="n">xpath</span><span class="si">}</span><span class="s2">&lt;/xPath&gt;</span>
+<span class="s2">    &lt;/dummyQuery&gt;&lt;/aQuery&gt;&quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">gcamreader</span><span class="o">.</span><span class="n">Query</span><span class="p">(</span><span class="n">querystr</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="handle_filter"><a class="viewcode-back" href="../../../tethys.html#tethys.utils.easy_query.handle_filter">[docs]</a><span class="k">def</span> <span class="nf">handle_filter</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Handle a kwarg for build_query</span>
+
+<span class="sd">    :param key: xml node @type attribute to match</span>
+<span class="sd">    :param value: string, or list of strings, indicating what the node @name attribute must match or not match</span>
+<span class="sd">    :return: xpath to filter nodes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># promote string value to length 1 list so that we only need to define how to handle list</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="c1"># need to handle &#39;!&#39; filters all at the end here so that conjunctions work</span>
+        <span class="n">ors</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">value</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;!&#39;</span><span class="p">)]</span>
+        <span class="n">andnots</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">value</span> <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;!&#39;</span><span class="p">)]</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[@type=&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+
+        <span class="c1"># things to include</span>
+        <span class="k">if</span> <span class="n">ors</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; and (</span><span class="si">{</span><span class="n">parse_name</span><span class="p">(</span><span class="n">ors</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ors</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; or </span><span class="si">{</span><span class="n">parse_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;)&quot;</span>
+
+        <span class="c1"># things to exclude</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">andnots</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; and not </span><span class="si">{</span><span class="n">parse_name</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;!&#39;</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;]&quot;</span>
+
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="c1"># so that when value is None, only matters that type is key</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;[@type=&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39;]&quot;</span></div>
+
+
+<div class="viewcode-block" id="parse_name"><a class="viewcode-back" href="../../../tethys.html#tethys.utils.easy_query.parse_name">[docs]</a><span class="k">def</span> <span class="nf">parse_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    convert a string to an xpath condition</span>
+<span class="sd">    the basic case converts &quot;foo&quot; to &quot;@name=&#39;foo&#39;&quot;</span>
+
+<span class="sd">    &#39;*&#39; acts as a wildcard, so &quot;foo*&quot; is converted to &quot;(starts-with(@name, &#39;foo&#39;))&quot;</span>
+
+<span class="sd">    :param name: the string to parse</span>
+<span class="sd">    :return: xpath condition indicated by string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="s1">&#39;*&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+        <span class="n">substrings</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;(&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">substring</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">substrings</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">substring</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">out</span> <span class="o">==</span> <span class="s2">&quot;(&quot;</span> <span class="k">else</span> <span class="s2">&quot; and &quot;</span>  <span class="c1"># don&#39;t need to add &#39;and&#39; for the first condition</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;starts-with(@name, &#39;</span><span class="si">{</span><span class="n">substring</span><span class="si">}</span><span class="s2">&#39;)&quot;</span>
+                <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">substrings</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;ends-with(@name, &#39;</span><span class="si">{</span><span class="n">substring</span><span class="si">}</span><span class="s2">&#39;)&quot;</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># note: order of internal substrings is not matched</span>
+                    <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;contains(@name, &#39;</span><span class="si">{</span><span class="n">substring</span><span class="si">}</span><span class="s2">&#39;)&quot;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;)&quot;</span>
+
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;@name=&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span></div>
+
+
+<div class="viewcode-block" id="get_year_axis"><a class="viewcode-back" href="../../../tethys.html#tethys.utils.easy_query.get_year_axis">[docs]</a><span class="k">def</span> <span class="nf">get_year_axis</span><span class="p">(</span><span class="n">variable</span><span class="p">):</span>
+    <span class="c1"># guess the year axis name</span>
+    <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;demand-physical&#39;</span><span class="p">,</span> <span class="s1">&#39;physical-output&#39;</span><span class="p">,</span> <span class="s1">&#39;price-paid&#39;</span><span class="p">,</span> <span class="s1">&#39;carbon-content&#39;</span><span class="p">,</span> <span class="s1">&#39;IO-coefficient&#39;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="s1">&#39;vintage&#39;</span>
+    <span class="k">return</span> <span class="s1">&#39;year&#39;</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Battelle Memorial Institute.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
