@@ -20,7 +20,7 @@ class Tethys:
 
     def __init__(self, config_file=None, years=None, resolution=0.125, demand_type='withdrawals',
                  perform_temporal=False, dbpath=None, dbfile=None, write_outputs=False, output_folder=None,
-                 output_file=None, compress_outputs=True, downscaling_rules=None, proxy_catalog=None, map_files=None,
+                 output_file=None, compress_outputs=True, downscaling_rules=None, proxy_files=None, map_files=None,
                  temporal_files=None):
         """ # TODO
         """
@@ -48,7 +48,7 @@ class Tethys:
 
         self.downscaling_rules = downscaling_rules
 
-        self.proxy_catalog = proxy_catalog
+        self.proxy_files = self._parse_proxy_files(proxy_files) if proxy_files is not None else None
         self.map_files = map_files
         self.temporal_files = temporal_files
 
@@ -94,23 +94,47 @@ class Tethys:
         self.map_files = config['maps']
 
         # parse proxy files structure from YAML
-        self.proxy_catalog = {}
-        for proxy in config['proxies']:
-            flags = proxy['flags'] if 'flags' in proxy else []
-            for variable in proxy['variables']:
+        self.proxy_files = self._parse_proxy_files(config['proxies'], config_file)
 
-                abbreviation = proxy['variables'][variable] if isinstance(proxy['variables'], dict) else variable
+    def _parse_proxy_files(self, proxy_files, config_file=''):
+        """Handle several shorthand expressions in the proxy catalog"""
 
-                for year in proxy['years']:
+        out = dict()
 
-                    name = proxy['name'].replace('[VAR]', abbreviation).replace('[YEAR]', str(year))
-                    filepath = os.path.abspath(os.path.join(proxy['folder'], name))
+        # name may be something like "ssp1_[YEAR].tif", which actually refers to multiple files
+        # such as "ssp1_2010.tif" and "ssp1_2020.tif" when info['years'] == [2010, 2020]
+        for name, info in proxy_files.items():
+            # promote strs to list
+            if isinstance(info['variables'], str):
+                info['variables'] = [info['variables']]
 
-                    if filepath not in self.proxy_catalog:
-                        self.proxy_catalog[filepath] = {'variables': set(), 'years': set(), 'flags': flags}
+            if isinstance(info['years'], int):
+                info['years'] = [info['years']]
 
-                    self.proxy_catalog[filepath]['variables'].add(variable)
-                    self.proxy_catalog[filepath]['years'].add(year)
+            # flags are optional
+            if 'flags' in info:
+                if isinstance(info['flags'], str):
+                    info['flags'] = [info['flags']]
+            else:
+                info['flags'] = []
+
+            for variable in info['variables']:
+
+                # file name may use an abbreviation of the variable name
+                # if info['variables'] is a dict of form {variable: abbreviation}
+                abbreviation = info['variables'][variable] if isinstance(info['variables'], dict) else variable
+
+                for year in info['years']:
+                    # determine the actual name of the file containing variable variable for year year
+                    filename = name.replace('{variable}', abbreviation).replace('{year}', str(year))
+                    filepath = os.path.abspath(os.path.join(os.path.dirname(config_file), filename))
+
+                    if filepath not in out:
+                        out[filepath] = {'variables': set(), 'years': set(), 'flags': info['flags']}
+
+                    out[filepath]['variables'].add(variable)
+                    out[filepath]['years'].add(year)
+        return out
 
     def harmonize(self, distribution, sectors=None):
         """Actual spatial downscaling happens here"""
@@ -146,7 +170,7 @@ class Tethys:
         self.outputs = xr.Dataset()
 
         # TODO: reorganize these data opening functions as methods
-        self.proxies = load_proxies(self.proxy_catalog, self.resolution, self.years)
+        self.proxies = load_proxies(self.proxy_files, self.resolution, self.years)
         self.regionmaps = xr.concat([region_masks(load_regionmap(target_resolution=self.resolution, mapfile=i))
                                      for i in self.map_files], dim='region')
         self.inputs = load_region_data(self.dbpath, self.dbfile, self.downscaling_rules, self.demand_type)
@@ -207,6 +231,7 @@ class Tethys:
             self.outputs.update(downscaled.to_dataset(dim='sector'))
 
         if self.write_outputs:
+            print('Writing Outputs')
             if self.compress_outputs:
                 # TODO: could give users more control over this? or tell them to use self.outputs directly?
                 encoding = {variable: {'zlib': True, 'complevel': 5} for variable in self.outputs}
