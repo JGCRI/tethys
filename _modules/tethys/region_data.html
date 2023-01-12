@@ -167,23 +167,25 @@
            <div itemprop="articleBody">
             
   <h1>Source code for tethys.region_data</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">gcamreader</span>
+<span></span><span class="kn">import</span> <span class="nn">gcamreader</span>
 <span class="kn">from</span> <span class="nn">tethys.utils.easy_query</span> <span class="kn">import</span> <span class="n">easy_query</span>
 
 
-<div class="viewcode-block" id="load_region_data"><a class="viewcode-back" href="../../tethys.html#tethys.region_data.load_region_data">[docs]</a><span class="k">def</span> <span class="nf">load_region_data</span><span class="p">(</span><span class="n">dbpath</span><span class="p">,</span> <span class="n">dbfile</span><span class="p">,</span> <span class="n">rules</span><span class="p">,</span> <span class="n">demand_type</span><span class="o">=</span><span class="s1">&#39;withdrawals&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="load_region_data"><a class="viewcode-back" href="../../tethys.html#tethys.region_data.load_region_data">[docs]</a><span class="k">def</span> <span class="nf">load_region_data</span><span class="p">(</span><span class="n">dbpath</span><span class="p">,</span> <span class="n">dbfile</span><span class="p">,</span> <span class="n">sectors</span><span class="p">,</span> <span class="n">demand_type</span><span class="o">=</span><span class="s1">&#39;withdrawals&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load region-scale water demand from GCAM needed to carry out a configuration</span>
 
 <span class="sd">    :param dbpath: path to folder containing dbfile (see gcamreader docs)</span>
 <span class="sd">    :param dbfile: name of GCAM database (the folder containing the .basex files)</span>
-<span class="sd">    :param rules: # TODO: maybe replace with sectors</span>
+<span class="sd">    :param sectors: GCAM sectors to filter to (friendly names will be converted to unfriendly names)</span>
 <span class="sd">    :param demand_type: &#39;withdrawals&#39; or &#39;consumption&#39;</span>
 <span class="sd">    :return: pandas dataframe with columns &#39;region&#39;, &#39;sector&#39;, &#39;year&#39;, &#39;value&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sectors</span> <span class="o">=</span> <span class="p">[</span><span class="n">unfriendly_sector_name</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sectors</span><span class="p">]</span>
+
     <span class="n">conn</span> <span class="o">=</span> <span class="n">gcamreader</span><span class="o">.</span><span class="n">LocalDBConn</span><span class="p">(</span><span class="n">dbpath</span><span class="p">,</span> <span class="n">dbfile</span><span class="p">)</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">runQuery</span><span class="p">(</span><span class="n">easy_query</span><span class="p">(</span><span class="s1">&#39;demand-physical&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="n">rules_to_sectors</span><span class="p">(</span><span class="n">rules</span><span class="p">),</span> <span class="n">technology</span><span class="o">=</span><span class="s1">&#39;!water_td_*&#39;</span><span class="p">,</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">runQuery</span><span class="p">(</span><span class="n">easy_query</span><span class="p">(</span><span class="s1">&#39;demand-physical&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="n">sectors</span><span class="p">,</span> <span class="n">technology</span><span class="o">=</span><span class="s1">&#39;!water_td_*&#39;</span><span class="p">,</span>
                                   <span class="nb">input</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;*_water </span><span class="si">{</span><span class="n">demand_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;water_td_*_</span><span class="si">{</span><span class="n">demand_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]))</span>
 
     <span class="c1"># add &#39;_BasinName&#39; to region if exists</span>
@@ -192,8 +194,6 @@
     <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">friendly_sector_name</span><span class="p">)</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">])[[</span><span class="s1">&#39;value&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-
-    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">df</span></div>
 
@@ -232,16 +232,6 @@
         <span class="k">return</span> <span class="n">sector_lookup</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span>
 
     <span class="k">return</span> <span class="n">x</span></div>
-
-
-<div class="viewcode-block" id="rules_to_sectors"><a class="viewcode-back" href="../../tethys.html#tethys.region_data.rules_to_sectors">[docs]</a><span class="k">def</span> <span class="nf">rules_to_sectors</span><span class="p">(</span><span class="n">rules</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert rules dict from YAML config to a list of sectors to query GCAM for&quot;&quot;&quot;</span>
-    <span class="n">sectors</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">rules</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">sectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unfriendly_sector_name</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">sectors</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">sectors</span></div>
 
 
 <div class="viewcode-block" id="elec_sector_weights"><a class="viewcode-back" href="../../tethys.html#tethys.region_data.elec_sector_weights">[docs]</a><span class="k">def</span> <span class="nf">elec_sector_weights</span><span class="p">(</span><span class="n">dbpath</span><span class="p">,</span> <span class="n">dbfile</span><span class="p">):</span>

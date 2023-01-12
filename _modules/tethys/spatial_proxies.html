@@ -171,44 +171,21 @@
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
 
-<div class="viewcode-block" id="load_proxies"><a class="viewcode-back" href="../../tethys.html#tethys.spatial_proxies.load_proxies">[docs]</a><span class="k">def</span> <span class="nf">load_proxies</span><span class="p">(</span><span class="n">catalog</span><span class="p">,</span> <span class="n">target_resolution</span><span class="p">,</span> <span class="n">target_years</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load all proxies from the catalog, regrid to target spatial resolution, and interpolate to target years</span>
-
-<span class="sd">    :param catalog: dictionary of proxy file names, variables, years</span>
-<span class="sd">    :param target_resolution: resolution (in degrees) to regrid to</span>
-<span class="sd">    :param target_years: list of years to interpolate to</span>
-<span class="sd">    :return: big Dataset of proxies</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Loading Proxy Data&#39;</span><span class="p">)</span>
-    <span class="n">dataarrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">da</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">catalog</span> <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">_preprocess</span><span class="p">(</span><span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">target_resolution</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
-
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Interpolating Proxies&#39;</span><span class="p">)</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">interp_helper</span><span class="p">(</span><span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">da</span> <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">dataarrays</span> <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">variable</span><span class="p">],</span> <span class="s1">&#39;year&#39;</span><span class="p">),</span> <span class="n">target_years</span><span class="p">)</span>
-                  <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">dataarrays</span><span class="p">))</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">ds</span></div>
-
-
-<span class="k">def</span> <span class="nf">_preprocess</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">target_resolution</span><span class="p">):</span>
+<div class="viewcode-block" id="load_proxy_file"><a class="viewcode-back" href="../../tethys.html#tethys.spatial_proxies.load_proxy_file">[docs]</a><span class="k">def</span> <span class="nf">load_proxy_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">target_resolution</span><span class="p">,</span> <span class="n">years</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">flags</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare a dataset from single file to be merged into a dataset of all proxies</span>
 
 <span class="sd">    handles many oddities found in proxies</span>
 
-<span class="sd">    :param ds: xarray Dataset opened from a file</span>
-<span class="sd">    :param catalog: dictionary of filenames and declared contents</span>
-<span class="sd">    :param target_resolution: resolution to regrid to (in degrees)</span>
-<span class="sd">    :return: preprocessed dataset</span>
+<span class="sd">    :param filename: name of file</span>
+<span class="sd">    :param target_resolution: resolution in degrees to regrid to</span>
+<span class="sd">    :param years: years to extract from the file</span>
+<span class="sd">    :param variables: variables to extract from the file</span>
+<span class="sd">    :param flags: list potentially containing &#39;cell_area_share&#39; or &#39;short_name_as_name&#39;</span>
+<span class="sd">    :return: preprocessed data set</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># TODO: break into separate functions as sensible (for testing)</span>
 
-    <span class="c1"># get details from files catalog</span>
-    <span class="n">filename</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">encoding</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span>
-    <span class="n">variables</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">catalog</span><span class="p">[</span><span class="n">filename</span><span class="p">][</span><span class="s1">&#39;variables&#39;</span><span class="p">])</span>
-    <span class="n">years</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">catalog</span><span class="p">[</span><span class="n">filename</span><span class="p">][</span><span class="s1">&#39;years&#39;</span><span class="p">])</span>
-    <span class="n">flags</span> <span class="o">=</span> <span class="n">catalog</span><span class="p">[</span><span class="n">filename</span><span class="p">][</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span>
-
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Loading </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="se">\n\t</span><span class="s1">Variables: </span><span class="si">{</span><span class="n">variables</span><span class="si">}</span><span class="se">\n\t</span><span class="s1">Years: </span><span class="si">{</span><span class="n">years</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># TODO: logger</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
 
     <span class="c1"># handle tif (can only handle single band single variable single year currently)</span>
     <span class="k">if</span> <span class="s1">&#39;band&#39;</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
@@ -259,7 +236,7 @@
 
     <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">lat</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">lon</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">ds</span>
+    <span class="k">return</span> <span class="n">ds</span></div>
 
 
 <div class="viewcode-block" id="percent_to_area"><a class="viewcode-back" href="../../tethys.html#tethys.spatial_proxies.percent_to_area">[docs]</a><span class="k">def</span> <span class="nf">percent_to_area</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>

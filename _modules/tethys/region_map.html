@@ -174,17 +174,18 @@
 <span class="kn">from</span> <span class="nn">tethys.spatial_proxies</span> <span class="kn">import</span> <span class="n">regrid</span>
 
 
-<div class="viewcode-block" id="load_regionmap"><a class="viewcode-back" href="../../tethys.html#tethys.region_map.load_regionmap">[docs]</a><span class="k">def</span> <span class="nf">load_regionmap</span><span class="p">(</span><span class="n">mapfile</span><span class="p">,</span> <span class="n">namefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_resolution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flip_lat</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="load_region_map"><a class="viewcode-back" href="../../tethys.html#tethys.region_map.load_region_map">[docs]</a><span class="k">def</span> <span class="nf">load_region_map</span><span class="p">(</span><span class="n">mapfile</span><span class="p">,</span> <span class="n">masks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">namefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_resolution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flip_lat</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Load region map.</span>
 
 <span class="sd">    :param mapfile: path to map file</span>
+<span class="sd">    :param masks: bool whether to convert categorical map to layer of region masks</span>
 <span class="sd">    :param namefile: optional path to csv with region names</span>
 <span class="sd">    :param target_resolution: resolution to coerce map to. If None (default), use base resolution</span>
 <span class="sd">    :param nodata: nodata value (like 9999), will be replaced with 0</span>
 <span class="sd">    :param flip_lat: bool, whether the map is &quot;upside down&quot;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataarray</span><span class="p">(</span><span class="n">mapfile</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s1">&#39;rasterio&#39;</span><span class="p">)</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataarray</span><span class="p">(</span><span class="n">mapfile</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s1">&#39;rasterio&#39;</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">nodata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">da</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">da</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="n">nodata</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -224,14 +225,11 @@
     <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">set_spatial_dims</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span><span class="p">)</span>
     <span class="n">da</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;regionid&#39;</span>
 
+    <span class="k">if</span> <span class="n">masks</span><span class="p">:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;regionid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span><span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="s1">&#39;region&#39;</span><span class="p">)</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span> <span class="o">==</span> <span class="n">names</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
     <span class="k">return</span> <span class="n">da</span></div>
-
-
-<div class="viewcode-block" id="region_masks"><a class="viewcode-back" href="../../tethys.html#tethys.region_map.region_masks">[docs]</a><span class="k">def</span> <span class="nf">region_masks</span><span class="p">(</span><span class="n">da</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create region mask array&quot;&quot;&quot;</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="n">da</span> <span class="o">==</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;regionid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span><span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="s1">&#39;region&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">mask</span></div>
 
 
 <div class="viewcode-block" id="intersection"><a class="viewcode-back" href="../../tethys.html#tethys.region_map.intersection">[docs]</a><span class="k">def</span> <span class="nf">intersection</span><span class="p">(</span><span class="n">da1</span><span class="p">,</span> <span class="n">da2</span><span class="p">):</span>

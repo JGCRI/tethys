@@ -262,19 +262,17 @@ the basic case converts “foo” to “&#64;name=’foo’”</p>
 Copyright (c) 2022, Battelle Memorial Institute</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="tethys.model.Tethys">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tethys.model.</span></span><span class="sig-name descname"><span class="pre">Tethys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.125</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demand_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'withdrawals'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perform_temporal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbpath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_outputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress_outputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downscaling_rules</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxy_catalog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temporal_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/model.html#Tethys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.model.Tethys" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tethys.model.</span></span><span class="sig-name descname"><span class="pre">Tethys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.125</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demand_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'withdrawals'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perform_temporal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbpath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_outputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress_outputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downscaling_rules</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxy_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temporal_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/model.html#Tethys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.model.Tethys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Model wrapper for Tethys</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="tethys.model.Tethys.harmonize">
-<span class="sig-name descname"><span class="pre">harmonize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/model.html#Tethys.harmonize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.model.Tethys.harmonize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Actual spatial downscaling happens here</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="tethys.model.Tethys.load_config">
-<span class="sig-name descname"><span class="pre">load_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/model.html#Tethys.load_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.model.Tethys.load_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load model parameters from a config.yml</p>
+<dt class="sig sig-object py" id="tethys.model.Tethys.downscale">
+<span class="sig-name descname"><span class="pre">downscale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_masks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/model.html#Tethys.downscale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.model.Tethys.downscale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actual spatial downscaling happens here
+:param distribution: DataArray (sector, year, lat, lon) spatial distribution of proxies
+:param inputs: DataArray (region, sector, year) demand values by region, sector, year
+:param region_masks: DataArray (lat, lon, region) of bools, True if (lat, lon) belongs to region
+:return: distribution scaled to match inputs in all regions</p>
 </dd></dl>
 
 <dl class="py method">
@@ -306,19 +304,22 @@ more control over chunks, works with sparse</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tethys.spatial_proxies.load_proxies">
-<span class="sig-prename descclassname"><span class="pre">tethys.spatial_proxies.</span></span><span class="sig-name descname"><span class="pre">load_proxies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_years</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/spatial_proxies.html#load_proxies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.spatial_proxies.load_proxies" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load all proxies from the catalog, regrid to target spatial resolution, and interpolate to target years</p>
+<dt class="sig sig-object py" id="tethys.spatial_proxies.load_proxy_file">
+<span class="sig-prename descclassname"><span class="pre">tethys.spatial_proxies.</span></span><span class="sig-name descname"><span class="pre">load_proxy_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/spatial_proxies.html#load_proxy_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.spatial_proxies.load_proxy_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare a dataset from single file to be merged into a dataset of all proxies</p>
+<p>handles many oddities found in proxies</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>catalog</strong> – dictionary of proxy file names, variables, years</p></li>
-<li><p><strong>target_resolution</strong> – resolution (in degrees) to regrid to</p></li>
-<li><p><strong>target_years</strong> – list of years to interpolate to</p></li>
+<li><p><strong>filename</strong> – name of file</p></li>
+<li><p><strong>target_resolution</strong> – resolution in degrees to regrid to</p></li>
+<li><p><strong>years</strong> – years to extract from the file</p></li>
+<li><p><strong>variables</strong> – variables to extract from the file</p></li>
+<li><p><strong>flags</strong> – list potentially containing ‘cell_area_share’ or ‘short_name_as_name’</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>big Dataset of proxies</p>
+<dd class="field-even"><p>preprocessed data set</p>
 </dd>
 </dl>
 </dd></dl>
@@ -380,7 +381,7 @@ more control over chunks, works with sparse</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename</strong> – file name</p></li>
-<li><p><strong>target_resolution</strong> – resoltion to regrid to (in degrees)</p></li>
+<li><p><strong>target_resolution</strong> – resolution to regrid to (in degrees)</p></li>
 <li><p><strong>years</strong> – years to select</p></li>
 <li><p><strong>method</strong> – regridding method (see regrid function)</p></li>
 </ul>
@@ -438,14 +439,14 @@ more control over chunks, works with sparse</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tethys.region_data.load_region_data">
-<span class="sig-prename descclassname"><span class="pre">tethys.region_data.</span></span><span class="sig-name descname"><span class="pre">load_region_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demand_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'withdrawals'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_data.html#load_region_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_data.load_region_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">tethys.region_data.</span></span><span class="sig-name descname"><span class="pre">load_region_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demand_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'withdrawals'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_data.html#load_region_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_data.load_region_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load region-scale water demand from GCAM needed to carry out a configuration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dbpath</strong> – path to folder containing dbfile (see gcamreader docs)</p></li>
 <li><p><strong>dbfile</strong> – name of GCAM database (the folder containing the .basex files)</p></li>
-<li><p><strong>rules</strong> – # TODO: maybe replace with sectors</p></li>
+<li><p><strong>sectors</strong> – GCAM sectors to filter to (friendly names will be converted to unfriendly names)</p></li>
 <li><p><strong>demand_type</strong> – ‘withdrawals’ or ‘consumption’</p></li>
 </ul>
 </dd>
@@ -453,12 +454,6 @@ more control over chunks, works with sparse</p>
 <dd class="field-even"><p>pandas dataframe with columns ‘region’, ‘sector’, ‘year’, ‘value’</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tethys.region_data.rules_to_sectors">
-<span class="sig-prename descclassname"><span class="pre">tethys.region_data.</span></span><span class="sig-name descname"><span class="pre">rules_to_sectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rules</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_data.html#rules_to_sectors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_data.rules_to_sectors" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert rules dict from YAML config to a list of sectors to query GCAM for</p>
 </dd></dl>
 
 <dl class="py function">
@@ -477,13 +472,14 @@ more control over chunks, works with sparse</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tethys.region_map.load_regionmap">
-<span class="sig-prename descclassname"><span class="pre">tethys.region_map.</span></span><span class="sig-name descname"><span class="pre">load_regionmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namefile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip_lat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_map.html#load_regionmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_map.load_regionmap" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tethys.region_map.load_region_map">
+<span class="sig-prename descclassname"><span class="pre">tethys.region_map.</span></span><span class="sig-name descname"><span class="pre">load_region_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namefile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip_lat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_map.html#load_region_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_map.load_region_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load region map.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mapfile</strong> – path to map file</p></li>
+<li><p><strong>masks</strong> – bool whether to convert categorical map to layer of region masks</p></li>
 <li><p><strong>namefile</strong> – optional path to csv with region names</p></li>
 <li><p><strong>target_resolution</strong> – resolution to coerce map to. If None (default), use base resolution</p></li>
 <li><p><strong>nodata</strong> – nodata value (like 9999), will be replaced with 0</p></li>
@@ -491,12 +487,6 @@ more control over chunks, works with sparse</p>
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tethys.region_map.region_masks">
-<span class="sig-prename descclassname"><span class="pre">tethys.region_map.</span></span><span class="sig-name descname"><span class="pre">region_masks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_map.html#region_masks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_map.region_masks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create region mask array</p>
 </dd></dl>
 
 </div>
