@@ -202,16 +202,21 @@ class Tethys:
             if self.perform_temporal:
                 # calculate the monthly distributions (share of annual) for each year
 
-                # TODO: Move the data loading into temporal_downscaling.py
+                # TODO: Move the data loading into temporal_downscaling.py?
+
+                out_years = range(self.years[0], self.years[-1] + 1)
 
                 if supersector == 'Domestic' or supersector == 'Municipal':
-                    tas = load_monthly_data(self.temporal_files['tas'], self.resolution, range(self.years[0], self.years[-1] + 1))
+
+                    tas = load_monthly_data(self.temporal_files['tas'], self.resolution, out_years)
                     amplitude = load_monthly_data(self.temporal_files['domr'], self.resolution, method='label')
+
                     distribution = monthly_distribution_domestic(tas, amplitude)
 
                 elif supersector == 'Electricity':
-                    hdd = load_monthly_data(self.temporal_files['hdd'], self.resolution, range(self.years[0], self.years[-1] + 1))
-                    cdd = load_monthly_data(self.temporal_files['cdd'], self.resolution, range(self.years[0], self.years[-1] + 1))
+
+                    hdd = load_monthly_data(self.temporal_files['hdd'], self.resolution, out_years)
+                    cdd = load_monthly_data(self.temporal_files['cdd'], self.resolution, out_years)
 
                     weights = elec_sector_weights(self.dbpath, self.dbfile)
                     weights = weights[(weights.region.isin(self.inputs.region[self.inputs.sector == 'Electricity'])) &
@@ -219,16 +224,20 @@ class Tethys:
                                       (weights.year.isin(self.years))].set_index(
                         ['region', 'sector', 'year'])['value'].to_xarray().fillna(0)
                     weights = interp_helper(weights)
+
                     region_masks = self.region_masks.sel(region=weights.region)
 
                     distribution = monthly_distribution_electricty(hdd, cdd, weights, region_masks)
 
                 elif supersector == 'Irrigation':
-                    irr = load_monthly_data(self.temporal_files['irr'], self.resolution, range(self.years[0], self.years[-1] + 1), method='label')
+
+                    irr = load_monthly_data(self.temporal_files['irr'], self.resolution, out_years, method='label')
                     irr_regions = self.inputs.region[(self.inputs.sector == 'Irrigation') &
                                                      (self.inputs.region.isin(self.region_masks.region.data))
                                                      ].unique()
+
                     regionmasks = self.region_masks.sel(region=irr_regions)
+
                     distribution = monthly_distribution_irrigation(irr, regionmasks)
 
                 else:
