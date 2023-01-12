@@ -1,20 +1,22 @@
-import numpy as np
 import gcamreader
 from tethys.utils.easy_query import easy_query
 
 
-def load_region_data(dbpath, dbfile, rules, demand_type='withdrawals'):
+def load_region_data(dbpath, dbfile, sectors, demand_type='withdrawals'):
     """Load region-scale water demand from GCAM needed to carry out a configuration
 
     :param dbpath: path to folder containing dbfile (see gcamreader docs)
     :param dbfile: name of GCAM database (the folder containing the .basex files)
-    :param rules: # TODO: maybe replace with sectors
+    :param sectors: GCAM sectors to filter to (friendly names will be converted to unfriendly names)
     :param demand_type: 'withdrawals' or 'consumption'
     :return: pandas dataframe with columns 'region', 'sector', 'year', 'value'
     """
+
+    sectors = [unfriendly_sector_name(i) for i in sectors]
+
     conn = gcamreader.LocalDBConn(dbpath, dbfile)
 
-    df = conn.runQuery(easy_query('demand-physical', sector=rules_to_sectors(rules), technology='!water_td_*',
+    df = conn.runQuery(easy_query('demand-physical', sector=sectors, technology='!water_td_*',
                                   input=[f'*_water {demand_type}', f'water_td_*_{demand_type[0].upper()}']))
 
     # add '_BasinName' to region if exists
@@ -61,16 +63,6 @@ def unfriendly_sector_name(x):
         return sector_lookup[x] + '*'
 
     return x
-
-
-def rules_to_sectors(rules):
-    """Convert rules dict from YAML config to a list of sectors to query GCAM for"""
-    sectors = []
-    for k, v in rules.items():
-        sectors.append(unfriendly_sector_name(k))
-        if isinstance(v, dict):
-            sectors.extend(v.keys())
-    return sectors
 
 
 def elec_sector_weights(dbpath, dbfile):

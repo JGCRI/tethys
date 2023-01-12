@@ -129,7 +129,9 @@ class Tethys:
         if self.csv is not None:
             self.inputs = pd.read_csv(os.path.join(self.root, self.csv))
         else:
-            self.inputs = load_region_data(os.path.join(self.root, self.dbpath), self.dbfile, self.downscaling_rules, self.demand_type)
+            sectors = [j for i in self.downscaling_rules.values() if isinstance(i, dict) for j in i] + \
+                      list(self.downscaling_rules.keys())
+            self.inputs = load_region_data(os.path.join(self.root, self.dbpath), self.dbfile, sectors, self.demand_type)
 
     def harmonize(self, distribution, sectors=None):
         """Actual spatial downscaling happens here"""
