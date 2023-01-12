@@ -24,8 +24,6 @@ def load_region_data(dbpath, dbfile, rules, demand_type='withdrawals'):
 
     df = df.groupby(['region', 'sector', 'year'])[['value']].sum().reset_index()
 
-    df['value'] = df['value'].astype(np.float32)
-
     return df
 
 

@@ -9,7 +9,7 @@ def load_monthly_data(filename, target_resolution, years=None, method='intensive
     """Load and prepare files used in
 
     :param filename: file name
-    :param target_resolution: resoltion to regrid to (in degrees)
+    :param target_resolution: resolution to regrid to (in degrees)
     :param years: years to select
     :param method: regridding method (see regrid function)
     :return:

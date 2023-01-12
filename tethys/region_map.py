@@ -5,17 +5,18 @@ import xarray as xr
 from tethys.spatial_proxies import regrid
 
 
-def load_regionmap(mapfile, namefile=None, target_resolution=None, nodata=None, flip_lat=False):
+def load_region_map(mapfile, masks=False, namefile=None, target_resolution=None, nodata=None, flip_lat=False):
     """ Load region map.
 
     :param mapfile: path to map file
+    :param masks: bool whether to convert categorical map to layer of region masks
     :param namefile: optional path to csv with region names
     :param target_resolution: resolution to coerce map to. If None (default), use base resolution
     :param nodata: nodata value (like 9999), will be replaced with 0
     :param flip_lat: bool, whether the map is "upside down"
     """
 
-    da = xr.load_dataarray(mapfile, engine='rasterio')
+    da = xr.load_dataarray(mapfile, engine='rasterio', chunks='auto')
 
     if nodata is not None:
         da.data[da.data == nodata] = 0
@@ -55,14 +56,11 @@ def load_regionmap(mapfile, namefile=None, target_resolution=None, nodata=None, 
     da = da.rio.set_spatial_dims(x_dim='lon', y_dim='lat')
     da.name = 'regionid'
 
+    if masks:
+        names = pd.Series(da.names, name='regionid').astype(int).sort_index().rename_axis('region')
+        da = da == names.to_xarray().chunk(chunks=dict(region=1))
+
     return da
-
-
-def region_masks(da):
-    """Create region mask array"""
-    mask = da == pd.Series(da.names, name='regionid').astype(int).sort_index().rename_axis('region').to_xarray()
-    mask = mask.chunk(chunks=dict(region=1))
-    return mask
 
 
 def intersection(da1, da2):

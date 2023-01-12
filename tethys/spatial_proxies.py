@@ -2,44 +2,21 @@ import numpy as np
 import xarray as xr
 
 
-def load_proxies(catalog, target_resolution, target_years):
-    """Load all proxies from the catalog, regrid to target spatial resolution, and interpolate to target years
-
-    :param catalog: dictionary of proxy file names, variables, years
-    :param target_resolution: resolution (in degrees) to regrid to
-    :param target_years: list of years to interpolate to
-    :return: big Dataset of proxies
-    """
-    print('Loading Proxy Data')
-    dataarrays = [da for i in catalog for da in _preprocess(xr.open_dataset(i, chunks='auto'), catalog, target_resolution).values()]
-
-    print('Interpolating Proxies')
-    ds = xr.merge(interp_helper(xr.concat([da for da in dataarrays if da.name == variable], 'year'), target_years)
-                  for variable in set(da.name for da in dataarrays)).to_array()
-
-    return ds
-
-
-def _preprocess(ds, catalog, target_resolution):
+def load_proxy_file(filename, target_resolution, years, variables, flags):
     """Prepare a dataset from single file to be merged into a dataset of all proxies
 
     handles many oddities found in proxies
 
-    :param ds: xarray Dataset opened from a file
-    :param catalog: dictionary of filenames and declared contents
-    :param target_resolution: resolution to regrid to (in degrees)
-    :return: preprocessed dataset
+    :param filename: name of file
+    :param target_resolution: resolution in degrees to regrid to
+    :param years: years to extract from the file
+    :param variables: variables to extract from the file
+    :param flags: list potentially containing 'cell_area_share' or 'short_name_as_name'
+    :return: preprocessed data set
     """
-
     # TODO: break into separate functions as sensible (for testing)
 
-    # get details from files catalog
-    filename = ds.encoding['source']
-    variables = sorted(catalog[filename]['variables'])
-    years = sorted(catalog[filename]['years'])
-    flags = catalog[filename]['flags']
-
-    print(f'Loading {filename}\n\tVariables: {variables}\n\tYears: {years}\n')  # TODO: logger
+    ds = xr.open_dataset(filename, chunks='auto')
 
     # handle tif (can only handle single band single variable single year currently)
     if 'band' in ds.coords:

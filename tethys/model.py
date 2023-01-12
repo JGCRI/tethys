@@ -10,23 +10,22 @@ Copyright (c) 2022, Battelle Memorial Institute
 import os
 import yaml
 from tethys.region_data import load_region_data, elec_sector_weights
-from tethys.spatial_proxies import load_proxies, interp_helper
-from tethys.region_map import load_regionmap, region_masks
+from tethys.spatial_proxies import load_proxy_file, interp_helper
+from tethys.region_map import load_region_map
 from tethys.temporal_downscaling import *
 
 
 class Tethys:
     """Model wrapper for Tethys"""
 
-    def __init__(self, config_file=None, years=None, resolution=0.125, demand_type='withdrawals',
-                 perform_temporal=False, dbpath=None, dbfile=None, write_outputs=False, output_folder=None,
+    def __init__(self, config_file='', years=None, resolution=0.125, demand_type='withdrawals',
+                 perform_temporal=False, dbpath=None, dbfile=None, csv=None, write_outputs=False, output_folder=None,
                  output_file=None, compress_outputs=True, downscaling_rules=None, proxy_files=None, map_files=None,
                  temporal_files=None):
         """ # TODO
         """
 
-        # YAML file
-        self.config_file = config_file
+        self.root = os.path.dirname(config_file)
 
         # project level settings
         self.years = years
@@ -38,7 +37,8 @@ class Tethys:
         self.dbpath = dbpath
         self.dbfile = dbfile
 
-        # TODO: re add support for csv input as alternative
+        # csv as alternative
+        self.csv = csv
 
         # outputs
         self.write_outputs = write_outputs
@@ -48,62 +48,32 @@ class Tethys:
 
         self.downscaling_rules = downscaling_rules
 
-        self.proxy_files = self._parse_proxy_files(proxy_files) if proxy_files is not None else None
+        self.proxy_files = proxy_files
         self.map_files = map_files
         self.temporal_files = temporal_files
 
         # data we'll load or generate later
-        self.regionmaps = None
+        self.region_masks = None
         self.proxies = None
         self.inputs = None
         self.outputs = None
 
         # settings in YAML override settings passed directly to __init__
-        if self.config_file is not None:
-            self.load_config(self.config_file)
+        if config_file != '':
+            with open(config_file) as file:
+                config = yaml.safe_load(file)
+            config = {k: v for k, v in config.items() if k in vars(self)}
+            vars(self).update(config)
 
-    def load_config(self, config_file):
-        """Load model parameters from a config.yml"""
+        self._parse_proxy_files()
 
-        with open(config_file) as file:
-            config = yaml.safe_load(file)
-
-        # project level settings
-        self.years = config['project']['years']
-        self.resolution = config['project']['resolution']
-        self.demand_type = config['project']['demand_type']
-        self.perform_temporal = config['project']['perform_temporal']
-
-        self.downscaling_rules = config['downscaling_rules']
-
-        # for parsing GCAM database
-        if 'GCAM' in config:
-            self.dbpath = config['GCAM']['dbpath']
-            self.dbfile = config['GCAM']['dbfile']
-
-        if 'outputs' in config:
-            self.write_outputs = True
-            self.output_folder = config['outputs']['folder']
-            self.output_file = config['outputs']['file']
-            if 'compress_outputs' in config['outputs']:  # TODO: better to do something like self.__dict__.update()?
-                self.compress_outputs = config['outputs']['compress_outputs']
-
-        if self.perform_temporal:
-            self.temporal_files = config['temporal']
-
-        self.map_files = config['maps']
-
-        # parse proxy files structure from YAML
-        self.proxy_files = self._parse_proxy_files(config['proxies'], config_file)
-
-    def _parse_proxy_files(self, proxy_files, config_file=''):
+    def _parse_proxy_files(self):
         """Handle several shorthand expressions in the proxy catalog"""
-
         out = dict()
 
         # name may be something like "ssp1_[YEAR].tif", which actually refers to multiple files
         # such as "ssp1_2010.tif" and "ssp1_2020.tif" when info['years'] == [2010, 2020]
-        for name, info in proxy_files.items():
+        for name, info in self.proxy_files.items():
             # promote strs to list
             if isinstance(info['variables'], str):
                 info['variables'] = [info['variables']]
@@ -127,14 +97,39 @@ class Tethys:
                 for year in info['years']:
                     # determine the actual name of the file containing variable variable for year year
                     filename = name.replace('{variable}', abbreviation).replace('{year}', str(year))
-                    filepath = os.path.abspath(os.path.join(os.path.dirname(config_file), filename))
 
-                    if filepath not in out:
-                        out[filepath] = {'variables': set(), 'years': set(), 'flags': info['flags']}
+                    if filename not in out:
+                        out[filename] = {'variables': [], 'years': [], 'flags': info['flags']}
 
-                    out[filepath]['variables'].add(variable)
-                    out[filepath]['years'].add(year)
-        return out
+                    if variable not in out[filename]['variables']:
+                        out[filename]['variables'].append(variable)
+                    if year not in out[filename]['years']:
+                        out[filename]['years'].append(year)
+
+        self.proxy_files = out
+
+    def _load_proxies(self):
+        """Load all proxies from the catalog, regrid to target spatial resolution, and interpolate to target years"""
+        print('Loading Proxy Data')
+        # align each variable spatially
+        dataarrays = [da for filename, info in self.proxy_files.items() for da in
+                      load_proxy_file(os.path.join(self.root, filename), self.resolution, **info).values()]
+
+        print('Interpolating Proxies')
+        # interpolate each variable, then merge to one array
+        self.proxies = xr.merge(interp_helper(xr.concat([da for da in dataarrays if da.name == variable], 'year'),
+                                              self.years) for variable in set(da.name for da in dataarrays)).to_array()
+
+    def _load_region_masks(self):
+        self.region_masks = xr.concat([load_region_map(os.path.join(self.root, filename), masks=True,
+                                                       target_resolution=self.resolution)
+                                       for filename in self.map_files], dim='region')
+
+    def _load_inputs(self):
+        if self.csv is not None:
+            self.inputs = pd.read_csv(os.path.join(self.root, self.csv))
+        else:
+            self.inputs = load_region_data(os.path.join(self.root, self.dbpath), self.dbfile, self.downscaling_rules, self.demand_type)
 
     def harmonize(self, distribution, sectors=None):
         """Actual spatial downscaling happens here"""
@@ -144,14 +139,14 @@ class Tethys:
         elif isinstance(sectors, str):
             sectors = [sectors]
 
-        inputs = self.inputs[(self.inputs.region.isin(self.regionmaps.region.data)) &
+        inputs = self.inputs[(self.inputs.region.isin(self.region_masks.region.data)) &
                              (self.inputs.sector.isin(sectors)) &
                              (self.inputs.year.isin(self.years))].set_index(['region', 'sector', 'year'])[
-            'value'].to_xarray().fillna(0)
+            'value'].to_xarray().fillna(0).astype(np.float32)
 
-        regionmaps = self.regionmaps.sel(region=inputs.region)
+        region_masks = self.region_masks.sel(region=inputs.region)
 
-        out = distribution.where(regionmaps, 0)
+        out = distribution.where(region_masks, 0)
 
         # take total of proxy sectors when input condition is for total
         if inputs.sector.size == 1:
@@ -169,11 +164,9 @@ class Tethys:
     def run_model(self):
         self.outputs = xr.Dataset()
 
-        # TODO: reorganize these data opening functions as methods
-        self.proxies = load_proxies(self.proxy_files, self.resolution, self.years)
-        self.regionmaps = xr.concat([region_masks(load_regionmap(target_resolution=self.resolution, mapfile=i))
-                                     for i in self.map_files], dim='region')
-        self.inputs = load_region_data(self.dbpath, self.dbfile, self.downscaling_rules, self.demand_type)
+        self._load_proxies()
+        self._load_region_masks()
+        self._load_inputs()
 
         for supersector, rules in self.downscaling_rules.items():
             print(f'Downscaling {supersector}')
@@ -207,20 +200,20 @@ class Tethys:
 
                     weights = elec_sector_weights(self.dbpath, self.dbfile)
                     weights = weights[(weights.region.isin(self.inputs.region[self.inputs.sector == 'Electricity'])) &
-                                      (weights.region.isin(self.regionmaps.region.data)) &
+                                      (weights.region.isin(self.region_masks.region.data)) &
                                       (weights.year.isin(self.years))].set_index(
                         ['region', 'sector', 'year'])['value'].to_xarray().fillna(0)
                     weights = interp_helper(weights)
-                    regionmasks = self.regionmaps.sel(region=weights.region)
+                    region_masks = self.region_masks.sel(region=weights.region)
 
-                    distribution = monthly_distribution_electricty(hdd, cdd, weights, regionmasks)
+                    distribution = monthly_distribution_electricty(hdd, cdd, weights, region_masks)
 
                 elif supersector == 'Irrigation':
                     irr = load_monthly_data(self.temporal_files['irr'], self.resolution, range(self.years[0], self.years[-1] + 1), method='label')
                     irr_regions = self.inputs.region[(self.inputs.sector == 'Irrigation') &
-                                                     (self.inputs.region.isin(self.regionmaps.region.data))
+                                                     (self.inputs.region.isin(self.region_masks.region.data))
                                                      ].unique()
-                    regionmasks = self.regionmaps.sel(region=irr_regions)
+                    regionmasks = self.region_masks.sel(region=irr_regions)
                     distribution = monthly_distribution_irrigation(irr, regionmasks)
 
                 else:
