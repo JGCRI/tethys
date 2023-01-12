@@ -19,7 +19,7 @@ class Tethys:
     """Model wrapper for Tethys"""
 
     def __init__(self, config_file='', years=None, resolution=0.125, demand_type='withdrawals',
-                 perform_temporal=False, dbpath=None, dbfile=None, csv=None, write_outputs=False, output_folder=None,
+                 perform_temporal=False, dbpath=None, dbfile=None, csv=None, write_outputs=False, output_folder='',
                  output_file=None, compress_outputs=True, downscaling_rules=None, proxy_files=None, map_files=None,
                  temporal_files=None):
         """ # TODO
@@ -133,20 +133,17 @@ class Tethys:
                       list(self.downscaling_rules.keys())
             self.inputs = load_region_data(os.path.join(self.root, self.dbpath), self.dbfile, sectors, self.demand_type)
 
-    def harmonize(self, distribution, sectors=None):
-        """Actual spatial downscaling happens here"""
+        # filter inputs to valid regions and years
+        self.inputs = self.inputs[(self.inputs.region.isin(self.region_masks.region.data)) &
+                                  (self.inputs.year.isin(self.years))]
 
-        if sectors is None:
-            sectors = distribution.sector.data
-        elif isinstance(sectors, str):
-            sectors = [sectors]
-
-        inputs = self.inputs[(self.inputs.region.isin(self.region_masks.region.data)) &
-                             (self.inputs.sector.isin(sectors)) &
-                             (self.inputs.year.isin(self.years))].set_index(['region', 'sector', 'year'])[
-            'value'].to_xarray().fillna(0).astype(np.float32)
-
-        region_masks = self.region_masks.sel(region=inputs.region)
+    def downscale(self, distribution, inputs, region_masks):
+        """Actual spatial downscaling happens here
+        :param distribution: DataArray (sector, year, lat, lon) spatial distribution of proxies
+        :param inputs: DataArray (region, sector, year) demand values by region, sector, year
+        :param region_masks: DataArray (lat, lon, region) of bools, True if (lat, lon) belongs to region
+        :return: distribution scaled to match inputs in all regions
+        """
 
         out = distribution.where(region_masks, 0)
 
@@ -171,7 +168,9 @@ class Tethys:
         self._load_inputs()
 
         for supersector, rules in self.downscaling_rules.items():
+
             print(f'Downscaling {supersector}')
+
             if not isinstance(rules, dict):
                 rules = {supersector: rules}
 
@@ -180,16 +179,30 @@ class Tethys:
                  for sector, proxy in rules.items()}
             ).to_array(dim='sector')
 
-            downscaled = self.harmonize(proxies)
+            inputs = self.inputs[self.inputs.sector.isin(proxies.sector.data)].set_index(
+                ['region', 'sector', 'year'])['value'].to_xarray().fillna(0).astype(np.float32)
+
+            region_masks = self.region_masks.sel(region=inputs.region)
+
+            downscaled = self.downscale(proxies, inputs, region_masks)
 
             # handle constraint for entire supersector
             if supersector not in rules and supersector in self.inputs.sector.unique():
+                # detect if supersector uses different regions than the sectors, or is just the total
                 if not set(self.inputs.region[self.inputs.sector.isin(downscaled.sector.data)]).issubset(
                         set(self.inputs.region[self.inputs.sector == supersector])):
-                    downscaled = self.harmonize(downscaled, supersector)
+
+                    inputs = self.inputs[self.inputs.sector == supersector].set_index(
+                        ['region', 'sector', 'year'])['value'].to_xarray().fillna(0).astype(np.float32)
+
+                    region_masks = self.region_masks.sel(region=inputs.region)
+
+                    downscaled = self.downscale(downscaled, inputs, region_masks)
 
             if self.perform_temporal:
                 # calculate the monthly distributions (share of annual) for each year
+
+                # TODO: Move the data loading into temporal_downscaling.py
 
                 if supersector == 'Domestic' or supersector == 'Municipal':
                     tas = load_monthly_data(self.temporal_files['tas'], self.resolution, range(self.years[0], self.years[-1] + 1))
