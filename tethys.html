@@ -101,12 +101,12 @@
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">API reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Tethys package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-tethys.utils.easy_query">tethys.utils.easy_query</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-tethys.model">tethys.model module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tethys.model">tethys.model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-tethys.spatial_proxies">tethys.spatial_proxies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-tethys.temporal_downscaling">tethys.temporal_downscaling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-tethys.region_data">tethys.region_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-tethys.region_map">tethys.region_map</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tethys.region_data">tethys.region_data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tethys.utils.easy_query">tethys.utils.easy_query</a></li>
 </ul>
 </li>
 </ul>
@@ -185,76 +185,8 @@
             
   <div class="section" id="tethys-package">
 <h1>Tethys package<a class="headerlink" href="#tethys-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-tethys.utils.easy_query">
-<span id="tethys-utils-easy-query"></span><h2>tethys.utils.easy_query<a class="headerlink" href="#module-tethys.utils.easy_query" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="tethys.utils.easy_query.easy_query">
-<span class="sig-prename descclassname"><span class="pre">tethys.utils.easy_query.</span></span><span class="sig-name descname"><span class="pre">easy_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/utils/easy_query.html#easy_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.utils.easy_query.easy_query" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build a query for a GCAM database</p>
-<p>kwargs act as filters on nodes, eg. “sector=’Beef’” is converted to the xpath “[&#64;type=’sector’ and &#64;name=’Beef’]”
-Lists are also accepted, so “sector=[‘Beef’, ‘Dairy’]” matches ‘Beef’ or ‘Dairy’</p>
-<p>Order of kwargs must follow the sector -&gt; subsector -&gt; technology -&gt; input/output/etc hierarchy</p>
-<p>Some shortcuts are supported. ‘*’ can be used as a wildcard, so input=’water_td_irr_*_C’
-matches any input starting with ‘water_td_irr’ and ending with ‘_C’</p>
-<p>Starting a filter string with ‘!’ negates it, so sector=’!elec*’ will exclude any sector names
-that begin with ‘elec’.
-Combinations are allowed, so input=[‘water_td_irr_*_C’, ‘!water_td_irr_A*’] would select all input basins,
-except those beginning with the letter ‘A’.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>variable</strong> – name of variable in database, such as ‘demand-physical’ or ‘emissions’</p></li>
-<li><p><strong>year_axis</strong> – optional name of year axis (‘year’ or ‘vintage’). If None, will be inferred from variable</p></li>
-<li><p><strong>kwargs</strong> – refer to description for details</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>gcamreader Query object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tethys.utils.easy_query.get_year_axis">
-<span class="sig-prename descclassname"><span class="pre">tethys.utils.easy_query.</span></span><span class="sig-name descname"><span class="pre">get_year_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/utils/easy_query.html#get_year_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.utils.easy_query.get_year_axis" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tethys.utils.easy_query.handle_filter">
-<span class="sig-prename descclassname"><span class="pre">tethys.utils.easy_query.</span></span><span class="sig-name descname"><span class="pre">handle_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/utils/easy_query.html#handle_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.utils.easy_query.handle_filter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Handle a kwarg for build_query</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>key</strong> – xml node &#64;type attribute to match</p></li>
-<li><p><strong>value</strong> – string, or list of strings, indicating what the node &#64;name attribute must match or not match</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>xpath to filter nodes</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tethys.utils.easy_query.parse_name">
-<span class="sig-prename descclassname"><span class="pre">tethys.utils.easy_query.</span></span><span class="sig-name descname"><span class="pre">parse_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/utils/easy_query.html#parse_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.utils.easy_query.parse_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>convert a string to an xpath condition
-the basic case converts “foo” to “&#64;name=’foo’”</p>
-<p>‘*’ acts as a wildcard, so “foo*” is converted to “(starts-with(&#64;name, ‘foo’))”</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>name</strong> – the string to parse</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>xpath condition indicated by string</p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
 <div class="section" id="module-tethys.model">
-<span id="tethys-model-module"></span><h2>tethys.model module<a class="headerlink" href="#module-tethys.model" title="Permalink to this headline">¶</a></h2>
+<span id="tethys-model"></span><h2>tethys.model<a class="headerlink" href="#module-tethys.model" title="Permalink to this headline">¶</a></h2>
 <p>&#64;Date: 09/20/2022
 &#64;author: Isaac Thompson (<a class="reference external" href="mailto:isaac&#46;thompson&#37;&#52;&#48;pnnl&#46;gov">isaac<span>&#46;</span>thompson<span>&#64;</span>pnnl<span>&#46;</span>gov</a>)
 &#64;Project: Tethys V2.0</p>
@@ -268,11 +200,19 @@ Copyright (c) 2022, Battelle Memorial Institute</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="tethys.model.Tethys.downscale">
 <span class="sig-name descname"><span class="pre">downscale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_masks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/model.html#Tethys.downscale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.model.Tethys.downscale" title="Permalink to this definition">¶</a></dt>
-<dd><p>Actual spatial downscaling happens here
-:param distribution: DataArray (sector, year, lat, lon) spatial distribution of proxies
-:param inputs: DataArray (region, sector, year) demand values by region, sector, year
-:param region_masks: DataArray (lat, lon, region) of bools, True if (lat, lon) belongs to region
-:return: distribution scaled to match inputs in all regions</p>
+<dd><p>Actual spatial downscaling happens here</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distribution</strong> – DataArray (sector, year, lat, lon) spatial distribution of proxies</p></li>
+<li><p><strong>inputs</strong> – DataArray (region, sector, year) demand values by region, sector, year</p></li>
+<li><p><strong>region_masks</strong> – DataArray (lat, lon, region) of bools, True if (lat, lon) belongs to region</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>distribution scaled to match inputs in all regions</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -411,6 +351,33 @@ more control over chunks, works with sparse</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-tethys.region_map">
+<span id="tethys-region-map"></span><h2>tethys.region_map<a class="headerlink" href="#module-tethys.region_map" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.region_map.intersection">
+<span class="sig-prename descclassname"><span class="pre">tethys.region_map.</span></span><span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">da2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_map.html#intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_map.intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience function for producing a map of intersections</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.region_map.load_region_map">
+<span class="sig-prename descclassname"><span class="pre">tethys.region_map.</span></span><span class="sig-name descname"><span class="pre">load_region_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namefile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip_lat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_map.html#load_region_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_map.load_region_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load region map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mapfile</strong> – path to map file</p></li>
+<li><p><strong>masks</strong> – bool whether to convert categorical map to layer of region masks</p></li>
+<li><p><strong>namefile</strong> – optional path to csv with region names</p></li>
+<li><p><strong>target_resolution</strong> – resolution to coerce map to. If None (default), use base resolution</p></li>
+<li><p><strong>nodata</strong> – nodata value (like 9999), will be replaced with 0</p></li>
+<li><p><strong>flip_lat</strong> – bool, whether the map is “upside down”</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="module-tethys.region_data">
 <span id="tethys-region-data"></span><h2>tethys.region_data<a class="headerlink" href="#module-tethys.region_data" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
@@ -463,28 +430,69 @@ more control over chunks, works with sparse</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-tethys.region_map">
-<span id="tethys-region-map"></span><h2>tethys.region_map<a class="headerlink" href="#module-tethys.region_map" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-tethys.utils.easy_query">
+<span id="tethys-utils-easy-query"></span><h2>tethys.utils.easy_query<a class="headerlink" href="#module-tethys.utils.easy_query" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="tethys.region_map.intersection">
-<span class="sig-prename descclassname"><span class="pre">tethys.region_map.</span></span><span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">da2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_map.html#intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_map.intersection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convenience function for producing a map of intersections</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tethys.region_map.load_region_map">
-<span class="sig-prename descclassname"><span class="pre">tethys.region_map.</span></span><span class="sig-name descname"><span class="pre">load_region_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namefile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip_lat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/region_map.html#load_region_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.region_map.load_region_map" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load region map.</p>
+<dt class="sig sig-object py" id="tethys.utils.easy_query.easy_query">
+<span class="sig-prename descclassname"><span class="pre">tethys.utils.easy_query.</span></span><span class="sig-name descname"><span class="pre">easy_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/utils/easy_query.html#easy_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.utils.easy_query.easy_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a query for a GCAM database</p>
+<p>kwargs act as filters on nodes, eg. “sector=’Beef’” is converted to the xpath “[&#64;type=’sector’ and &#64;name=’Beef’]”
+Lists are also accepted, so “sector=[‘Beef’, ‘Dairy’]” matches ‘Beef’ or ‘Dairy’</p>
+<p>Order of kwargs must follow the sector -&gt; subsector -&gt; technology -&gt; input/output/etc hierarchy</p>
+<p>Some shortcuts are supported. ‘*’ can be used as a wildcard, so input=’water_td_irr_*_C’
+matches any input starting with ‘water_td_irr’ and ending with ‘_C’</p>
+<p>Starting a filter string with ‘!’ negates it, so sector=’!elec*’ will exclude any sector names
+that begin with ‘elec’.
+Combinations are allowed, so input=[‘water_td_irr_*_C’, ‘!water_td_irr_A*’] would select all input basins,
+except those beginning with the letter ‘A’.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mapfile</strong> – path to map file</p></li>
-<li><p><strong>masks</strong> – bool whether to convert categorical map to layer of region masks</p></li>
-<li><p><strong>namefile</strong> – optional path to csv with region names</p></li>
-<li><p><strong>target_resolution</strong> – resolution to coerce map to. If None (default), use base resolution</p></li>
-<li><p><strong>nodata</strong> – nodata value (like 9999), will be replaced with 0</p></li>
-<li><p><strong>flip_lat</strong> – bool, whether the map is “upside down”</p></li>
+<li><p><strong>variable</strong> – name of variable in database, such as ‘demand-physical’ or ‘emissions’</p></li>
+<li><p><strong>year_axis</strong> – optional name of year axis (‘year’ or ‘vintage’). If None, will be inferred from variable</p></li>
+<li><p><strong>kwargs</strong> – refer to description for details</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>gcamreader Query object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.utils.easy_query.get_year_axis">
+<span class="sig-prename descclassname"><span class="pre">tethys.utils.easy_query.</span></span><span class="sig-name descname"><span class="pre">get_year_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/utils/easy_query.html#get_year_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.utils.easy_query.get_year_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.utils.easy_query.handle_filter">
+<span class="sig-prename descclassname"><span class="pre">tethys.utils.easy_query.</span></span><span class="sig-name descname"><span class="pre">handle_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/utils/easy_query.html#handle_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.utils.easy_query.handle_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle a kwarg for build_query</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – xml node &#64;type attribute to match</p></li>
+<li><p><strong>value</strong> – string, or list of strings, indicating what the node &#64;name attribute must match or not match</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>xpath to filter nodes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tethys.utils.easy_query.parse_name">
+<span class="sig-prename descclassname"><span class="pre">tethys.utils.easy_query.</span></span><span class="sig-name descname"><span class="pre">parse_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tethys/utils/easy_query.html#parse_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tethys.utils.easy_query.parse_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>convert a string to an xpath condition
+the basic case converts “foo” to “&#64;name=’foo’”</p>
+<p>‘*’ acts as a wildcard, so “foo*” is converted to “(starts-with(&#64;name, ‘foo’))”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> – the string to parse</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>xpath condition indicated by string</p>
 </dd>
 </dl>
 </dd></dl>

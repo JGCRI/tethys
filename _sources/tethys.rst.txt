@@ -1,15 +1,8 @@
 Tethys package
 ==============
 
-tethys.utils.easy_query
------------------------
 
-.. automodule:: tethys.utils.easy_query
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-tethys.model module
+tethys.model
 -------------------
 
 .. automodule:: tethys.model
@@ -33,6 +26,16 @@ tethys.temporal_downscaling
    :undoc-members:
    :show-inheritance:
 
+
+tethys.region_map
+-----------------
+
+.. automodule:: tethys.region_map
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 tethys.region_data
 ------------------
 
@@ -41,10 +44,10 @@ tethys.region_data
    :undoc-members:
    :show-inheritance:
 
-tethys.region_map
------------------
+tethys.utils.easy_query
+-----------------------
 
-.. automodule:: tethys.region_map
+.. automodule:: tethys.utils.easy_query
    :members:
    :undoc-members:
    :show-inheritance:

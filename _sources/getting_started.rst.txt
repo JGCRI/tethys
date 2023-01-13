@@ -1,31 +1,33 @@
 Getting Started
-==================================
+===============
+This page walks you through the steps of installing **tethys** and running an example. But first:
 
-About
------------------------------------
-Tethys is a spatiotemporal downscaling model for global water use constructed at the Joint Global Change Research Institute of the Pacific Northwest National Laboratory (http://www.globalchange.umd.edu). It serves to link several hydrological models to the Global Change Analysis Model (GCAM) by disaggregating geopolitical region and water basin scale data from GCAM into finer spatial and temporal resolutions.
+.. note:: This page is currently under construction in preparation for version 2
 
-GCAM uses 32 geopolitical regions for energy and economy systems, and 235 water basins for land, agriculture, and water systems, with 5 year timesteps. Hydrological and other sectoral models often need gridded data with 0.5 or 0.125 geographic degree resolution and monthly timesteps in order to model physical processes heavily influenced by surface and subsurface features. Tethys applies statistical downscaling algorithms to reconstruct water withdrawal data at this resolution across six sectors: irrigation, livestock, domestic, electricity generation, manufacturing, and mining. The methodology and equations used are described in more detail in :ref:`downscaling-algorithms`.
+Motivation
+----------
+Integrated human-Earth systems models, such as GCAM, can project future water demand at a coarse, regionally-relevant scale by modeling long-term interactions between multiple sectors under a variety of scenarios, while gridded hydrology models simulate physical processes at a much finer spatial and temporal resolution. **tethys** facilitates coupling between these kinds of models by providing finer-scale water demand data while maintaining consistency with coarser-scale global dynamics.
 
-.. figure:: _static/workflow.png
+.. figure:: _static/motivation.png
   :width: 100%
-  :alt: workflow
+  :alt: spatial downscaling
   :align: center
   :figclass: align-center
-  
-  *Major inputs and outputs of Tethys by six sectors*
 
-Prerequisites
------------------------------------
-* Python (tested on 3.9) https://www.python.org/downloads/ 
+While **tethys** is designed to integrate seamlessly with GCAM, it has the ability to downscale region-scale water demand data from other sources as well.
+
+
+Installation
+------------
+First of all you'll need to have Python installed.
+
+* Python (tested on 3.9) https://www.python.org/downloads/
 * Java https://www.java.com/en/download/
 
 .. note:: Without Java installed, the dependency gcamreader will be unable to query the GCAM database files.
 
 
-Installation
------------------------------------
-Currently, tethys can be cloned from https://github.com/JGCRI/tethys using::
+Currently, **tethys** can be cloned from https://github.com/JGCRI/tethys using::
 
     $ git clone https://github.com/JGCRI/tethys
 	
@@ -38,14 +40,14 @@ Once downloaded, install as a Python package by running *setup.py* from the comm
 
 	$ python setup.py install
 	
-This will automatically install the packages listed in :ref:`dependencies`. In order to avoid package version conflicts, consider creating a virtual environment for tethys.
+This will automatically install the dependencies. In order to avoid package version conflicts, consider using a virtual environment.
 
 In the future, easy installation will be available via pip.
 
 .. _installing-package-data:
 
-Installing Package Data
------------------------------------
+Example Data
+------------
 Example data is available for download at https://zenodo.org/record/6399117/files/example_v1_3_1.zip?download=1. 
 
 The data can also be directly downloaded for the latest release version as follows::
@@ -73,36 +75,3 @@ Make sure the config file is properly set up and somewhere Python can find it (o
    dmw = tethys.model.run_model('config.ini')
    
 Logging info should begin printing to the console, and after a few minutes downscaled data and diagnostics output files will be created.
-
-
-.. _dependencies:
-
-Dependencies
-------------
-
-===========	================
-Dependency	Minimum Version
-===========	================
-configobj   5.0.6
-numpy       1.21
-pandas      1.2.4
-requests    2.20.0
-gcamreader  1.2.5
-netCDF4     1.6
-===========	================
-
-Optional Dependencies
----------------------
-
-=======================	================
-Dependency      		Minimum Version
-=======================	================
-build					0.5.1
-nbsphinx				0.8.6
-setuptools				57.0.0
-sphinx					4.0.2
-sphinx-panels			0.6.0
-sphinx-rtd-theme		0.5.2
-sphinx-mathjax-offline	0.0.1
-twine					3.4.1
-=======================	================
