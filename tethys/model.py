@@ -139,6 +139,7 @@ class Tethys:
 
     def downscale(self, distribution, inputs, region_masks):
         """Actual spatial downscaling happens here
+
         :param distribution: DataArray (sector, year, lat, lon) spatial distribution of proxies
         :param inputs: DataArray (region, sector, year) demand values by region, sector, year
         :param region_masks: DataArray (lat, lon, region) of bools, True if (lat, lon) belongs to region

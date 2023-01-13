@@ -1,21 +1,14 @@
 :notoc:
 
-tethys documentation
-====================
+About
+=====
+**tethys** is an open-source spatiotemporal downscaling model for global water demand, written in Python. **tethys** was built at the `Joint Global Change Research Institute <https://www.pnnl.gov/projects/jgcri>`_ in order to:
 
-**Date**: |today| **Version**: |version|
-
-**Useful links**:
-`Source Repository <https://github.com/JGCRI/tethys>`_ |
-`Issues & Ideas <https://github.com/JGCRI/tethys/issues>`_ |
-`Interactive Quickstarter <https://github.com/JGCRI/tethys/blob/main/notebooks/quickstarter.ipynb>`_
-
-**tethys** is an open-source spatiotemporal downscaling model for global water use, written in Python. **tethys** was created to:
-
- 1) Convert annual region/basin scale water demand from the Global Change Analysis Model (GCAM) into a monthly gridded format suitable for use with global hydrologic models,
+ 1) Convert region-scale, annual water demand projections from the `Global Change Analysis Model <http://jgcri.github.io/gcam-doc/index.html>`_ (GCAM) into a gridded monthly format suitable for use with global hydrologic models, and
 
  2) Provide localized water demand projections across alternative futures, which are critical for understanding scarcity and planning for future need.
 
+.. note:: This documentation is currently under construction in preparation for version 2
 
 .. panels::
     :card: + intro-card text-center
@@ -87,11 +80,16 @@ tethys documentation
             :text: To the development guide
             :classes: btn-block btn-secondary stretched-link
 
+**Date**: |today| **Version**: |version|
+
+**Useful links**:
+`Source Repository <https://github.com/JGCRI/tethys>`_ |
+`Issues & Ideas <https://github.com/JGCRI/tethys/issues>`_
 
 .. toctree::
    :maxdepth: 2
    :hidden:
-
+   
    getting_started
    user_guide
    modules
