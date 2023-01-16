@@ -19,9 +19,8 @@ class Tethys:
     """Model wrapper for Tethys"""
 
     def __init__(self, config_file='', years=None, resolution=0.125, demand_type='withdrawals',
-                 perform_temporal=False, dbpath=None, dbfile=None, csv=None, write_outputs=False, output_folder='',
-                 output_file=None, compress_outputs=True, downscaling_rules=None, proxy_files=None, map_files=None,
-                 temporal_files=None):
+                 perform_temporal=False, gcam_db=None, csv=None, output_file=None,
+                 compress_outputs=True, downscaling_rules=None, proxy_files=None, map_files=None, temporal_files=None):
         """ # TODO
         """
 
@@ -34,15 +33,12 @@ class Tethys:
         self.perform_temporal = perform_temporal
 
         # GCAM database info
-        self.dbpath = dbpath
-        self.dbfile = dbfile
+        self.gcam_db = os.path.join(self.root, gcam_db)
 
         # csv as alternative
-        self.csv = csv
+        self.csv = os.path.join(self.root, csv)
 
         # outputs
-        self.write_outputs = write_outputs
-        self.output_folder = output_folder
         self.output_file = output_file
         self.compress_outputs = compress_outputs
 
@@ -131,7 +127,7 @@ class Tethys:
         else:
             sectors = [j for i in self.downscaling_rules.values() if isinstance(i, dict) for j in i] + \
                       list(self.downscaling_rules.keys())
-            self.inputs = load_region_data(os.path.join(self.root, self.dbpath), self.dbfile, sectors, self.demand_type)
+            self.inputs = load_region_data(self.gcam_db, sectors, self.demand_type)
 
         # filter inputs to valid regions and years
         self.inputs = self.inputs[(self.inputs.region.isin(self.region_masks.region.data)) &
@@ -219,7 +215,7 @@ class Tethys:
                     hdd = load_monthly_data(self.temporal_files['hdd'], self.resolution, out_years)
                     cdd = load_monthly_data(self.temporal_files['cdd'], self.resolution, out_years)
 
-                    weights = elec_sector_weights(self.dbpath, self.dbfile)
+                    weights = elec_sector_weights(self.gcam_db)
                     weights = weights[(weights.region.isin(self.inputs.region[self.inputs.sector == 'Electricity'])) &
                                       (weights.region.isin(self.region_masks.region.data)) &
                                       (weights.year.isin(self.years))].set_index(
@@ -248,11 +244,11 @@ class Tethys:
 
             self.outputs.update(downscaled.to_dataset(dim='sector'))
 
-        if self.write_outputs:
+        if self.output_file is not None:
             print('Writing Outputs')
             if self.compress_outputs:
                 # TODO: could give users more control over this? or tell them to use self.outputs directly?
                 encoding = {variable: {'zlib': True, 'complevel': 5} for variable in self.outputs}
-                self.outputs.to_netcdf(os.path.join(self.output_folder, self.output_file), encoding=encoding)
+                self.outputs.to_netcdf(os.path.join(self.root, self.output_file), encoding=encoding)
             else:
-                self.outputs.to_netcdf(os.path.join(self.output_folder, self.output_file))
+                self.outputs.to_netcdf(os.path.join(self.root, self.output_file))

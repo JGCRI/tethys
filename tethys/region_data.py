@@ -1,12 +1,12 @@
+import os
 import gcamreader
 from tethys.utils.easy_query import easy_query
 
 
-def load_region_data(dbpath, dbfile, sectors, demand_type='withdrawals'):
+def load_region_data(gcam_db, sectors, demand_type='withdrawals'):
     """Load region-scale water demand from GCAM needed to carry out a configuration
 
-    :param dbpath: path to folder containing dbfile (see gcamreader docs)
-    :param dbfile: name of GCAM database (the folder containing the .basex files)
+    :param gcam_db: path to GCAM database (the folder containing the .basex files)
     :param sectors: GCAM sectors to filter to (friendly names will be converted to unfriendly names)
     :param demand_type: 'withdrawals' or 'consumption'
     :return: pandas dataframe with columns 'region', 'sector', 'year', 'value'
@@ -14,6 +14,7 @@ def load_region_data(dbpath, dbfile, sectors, demand_type='withdrawals'):
 
     sectors = [unfriendly_sector_name(i) for i in sectors]
 
+    dbpath, dbfile = os.path.split(gcam_db)
     conn = gcamreader.LocalDBConn(dbpath, dbfile)
 
     df = conn.runQuery(easy_query('demand-physical', sector=sectors, technology='!water_td_*',
@@ -65,9 +66,10 @@ def unfriendly_sector_name(x):
     return x
 
 
-def elec_sector_weights(dbpath, dbfile):
+def elec_sector_weights(gcam_db):
     """Get the electricity sector weights from GCAM database"""
 
+    dbpath, dbfile = os.path.split(gcam_db)
     conn = gcamreader.LocalDBConn(dbpath, dbfile)
 
     df = conn.runQuery(easy_query('demand-physical', input=['elect_td_bld', 'elect_td_ind', 'elect_td_trn']))

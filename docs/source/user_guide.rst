@@ -58,89 +58,224 @@ Temporal Downscaling
 
 Domestic/Municipal
 """"""""""""""""""
-Temporal downscaling for the domestic/municipal sector follows the formula from Wada et al. (2011), which uses monthly temperature and a regional amplitude coefficient to reproduce summer peaks. For each grid cell,
+Temporal downscaling for the domestic/municipal sector follows the formula from `Wada et al. (2011) <https://doi.org/10.1029/2010WR009792>`_, which uses monthly temperature and a regional amplitude coefficient to reproduce summer peaks. For each grid cell,
 
 .. math::
 	\text{demand}_\text{month} = \frac{\text{demand}_\text{year}}{12} \times \left(\frac{\text{temp}_\text{month} - \text{temp}_\text{mean}}{\text{temp}_\text{max} - \text{temp}_\text{min}}R_\text{cell} + 1\right)
 
 Electricity Generation
 """"""""""""""""""""""
-Temporal downscaling for the electricity generation sector follows the formula from Voisin et al. (2013), which assumes that monthly water demand is proportional to monthly electricity demand, which in turn depends on heating and cooling degree days (HDD and CDD).
-
-When both annual heating and cooling are above certain thresholds, the water withdrawal for electricity generation in month i of year j is given by
+Temporal downscaling for the electricity generation sector follows the formula from `Voisin et al. (2013) <https://doi.org/10.5194/hess-17-4555-2013>`_, which assumes that monthly water demand is proportional to monthly electricity demand, which in turn depends on heating and cooling degree days (HDD and CDD). HDD for a month or year is defined as the sum of :math:`(\text{temperature}_\text{day} - 18^{\circ}\text{C})` across all days in the time period, while CDD is the sum of :math:`(18^{\circ}\text{C} - \text{temperature}_\text{day})`. For grid cells where annual HDD > 450 and CDD > 650,
 
 .. math::
-	W_{ij} = W_j\times\left[p_b\times\left(p_h\frac{\text{HDD}_{ij}}{\sum\text{HDD}_{ij}}+p_c\frac{\text{CDD}_{ij}}{\sum\text{CDD}_{ij}}+p_u\frac{1}{12}\right)+p_{it}\frac{1}{12}\right]
+	\text{demand}_\text{month} = \text{demand}_\text{year} \times \left( p_\text{heating}\frac{\text{HDD}_\text{month}}{\text{HDD}_\text{year}} + p_\text{cooling}\frac{\text{CDD}_\text{month}}{\text{CDD}_\text{year}} + p_\text{other}\frac{1}{12} \right),
 	
-where W_j is the water withdrawal for electricity generation in year j, the p values are taken from :ref:`TD_Elec_paras`, and monthly and annual HDD/CDD values are calculated from :ref:`ClimateForcing/WATCH`. When sum(HDD) < 650 or sum(CDD) < 450, slightly different versions of this formula are used.
+where :math:`p_\text{heating}` is the share of the region's annual electricity consumption used for heating buildings, :math:`p_\text{cooling}` is the share used for cooling buildings, and :math:`p_\text{other}` the share for all other uses in buildings, as well as for industry and transportation. These proportions come from region-scale data, but there may be cells in a region that do not have heating or cooling infrastructure (for example, because it doesn't usually get cold there), so this formula is modified for cells depending on annual HDD and CDD as described in `Huang et al. (2018) <https://doi.org/10.5194/hess-22-2117-2018>`_. When HDD > 450, but CDD < 650, 
+
+.. math::
+	\text{demand}_\text{month} = \text{demand}_\text{year} \times \left( (p_\text{heating} + p_\text{cooling} )\frac{\text{HDD}_\text{month}}{\text{HDD}_\text{year}} + p_\text{other}\frac{1}{12} \right).
+
+Similarly, when CDD > 650, but HDD < 450
+
+.. math::
+	\text{demand}_\text{month} = \text{demand}_\text{year} \times \left( (p_\text{cooling} + p_\text{heating} )\frac{\text{CDD}_\text{month}}{\text{CDD}_\text{year}} + p_\text{other}\frac{1}{12} \right).
+	
+When both HDD < 450 and CDD < 650, all sources of monthly variation vanish, leaving
+
+.. math::
+	\text{demand}_\text{month} = \text{demand}_\text{year} \times \frac{1}{12}.
 
 Irrigation
 """"""""""
-The monthly gridded irrigation water withdrawal was estimated by relying on monthly irrigation results from several global hydrological models (e.g. H08 [#Hanasaki2008a]_ [#Hanasaki2008b]_, LPJmL [#Rost2008]_, and PCR-GLOBWB [#Wada2011]_ [#VanBeek2011]_) to quantify monthly weighting profiles of how irrigation is spread out within a year in a particular region and per crop type.
+Temporal downscaling for the irrigation sector is based on monthly irrigation profiles calculated from exogenous crop water models. Users supply monthly gridded irrigation data from a model of their choice, which is then averaged over the region-basin, and applied as follows:
+
+.. math::
+	\text{demand}_\text{month} = \text{demand}_\text{year} \times \frac{\text{irrigation}_\text{month}}{\text{irrigation}_\text{year}}.
 
 Other
 """""
-For the livestock, manufacturing, and mining sectors it was assumed that water withdrawal is uniform throughout the year. As months (and years) can have different numbers of days, this is also taken into consideration. For month i of year j, the monthly water withdrawal for any of these sectors is given by
+Temoral downscaling of the livestock, manufacturing, and mining sectors assumes that monthly water demand is uniform, following Wada et al. (2011).
 
 .. math::
+	\text{demand}_\text{month} = \text{demand}_\text{year} \times \frac{1}{12}
 
-	W_i = W_j\times\frac{D_i}{D_j}
-
-where W_j is the annual sectoral withdrawal, D_i is the number of days in month i, and D_j is the number of days in year j.
-
+As new methods are developed for temporally downscaling these sectors, they will be added.
 
 
 Configuration File
 ------------------
-**tethys** uses a YAML configuration file.
+**tethys** uses a `YAML <https://yaml.org/spec/1.2.2/>`_ configuration file. The options in this file correspond to the arguments passed to the :ref:`Tethys class <tethys.model>`. Options not present in the config file will use the default. An overview is provided in the following table, with more details and examples below.
+
+======================== =======================================================
+Option                   Description
+======================== =======================================================
+:ref:`years`             list of years to be included spatial downscaling
+:ref:`resolution`        resolution in degrees for spatial downscaling
+:ref:`demand_type`       choice between "withdrawals" (default) or "consumption"
+:ref:`perform_temporal`  choice between "false" (default) or "true"
+:ref:`gcam_db`           relative path to a GCAM database
+:ref:`csv`               relative path to csv file containing inputs
+:ref:`output_file`       name of file to write outputs to
+:ref:`compress_outputs`  choice between "true" (default) or "false"
+:ref:`downscaling_rules` see details
+:ref:`proxy_files`       see details
+:ref:`map_files`         see details
+:ref:`temporal_files`    see details
+======================== =======================================================
+
+
+years
+^^^^^
+List of years for spatial downscaling. Region-scale input demands will be filtered to these years. Proxy data will be linearly interpolated to the years on this list (except for years outside the endpoints of the proxy data, which will use the nearest endpoint).
+
+.. code-block:: yaml
+
+  years: [2010, 2015, 2020, 2025]
+
+
+resolution
+^^^^^^^^^^
+Output resolution in degrees for spatial downscaling. Proxies will be regridded to this resolution.
+
+.. code-block:: yaml
+
+  resolution: 0.125
+
+
+demand_type
+^^^^^^^^^^^
+Whether the demands are water withdrawals or conusmption. Default is withdrawals. This option determines what values will be checked in the GCAM database if used, and will be passed along to the outputs.
+
+.. code-block:: yaml
+
+  demand_type: consumption
+
+
+perform_temporal
+^^^^^^^^^^^^^^^^
+Whether to perform temporal downscaling or not. Default is false.
+
+.. code-block:: yaml
+
+  perform_temporal: true
+
+
+gcam_db
+^^^^^^^
+Path to a GCAM database (the folder containing a bunch of *.basex* files).
+
+.. code-block:: yaml
+
+  gcam_db: data/GCAM_databases/my_GCAM_db
+
+
+csv
+^^^
+As an alternative to ``gcam_db``, path to a csv file containing region-scale water demand inputs. The file should have the following columns: region, sector, year, and value.
+
+.. code-block:: yaml
+
+  csv: data/example_input.csv
+
+
+output_file
+^^^^^^^^^^^
+Filepath in which outputs will be written. If none (default), outputs will not be saved, but they can be interacted with in-memory via the outputs attribute of the Tethys class. If the path is not absolute, it will be relative to the directory containing the config file. This file will be overwritten if it exist already and created if it doesn't, but the directory containing it must already exist.
+
+.. code-block:: yaml
+
+  output_file: outputs/tethys_outputs.nc  # the folder "<config_file_dir>/outputs" must already exist
+
+
+compress_outputs
+^^^^^^^^^^^^^^^^
+Whether or not to compress the outputs. Defaults to true. This will use zlib level 5, but you can have more customization over this by interacting directly with the outputs attribute of the Tethys class.
+
+.. code-block:: yaml
+
+  compress_outputs: false  # because we want our outputs files to be really big for some reason
+
+
+downscaling_rules
+^^^^^^^^^^^^^^^^^
+A mapping between water demand sectors and proxy variables. The simplest kind of entry is of the form ``sector: proxy``, like for the Municipal sector in the example below. When a sector is composed of multiple subsectors, a second layer of mappings is allowed (as with Livestock in the example below). The proxy can optionally be a list of variables.
+
+.. code-block:: yaml
+
+  downscaling_rules:
+    Municipal:   Population
+    Livestock:
+      Beef:      [Buffalo, Cattle]
+      Dairy:     [Buffalo, Cattle]
+      Pork:      Pig
+      Poultry:   [Chicken, Duck]
+      SheepGoat: [Sheep, Goat]
+	  
+
+proxy_files
+^^^^^^^^^^^
+A mapping of file paths (absolute, or relative to the config file) to the proxy variables and years they contain, as well as any flags needed to interpret them. The entries are of the form
+
+.. code-block:: yaml
+
+  filepath:
+    variables:  # variable or list of variables in the file
+    years:  # year or list of years in the file
+    flags:  # flag or list of flags to help interpret the file (optional)
+	
+Flags understood are 'cell_area_share', and 'short_name_as_name'. 'cell_area_share' means that the grid cell values in the file correspond to the share of that cell covered by the variable, so **tethys** multiplies by the area of the cell to obtain a quantity that can be used as a proxy. 'short_name_as_name' is for netCDF files where ``variables`` corresponds to the 'short_name' attribute, not the variable name.
+
+For files systematically named by variable and/or year, the file path can contain ``{variable}`` and ``{year}``, and the corresponding values will be substituted. If the files use abbreviated names, then ``variables`` can be a mapping of ``variable: abbreviation`` pairs.
+
+.. code-block:: yaml
+
+  proxy_files:
+  
+    # 4 files, each containing Population data for a single year
+    data/population/ssp1_{year}.tif:
+      variables: Population
+      years: [2010, 2020, 2030, 2040]
+
+    # 7 files, each containing data for a single animal in 2010
+    # files are named using abbreviations like '5_Bf_2010_Da.tif',
+    # but we refer to the variable with the full name like 'Buffalo'
+    data/GLW3/5_{variable}_2010_Da.tif:
+      variables: {Buffalo: Bf, Cattle: Ct, Sheep: Sh, Goat: Gt, Chicken: Ch, Duck: Dk, Pig: Pg}
+      years: 2010
+
+    # 6 files, each containing multiple variables for a single year
+    # the variables represent the share of area in the grid cell, not the total area
+    # we only extract the variables whose netCDF short_name is in the list
+    data/Demeter/ssp1_rcp26_gfdl_{year}.nc:
+      flags: [cell_area_share, short_name_as_name]
+      variables: [Corn_irr, Cotton_irr, OtherCrop_irr, Soy_irr, Rice_irr, Sugarcrop_irr, Wheat_irr]
+      years: [2005, 2010, 2015, 2020, 2025, 2030]
+	  
+
+map_files
+^^^^^^^^^
+List of paths to map files. These should be geotiffs with an attribute called 'names' containing a mapping of names to region numbers. 0 is reserved for nonland/ignored regions.
+
+.. code-block:: yaml
+
+  map_files: [data/maps/regions.tif, data/maps/regionbasins.tif]
 
 
 
-References
-----------
-..
-	NOTE: The below references were all copied from the previous version. In-line reference links have also been preserved in most sections that were largely copied from the previous verion. This should be reviewed.
+temporal_files
+^^^^^^^^^^^^^^
+Mapping of files that will be accessible to temporal downscaling methods.
 
-.. [#Li2017] Li, X., Vernon, C.R., Hejazi, M.I., Link, R.P, Feng, L., Liu, Y., Rauchenstein, L.T., 2017. Xanthos – A Global Hydrologic Model. Journal of Open Research Software 5(1): 21. DOI: http://doi.org/10.5334/jors.181
+.. code-block:: yaml
 
-.. [#Edmonds1985] Edmonds, J., and Reilly, J. M., 1985. Global Energy: Assessing the Future. Oxford University Press, New York, pp.317.
+  temporal_files:
+    HDD: data/temporal/HDD_monthly.nc
+    CDD: data/temporal/CDD_monthly.nc
 
-.. [#Edmonds1997] Edmonds, J., Wise, M., Pitcher, H., Richels, R., Wigley, T. and Maccracken, C., 1997. An integrated assessment of climate change and the accelerated introduction of advanced energy technologies-an application of MiniCAM 1.0. Mitigation and adaptation strategies for global change 1(4): 311-339. DOI: http://dx.doi.org/10.1023/B:MITI.0000027386.34214.60
 
-.. [#Hejazi2014] Hejazi, M.I., Edmonds, J., Clarke, L., Kyle, P., Davies, E., Chaturvedi, V., Wise, M., Patel, P., Eom, J. and Calvin, K., 2014. Integrated assessment of global water scarcity over the 21st century under multiple climate change mitigation policies. Hydrology and Earth System Sciences 18: 2859-2883. DOI: http://dx.doi.org/10.5194/hess-18-2859-2014
+Generalization
+--------------
+**tethys** was developed with consideration for GCAM's breakdown of water demand, but was designed to be as flexible as possible with support for user-specified downscaling configurations.
 
-.. [#Huang2017] Huang, Z., Hejazi, M., Li, X., Tang, Q., Leng, G., Liu, Y., Döll, P., Eisner, S., Gerten, D., Hanasaki, N., and Wada, Y., 2017. Reconstruction of global gridded monthly sectoral water withdrawals for 1971–2010 and analysis of their spatiotemporal patterns, Hydrology and Earth System Sciences Discussions, DOI: https://doi.org/10.5194/hess-2017-551
+Fundamentally, spatial downscaling requires 
 
-.. [#Wada2011] Wada, Y., Van Beek, L.P.H., Viviroli, D., Dürr, H.H., Weingartner, R. and Bierkens, M.F., 2011. Global monthly water stress: 2. Water withdrawal and severity of water stress. Water Resources Research 47(7): W07518. DOI: http://dx.doi.org/10.1029/2010WR009792
-
-.. [#Siebert2007] Siebert, S., Döll, P., Feick, S., Hoogeveen, J. and Frenken, K., 2007. Global map of irrigation areas version 4.0. 1. Johann Wolfgang Goethe University, Frankfurt am Main, Germany/Food and Agriculture Organization of the United Nations, Rome, Italy.
-
-.. [#Portmann2008] Portmann, F.T., Siebert, S., Bauer, C. and Döll, P., 2008. Global dataset of monthly growing areas of 26 irrigated crops: version 1.0. University of Frankfurt, Germany.
-
-.. [#Klein2011] Klein Goldewijk, K., Beusen, A., Van Drecht, G. and De Vos, M., 2011. The HYDE 3.1 spatially explicit database of human induced global land use change over the past 12,000 years. Global Ecology and Biogeography 20(1): 73-86. DOI: https://doi.org/10.1111/j.1466-8238.2010.00587.x
-
-.. [#CIESIN2016] Center for International Earth Science Information Network (CIESIN) - Columbia University. 2016. Gridded Population of the World, Version 4 (GPWv4): Population Count. NASA Socioeconomic Data and Applications Center (SEDAC), Palisades, NY. DOI: http://dx.doi.org/10.7927/H4X63JVC
-
-.. [#Siebert2013] Siebert, S., Henrich, V., Frenken, K., and Burke, J., 2013. Global Map of Irrigation Areas version 5. Rheinische Friedrich-Wilhelms-University, Bonn, Germany / Food and Agriculture Organization of the United Nations, Rome, Italy.
-
-.. [#Wint2007] Wint, W. and Robinson, T., 2007. Gridded livestock of the world. Food and Agriculture Organization (FAO), report 131, Rome.
-
-.. [#Alcamo2002] Alcamo, J. and Henrichs, T., 2002. Critical regions: A model-based estimation of world water resources sensitive to global changes. Aquatic Sciences-Research Across Boundaries, 64(4): 352-362. DOI: https://doi.org/10.1007/PL00012591
-
-.. [#Florke2004] Flörke, M. and Alcamo, J., 2004. European outlook on water use. Center for Environmental Systems Research, University of Kassel, Final Report, EEA/RNC/03/007, 83.
-
-.. [#Hanasaki2008a] Hanasaki, N., Kanae, S., Oki, T., Masuda, K., Motoya, K., Shirakawa, N., Shen, Y. and Tanaka, K., 2008. An integrated model for the assessment of global water resources–Part 1: Model description and input meteorological forcing. Hydrology and Earth System Sciences 12(4): 1007-1025. DOI: https://doi.org/10.5194/hess-12-1007-2008
-
-.. [#Hanasaki2008b] Hanasaki, N., Kanae, S., Oki, T., Masuda, K., Motoya, K., Shirakawa, N., Shen, Y. and Tanaka, K., 2008. An integrated model for the assessment of global water resources–Part 2: Applications and assessments. Hydrology and Earth System Sciences 12(4): 1027-1037. DOI: https://doi.org/10.5194/hess-12-1027-2008
-
-.. [#Rost2008] Rost, S., Gerten, D., Bondeau, A., Lucht, W., Rohwer, J. and Schaphoff, S., 2008. Agricultural green and blue water consumption and its influence on the global water system. Water Resources Research 44(9): W09405. DOI: https://doi.org/10.1029/2007WR006331
-
-.. [#VanBeek2011] Van Beek, L.P.H., Wada, Y. and Bierkens, M.F., 2011. Global monthly water stress: 1. Water balance and water availability. Water Resources Research 47(7): W07517. DOI: https://doi.org/10.1029/2010WR009791
-
-.. [#Voisin2013] Voisin, N., Liu, L., Hejazi, M., Tesfa, T., Li, H., Huang, M., Liu, Y. and Leung, L.R., 2013. One-way coupling of an integrated assessment model and a water resources model: evaluation and implications of future changes over the US Midwest. Hydrology and Earth System Sciences 17(11): 4555-4575. DOI: https://doi.org/10.5194/hess-17-4555-2013
-
-.. [#Hejazi2015] Hejazi, M.I., Voisin, N., Liu, L., Bramer, L.M., Fortin, D.C., Hathaway, J.E., Huang, M., Kyle, P., Leung, L.R., Li, H.Y. and Liu, Y., 2015. 21st century United States emissions mitigation could increase water stress more than the climate change it is mitigating. Proceedings of the National Academy of Sciences 112(34): 10635-10640. DOI: https://doi.org/10.1073/pnas.1421675112
-
-.. [#Kim2016] Kim, S.H., Hejazi, M., Liu, L., Calvin, K., Clarke, L., Edmonds, J., Kyle, P., Patel, P., Wise, M. and Davies, E., 2016. Balancing global water availability and use at basin scale in an integrated assessment model. Climatic Change 136(2): 217-231. DOI: http://dx.doi.org/10.1007/s10584-016-1604-6
-
-.. [#NetCDF] An Introduction to NetCDF. http://www.unidata.ucar.edu/software/netcdf/docs/netcdf_introduction.html

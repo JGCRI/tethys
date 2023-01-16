@@ -30,16 +30,16 @@ First of all you'll need to have Python installed.
 Currently, **tethys** can be cloned from https://github.com/JGCRI/tethys using::
 
     $ git clone https://github.com/JGCRI/tethys
-	
+
 The next commands need to be run from within the tethys directory you just downloaded, so change directory with::
 
-	$ cd tethys
+    $ cd tethys
 
 
 Once downloaded, install as a Python package by running *setup.py* from the command line::
 
-	$ python setup.py install
-	
+    $ python setup.py install
+
 This will automatically install the dependencies. In order to avoid package version conflicts, consider using a virtual environment.
 
 In the future, easy installation will be available via pip.
@@ -52,7 +52,7 @@ Example data is available for download at https://zenodo.org/record/6399117/file
 
 The data can also be directly downloaded for the latest release version as follows::
 
-	import tethys
+    import tethys
     
     # the directory that you want to download and extract the example data to
     data_dir = "<my data download location>"
@@ -68,8 +68,8 @@ Run
 -----------------------------------
 Verify the installation was successful by running the following in Python::
 
-	import tethys
-	
+    import tethys
+
 Make sure the config file is properly set up and somewhere Python can find it (or use its absolute file path), then run::
 
    dmw = tethys.model.run_model('config.ini')
