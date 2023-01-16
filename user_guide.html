@@ -110,8 +110,22 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#configuration-file">Configuration File</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-file">Configuration File</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#years">years</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resolution">resolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#demand-type">demand_type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#perform-temporal">perform_temporal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gcam-db">gcam_db</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#csv">csv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#output-file">output_file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compress-outputs">compress_outputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#downscaling-rules">downscaling_rules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#proxy-files">proxy_files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#map-files">map_files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#temporal-files">temporal_files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#generalization">Generalization</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">API reference</a></li>
@@ -273,105 +287,218 @@
 <p><strong>tethys</strong> uses sector-specific formulas from the literature for temporal downscaling, which are described in detail below. In general, these determine the fraction of a year’s water demand to allocate to each month based on a statistical relationship between monthly water demand and some other monthly variable. When necessary, outputs from spatial downscaling are interpolated to annual time steps as an intermediate step.</p>
 <div class="section" id="domestic-municipal">
 <h4>Domestic/Municipal<a class="headerlink" href="#domestic-municipal" title="Permalink to this headline">¶</a></h4>
-<p>Temporal downscaling for the domestic/municipal sector follows the formula from Wada et al. (2011), which uses monthly temperature and a regional amplitude coefficient to reproduce summer peaks. For each grid cell,</p>
+<p>Temporal downscaling for the domestic/municipal sector follows the formula from <a class="reference external" href="https://doi.org/10.1029/2010WR009792">Wada et al. (2011)</a>, which uses monthly temperature and a regional amplitude coefficient to reproduce summer peaks. For each grid cell,</p>
 <div class="math">
 <p><img src="_images/math/673e75d7ec2aa23a96c2446d2fb0f663d9109198.png" alt="\text{demand}_\text{month} = \frac{\text{demand}_\text{year}}{12} \times \left(\frac{\text{temp}_\text{month} - \text{temp}_\text{mean}}{\text{temp}_\text{max} - \text{temp}_\text{min}}R_\text{cell} + 1\right)"/></p>
 </div></div>
 <div class="section" id="electricity-generation">
 <h4>Electricity Generation<a class="headerlink" href="#electricity-generation" title="Permalink to this headline">¶</a></h4>
-<p>Temporal downscaling for the electricity generation sector follows the formula from Voisin et al. (2013), which assumes that monthly water demand is proportional to monthly electricity demand, which in turn depends on heating and cooling degree days (HDD and CDD).</p>
-<p>When both annual heating and cooling are above certain thresholds, the water withdrawal for electricity generation in month i of year j is given by</p>
+<p>Temporal downscaling for the electricity generation sector follows the formula from <a class="reference external" href="https://doi.org/10.5194/hess-17-4555-2013">Voisin et al. (2013)</a>, which assumes that monthly water demand is proportional to monthly electricity demand, which in turn depends on heating and cooling degree days (HDD and CDD). HDD for a month or year is defined as the sum of <img class="math" src="_images/math/c3fd129ccb91dddf2febb537672a6cba2c508d9c.png" alt="(\text{temperature}_\text{day} - 18^{\circ}\text{C})"/> across all days in the time period, while CDD is the sum of <img class="math" src="_images/math/1b009ec8ab88434f310942a420f34139f3c6d9c4.png" alt="(18^{\circ}\text{C} - \text{temperature}_\text{day})"/>. For grid cells where annual HDD &gt; 450 and CDD &gt; 650,</p>
 <div class="math">
-<p><img src="_images/math/5a27d70b948ccc6a9e5b69e122795c518d3e8319.png" alt="W_{ij} = W_j\times\left[p_b\times\left(p_h\frac{\text{HDD}_{ij}}{\sum\text{HDD}_{ij}}+p_c\frac{\text{CDD}_{ij}}{\sum\text{CDD}_{ij}}+p_u\frac{1}{12}\right)+p_{it}\frac{1}{12}\right]"/></p>
-</div><p>where W_j is the water withdrawal for electricity generation in year j, the p values are taken from <span class="xref std std-ref">TD_Elec_paras</span>, and monthly and annual HDD/CDD values are calculated from <span class="xref std std-ref">ClimateForcing/WATCH</span>. When sum(HDD) &lt; 650 or sum(CDD) &lt; 450, slightly different versions of this formula are used.</p>
-</div>
+<p><img src="_images/math/27f1608c048c821e56777cc34ce509fc07ab3f0b.png" alt="\text{demand}_\text{month} = \text{demand}_\text{year} \times \left( p_\text{heating}\frac{\text{HDD}_\text{month}}{\text{HDD}_\text{year}} + p_\text{cooling}\frac{\text{CDD}_\text{month}}{\text{CDD}_\text{year}} + p_\text{other}\frac{1}{12} \right),"/></p>
+</div><p>where <img class="math" src="_images/math/8c2c50fabb2fc56ca95ca6f642053fe1a23729ba.png" alt="p_\text{heating}"/> is the share of the region’s annual electricity consumption used for heating buildings, <img class="math" src="_images/math/c964bc635f0fb1ba48278da9fe4a61ee7f5c150c.png" alt="p_\text{cooling}"/> is the share used for cooling buildings, and <img class="math" src="_images/math/874ba0a694f653ebfd28816bd33542a7ced4f1a4.png" alt="p_\text{other}"/> the share for all other uses in buildings, as well as for industry and transportation. These proportions come from region-scale data, but there may be cells in a region that do not have heating or cooling infrastructure (for example, because it doesn’t usually get cold there), so this formula is modified for cells depending on annual HDD and CDD as described in <a class="reference external" href="https://doi.org/10.5194/hess-22-2117-2018">Huang et al. (2018)</a>. When HDD &gt; 450, but CDD &lt; 650,</p>
+<div class="math">
+<p><img src="_images/math/11cbac5c8ff1cfaeeb4662534d459ef44358ded2.png" alt="\text{demand}_\text{month} = \text{demand}_\text{year} \times \left( (p_\text{heating} + p_\text{cooling} )\frac{\text{HDD}_\text{month}}{\text{HDD}_\text{year}} + p_\text{other}\frac{1}{12} \right)."/></p>
+</div><p>Similarly, when CDD &gt; 650, but HDD &lt; 450</p>
+<div class="math">
+<p><img src="_images/math/ecfbfeab5b196f2c050bdf4e9fc7ce629b9d0926.png" alt="\text{demand}_\text{month} = \text{demand}_\text{year} \times \left( (p_\text{cooling} + p_\text{heating} )\frac{\text{CDD}_\text{month}}{\text{CDD}_\text{year}} + p_\text{other}\frac{1}{12} \right)."/></p>
+</div><p>When both HDD &lt; 450 and CDD &lt; 650, all sources of monthly variation vanish, leaving</p>
+<div class="math">
+<p><img src="_images/math/3a479388d3bd37ca0407ac280fa813ec00d25920.png" alt="\text{demand}_\text{month} = \text{demand}_\text{year} \times \frac{1}{12}."/></p>
+</div></div>
 <div class="section" id="irrigation">
 <h4>Irrigation<a class="headerlink" href="#irrigation" title="Permalink to this headline">¶</a></h4>
-<p>The monthly gridded irrigation water withdrawal was estimated by relying on monthly irrigation results from several global hydrological models (e.g. H08 <a class="footnote-reference brackets" href="#hanasaki2008a" id="id1">15</a> <a class="footnote-reference brackets" href="#hanasaki2008b" id="id2">16</a>, LPJmL <a class="footnote-reference brackets" href="#rost2008" id="id3">17</a>, and PCR-GLOBWB <a class="footnote-reference brackets" href="#wada2011" id="id4">6</a> <a class="footnote-reference brackets" href="#vanbeek2011" id="id5">18</a>) to quantify monthly weighting profiles of how irrigation is spread out within a year in a particular region and per crop type.</p>
-</div>
+<p>Temporal downscaling for the irrigation sector is based on monthly irrigation profiles calculated from exogenous crop water models. Users supply monthly gridded irrigation data from a model of their choice, which is then averaged over the region-basin, and applied as follows:</p>
+<div class="math">
+<p><img src="_images/math/15d9d4a7dcefcf034a6e4a58cbe63f63d2133b7a.png" alt="\text{demand}_\text{month} = \text{demand}_\text{year} \times \frac{\text{irrigation}_\text{month}}{\text{irrigation}_\text{year}}."/></p>
+</div></div>
 <div class="section" id="other">
 <h4>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h4>
-<p>For the livestock, manufacturing, and mining sectors it was assumed that water withdrawal is uniform throughout the year. As months (and years) can have different numbers of days, this is also taken into consideration. For month i of year j, the monthly water withdrawal for any of these sectors is given by</p>
+<p>Temoral downscaling of the livestock, manufacturing, and mining sectors assumes that monthly water demand is uniform, following Wada et al. (2011).</p>
 <div class="math">
-<p><img src="_images/math/9bbe204d880e6ddddba3f1b6fb7048a1c9bc9e4c.png" alt="W_i = W_j\times\frac{D_i}{D_j}"/></p>
-</div><p>where W_j is the annual sectoral withdrawal, D_i is the number of days in month i, and D_j is the number of days in year j.</p>
+<p><img src="_images/math/11fb48bafa0ea3bc25f47c7c3b610baa4dceaaa6.png" alt="\text{demand}_\text{month} = \text{demand}_\text{year} \times \frac{1}{12}"/></p>
+</div><p>As new methods are developed for temporally downscaling these sectors, they will be added.</p>
 </div>
 </div>
 </div>
 <div class="section" id="configuration-file">
 <h2>Configuration File<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h2>
-<p><strong>tethys</strong> uses a YAML configuration file.</p>
+<p><strong>tethys</strong> uses a <a class="reference external" href="https://yaml.org/spec/1.2.2/">YAML</a> configuration file. The options in this file correspond to the arguments passed to the <a class="reference internal" href="tethys.html#module-tethys.model"><span class="std std-ref">Tethys class</span></a>. Options not present in the config file will use the default. An overview is provided in the following table, with more details and examples below.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 70%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#years"><span class="std std-ref">years</span></a></p></td>
+<td><p>list of years to be included spatial downscaling</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#resolution"><span class="std std-ref">resolution</span></a></p></td>
+<td><p>resolution in degrees for spatial downscaling</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#demand-type"><span class="std std-ref">demand_type</span></a></p></td>
+<td><p>choice between “withdrawals” (default) or “consumption”</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#perform-temporal"><span class="std std-ref">perform_temporal</span></a></p></td>
+<td><p>choice between “false” (default) or “true”</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gcam-db"><span class="std std-ref">gcam_db</span></a></p></td>
+<td><p>relative path to a GCAM database</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#csv"><span class="std std-ref">csv</span></a></p></td>
+<td><p>relative path to csv file containing inputs</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#output-file"><span class="std std-ref">output_file</span></a></p></td>
+<td><p>name of file to write outputs to</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#compress-outputs"><span class="std std-ref">compress_outputs</span></a></p></td>
+<td><p>choice between “true” (default) or “false”</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#downscaling-rules"><span class="std std-ref">downscaling_rules</span></a></p></td>
+<td><p>see details</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#proxy-files"><span class="std std-ref">proxy_files</span></a></p></td>
+<td><p>see details</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#map-files"><span class="std std-ref">map_files</span></a></p></td>
+<td><p>see details</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#temporal-files"><span class="std std-ref">temporal_files</span></a></p></td>
+<td><p>see details</p></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="years">
+<h3>years<a class="headerlink" href="#years" title="Permalink to this headline">¶</a></h3>
+<p>List of years for spatial downscaling. Region-scale input demands will be filtered to these years. Proxy data will be linearly interpolated to the years on this list (except for years outside the endpoints of the proxy data, which will use the nearest endpoint).</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">years</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2010</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2015</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2020</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2025</span><span class="p p-Indicator">]</span>
+</pre></div>
 </div>
-<div class="section" id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<dl class="footnote brackets">
-<dt class="label" id="li2017"><span class="brackets">1</span></dt>
-<dd><p>Li, X., Vernon, C.R., Hejazi, M.I., Link, R.P, Feng, L., Liu, Y., Rauchenstein, L.T., 2017. Xanthos – A Global Hydrologic Model. Journal of Open Research Software 5(1): 21. DOI: <a class="reference external" href="http://doi.org/10.5334/jors.181">http://doi.org/10.5334/jors.181</a></p>
-</dd>
-<dt class="label" id="edmonds1985"><span class="brackets">2</span></dt>
-<dd><p>Edmonds, J., and Reilly, J. M., 1985. Global Energy: Assessing the Future. Oxford University Press, New York, pp.317.</p>
-</dd>
-<dt class="label" id="edmonds1997"><span class="brackets">3</span></dt>
-<dd><p>Edmonds, J., Wise, M., Pitcher, H., Richels, R., Wigley, T. and Maccracken, C., 1997. An integrated assessment of climate change and the accelerated introduction of advanced energy technologies-an application of MiniCAM 1.0. Mitigation and adaptation strategies for global change 1(4): 311-339. DOI: <a class="reference external" href="http://dx.doi.org/10.1023/B:MITI.0000027386.34214.60">http://dx.doi.org/10.1023/B:MITI.0000027386.34214.60</a></p>
-</dd>
-<dt class="label" id="hejazi2014"><span class="brackets">4</span></dt>
-<dd><p>Hejazi, M.I., Edmonds, J., Clarke, L., Kyle, P., Davies, E., Chaturvedi, V., Wise, M., Patel, P., Eom, J. and Calvin, K., 2014. Integrated assessment of global water scarcity over the 21st century under multiple climate change mitigation policies. Hydrology and Earth System Sciences 18: 2859-2883. DOI: <a class="reference external" href="http://dx.doi.org/10.5194/hess-18-2859-2014">http://dx.doi.org/10.5194/hess-18-2859-2014</a></p>
-</dd>
-<dt class="label" id="huang2017"><span class="brackets">5</span></dt>
-<dd><p>Huang, Z., Hejazi, M., Li, X., Tang, Q., Leng, G., Liu, Y., Döll, P., Eisner, S., Gerten, D., Hanasaki, N., and Wada, Y., 2017. Reconstruction of global gridded monthly sectoral water withdrawals for 1971–2010 and analysis of their spatiotemporal patterns, Hydrology and Earth System Sciences Discussions, DOI: <a class="reference external" href="https://doi.org/10.5194/hess-2017-551">https://doi.org/10.5194/hess-2017-551</a></p>
-</dd>
-<dt class="label" id="wada2011"><span class="brackets"><a class="fn-backref" href="#id4">6</a></span></dt>
-<dd><p>Wada, Y., Van Beek, L.P.H., Viviroli, D., Dürr, H.H., Weingartner, R. and Bierkens, M.F., 2011. Global monthly water stress: 2. Water withdrawal and severity of water stress. Water Resources Research 47(7): W07518. DOI: <a class="reference external" href="http://dx.doi.org/10.1029/2010WR009792">http://dx.doi.org/10.1029/2010WR009792</a></p>
-</dd>
-<dt class="label" id="siebert2007"><span class="brackets">7</span></dt>
-<dd><p>Siebert, S., Döll, P., Feick, S., Hoogeveen, J. and Frenken, K., 2007. Global map of irrigation areas version 4.0. 1. Johann Wolfgang Goethe University, Frankfurt am Main, Germany/Food and Agriculture Organization of the United Nations, Rome, Italy.</p>
-</dd>
-<dt class="label" id="portmann2008"><span class="brackets">8</span></dt>
-<dd><p>Portmann, F.T., Siebert, S., Bauer, C. and Döll, P., 2008. Global dataset of monthly growing areas of 26 irrigated crops: version 1.0. University of Frankfurt, Germany.</p>
-</dd>
-<dt class="label" id="klein2011"><span class="brackets">9</span></dt>
-<dd><p>Klein Goldewijk, K., Beusen, A., Van Drecht, G. and De Vos, M., 2011. The HYDE 3.1 spatially explicit database of human induced global land use change over the past 12,000 years. Global Ecology and Biogeography 20(1): 73-86. DOI: <a class="reference external" href="https://doi.org/10.1111/j.1466-8238.2010.00587.x">https://doi.org/10.1111/j.1466-8238.2010.00587.x</a></p>
-</dd>
-<dt class="label" id="ciesin2016"><span class="brackets">10</span></dt>
-<dd><p>Center for International Earth Science Information Network (CIESIN) - Columbia University. 2016. Gridded Population of the World, Version 4 (GPWv4): Population Count. NASA Socioeconomic Data and Applications Center (SEDAC), Palisades, NY. DOI: <a class="reference external" href="http://dx.doi.org/10.7927/H4X63JVC">http://dx.doi.org/10.7927/H4X63JVC</a></p>
-</dd>
-<dt class="label" id="siebert2013"><span class="brackets">11</span></dt>
-<dd><p>Siebert, S., Henrich, V., Frenken, K., and Burke, J., 2013. Global Map of Irrigation Areas version 5. Rheinische Friedrich-Wilhelms-University, Bonn, Germany / Food and Agriculture Organization of the United Nations, Rome, Italy.</p>
-</dd>
-<dt class="label" id="wint2007"><span class="brackets">12</span></dt>
-<dd><p>Wint, W. and Robinson, T., 2007. Gridded livestock of the world. Food and Agriculture Organization (FAO), report 131, Rome.</p>
-</dd>
-<dt class="label" id="alcamo2002"><span class="brackets">13</span></dt>
-<dd><p>Alcamo, J. and Henrichs, T., 2002. Critical regions: A model-based estimation of world water resources sensitive to global changes. Aquatic Sciences-Research Across Boundaries, 64(4): 352-362. DOI: <a class="reference external" href="https://doi.org/10.1007/PL00012591">https://doi.org/10.1007/PL00012591</a></p>
-</dd>
-<dt class="label" id="florke2004"><span class="brackets">14</span></dt>
-<dd><p>Flörke, M. and Alcamo, J., 2004. European outlook on water use. Center for Environmental Systems Research, University of Kassel, Final Report, EEA/RNC/03/007, 83.</p>
-</dd>
-<dt class="label" id="hanasaki2008a"><span class="brackets"><a class="fn-backref" href="#id1">15</a></span></dt>
-<dd><p>Hanasaki, N., Kanae, S., Oki, T., Masuda, K., Motoya, K., Shirakawa, N., Shen, Y. and Tanaka, K., 2008. An integrated model for the assessment of global water resources–Part 1: Model description and input meteorological forcing. Hydrology and Earth System Sciences 12(4): 1007-1025. DOI: <a class="reference external" href="https://doi.org/10.5194/hess-12-1007-2008">https://doi.org/10.5194/hess-12-1007-2008</a></p>
-</dd>
-<dt class="label" id="hanasaki2008b"><span class="brackets"><a class="fn-backref" href="#id2">16</a></span></dt>
-<dd><p>Hanasaki, N., Kanae, S., Oki, T., Masuda, K., Motoya, K., Shirakawa, N., Shen, Y. and Tanaka, K., 2008. An integrated model for the assessment of global water resources–Part 2: Applications and assessments. Hydrology and Earth System Sciences 12(4): 1027-1037. DOI: <a class="reference external" href="https://doi.org/10.5194/hess-12-1027-2008">https://doi.org/10.5194/hess-12-1027-2008</a></p>
-</dd>
-<dt class="label" id="rost2008"><span class="brackets"><a class="fn-backref" href="#id3">17</a></span></dt>
-<dd><p>Rost, S., Gerten, D., Bondeau, A., Lucht, W., Rohwer, J. and Schaphoff, S., 2008. Agricultural green and blue water consumption and its influence on the global water system. Water Resources Research 44(9): W09405. DOI: <a class="reference external" href="https://doi.org/10.1029/2007WR006331">https://doi.org/10.1029/2007WR006331</a></p>
-</dd>
-<dt class="label" id="vanbeek2011"><span class="brackets"><a class="fn-backref" href="#id5">18</a></span></dt>
-<dd><p>Van Beek, L.P.H., Wada, Y. and Bierkens, M.F., 2011. Global monthly water stress: 1. Water balance and water availability. Water Resources Research 47(7): W07517. DOI: <a class="reference external" href="https://doi.org/10.1029/2010WR009791">https://doi.org/10.1029/2010WR009791</a></p>
-</dd>
-<dt class="label" id="voisin2013"><span class="brackets">19</span></dt>
-<dd><p>Voisin, N., Liu, L., Hejazi, M., Tesfa, T., Li, H., Huang, M., Liu, Y. and Leung, L.R., 2013. One-way coupling of an integrated assessment model and a water resources model: evaluation and implications of future changes over the US Midwest. Hydrology and Earth System Sciences 17(11): 4555-4575. DOI: <a class="reference external" href="https://doi.org/10.5194/hess-17-4555-2013">https://doi.org/10.5194/hess-17-4555-2013</a></p>
-</dd>
-<dt class="label" id="hejazi2015"><span class="brackets">20</span></dt>
-<dd><p>Hejazi, M.I., Voisin, N., Liu, L., Bramer, L.M., Fortin, D.C., Hathaway, J.E., Huang, M., Kyle, P., Leung, L.R., Li, H.Y. and Liu, Y., 2015. 21st century United States emissions mitigation could increase water stress more than the climate change it is mitigating. Proceedings of the National Academy of Sciences 112(34): 10635-10640. DOI: <a class="reference external" href="https://doi.org/10.1073/pnas.1421675112">https://doi.org/10.1073/pnas.1421675112</a></p>
-</dd>
-<dt class="label" id="kim2016"><span class="brackets">21</span></dt>
-<dd><p>Kim, S.H., Hejazi, M., Liu, L., Calvin, K., Clarke, L., Edmonds, J., Kyle, P., Patel, P., Wise, M. and Davies, E., 2016. Balancing global water availability and use at basin scale in an integrated assessment model. Climatic Change 136(2): 217-231. DOI: <a class="reference external" href="http://dx.doi.org/10.1007/s10584-016-1604-6">http://dx.doi.org/10.1007/s10584-016-1604-6</a></p>
-</dd>
-<dt class="label" id="netcdf"><span class="brackets">22</span></dt>
-<dd><p>An Introduction to NetCDF. <a class="reference external" href="http://www.unidata.ucar.edu/software/netcdf/docs/netcdf_introduction.html">http://www.unidata.ucar.edu/software/netcdf/docs/netcdf_introduction.html</a></p>
-</dd>
-</dl>
+</div>
+<div class="section" id="resolution">
+<h3>resolution<a class="headerlink" href="#resolution" title="Permalink to this headline">¶</a></h3>
+<p>Output resolution in degrees for spatial downscaling. Proxies will be regridded to this resolution.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">resolution</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.125</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="demand-type">
+<h3>demand_type<a class="headerlink" href="#demand-type" title="Permalink to this headline">¶</a></h3>
+<p>Whether the demands are water withdrawals or conusmption. Default is withdrawals. This option determines what values will be checked in the GCAM database if used, and will be passed along to the outputs.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">demand_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">consumption</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="perform-temporal">
+<h3>perform_temporal<a class="headerlink" href="#perform-temporal" title="Permalink to this headline">¶</a></h3>
+<p>Whether to perform temporal downscaling or not. Default is false.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">perform_temporal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="gcam-db">
+<h3>gcam_db<a class="headerlink" href="#gcam-db" title="Permalink to this headline">¶</a></h3>
+<p>Path to a GCAM database (the folder containing a bunch of <em>.basex</em> files).</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">gcam_db</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/GCAM_databases/my_GCAM_db</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="csv">
+<h3>csv<a class="headerlink" href="#csv" title="Permalink to this headline">¶</a></h3>
+<p>As an alternative to <code class="docutils literal notranslate"><span class="pre">gcam_db</span></code>, path to a csv file containing region-scale water demand inputs. The file should have the following columns: region, sector, year, and value.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">csv</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/example_input.csv</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="output-file">
+<h3>output_file<a class="headerlink" href="#output-file" title="Permalink to this headline">¶</a></h3>
+<p>Filepath in which outputs will be written. If none (default), outputs will not be saved, but they can be interacted with in-memory via the outputs attribute of the Tethys class. If the path is not absolute, it will be relative to the directory containing the config file. This file will be overwritten if it exist already and created if it doesn’t, but the directory containing it must already exist.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">output_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputs/tethys_outputs.nc</span><span class="w">  </span><span class="c1"># the folder &quot;&lt;config_file_dir&gt;/outputs&quot; must already exist</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="compress-outputs">
+<h3>compress_outputs<a class="headerlink" href="#compress-outputs" title="Permalink to this headline">¶</a></h3>
+<p>Whether or not to compress the outputs. Defaults to true. This will use zlib level 5, but you can have more customization over this by interacting directly with the outputs attribute of the Tethys class.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">compress_outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">  </span><span class="c1"># because we want our outputs files to be really big for some reason</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="downscaling-rules">
+<h3>downscaling_rules<a class="headerlink" href="#downscaling-rules" title="Permalink to this headline">¶</a></h3>
+<p>A mapping between water demand sectors and proxy variables. The simplest kind of entry is of the form <code class="docutils literal notranslate"><span class="pre">sector:</span> <span class="pre">proxy</span></code>, like for the Municipal sector in the example below. When a sector is composed of multiple subsectors, a second layer of mappings is allowed (as with Livestock in the example below). The proxy can optionally be a list of variables.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">downscaling_rules</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">Municipal</span><span class="p">:</span><span class="w">   </span><span class="l l-Scalar l-Scalar-Plain">Population</span>
+<span class="w">  </span><span class="nt">Livestock</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">Beef</span><span class="p">:</span><span class="w">      </span><span class="p p-Indicator">[</span><span class="nv">Buffalo</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Cattle</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">Dairy</span><span class="p">:</span><span class="w">     </span><span class="p p-Indicator">[</span><span class="nv">Buffalo</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Cattle</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">Pork</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">Pig</span>
+<span class="w">    </span><span class="nt">Poultry</span><span class="p">:</span><span class="w">   </span><span class="p p-Indicator">[</span><span class="nv">Chicken</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Duck</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">SheepGoat</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Sheep</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Goat</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="proxy-files">
+<h3>proxy_files<a class="headerlink" href="#proxy-files" title="Permalink to this headline">¶</a></h3>
+<p>A mapping of file paths (absolute, or relative to the config file) to the proxy variables and years they contain, as well as any flags needed to interpret them. The entries are of the form</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">filepath</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variables</span><span class="p">:</span><span class="w">  </span><span class="c1"># variable or list of variables in the file</span>
+<span class="w">  </span><span class="nt">years</span><span class="p">:</span><span class="w">  </span><span class="c1"># year or list of years in the file</span>
+<span class="w">  </span><span class="nt">flags</span><span class="p">:</span><span class="w">  </span><span class="c1"># flag or list of flags to help interpret the file (optional)</span>
+</pre></div>
+</div>
+<p>Flags understood are ‘cell_area_share’, and ‘short_name_as_name’. ‘cell_area_share’ means that the grid cell values in the file correspond to the share of that cell covered by the variable, so <strong>tethys</strong> multiplies by the area of the cell to obtain a quantity that can be used as a proxy. ‘short_name_as_name’ is for netCDF files where <code class="docutils literal notranslate"><span class="pre">variables</span></code> corresponds to the ‘short_name’ attribute, not the variable name.</p>
+<p>For files systematically named by variable and/or year, the file path can contain <code class="docutils literal notranslate"><span class="pre">{variable}</span></code> and <code class="docutils literal notranslate"><span class="pre">{year}</span></code>, and the corresponding values will be substituted. If the files use abbreviated names, then <code class="docutils literal notranslate"><span class="pre">variables</span></code> can be a mapping of <code class="docutils literal notranslate"><span class="pre">variable:</span> <span class="pre">abbreviation</span></code> pairs.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">proxy_files</span><span class="p">:</span>
+
+<span class="w">  </span><span class="c1"># 4 files, each containing Population data for a single year</span>
+<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">data/population/ssp1_{year}.tif</span><span class="p p-Indicator">:</span>
+<span class="w">    </span><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Population</span>
+<span class="w">    </span><span class="nt">years</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2010</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2020</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2030</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2040</span><span class="p p-Indicator">]</span>
+
+<span class="w">  </span><span class="c1"># 7 files, each containing data for a single animal in 2010</span>
+<span class="w">  </span><span class="c1"># files are named using abbreviations like &#39;5_Bf_2010_Da.tif&#39;,</span>
+<span class="w">  </span><span class="c1"># but we refer to the variable with the full name like &#39;Buffalo&#39;</span>
+<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">data/GLW3/5_{variable}_2010_Da.tif</span><span class="p p-Indicator">:</span>
+<span class="w">    </span><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">Buffalo</span><span class="p">:</span><span class="w"> </span><span class="nv">Bf</span><span class="p p-Indicator">,</span><span class="nt"> Cattle</span><span class="p">:</span><span class="w"> </span><span class="nv">Ct</span><span class="p p-Indicator">,</span><span class="nt"> Sheep</span><span class="p">:</span><span class="w"> </span><span class="nv">Sh</span><span class="p p-Indicator">,</span><span class="nt"> Goat</span><span class="p">:</span><span class="w"> </span><span class="nv">Gt</span><span class="p p-Indicator">,</span><span class="nt"> Chicken</span><span class="p">:</span><span class="w"> </span><span class="nv">Ch</span><span class="p p-Indicator">,</span><span class="nt"> Duck</span><span class="p">:</span><span class="w"> </span><span class="nv">Dk</span><span class="p p-Indicator">,</span><span class="nt"> Pig</span><span class="p">:</span><span class="w"> </span><span class="nv">Pg</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="nt">years</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2010</span>
+
+<span class="w">  </span><span class="c1"># 6 files, each containing multiple variables for a single year</span>
+<span class="w">  </span><span class="c1"># the variables represent the share of area in the grid cell, not the total area</span>
+<span class="w">  </span><span class="c1"># we only extract the variables whose netCDF short_name is in the list</span>
+<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">data/Demeter/ssp1_rcp26_gfdl_{year}.nc</span><span class="p p-Indicator">:</span>
+<span class="w">    </span><span class="nt">flags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">cell_area_share</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">short_name_as_name</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Corn_irr</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Cotton_irr</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">OtherCrop_irr</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Soy_irr</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Rice_irr</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Sugarcrop_irr</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Wheat_irr</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">years</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2005</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2010</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2015</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2020</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2025</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2030</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="map-files">
+<h3>map_files<a class="headerlink" href="#map-files" title="Permalink to this headline">¶</a></h3>
+<p>List of paths to map files. These should be geotiffs with an attribute called ‘names’ containing a mapping of names to region numbers. 0 is reserved for nonland/ignored regions.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">map_files</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">data/maps/regions.tif</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">data/maps/regionbasins.tif</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="temporal-files">
+<h3>temporal_files<a class="headerlink" href="#temporal-files" title="Permalink to this headline">¶</a></h3>
+<p>Mapping of files that will be accessible to temporal downscaling methods.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">temporal_files</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">HDD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/temporal/HDD_monthly.nc</span>
+<span class="w">  </span><span class="nt">CDD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/temporal/CDD_monthly.nc</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="generalization">
+<h2>Generalization<a class="headerlink" href="#generalization" title="Permalink to this headline">¶</a></h2>
+<p><strong>tethys</strong> was developed with consideration for GCAM’s breakdown of water demand, but was designed to be as flexible as possible with support for user-specified downscaling configurations.</p>
+<p>Fundamentally, spatial downscaling requires</p>
 </div>
 </div>
 
