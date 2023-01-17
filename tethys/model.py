@@ -18,13 +18,13 @@ from tethys.temporal_downscaling import *
 class Tethys:
     """Model wrapper for Tethys"""
 
-    def __init__(self, config_file='', years=None, resolution=0.125, demand_type='withdrawals',
-                 perform_temporal=False, gcam_db=None, csv=None, output_file=None,
-                 compress_outputs=True, downscaling_rules=None, proxy_files=None, map_files=None, temporal_files=None):
+    def __init__(self, config_file=None, years=None, resolution=0.125, demand_type='withdrawals',
+                 perform_temporal=False, gcam_db=None, csv=None, output_file=None, compress_outputs=True,
+                 downscaling_rules=None, proxy_files=None, map_files=None, temporal_files=None):
         """ # TODO
         """
 
-        self.root = os.path.dirname(config_file)
+        self.root = None
 
         # project level settings
         self.years = years
@@ -33,10 +33,10 @@ class Tethys:
         self.perform_temporal = perform_temporal
 
         # GCAM database info
-        self.gcam_db = os.path.join(self.root, gcam_db)
+        self.gcam_db = gcam_db
 
         # csv as alternative
-        self.csv = os.path.join(self.root, csv)
+        self.csv = csv
 
         # outputs
         self.output_file = output_file
@@ -55,11 +55,17 @@ class Tethys:
         self.outputs = None
 
         # settings in YAML override settings passed directly to __init__
-        if config_file != '':
+        if config_file is not None:
             with open(config_file) as file:
                 config = yaml.safe_load(file)
             config = {k: v for k, v in config.items() if k in vars(self)}
             vars(self).update(config)
+
+        if self.root is None:
+            if config_file is not None:
+                self.root = os.path.dirname(config_file)
+            else:
+                self.root = os.getcwd()
 
         self._parse_proxy_files()
 
@@ -127,7 +133,7 @@ class Tethys:
         else:
             sectors = [j for i in self.downscaling_rules.values() if isinstance(i, dict) for j in i] + \
                       list(self.downscaling_rules.keys())
-            self.inputs = load_region_data(self.gcam_db, sectors, self.demand_type)
+            self.inputs = load_region_data(os.path.join(self.root, self.gcam_db), sectors, self.demand_type)
 
         # filter inputs to valid regions and years
         self.inputs = self.inputs[(self.inputs.region.isin(self.region_masks.region.data)) &
@@ -215,7 +221,7 @@ class Tethys:
                     hdd = load_monthly_data(self.temporal_files['hdd'], self.resolution, out_years)
                     cdd = load_monthly_data(self.temporal_files['cdd'], self.resolution, out_years)
 
-                    weights = elec_sector_weights(self.gcam_db)
+                    weights = elec_sector_weights(os.path.join(self.root, self.gcam_db))
                     weights = weights[(weights.region.isin(self.inputs.region[self.inputs.sector == 'Electricity'])) &
                                       (weights.region.isin(self.region_masks.region.data)) &
                                       (weights.year.isin(self.years))].set_index(
@@ -252,3 +258,11 @@ class Tethys:
                 self.outputs.to_netcdf(os.path.join(self.root, self.output_file), encoding=encoding)
             else:
                 self.outputs.to_netcdf(os.path.join(self.root, self.output_file))
+
+
+def run_model(config_file):
+    config_file = os.path.join(os.getcwd(), config_file)
+    print('Tethys configuration:')
+    m = Tethys(config_file=config_file)
+    m.run_model()
+    return m
