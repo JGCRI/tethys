@@ -193,15 +193,8 @@
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>First of all you’ll need to have Python installed.</p>
-<ul class="simple">
-<li><p>Python (tested on 3.9) <a class="reference external" href="https://www.python.org/downloads/">https://www.python.org/downloads/</a></p></li>
-<li><p>Java <a class="reference external" href="https://www.java.com/en/download/">https://www.java.com/en/download/</a></p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Without Java installed, the dependency gcamreader will be unable to query the GCAM database files.</p>
-</div>
+<p>First of all you’ll need to have <a class="reference external" href="https://www.python.org/downloads/">Python</a> installed.</p>
+<p>If you plan on querying a GCAM database, you’ll need <a class="reference external" href="https://openjdk.org">Java</a> installed and added to your path.</p>
 <p>Currently, <strong>tethys</strong> can be cloned from <a class="reference external" href="https://github.com/JGCRI/tethys">https://github.com/JGCRI/tethys</a> using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/JGCRI/tethys
 </pre></div>
@@ -218,35 +211,16 @@
 <p>In the future, easy installation will be available via pip.</p>
 </div>
 <div class="section" id="example-data">
-<span id="installing-package-data"></span><h2>Example Data<a class="headerlink" href="#example-data" title="Permalink to this headline">¶</a></h2>
-<p>Example data is available for download at <a class="reference external" href="https://zenodo.org/record/6399117/files/example_v1_3_1.zip?download=1">https://zenodo.org/record/6399117/files/example_v1_3_1.zip?download=1</a>.</p>
-<p>The data can also be directly downloaded for the latest release version as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tethys</span>
-
-<span class="c1"># the directory that you want to download and extract the example data to</span>
-<span class="n">data_dir</span> <span class="o">=</span> <span class="s2">&quot;&lt;my data download location&gt;&quot;</span>
-
-<span class="c1"># download and unzip the package data to your local machine</span>
-<span class="n">tethys</span><span class="o">.</span><span class="n">get_package_data</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the download is 2.1 GB, the extracted data will require around <strong>9.6 GB</strong> of storage space.</p>
-</div>
-<p>Once extracted, change the paths in <em>config.ini</em> to point to the relevant files and directories on your machine.</p>
+<h2>Example Data<a class="headerlink" href="#example-data" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="run">
 <h2>Run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h2>
-<p>Verify the installation was successful by running the following in Python:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tethys</span>
+<p>Verify the installation was successful by running the following in Python</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tethys</span> <span class="kn">import</span> <span class="n">run_model</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">run_model</span><span class="p">(</span><span class="s1">&#39;tethys\example\config_minimal.yml&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Make sure the config file is properly set up and somewhere Python can find it (or use its absolute file path), then run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dmw</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">run_model</span><span class="p">(</span><span class="s1">&#39;config.ini&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Logging info should begin printing to the console, and after a few minutes downscaled data and diagnostics output files will be created.</p>
 </div>
 </div>
 

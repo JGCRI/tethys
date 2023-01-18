@@ -498,7 +498,34 @@
 <div class="section" id="generalization">
 <h2>Generalization<a class="headerlink" href="#generalization" title="Permalink to this headline">¶</a></h2>
 <p><strong>tethys</strong> was developed with consideration for GCAM’s breakdown of water demand, but was designed to be as flexible as possible with support for user-specified downscaling configurations.</p>
-<p>Fundamentally, spatial downscaling requires</p>
+<p>Fundamentally, proxy-based spatial downscaling requires</p>
+<ul class="simple">
+<li><p>region-scale input data (to be downscaled)</p></li>
+<li><p>gridded proxy data</p></li>
+<li><p>a map defining what grid cells belong to each region</p></li>
+</ul>
+<p>The configuration file provides an <span class="xref std std-ref">interface</span> for describing the relationship between input sectors and proxy variables, which enables <strong>tethys</strong> to be compatible with versions of GCAM using different breakdowns of water demand (for example, different crop types), but also allows it to downscale water demand data from other models and sources. This flexibility makes it easy to run <strong>tethys</strong> with new input and proxy datasets as they become available.</p>
+<p>Suppose we had region-scale Municipal water demand data by income decile, as well as Population datasets broken out similarly. Then this could be represented in the config file with something like</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">downscaling_rules</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">Municipal</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">Municipal_d1</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">Population_d1</span>
+<span class="w">    </span><span class="nt">Municipal_d2</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">Population_d2</span>
+<span class="w">    </span><span class="nt">Municipal_d3</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">Population_d3</span>
+<span class="w">    </span><span class="nt">Municipal_d4</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">Population_d4</span>
+<span class="w">    </span><span class="nt">Municipal_d5</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">Population_d5</span>
+<span class="w">    </span><span class="nt">Municipal_d6</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">Population_d6</span>
+<span class="w">    </span><span class="nt">Municipal_d7</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">Population_d7</span>
+<span class="w">    </span><span class="nt">Municipal_d8</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">Population_d8</span>
+<span class="w">    </span><span class="nt">Municipal_d9</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">Population_d9</span>
+<span class="w">    </span><span class="nt">Municipal_d10</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Population_d10</span>
+
+<span class="nt">proxy_files</span><span class="p">:</span>
+<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">data/Population/{variable}_{year}.tif</span><span class="p p-Indicator">:</span>
+<span class="w">    </span><span class="nt">variables</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Population_d1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Population_d2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Population_d3</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Population_d4</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Population_d5</span><span class="p p-Indicator">,</span>
+<span class="w">                </span><span class="nv">Population_d6</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Population_d7</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Population_d8</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Population_d9</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Population_d10</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">years</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2005</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2010</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2015</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2020</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
 </div>
 </div>
 

@@ -277,5 +277,34 @@ Generalization
 --------------
 **tethys** was developed with consideration for GCAM's breakdown of water demand, but was designed to be as flexible as possible with support for user-specified downscaling configurations.
 
-Fundamentally, spatial downscaling requires 
+Fundamentally, proxy-based spatial downscaling requires
+
+* region-scale input data (to be downscaled)
+* gridded proxy data
+* a map defining what grid cells belong to each region
+
+The configuration file provides an :ref:`interface <downscaling-rules>` for describing the relationship between input sectors and proxy variables, which enables **tethys** to be compatible with versions of GCAM using different breakdowns of water demand (for example, different crop types), but also allows it to downscale water demand data from other models and sources. This flexibility makes it easy to run **tethys** with new input and proxy datasets as they become available.
+
+Suppose we had region-scale Municipal water demand data by income decile, as well as Population datasets broken out similarly. Then this could be represented in the config file with something like
+
+.. code-block:: yaml
+
+  downscaling_rules:
+    Municipal:
+      Municipal_d1:  Population_d1
+      Municipal_d2:  Population_d2
+      Municipal_d3:  Population_d3
+      Municipal_d4:  Population_d4
+      Municipal_d5:  Population_d5
+      Municipal_d6:  Population_d6
+      Municipal_d7:  Population_d7
+      Municipal_d8:  Population_d8
+      Municipal_d9:  Population_d9
+      Municipal_d10: Population_d10
+  
+  proxy_files:
+    data/Population/{variable}_{year}.tif:
+      variables: [Population_d1, Population_d2, Population_d3, Population_d4, Population_d5,
+                  Population_d6, Population_d7, Population_d8, Population_d9, Population_d10]
+      years: [2005, 2010, 2015, 2020]
 
