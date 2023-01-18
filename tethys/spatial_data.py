@@ -2,7 +2,7 @@ import numpy as np
 import xarray as xr
 
 
-def load_proxy_file(filename, target_resolution, years, variables, flags):
+def load_file(filename, target_resolution, years, variables=None, flags=None, regrid_method='extensive'):
     """Prepare a dataset from single file to be merged into a dataset of all proxies
 
     handles many oddities found in proxies
@@ -12,9 +12,11 @@ def load_proxy_file(filename, target_resolution, years, variables, flags):
     :param years: years to extract from the file
     :param variables: variables to extract from the file
     :param flags: list potentially containing 'cell_area_share' or 'short_name_as_name'
+    :param regrid_method: passed along to regrid
     :return: preprocessed data set
     """
-    # TODO: break into separate functions as sensible (for testing)
+
+    flags = [] if flags is None else flags
 
     ds = xr.open_dataset(filename, chunks='auto')
 
@@ -28,15 +30,42 @@ def load_proxy_file(filename, target_resolution, years, variables, flags):
         ds = ds.rename({i: ds.get(i).attrs['short_name'] for i in ds.data_vars})
 
     # filter to desired variables
-    ds = ds[variables]
+    if variables is not None:
+        ds = ds[variables]
 
     # create a year dimension if missing, with the years reported for this file in the catalog
     if 'year' not in ds.coords:
-        ds = ds.expand_dims(year=len(years)).assign_coords(year=('year', years))
+        ds = ds.expand_dims(year=len(years))
+    else:
+        ds = ds.sel(year=years, method='nearest')  # nearest used for temporal files
+    ds['year'] = years
 
-    # filter to desired years
-    ds = ds.isel(year=ds.year.isin(years))
+    # do the year filtering
+    if years is not None and 'year' in ds.coords:
+        ds = ds.sel(year=years, method='nearest').chunk(chunks=dict(year=1))
+        ds['year'] = years
 
+    # numeric stuff
+    ds = ds.fillna(0).astype(np.float32)
+
+    # rename to lat lon and handle some wacky stuff
+    ds = clean_spatial_dims(ds)
+
+    if 'cell_area_share' in flags:
+        ds = percent_to_area(ds)
+
+    # spatial aligning
+    ds = pad_global(ds)
+    ds = regrid(ds, target_resolution, method=regrid_method)
+
+    ds = ds.chunk(chunks=dict(lat=-1, lon=-1))
+    if 'month' in ds.coords:
+        ds = ds.chunk(chunks=dict(month=12))
+
+    return ds
+
+
+def clean_spatial_dims(ds):
     # coerce spatial dimension names
     if 'latitude' in ds.coords:
         ds = ds.rename(latitude='lat')
@@ -53,19 +82,6 @@ def load_proxy_file(filename, target_resolution, years, variables, flags):
     # drop repeated latitudes
     ds['lat'] = ds.lat.round(10)  # 10 decimal-place tolerance
     ds = ds.drop_duplicates(dim='lat')
-
-    # numeric stuff
-    ds = ds.fillna(0)
-    ds = ds.astype(np.float32)
-
-    if 'cell_area_share' in flags:
-        ds = percent_to_area(ds)
-
-    # spatial aligning
-    ds = pad_global(ds)
-    ds = regrid(ds, target_resolution, method='extensive')
-
-    ds = ds.chunk(chunks=dict(lat=-1, lon=-1))
 
     return ds
 
@@ -169,7 +185,8 @@ def interp_helper(da, target_years=None):
 
     lower = da.isel(year=lower_idx).chunk(chunks=dict(year=1)).assign_coords(year=target_years)
     upper = da.isel(year=upper_idx).chunk(chunks=dict(year=1)).assign_coords(year=target_years)
-    out = lower * xr.DataArray(lower_weights, dict(year=target_years)) + upper * xr.DataArray(upper_weights, dict(year=target_years))
+    out = lower * xr.DataArray(lower_weights, dict(year=target_years)) + \
+        upper * xr.DataArray(upper_weights, dict(year=target_years))
 
     out = out.rename(da.name)
 

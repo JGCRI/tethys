@@ -1,11 +1,12 @@
-from tethys.temporal_downscaling import load_monthly_data
+from tethys.spatial_data import load_file
 
 
 def monthly_distribution(self):
     """Temporal downscaling of irrigation water demand"""
 
-    irr = load_monthly_data(self.temporal_files['irr'], self.resolution, range(self.years[0], self.years[-1] + 1),
-                            method='label')
+    years = range(self.years[0], self.years[-1] + 1)
+    irr = load_file(self.temporal_files['irr'], self.resolution, years, regrid_method='label')['pirrww']
+
     irr_regions = self.inputs.region[(self.inputs.sector == 'Irrigation') &
                                      (self.inputs.region.isin(self.region_masks.region.data))].unique()
 

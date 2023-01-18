@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from tethys.region_data import load_region_data
-from tethys.spatial_proxies import load_proxy_file, interp_helper
+from tethys.spatial_data import load_file, interp_helper
 from tethys.region_map import load_region_map
 
 
@@ -128,7 +128,7 @@ class Tethys:
         print('Loading Proxy Data')
         # align each variable spatially
         dataarrays = [da for filename, info in self.proxy_files.items() for da in
-                      load_proxy_file(os.path.join(self.root, filename), self.resolution, **info).values()]
+                      load_file(os.path.join(self.root, filename), self.resolution, **info).values()]
 
         print('Interpolating Proxies')
         # interpolate each variable, then merge to one array
@@ -223,7 +223,7 @@ class Tethys:
                     module = f'tethys.td_methods.{self.temporal_methods[supersector.lower()]}'
                     distribution = getattr(importlib.import_module(module), 'monthly_distribution')(self)
                 else:
-                    distribution = xr.DataArray(np.full(12, 1/12, np.float32), coords=dict(month=range(12)))
+                    distribution = xr.DataArray(np.full(12, 1/12, np.float32), coords=dict(month=range(1, 13)))
 
                 downscaled = interp_helper(downscaled) * distribution
 

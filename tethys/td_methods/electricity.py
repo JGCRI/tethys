@@ -2,22 +2,21 @@ import os
 import numpy as np
 import pandas as pd
 import xarray as xr
-from tethys.temporal_downscaling import load_monthly_data
 from tethys.region_data import elec_sector_weights
-from tethys.spatial_proxies import interp_helper
+from tethys.spatial_data import load_file, interp_helper
 
 
 def monthly_distribution(self):
     """Temporal downscaling of water demand for electricity generation using algorithm from Voisin et al. (2013)"""
-
-    hdd = load_monthly_data(self.temporal_files['hdd'], self.resolution, range(self.years[0], self.years[-1] + 1))
-    cdd = load_monthly_data(self.temporal_files['cdd'], self.resolution, range(self.years[0], self.years[-1] + 1))
+    years = range(self.years[0], self.years[-1] + 1)
+    hdd = load_file(self.temporal_files['hdd'], self.resolution, years, regrid_method='intensive')['hdd']
+    cdd = load_file(self.temporal_files['cdd'], self.resolution, years, regrid_method='intensive')['cdd']
 
     weights = elec_sector_weights(os.path.join(self.root, self.gcam_db))
     weights = weights[(weights.region.isin(self.inputs.region[self.inputs.sector == 'Electricity'])) &
                       (weights.region.isin(self.region_masks.region.data)) &
-                      (weights.year.isin(self.years))].set_index(
-        ['region', 'sector', 'year'])['value'].to_xarray().fillna(0).astype(np.float32)
+                      (weights.year.isin(self.years))].set_index(['region', 'sector', 'year']
+                                                                 )['value'].to_xarray().fillna(0).astype(np.float32)
     weights = interp_helper(weights)
 
     region_masks = self.region_masks.sel(region=weights.region)
