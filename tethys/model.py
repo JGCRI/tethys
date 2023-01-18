@@ -9,10 +9,13 @@ Copyright (c) 2022, Battelle Memorial Institute
 """
 import os
 import yaml
-from tethys.region_data import load_region_data, elec_sector_weights
+import importlib
+import numpy as np
+import pandas as pd
+import xarray as xr
+from tethys.region_data import load_region_data
 from tethys.spatial_proxies import load_proxy_file, interp_helper
 from tethys.region_map import load_region_map
-from tethys.temporal_downscaling import *
 
 
 class Tethys:
@@ -20,7 +23,7 @@ class Tethys:
 
     def __init__(self, config_file=None, years=None, resolution=0.125, demand_type='withdrawals',
                  perform_temporal=False, gcam_db=None, csv=None, output_file=None, compress_outputs=True,
-                 downscaling_rules=None, proxy_files=None, map_files=None, temporal_files=None):
+                 downscaling_rules=None, proxy_files=None, map_files=None, temporal_files=None, temporal_methods=None):
         """ # TODO
         """
 
@@ -48,6 +51,8 @@ class Tethys:
         self.map_files = map_files
         self.temporal_files = temporal_files
 
+        self.temporal_methods = temporal_methods
+
         # data we'll load or generate later
         self.region_masks = None
         self.proxies = None
@@ -66,6 +71,14 @@ class Tethys:
                 self.root = os.path.dirname(config_file)
             else:
                 self.root = os.getcwd()
+
+        if self.temporal_methods is None:
+            self.temporal_methods = {
+                'domestic': 'domestic',
+                'municipal': 'domestic',
+                'electricity': 'electricity',
+                'irrigation': 'irrigation'
+            }
 
         self._parse_proxy_files()
 
@@ -205,44 +218,10 @@ class Tethys:
             if self.perform_temporal:
                 # calculate the monthly distributions (share of annual) for each year
 
-                # TODO: Move the data loading into temporal_downscaling.py?
-
-                out_years = range(self.years[0], self.years[-1] + 1)
-
-                if supersector == 'Domestic' or supersector == 'Municipal':
-
-                    tas = load_monthly_data(self.temporal_files['tas'], self.resolution, out_years)
-                    amplitude = load_monthly_data(self.temporal_files['domr'], self.resolution, method='label')
-
-                    distribution = monthly_distribution_domestic(tas, amplitude)
-
-                elif supersector == 'Electricity':
-
-                    hdd = load_monthly_data(self.temporal_files['hdd'], self.resolution, out_years)
-                    cdd = load_monthly_data(self.temporal_files['cdd'], self.resolution, out_years)
-
-                    weights = elec_sector_weights(os.path.join(self.root, self.gcam_db))
-                    weights = weights[(weights.region.isin(self.inputs.region[self.inputs.sector == 'Electricity'])) &
-                                      (weights.region.isin(self.region_masks.region.data)) &
-                                      (weights.year.isin(self.years))].set_index(
-                        ['region', 'sector', 'year'])['value'].to_xarray().fillna(0)
-                    weights = interp_helper(weights)
-
-                    region_masks = self.region_masks.sel(region=weights.region)
-
-                    distribution = monthly_distribution_electricty(hdd, cdd, weights, region_masks)
-
-                elif supersector == 'Irrigation':
-
-                    irr = load_monthly_data(self.temporal_files['irr'], self.resolution, out_years, method='label')
-                    irr_regions = self.inputs.region[(self.inputs.sector == 'Irrigation') &
-                                                     (self.inputs.region.isin(self.region_masks.region.data))
-                                                     ].unique()
-
-                    regionmasks = self.region_masks.sel(region=irr_regions)
-
-                    distribution = monthly_distribution_irrigation(irr, regionmasks)
-
+                # this is how we'll do this for now
+                if supersector.lower() in self.temporal_methods:
+                    module = f'tethys.td_methods.{self.temporal_methods[supersector.lower()]}'
+                    distribution = getattr(importlib.import_module(module), 'monthly_distribution')(self)
                 else:
                     distribution = xr.DataArray(np.full(12, 1/12, np.float32), coords=dict(month=range(12)))
 
@@ -253,7 +232,6 @@ class Tethys:
         if self.output_file is not None:
             print('Writing Outputs')
             if self.compress_outputs:
-                # TODO: could give users more control over this? or tell them to use self.outputs directly?
                 encoding = {variable: {'zlib': True, 'complevel': 5} for variable in self.outputs}
                 self.outputs.to_netcdf(os.path.join(self.root, self.output_file), encoding=encoding)
             else:
