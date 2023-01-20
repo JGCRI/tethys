@@ -13,9 +13,9 @@ import importlib
 import numpy as np
 import pandas as pd
 import xarray as xr
-from tethys.region_data import load_region_data
-from tethys.spatial_data import load_file, interp_helper
-from tethys.region_map import load_region_map
+from tethys.datareader.regional import load_region_data
+from tethys.datareader.gridded import load_file, interp_helper
+from tethys.datareader.maps import load_region_map
 
 
 class Tethys:
@@ -79,6 +79,8 @@ class Tethys:
                 'electricity': 'electricity',
                 'irrigation': 'irrigation'
             }
+        else:
+            self.temporal_methods = {k.lower(): v for k, v in self.temporal_methods.items()}
 
         self._parse_proxy_files()
 
@@ -220,8 +222,8 @@ class Tethys:
 
                 # this is how we'll do this for now
                 if supersector.lower() in self.temporal_methods:
-                    module = f'tethys.td_methods.{self.temporal_methods[supersector.lower()]}'
-                    distribution = getattr(importlib.import_module(module), 'monthly_distribution')(self)
+                    module = f'tethys.tdmethods.{self.temporal_methods[supersector.lower()]}'
+                    distribution = getattr(importlib.import_module(module), 'temporal_distribution')(self)
                 else:
                     distribution = xr.DataArray(np.full(12, 1/12, np.float32), coords=dict(month=range(1, 13)))
 

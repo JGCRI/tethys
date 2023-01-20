@@ -34,7 +34,7 @@ Irrigation             Irrigated area
 Within a region, it is assumed that the distribution of water demand is proportional to the distribution of the proxy. For example, a grid cell that is part of the USA region and contains 1% of the USA's population would be allocated 1% of the USA's municipal water demand.
 
 .. math::
-	\text{demand}_\text{cell} = \text{demand}_\text{region} \times \frac{\text{proxy}_\text{cell}}{\text{proxy}_\text{region}}
+    \text{demand}_\text{cell} = \text{demand}_\text{region} \times \frac{\text{proxy}_\text{cell}}{\text{proxy}_\text{region}}
 
 A sector may consist of multiple subsectors. For example, in GCAM, the livestock sector is split into 5 categories of animal products. Additionally, available proxy datasets may not map directly to these subsectors. **tethys** accounts for this by allowing user-defined mappings of water demand subsectors to proxy variables. The table below shows an example mapping between GCAM livestock subsectors and animal categories in the `GLW 3 <https://doi.org/10.1038/sdata.2018.227>`_ dataset.
 
@@ -61,7 +61,7 @@ Domestic/Municipal
 Temporal downscaling for the domestic/municipal sector follows the formula from `Wada et al. (2011) <https://doi.org/10.1029/2010WR009792>`_, which uses monthly temperature and a regional amplitude coefficient to reproduce summer peaks. For each grid cell,
 
 .. math::
-	\text{demand}_\text{month} = \frac{\text{demand}_\text{year}}{12} \times \left(\frac{\text{temp}_\text{month} - \text{temp}_\text{mean}}{\text{temp}_\text{max} - \text{temp}_\text{min}}R_\text{cell} + 1\right)
+    \frac{\text{demand}_\text{year}}{12} \times \left(\frac{\text{temp}_\text{month} - \text{temp}_\text{mean}}{\text{temp}_\text{max} - \text{temp}_\text{min}}R_\text{cell} + 1\right)
 
 Electricity Generation
 """"""""""""""""""""""
@@ -90,7 +90,7 @@ Irrigation
 Temporal downscaling for the irrigation sector is based on monthly irrigation profiles calculated from exogenous crop water models. Users supply monthly gridded irrigation data from a model of their choice, which is then averaged over the region-basin, and applied as follows:
 
 .. math::
-	\text{demand}_\text{month} = \text{demand}_\text{year} \times \frac{\text{irrigation}_\text{month}}{\text{irrigation}_\text{year}}.
+    \text{demand}_\text{month} = \text{demand}_\text{year} \times \frac{\text{irrigation}_\text{month}}{\text{irrigation}_\text{year}}.
 
 Other
 """""
@@ -121,6 +121,7 @@ Option                   Description
 :ref:`proxy_files`       see details
 :ref:`map_files`         see details
 :ref:`temporal_files`    see details
+:ref:`temporal_methods`  see details
 ======================== =======================================================
 
 
@@ -272,10 +273,24 @@ Mapping of files that will be accessible to temporal downscaling methods.
     HDD: data/temporal/HDD_monthly.nc
     CDD: data/temporal/CDD_monthly.nc
 
+temporal_methods
+^^^^^^^^^^^^^^^^
+Mapping of sector name to downscaling method in the *tdmethods* module. If not specified, defaults for GCAM sectors are used. If specified, sectors in the mapping will use uniform downscaling as a fallback. See :ref:`Temporal Modifications`.
+
+.. code-block:: yaml
+
+  temporal_methods:
+    Municipal: domestic
+    Electricity: electricity
+	
+
 
 Generalization
 --------------
 **tethys** was developed with consideration for GCAM's breakdown of water demand, but was designed to be as flexible as possible with support for user-specified downscaling configurations.
+
+Spatial Modifications
+^^^^^^^^^^^^^^^^^^^^^
 
 Fundamentally, proxy-based spatial downscaling requires
 
@@ -283,7 +298,7 @@ Fundamentally, proxy-based spatial downscaling requires
 * gridded proxy data
 * a map defining what grid cells belong to each region
 
-The configuration file provides an :ref:`interface <downscaling-rules>` for describing the relationship between input sectors and proxy variables, which enables **tethys** to be compatible with versions of GCAM using different breakdowns of water demand (for example, different crop types), but also allows it to downscale water demand data from other models and sources. This flexibility makes it easy to run **tethys** with new input and proxy datasets as they become available.
+The configuration file provides an :ref:`interface <downscaling_rules>` for describing the relationship between input sectors and proxy variables, which enables **tethys** to be compatible with versions of GCAM using different breakdowns of water demand (for example, different crop types), but also allows it to downscale water demand data from other models and sources. This flexibility makes it easy to run **tethys** with new input and proxy datasets as they become available.
 
 Suppose we had region-scale Municipal water demand data by income decile, as well as Population datasets broken out similarly. Then this could be represented in the config file with something like
 
@@ -308,3 +323,33 @@ Suppose we had region-scale Municipal water demand data by income decile, as wel
                   Population_d6, Population_d7, Population_d8, Population_d9, Population_d10]
       years: [2005, 2010, 2015, 2020]
 
+Temporal Modifications
+^^^^^^^^^^^^^^^^^^^^^^
+
+**tethys** also has a mechanism for defining custom temporal downscaling rules. The *tdmethods* folder contains functions that take the `Tethys` object as argument and output a monthly distribution. You can add your own module that defines a `temporal_distribution` function, and then use the `temporal_methods` setting to indicate what method should be used for which sector.
+
+As a simple example, suppose we wanted to define a rule that downscales water demand for manufacturing based on the number of days in a calendar month (ignoring leap years), as opposed to 12 equal segments of the year. We could write the following, say *daysinmonth.py*
+
+.. code-block:: python
+
+  # td_methods/daysinmonth.py
+  
+  import xarray as xr
+  
+  
+  def temporal_distribution(model):
+    """Temporal downscaling distribution based on days in calendar month"""
+	
+    days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    distribution = xr.DataArray(days_in_month, coords=dict(month=range(1, 13)) / 365
+	
+    return distribution
+
+Then, in the configuration file:
+
+.. code-block:: yaml
+
+  temporal_methods:
+    Manufacturing: daysinmonth
+
+The custom function should be named 'monthly_distribution' and accept a ``Tethys`` object as its only argument. It should return an xarray DataArray with at least a dimension named 'month', but could be also have dimensions 'year', 'lat', and 'lon'. The sums across the month axis should add to 1. The resulting distribution will be broadcast against the output from spatial downscaling.

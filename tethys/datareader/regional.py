@@ -1,6 +1,6 @@
 import os
 import gcamreader
-from tethys.utils.easy_query import easy_query
+from tethys.datareader.easy_query import easy_query
 
 
 def load_region_data(gcam_db, sectors, demand_type='withdrawals'):
