@@ -82,6 +82,9 @@ class Tethys:
         else:
             self.temporal_methods = {k.lower(): v for k, v in self.temporal_methods.items()}
 
+        if self.temporal_files is not None:
+            self.temporal_files = {k: os.path.join(self.root, v) for k, v in self.temporal_files.items()}
+
         self._parse_proxy_files()
 
     def _parse_proxy_files(self):
@@ -207,8 +210,8 @@ class Tethys:
             # handle constraint for entire supersector
             if supersector not in rules and supersector in self.inputs.sector.unique():
                 # detect if supersector uses different regions than the sectors, or is just the total
-                if not set(self.inputs.region[self.inputs.sector.isin(downscaled.sector.data)]).issubset(
-                        set(self.inputs.region[self.inputs.sector == supersector])):
+                if not set(self.inputs.region[self.inputs.sector == supersector]).issubset(
+                        set(self.inputs.region[self.inputs.sector.isin(downscaled.sector.data)])):
 
                     inputs = self.inputs[self.inputs.sector == supersector].set_index(
                         ['region', 'sector', 'year'])['value'].to_xarray().fillna(0).astype(np.float32)

@@ -199,7 +199,7 @@ Whether or not to compress the outputs. Defaults to true. This will use zlib lev
 
 downscaling_rules
 ^^^^^^^^^^^^^^^^^
-A mapping between water demand sectors and proxy variables. The simplest kind of entry is of the form ``sector: proxy``, like for the Municipal sector in the example below. When a sector is composed of multiple subsectors, a second layer of mappings is allowed (as with Livestock in the example below). The proxy can optionally be a list of variables.
+A mapping between water demand sectors and proxy variables. The simplest kind of entry is of the form ``sector: proxy``, like for the Municipal sector in the example below. The proxy can optionally be a list of variables that will be added together first. When a sector is composed of multiple subsectors, a second layer of mappings is allowed (as with Livestock in the example below). If the total sector has a total demand at a finer regional resolution (e.g., GCAM-USA livestock), that will be applied as a constraint on the total after downscaling by subsector at coarser regional resolution.
 
 .. code-block:: yaml
 
@@ -352,4 +352,4 @@ Then, in the configuration file:
   temporal_methods:
     Manufacturing: daysinmonth
 
-The custom function should be named 'monthly_distribution' and accept a ``Tethys`` object as its only argument. It should return an xarray DataArray with at least a dimension named 'month', but could be also have dimensions 'year', 'lat', and 'lon'. The sums across the month axis should add to 1. The resulting distribution will be broadcast against the output from spatial downscaling.
+The custom function should be named 'temporal_distribution' and accept a ``Tethys`` object as its only argument. It should return an xarray DataArray with at least a dimension named 'month', but could be also have dimensions 'year', 'lat', and 'lon'. The sums across the month axis should add to 1. The resulting distribution will be broadcast against the output from spatial downscaling.
