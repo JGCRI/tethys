@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>tethys.tdmethods.irrigation &mdash; tethys 2.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/tethys.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/getting_started.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> tethys
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to <strong>tethys</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../footer.html">Acknowledgement</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tethys</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>tethys.tdmethods.irrigation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for tethys.tdmethods.irrigation</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">tethys.datareader.gridded</span> <span class="kn">import</span> <span class="n">load_file</span>
+
+
+<div class="viewcode-block" id="temporal_distribution"><a class="viewcode-back" href="../../../tethys.html#tethys.tdmethods.irrigation.temporal_distribution">[docs]</a><span class="k">def</span> <span class="nf">temporal_distribution</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Temporal downscaling of irrigation water demand&quot;&quot;&quot;</span>
+
+    <span class="n">years</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">years</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">model</span><span class="o">.</span><span class="n">years</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">irr</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">temporal_files</span><span class="p">[</span><span class="s1">&#39;irr&#39;</span><span class="p">],</span> <span class="n">model</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">years</span><span class="p">,</span> <span class="n">regrid_method</span><span class="o">=</span><span class="s1">&#39;label&#39;</span><span class="p">)[</span><span class="s1">&#39;pirrww&#39;</span><span class="p">]</span>
+
+    <span class="n">irr_regions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">region</span><span class="p">[(</span><span class="n">model</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">sector</span> <span class="o">==</span> <span class="s1">&#39;Irrigation&#39;</span><span class="p">)</span> <span class="o">&amp;</span>
+                                      <span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">region_masks</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">data</span><span class="p">))]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+
+    <span class="n">region_masks</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">region_masks</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">irr_regions</span><span class="p">)</span>
+
+    <span class="n">irr_grouped</span> <span class="o">=</span> <span class="n">irr</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">region_masks</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">month_sums</span> <span class="o">=</span> <span class="n">irr_grouped</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">))</span>
+    <span class="n">year_sums</span> <span class="o">=</span> <span class="n">month_sums</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;month&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># avoid 0/0</span>
+
+    <span class="n">distribution</span> <span class="o">=</span> <span class="n">region_masks</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">month_sums</span> <span class="o">/</span> <span class="n">year_sums</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s1">&#39;region&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">distribution</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Battelle Memorial Institute.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

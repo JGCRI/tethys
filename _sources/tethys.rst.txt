@@ -1,53 +1,67 @@
 Tethys package
 ==============
 
-
 tethys.model
--------------------
+------------
 
 .. automodule:: tethys.model
    :members:
    :undoc-members:
    :show-inheritance:
 
-tethys.spatial_proxies
+tethys.datareader.gridded
+-------------------------
+
+.. automodule:: tethys.datareader.gridded
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tethys.datareader.maps
 ----------------------
 
-.. automodule:: tethys.spatial_proxies
+.. automodule:: tethys.datareader.maps
    :members:
    :undoc-members:
    :show-inheritance:
 
-tethys.temporal_downscaling
+tethys.datareader.regional
+--------------------------
+
+.. automodule:: tethys.datareader.regional
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tethys.datareader.easy_query
+----------------------------
+
+.. automodule:: tethys.datareader.easy_query
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tethys.tdmethods.domestic
+-------------------------
+
+.. automodule:: tethys.tdmethods.domestic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tethys.tdmethods.electricity
+----------------------------
+
+.. automodule:: tethys.tdmethods.electricity
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tethys.tdmethods.irrigation
 ---------------------------
 
-.. automodule:: tethys.temporal_downscaling
+.. automodule:: tethys.tdmethods.irrigation
    :members:
    :undoc-members:
    :show-inheritance:
 
-
-tethys.region_map
------------------
-
-.. automodule:: tethys.region_map
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-tethys.region_data
-------------------
-
-.. automodule:: tethys.region_data
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-tethys.utils.easy_query
------------------------
-
-.. automodule:: tethys.utils.easy_query
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -123,9 +123,14 @@
 <li class="toctree-l3"><a class="reference internal" href="#proxy-files">proxy_files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#map-files">map_files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#temporal-files">temporal_files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#temporal-methods">temporal_methods</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#generalization">Generalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#generalization">Generalization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#spatial-modifications">Spatial Modifications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#temporal-modifications">Temporal Modifications</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">API reference</a></li>
@@ -289,7 +294,7 @@
 <h4>Domestic/Municipal<a class="headerlink" href="#domestic-municipal" title="Permalink to this headline">¶</a></h4>
 <p>Temporal downscaling for the domestic/municipal sector follows the formula from <a class="reference external" href="https://doi.org/10.1029/2010WR009792">Wada et al. (2011)</a>, which uses monthly temperature and a regional amplitude coefficient to reproduce summer peaks. For each grid cell,</p>
 <div class="math">
-<p><img src="_images/math/673e75d7ec2aa23a96c2446d2fb0f663d9109198.png" alt="\text{demand}_\text{month} = \frac{\text{demand}_\text{year}}{12} \times \left(\frac{\text{temp}_\text{month} - \text{temp}_\text{mean}}{\text{temp}_\text{max} - \text{temp}_\text{min}}R_\text{cell} + 1\right)"/></p>
+<p><img src="_images/math/f5fd5b2e598ae25681bcc3f635979efe215621e0.png" alt="\frac{\text{demand}_\text{year}}{12} \times \left(\frac{\text{temp}_\text{month} - \text{temp}_\text{mean}}{\text{temp}_\text{max} - \text{temp}_\text{min}}R_\text{cell} + 1\right)"/></p>
 </div></div>
 <div class="section" id="electricity-generation">
 <h4>Electricity Generation<a class="headerlink" href="#electricity-generation" title="Permalink to this headline">¶</a></h4>
@@ -371,6 +376,9 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#temporal-files"><span class="std std-ref">temporal_files</span></a></p></td>
 <td><p>see details</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#temporal-methods"><span class="std std-ref">temporal_methods</span></a></p></td>
+<td><p>see details</p></td>
+</tr>
 </tbody>
 </table>
 <div class="section" id="years">
@@ -431,7 +439,7 @@
 </div>
 <div class="section" id="downscaling-rules">
 <h3>downscaling_rules<a class="headerlink" href="#downscaling-rules" title="Permalink to this headline">¶</a></h3>
-<p>A mapping between water demand sectors and proxy variables. The simplest kind of entry is of the form <code class="docutils literal notranslate"><span class="pre">sector:</span> <span class="pre">proxy</span></code>, like for the Municipal sector in the example below. When a sector is composed of multiple subsectors, a second layer of mappings is allowed (as with Livestock in the example below). The proxy can optionally be a list of variables.</p>
+<p>A mapping between water demand sectors and proxy variables. The simplest kind of entry is of the form <code class="docutils literal notranslate"><span class="pre">sector:</span> <span class="pre">proxy</span></code>, like for the Municipal sector in the example below. The proxy can optionally be a list of variables that will be added together first. When a sector is composed of multiple subsectors, a second layer of mappings is allowed (as with Livestock in the example below). If the total sector has a total demand at a finer regional resolution (e.g., GCAM-USA livestock), that will be applied as a constraint on the total after downscaling by subsector at coarser regional resolution.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">downscaling_rules</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">Municipal</span><span class="p">:</span><span class="w">   </span><span class="l l-Scalar l-Scalar-Plain">Population</span>
 <span class="w">  </span><span class="nt">Livestock</span><span class="p">:</span>
@@ -494,17 +502,28 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="temporal-methods">
+<h3>temporal_methods<a class="headerlink" href="#temporal-methods" title="Permalink to this headline">¶</a></h3>
+<p>Mapping of sector name to downscaling method in the <em>tdmethods</em> module. If not specified, defaults for GCAM sectors are used. If specified, sectors in the mapping will use uniform downscaling as a fallback. See <a class="reference internal" href="#temporal-modifications"><span class="std std-ref">Temporal Modifications</span></a>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">temporal_methods</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">Municipal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">domestic</span>
+<span class="w">  </span><span class="nt">Electricity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">electricity</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="generalization">
 <h2>Generalization<a class="headerlink" href="#generalization" title="Permalink to this headline">¶</a></h2>
 <p><strong>tethys</strong> was developed with consideration for GCAM’s breakdown of water demand, but was designed to be as flexible as possible with support for user-specified downscaling configurations.</p>
+<div class="section" id="spatial-modifications">
+<h3>Spatial Modifications<a class="headerlink" href="#spatial-modifications" title="Permalink to this headline">¶</a></h3>
 <p>Fundamentally, proxy-based spatial downscaling requires</p>
 <ul class="simple">
 <li><p>region-scale input data (to be downscaled)</p></li>
 <li><p>gridded proxy data</p></li>
 <li><p>a map defining what grid cells belong to each region</p></li>
 </ul>
-<p>The configuration file provides an <span class="xref std std-ref">interface</span> for describing the relationship between input sectors and proxy variables, which enables <strong>tethys</strong> to be compatible with versions of GCAM using different breakdowns of water demand (for example, different crop types), but also allows it to downscale water demand data from other models and sources. This flexibility makes it easy to run <strong>tethys</strong> with new input and proxy datasets as they become available.</p>
+<p>The configuration file provides an <a class="reference internal" href="#downscaling-rules"><span class="std std-ref">interface</span></a> for describing the relationship between input sectors and proxy variables, which enables <strong>tethys</strong> to be compatible with versions of GCAM using different breakdowns of water demand (for example, different crop types), but also allows it to downscale water demand data from other models and sources. This flexibility makes it easy to run <strong>tethys</strong> with new input and proxy datasets as they become available.</p>
 <p>Suppose we had region-scale Municipal water demand data by income decile, as well as Population datasets broken out similarly. Then this could be represented in the config file with something like</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">downscaling_rules</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">Municipal</span><span class="p">:</span>
@@ -525,6 +544,32 @@
 <span class="w">                </span><span class="nv">Population_d6</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Population_d7</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Population_d8</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Population_d9</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Population_d10</span><span class="p p-Indicator">]</span>
 <span class="w">    </span><span class="nt">years</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2005</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2010</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2015</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2020</span><span class="p p-Indicator">]</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="temporal-modifications">
+<h3>Temporal Modifications<a class="headerlink" href="#temporal-modifications" title="Permalink to this headline">¶</a></h3>
+<p><strong>tethys</strong> also has a mechanism for defining custom temporal downscaling rules. The <em>tdmethods</em> folder contains functions that take the <cite>Tethys</cite> object as argument and output a monthly distribution. You can add your own module that defines a <cite>temporal_distribution</cite> function, and then use the <cite>temporal_methods</cite> setting to indicate what method should be used for which sector.</p>
+<p>As a simple example, suppose we wanted to define a rule that downscales water demand for manufacturing based on the number of days in a calendar month (ignoring leap years), as opposed to 12 equal segments of the year. We could write the following, say <em>daysinmonth.py</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># td_methods/daysinmonth.py</span>
+
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+
+<span class="k">def</span> <span class="nf">temporal_distribution</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Temporal downscaling distribution based on days in calendar month&quot;&quot;&quot;</span>
+
+  <span class="n">days_in_month</span> <span class="o">=</span> <span class="p">[</span><span class="mi">31</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">]</span>
+  <span class="n">distribution</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">days_in_month</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">month</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">13</span><span class="p">))</span> <span class="o">/</span> <span class="mi">365</span>
+
+  <span class="k">return</span> <span class="n">distribution</span>
+</pre></div>
+</div>
+<p>Then, in the configuration file:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">temporal_methods</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">Manufacturing</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">daysinmonth</span>
+</pre></div>
+</div>
+<p>The custom function should be named ‘temporal_distribution’ and accept a <code class="docutils literal notranslate"><span class="pre">Tethys</span></code> object as its only argument. It should return an xarray DataArray with at least a dimension named ‘month’, but could be also have dimensions ‘year’, ‘lat’, and ‘lon’. The sums across the month axis should add to 1. The resulting distribution will be broadcast against the output from spatial downscaling.</p>
 </div>
 </div>
 </div>

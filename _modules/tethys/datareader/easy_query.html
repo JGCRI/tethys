@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>tethys.utils.easy_query &mdash; tethys 2.0.0 documentation</title>
+  <title>tethys.datareader.easy_query &mdash; tethys 2.0.0 documentation</title>
   
 
   
@@ -151,7 +151,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>tethys.utils.easy_query</li>
+      <li>tethys.datareader.easy_query</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -166,11 +166,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for tethys.utils.easy_query</h1><div class="highlight"><pre>
+  <h1>Source code for tethys.datareader.easy_query</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">gcamreader</span>
 
 
-<div class="viewcode-block" id="easy_query"><a class="viewcode-back" href="../../../tethys.html#tethys.utils.easy_query.easy_query">[docs]</a><span class="k">def</span> <span class="nf">easy_query</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">year_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="easy_query"><a class="viewcode-back" href="../../../tethys.html#tethys.datareader.easy_query.easy_query">[docs]</a><span class="k">def</span> <span class="nf">easy_query</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">year_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a query for a GCAM database</span>
 
 <span class="sd">    kwargs act as filters on nodes, eg. &quot;sector=&#39;Beef&#39;&quot; is converted to the xpath &quot;[@type=&#39;sector&#39; and @name=&#39;Beef&#39;]&quot;</span>
@@ -212,7 +212,7 @@
     <span class="k">return</span> <span class="n">gcamreader</span><span class="o">.</span><span class="n">Query</span><span class="p">(</span><span class="n">querystr</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="handle_filter"><a class="viewcode-back" href="../../../tethys.html#tethys.utils.easy_query.handle_filter">[docs]</a><span class="k">def</span> <span class="nf">handle_filter</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="handle_filter"><a class="viewcode-back" href="../../../tethys.html#tethys.datareader.easy_query.handle_filter">[docs]</a><span class="k">def</span> <span class="nf">handle_filter</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Handle a kwarg for build_query</span>
 
 <span class="sd">    :param key: xml node @type attribute to match</span>
@@ -250,7 +250,7 @@
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;[@type=&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39;]&quot;</span></div>
 
 
-<div class="viewcode-block" id="parse_name"><a class="viewcode-back" href="../../../tethys.html#tethys.utils.easy_query.parse_name">[docs]</a><span class="k">def</span> <span class="nf">parse_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="parse_name"><a class="viewcode-back" href="../../../tethys.html#tethys.datareader.easy_query.parse_name">[docs]</a><span class="k">def</span> <span class="nf">parse_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    convert a string to an xpath condition</span>
 <span class="sd">    the basic case converts &quot;foo&quot; to &quot;@name=&#39;foo&#39;&quot;</span>
@@ -281,7 +281,7 @@
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;@name=&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span></div>
 
 
-<div class="viewcode-block" id="get_year_axis"><a class="viewcode-back" href="../../../tethys.html#tethys.utils.easy_query.get_year_axis">[docs]</a><span class="k">def</span> <span class="nf">get_year_axis</span><span class="p">(</span><span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="get_year_axis"><a class="viewcode-back" href="../../../tethys.html#tethys.datareader.easy_query.get_year_axis">[docs]</a><span class="k">def</span> <span class="nf">get_year_axis</span><span class="p">(</span><span class="n">variable</span><span class="p">):</span>
     <span class="c1"># guess the year axis name</span>
     <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;demand-physical&#39;</span><span class="p">,</span> <span class="s1">&#39;physical-output&#39;</span><span class="p">,</span> <span class="s1">&#39;price-paid&#39;</span><span class="p">,</span> <span class="s1">&#39;carbon-content&#39;</span><span class="p">,</span> <span class="s1">&#39;IO-coefficient&#39;</span><span class="p">]:</span>
         <span class="k">return</span> <span class="s1">&#39;vintage&#39;</span>

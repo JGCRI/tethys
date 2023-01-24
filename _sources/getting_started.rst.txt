@@ -19,26 +19,13 @@ While **tethys** is designed to integrate seamlessly with GCAM, it has the abili
 
 Installation
 ------------
-First of all you'll need to have `Python <https://www.python.org/downloads/>`_ installed.
+As a prerequisite, you'll need to have `Python <https://www.python.org/downloads/>`_ installed, and if you plan on querying a GCAM database, `Java <https://openjdk.org>`_ must be installed and added to your path.
 
-If you plan on querying a GCAM database, you'll need `Java <https://openjdk.org>`_ installed and added to your path.
+**tethys** can be installed from GitHub using pip::
 
-
-Currently, **tethys** can be cloned from https://github.com/JGCRI/tethys using::
-
-    $ git clone https://github.com/JGCRI/tethys
-
-The next commands need to be run from within the tethys directory you just downloaded, so change directory with::
-
-    $ cd tethys
-
-Once downloaded, install as a Python package by running *setup.py* from the command line::
-
-    $ python setup.py install
+  pip install git+https://github.com/JGCRI/tethys@dev
 
 This will automatically install the dependencies. In order to avoid package version conflicts, consider using a virtual environment.
-
-In the future, easy installation will be available via pip.
 
 
 Example Data
@@ -51,8 +38,7 @@ Verify the installation was successful by running the following in Python
 
 .. code-block:: python
 
-  from tethys import run_model
+  import tethys
 
-  m = run_model('tethys\example\config_minimal.yml')
+  result = tethys.run_model('tethys\example\config_example.yml')
 
-   
