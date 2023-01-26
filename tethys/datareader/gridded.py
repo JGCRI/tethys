@@ -136,7 +136,7 @@ def regrid(ds, target_resolution, method='extensive'):
     r = lcm // ds.lat.size
     s = lcm // target_lat_size
 
-    ds = ds.chunk(chunks=dict(lat=int(360*s/r), lon=int(720*s/r)))  # prevent huge chunks when r is big
+    #ds = ds.chunk(chunks=dict(lat=int(360*s/r), lon=int(720*s/r)))  # prevent huge chunks when r is big
 
     if method == 'label':
         ds = ds.isel(lon=np.arange(ds.lon.size).repeat(r)).coarsen(lon=s).max()

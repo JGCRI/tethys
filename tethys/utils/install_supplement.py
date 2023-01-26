@@ -16,8 +16,9 @@ class InstallSupplement:
     """
 
     # URL for DOI minted example data hosted on Zenodo
-    DATA_VERSION_URLS = {'1.3.0': 'https://zenodo.org/record/4780604/files/example_v1_3_0.zip?download=1',
-                         '1.3.1': 'https://zenodo.org/record/6399117/files/example_v1_3_1.zip?download=1'}
+    DATA_VERSION_URLS = {
+        '2.0.0': 'https://zenodo.org/record/7569652/files/example.zip?download=1'
+    }
 
     def __init__(self, example_data_directory):
 
@@ -39,7 +40,7 @@ class InstallSupplement:
             raise(msg.format(current_version))
 
         # retrieve content from URL
-        print("Downloading example data for Tethys version {}...".format(current_version))
+        print(f"Downloading example data for Tethys version {current_version}. This might take a few minutes.")
         r = requests.get(data_link)
 
         with zipfile.ZipFile(BytesIO(r.content)) as zipped:
@@ -50,7 +51,7 @@ class InstallSupplement:
                 zipped.extract(f, self.example_data_directory)
 
 
-def get_package_data(example_data_directory):
+def get_example_data(example_data_directory=None):
     """Download and unpack example data supplement from Zenodo that matches the current installed
     Tethys distribution.
 
@@ -61,6 +62,9 @@ def get_package_data(example_data_directory):
     :type example_data_directory:               str
 
     """
+
+    if example_data_directory is None:
+        example_data_directory = os.path.dirname(os.path.dirname(__file__))  # tethys package directory
 
     zen = InstallSupplement(example_data_directory)
 

@@ -22,7 +22,7 @@ class Tethys:
     """Model wrapper for Tethys"""
 
     def __init__(self, config_file=None, years=None, resolution=0.125, demand_type='withdrawals',
-                 perform_temporal=False, gcam_db=None, csv=None, output_file=None, compress_outputs=True,
+                 perform_temporal=False, gcam_db=None, csv=None, output_file=None,
                  downscaling_rules=None, proxy_files=None, map_files=None, temporal_files=None, temporal_methods=None):
         """ # TODO
         """
@@ -43,7 +43,6 @@ class Tethys:
 
         # outputs
         self.output_file = output_file
-        self.compress_outputs = compress_outputs
 
         self.downscaling_rules = downscaling_rules
 
@@ -236,16 +235,12 @@ class Tethys:
 
         if self.output_file is not None:
             print('Writing Outputs')
-            if self.compress_outputs:
-                encoding = {variable: {'zlib': True, 'complevel': 5} for variable in self.outputs}
-                self.outputs.to_netcdf(os.path.join(self.root, self.output_file), encoding=encoding)
-            else:
-                self.outputs.to_netcdf(os.path.join(self.root, self.output_file))
+            encoding = {variable: {'zlib': True, 'complevel': 5} for variable in self.outputs}
+            self.outputs.to_netcdf(os.path.join(self.root, self.output_file), encoding=encoding)
 
 
 def run_model(config_file):
     config_file = os.path.join(os.getcwd(), config_file)
-    print('Tethys configuration:')
-    m = Tethys(config_file=config_file)
-    m.run_model()
-    return m
+    result = Tethys(config_file=config_file)
+    result.run_model()
+    return result
