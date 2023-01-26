@@ -116,7 +116,6 @@ Option                   Description
 :ref:`gcam_db`           relative path to a GCAM database
 :ref:`csv`               relative path to csv file containing inputs
 :ref:`output_file`       name of file to write outputs to
-:ref:`compress_outputs`  choice between "true" (default) or "false"
 :ref:`downscaling_rules` see details
 :ref:`proxy_files`       see details
 :ref:`map_files`         see details
@@ -183,18 +182,11 @@ output_file
 ^^^^^^^^^^^
 Filepath in which outputs will be written. If none (default), outputs will not be saved, but they can be interacted with in-memory via the outputs attribute of the Tethys class. If the path is not absolute, it will be relative to the directory containing the config file. This file will be overwritten if it exist already and created if it doesn't, but the directory containing it must already exist.
 
+.. Note:: **tethys** contains a simple output writer for convenience, but for computationally expensive configurations (large number of sectors and regions at high resolution) that will be evaluated in parallel, you may be better off writing a custom function to save your outputs. The ``outputs`` object is a Dask-backed Xarray Dataset, and saving the entire thing to a single file can sometimes cause the scheduler to trip over itself or use resources inefficiently. Writing each variable or year to its own file can coax the scheduler into behaving better, but this performance depends a lot on your system and the complexity of the downscaling configuration.
+
 .. code-block:: yaml
 
   output_file: outputs/tethys_outputs.nc  # the folder "<config_file_dir>/outputs" must already exist
-
-
-compress_outputs
-^^^^^^^^^^^^^^^^
-Whether or not to compress the outputs. Defaults to true. This will use zlib level 5, but you can have more customization over this by interacting directly with the outputs attribute of the Tethys class.
-
-.. code-block:: yaml
-
-  compress_outputs: false  # because we want our outputs files to be really big for some reason
 
 
 downscaling_rules

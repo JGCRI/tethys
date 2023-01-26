@@ -199,16 +199,28 @@
 </pre></div>
 </div>
 <p>This will automatically install the dependencies. In order to avoid package version conflicts, consider using a virtual environment.</p>
+<p>Try importing <strong>tethys</strong> to confirm that installation was succesful:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tethys</span>
+
+<span class="n">tethys</span><span class="o">.</span><span class="n">__version__</span>  <span class="c1"># should print &#39;2.0.0&#39;</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="example-data">
 <h2>Example Data<a class="headerlink" href="#example-data" title="Permalink to this headline">¶</a></h2>
+<p>Example data and configurations can be downloaded from Zenodo <a class="reference external" href="https://doi.org/10.5281/zenodo.7569651">here</a>, or by using the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tethys</span><span class="o">.</span><span class="n">get_example_data</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The download decompresses to about 4.5GB. By default, it will make a directory called <code class="docutils literal notranslate"><span class="pre">example</span></code> at the root of the <strong>tethys</strong> pacakge, but you can specify another path.</p>
 </div>
 <div class="section" id="run">
 <h2>Run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h2>
-<p>Verify the installation was successful by running the following in Python</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tethys</span>
+<p>With the example data downloaded, a simple configuration can be run</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># assuming you downloaded to the default location</span>
+<span class="n">config_file</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="vm">__file__</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;__init__.py&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;example</span><span class="se">\\</span><span class="s1">config_example.yml&#39;</span>
 
-<span class="n">result</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="n">run_model</span><span class="p">(</span><span class="s1">&#39;tethys\example\config_example.yml&#39;</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="n">run_model</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

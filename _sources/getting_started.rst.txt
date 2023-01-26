@@ -27,18 +27,35 @@ As a prerequisite, you'll need to have `Python <https://www.python.org/downloads
 
 This will automatically install the dependencies. In order to avoid package version conflicts, consider using a virtual environment.
 
-
-Example Data
-------------
-
-
-Run
----
-Verify the installation was successful by running the following in Python
+Try importing **tethys** to confirm that installation was succesful:
 
 .. code-block:: python
 
   import tethys
+  
+  tethys.__version__  # should print '2.0.0'
 
-  result = tethys.run_model('tethys\example\config_example.yml')
+
+Example Data
+------------
+
+Example data and configurations can be downloaded from Zenodo `here <https://doi.org/10.5281/zenodo.7569651>`_, or by using the following:
+
+.. code-block:: python
+  
+  tethys.get_example_data()
+  
+The download decompresses to about 4.5GB. By default, it will make a directory called ``example`` at the root of the **tethys** pacakge, but you can specify another path.
+
+
+Run
+---
+With the example data downloaded, a simple configuration can be run
+
+.. code-block:: python
+
+  # assuming you downloaded to the default location
+  config_file = tethys.__file__.strip('__init__.py') + 'example\\config_example.yml'
+
+  result = tethys.run_model(config_file)
 

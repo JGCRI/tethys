@@ -118,7 +118,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#gcam-db">gcam_db</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#csv">csv</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#output-file">output_file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#compress-outputs">compress_outputs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#downscaling-rules">downscaling_rules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#proxy-files">proxy_files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#map-files">map_files</a></li>
@@ -361,22 +360,19 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#output-file"><span class="std std-ref">output_file</span></a></p></td>
 <td><p>name of file to write outputs to</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#compress-outputs"><span class="std std-ref">compress_outputs</span></a></p></td>
-<td><p>choice between “true” (default) or “false”</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#downscaling-rules"><span class="std std-ref">downscaling_rules</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#downscaling-rules"><span class="std std-ref">downscaling_rules</span></a></p></td>
 <td><p>see details</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#proxy-files"><span class="std std-ref">proxy_files</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#proxy-files"><span class="std std-ref">proxy_files</span></a></p></td>
 <td><p>see details</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#map-files"><span class="std std-ref">map_files</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#map-files"><span class="std std-ref">map_files</span></a></p></td>
 <td><p>see details</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#temporal-files"><span class="std std-ref">temporal_files</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#temporal-files"><span class="std std-ref">temporal_files</span></a></p></td>
 <td><p>see details</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#temporal-methods"><span class="std std-ref">temporal_methods</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#temporal-methods"><span class="std std-ref">temporal_methods</span></a></p></td>
 <td><p>see details</p></td>
 </tr>
 </tbody>
@@ -426,14 +422,11 @@
 <div class="section" id="output-file">
 <h3>output_file<a class="headerlink" href="#output-file" title="Permalink to this headline">¶</a></h3>
 <p>Filepath in which outputs will be written. If none (default), outputs will not be saved, but they can be interacted with in-memory via the outputs attribute of the Tethys class. If the path is not absolute, it will be relative to the directory containing the config file. This file will be overwritten if it exist already and created if it doesn’t, but the directory containing it must already exist.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>tethys</strong> contains a simple output writer for convenience, but for computationally expensive configurations (large number of sectors and regions at high resolution) that will be evaluated in parallel, you may be better off writing a custom function to save your outputs. The <code class="docutils literal notranslate"><span class="pre">outputs</span></code> object is a Dask-backed Xarray Dataset, and saving the entire thing to a single file can sometimes cause the scheduler to trip over itself or use resources inefficiently. Writing each variable or year to its own file can coax the scheduler into behaving better, but this performance depends a lot on your system and the complexity of the downscaling configuration.</p>
+</div>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">output_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputs/tethys_outputs.nc</span><span class="w">  </span><span class="c1"># the folder &quot;&lt;config_file_dir&gt;/outputs&quot; must already exist</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="compress-outputs">
-<h3>compress_outputs<a class="headerlink" href="#compress-outputs" title="Permalink to this headline">¶</a></h3>
-<p>Whether or not to compress the outputs. Defaults to true. This will use zlib level 5, but you can have more customization over this by interacting directly with the outputs attribute of the Tethys class.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">compress_outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">  </span><span class="c1"># because we want our outputs files to be really big for some reason</span>
 </pre></div>
 </div>
 </div>
