@@ -84,6 +84,9 @@ class Tethys:
         if self.temporal_files is not None:
             self.temporal_files = {k: os.path.join(self.root, v) for k, v in self.temporal_files.items()}
 
+        if self.output_file is not None:
+            self.output_file = os.path.join(self.root, self.output_file)
+
         self._parse_proxy_files()
 
     def _parse_proxy_files(self):
@@ -236,7 +239,7 @@ class Tethys:
         if self.output_file is not None:
             print('Writing Outputs')
             encoding = {variable: {'zlib': True, 'complevel': 5} for variable in self.outputs}
-            self.outputs.to_netcdf(os.path.join(self.root, self.output_file), encoding=encoding)
+            self.outputs.to_netcdf(self.output_file, encoding=encoding)
 
 
 def run_model(config_file):
