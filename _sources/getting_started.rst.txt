@@ -55,7 +55,51 @@ With the example data downloaded, a simple configuration can be run
 .. code-block:: python
 
   # assuming you downloaded to the default location
-  config_file = tethys.__file__.strip('__init__.py') + 'example\\config_example.yml'
+  config_file = tethys.__file__.strip('__init__.py') + 'example/config_example.yml'
 
   result = tethys.run_model(config_file)
+
+
+Plotting
+--------
+**tethys** makes use of the `Xarray <https://docs.xarray.dev/en/stable/index.html>`_ package, which provides convenient plotting functionality.
+
+.. code-block:: python
+  
+  from matplotlib import colors, pyplot as plt
+  
+  # higher dpi in order to see resolution
+  plt.figure(figsize=(10, 6), dpi=300)
+  
+  # powernorm the color palette in order to see more detail at the low end
+  result.outputs.Municipal.sel(year=2010).plot(norm=colors.PowerNorm(0.25), cmap='viridis_r')
+  
+  plt.show()
+
+
+Dashboard
+---------
+**tethys** uses `Dask <https://docs.dask.org/en/stable/>`_ for parallelization and to lazily compute results. You can launch the dask distributed client in order to view dashboard and monitor the progress of large workflows.
+
+.. note:: viewing the dashboard requires a few other dependencies not automatically installed by **tethys**
+
+.. code-block:: python
+  
+  from dask.distributed import Client
+  
+  # this configuration may need to be different depending on your machine
+  client = Client(threads_per_worker=8, n_workers=1, processes=False, memory_limit='8GB')
+  
+  # link to view the dask dashboard in your browser, probably localhost:8787
+  client.dashboard_link
+  
+  # run tethys AFTER launching the client
+  config_file = tethys.__file__.strip('__init__.py') + 'example/config_demeter.yml'
+  result = tethys.run_model(config_file)
+  
+  # this configuration does not write outputs to a file,
+  # so plots are lazily computed when requested
+  result.outputs.Wheat.sel(year=2030).plot(norm=colors.PowerNorm(0.25), cmap='viridis_r')
+  plt.show()
+
 

@@ -121,8 +121,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#downscaling-rules">downscaling_rules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#proxy-files">proxy_files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#map-files">map_files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#temporal-files">temporal_files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#temporal-methods">temporal_methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#temporal-files">temporal_files</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#generalization">Generalization</a><ul>
@@ -361,19 +361,19 @@
 <td><p>name of file to write outputs to</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#downscaling-rules"><span class="std std-ref">downscaling_rules</span></a></p></td>
-<td><p>see details</p></td>
+<td><p>mapping from water demand sectors to proxy variables</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#proxy-files"><span class="std std-ref">proxy_files</span></a></p></td>
-<td><p>see details</p></td>
+<td><p>mapping of spatial proxy files to their years/variables</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#map-files"><span class="std std-ref">map_files</span></a></p></td>
-<td><p>see details</p></td>
+<td><p>list of files containing region maps</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#temporal-files"><span class="std std-ref">temporal_files</span></a></p></td>
-<td><p>see details</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#temporal-methods"><span class="std std-ref">temporal_methods</span></a></p></td>
+<td><p>mapping of sector to temporal downscaling method</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#temporal-methods"><span class="std std-ref">temporal_methods</span></a></p></td>
-<td><p>see details</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#temporal-files"><span class="std std-ref">temporal_files</span></a></p></td>
+<td><p>files that will be accessible during temporal downscaling</p></td>
 </tr>
 </tbody>
 </table>
@@ -486,21 +486,21 @@
 </pre></div>
 </div>
 </div>
-<div class="section" id="temporal-files">
-<h3>temporal_files<a class="headerlink" href="#temporal-files" title="Permalink to this headline">¶</a></h3>
-<p>Mapping of files that will be accessible to temporal downscaling methods.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">temporal_files</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">HDD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/temporal/HDD_monthly.nc</span>
-<span class="w">  </span><span class="nt">CDD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/temporal/CDD_monthly.nc</span>
-</pre></div>
-</div>
-</div>
 <div class="section" id="temporal-methods">
 <h3>temporal_methods<a class="headerlink" href="#temporal-methods" title="Permalink to this headline">¶</a></h3>
 <p>Mapping of sector name to downscaling method in the <em>tdmethods</em> module. If not specified, defaults for GCAM sectors are used. If specified, sectors in the mapping will use uniform downscaling as a fallback. See <a class="reference internal" href="#temporal-modifications"><span class="std std-ref">Temporal Modifications</span></a>.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">temporal_methods</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">Municipal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">domestic</span>
 <span class="w">  </span><span class="nt">Electricity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">electricity</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="temporal-files">
+<h3>temporal_files<a class="headerlink" href="#temporal-files" title="Permalink to this headline">¶</a></h3>
+<p>Mapping of files that will be accessible to temporal downscaling methods.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">temporal_files</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">HDD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/temporal/HDD_monthly.nc</span>
+<span class="w">  </span><span class="nt">CDD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/temporal/CDD_monthly.nc</span>
 </pre></div>
 </div>
 </div>

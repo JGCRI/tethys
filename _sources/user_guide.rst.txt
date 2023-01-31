@@ -106,9 +106,9 @@ Configuration File
 ------------------
 **tethys** uses a `YAML <https://yaml.org/spec/1.2.2/>`_ configuration file. The options in this file correspond to the arguments passed to the :ref:`Tethys class <tethys.model>`. Options not present in the config file will use the default. An overview is provided in the following table, with more details and examples below.
 
-======================== =======================================================
+======================== =========================================================
 Option                   Description
-======================== =======================================================
+======================== =========================================================
 :ref:`years`             list of years to be included spatial downscaling
 :ref:`resolution`        resolution in degrees for spatial downscaling
 :ref:`demand_type`       choice between "withdrawals" (default) or "consumption"
@@ -116,12 +116,12 @@ Option                   Description
 :ref:`gcam_db`           relative path to a GCAM database
 :ref:`csv`               relative path to csv file containing inputs
 :ref:`output_file`       name of file to write outputs to
-:ref:`downscaling_rules` see details
-:ref:`proxy_files`       see details
-:ref:`map_files`         see details
-:ref:`temporal_files`    see details
-:ref:`temporal_methods`  see details
-======================== =======================================================
+:ref:`downscaling_rules` mapping from water demand sectors to proxy variables
+:ref:`proxy_files`       mapping of spatial proxy files to their years/variables
+:ref:`map_files`         list of files containing region maps
+:ref:`temporal_methods`  mapping of sector to temporal downscaling method
+:ref:`temporal_files`    files that will be accessible during temporal downscaling
+======================== =========================================================
 
 
 years
@@ -254,17 +254,6 @@ List of paths to map files. These should be geotiffs with an attribute called 'n
   map_files: [data/maps/regions.tif, data/maps/regionbasins.tif]
 
 
-
-temporal_files
-^^^^^^^^^^^^^^
-Mapping of files that will be accessible to temporal downscaling methods.
-
-.. code-block:: yaml
-
-  temporal_files:
-    HDD: data/temporal/HDD_monthly.nc
-    CDD: data/temporal/CDD_monthly.nc
-
 temporal_methods
 ^^^^^^^^^^^^^^^^
 Mapping of sector name to downscaling method in the *tdmethods* module. If not specified, defaults for GCAM sectors are used. If specified, sectors in the mapping will use uniform downscaling as a fallback. See :ref:`Temporal Modifications`.
@@ -275,6 +264,16 @@ Mapping of sector name to downscaling method in the *tdmethods* module. If not s
     Municipal: domestic
     Electricity: electricity
 	
+
+temporal_files
+^^^^^^^^^^^^^^
+Mapping of files that will be accessible to temporal downscaling methods.
+
+.. code-block:: yaml
+
+  temporal_files:
+    HDD: data/temporal/HDD_monthly.nc
+    CDD: data/temporal/CDD_monthly.nc
 
 
 Generalization

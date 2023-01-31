@@ -102,6 +102,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example-data">Example Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run">Run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plotting">Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dashboard">Dashboard</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
@@ -218,9 +220,50 @@
 <h2>Run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h2>
 <p>With the example data downloaded, a simple configuration can be run</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># assuming you downloaded to the default location</span>
-<span class="n">config_file</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="vm">__file__</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;__init__.py&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;example</span><span class="se">\\</span><span class="s1">config_example.yml&#39;</span>
+<span class="n">config_file</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="vm">__file__</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;__init__.py&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;example/config_example.yml&#39;</span>
 
 <span class="n">result</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="n">run_model</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="plotting">
+<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h2>
+<p><strong>tethys</strong> makes use of the <a class="reference external" href="https://docs.xarray.dev/en/stable/index.html">Xarray</a> package, which provides convenient plotting functionality.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colors</span><span class="p">,</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># higher dpi in order to see resolution</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+<span class="c1"># powernorm the color palette in order to see more detail at the low end</span>
+<span class="n">result</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">Municipal</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2010</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="n">colors</span><span class="o">.</span><span class="n">PowerNorm</span><span class="p">(</span><span class="mf">0.25</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis_r&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="dashboard">
+<h2>Dashboard<a class="headerlink" href="#dashboard" title="Permalink to this headline">¶</a></h2>
+<p><strong>tethys</strong> uses <a class="reference external" href="https://docs.dask.org/en/stable/">Dask</a> for parallelization and to lazily compute results. You can launch the dask distributed client in order to view dashboard and monitor the progress of large workflows.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>viewing the dashboard requires a few other dependencies not automatically installed by <strong>tethys</strong></p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dask.distributed</span> <span class="kn">import</span> <span class="n">Client</span>
+
+<span class="c1"># this configuration may need to be different depending on your machine</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="n">threads_per_worker</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">n_workers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">memory_limit</span><span class="o">=</span><span class="s1">&#39;8GB&#39;</span><span class="p">)</span>
+
+<span class="c1"># link to view the dask dashboard in your browser, probably localhost:8787</span>
+<span class="n">client</span><span class="o">.</span><span class="n">dashboard_link</span>
+
+<span class="c1"># run tethys AFTER launching the client</span>
+<span class="n">config_file</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="vm">__file__</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;__init__.py&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;example/config_demeter.yml&#39;</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="n">run_model</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+
+<span class="c1"># this configuration does not write outputs to a file,</span>
+<span class="c1"># so plots are lazily computed when requested</span>
+<span class="n">result</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">Wheat</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2030</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="n">colors</span><span class="o">.</span><span class="n">PowerNorm</span><span class="p">(</span><span class="mf">0.25</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis_r&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
