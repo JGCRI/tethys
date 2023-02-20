@@ -1,0 +1,23 @@
+# Basic example config file for Tethys
+
+# Project level settings
+years: [2010, 2015, 2020]
+resolution: 1
+demand_type: withdrawals
+
+# csv input
+csv: data.csv
+
+# dictionary of proxy files and promised variables and years
+proxy_files:
+  population_{year}.tif:
+    variables: Population
+    years: [2010, 2020]
+
+# mapping of inputs sectors to proxies
+downscaling_rules:
+  Municipal: Population
+
+# list of map files
+map_files:
+  - map.tif

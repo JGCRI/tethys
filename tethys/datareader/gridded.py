@@ -97,7 +97,7 @@ def percent_to_area(ds):
 
     # formula for total grid cell area (km^2) based on latitude and cell resolution
     cell_areas = xr.DataArray(np.cos(np.radians(ds.lat)) * (111.32 * 110.57) * source_resolution * source_resolution,
-                              coords=dict(lat=ds.lat))
+                              coords=dict(lat=ds.lat)).astype(np.float32)
 
     return ds * cell_areas
 
