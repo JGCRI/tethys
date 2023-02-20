@@ -202,8 +202,8 @@ class Tethys:
                  for sector, proxy in rules.items()}
             ).to_array(dim='sector')
 
-            inputs = self.inputs[self.inputs.sector.isin(proxies.sector.data)].set_index(
-                ['region', 'sector', 'year'])['value'].to_xarray().fillna(0).astype(np.float32)
+            inputs = self.inputs[self.inputs.sector.isin(proxies.sector.data)].groupby(
+                ['region', 'sector', 'year'])['value'].sum().to_xarray().fillna(0).astype(np.float32)
 
             region_masks = self.region_masks.sel(region=inputs.region)
 

@@ -102,6 +102,14 @@ def percent_to_area(ds):
     return ds * cell_areas
 
 
+def set_global_coords(ds, resolution):
+    offset = resolution / 2
+    ds['lat'] = np.linspace(90 - offset, -90 + offset, round(180 / resolution))
+    ds['lon'] = np.linspace(-180 + offset, 180 - offset, round(360 / resolution))
+
+    return ds
+
+
 def pad_global(ds):
     """pad inputs to global resolution
 
@@ -117,6 +125,8 @@ def pad_global(ds):
     ds = ds.pad(lat=(lat_offset, round(180 / source_resolution) - lat_offset - ds.lat.size),
                 lon=(lon_offset, round(360 / source_resolution) - lon_offset - ds.lon.size),
                 constant_values=0)
+
+    ds = set_global_coords(ds, source_resolution)
 
     return ds
 
@@ -136,8 +146,6 @@ def regrid(ds, target_resolution, method='extensive'):
     r = lcm // ds.lat.size
     s = lcm // target_lat_size
 
-    #ds = ds.chunk(chunks=dict(lat=int(360*s/r), lon=int(720*s/r)))  # prevent huge chunks when r is big
-
     if method == 'label':
         ds = ds.isel(lon=np.arange(ds.lon.size).repeat(r)).coarsen(lon=s).max()
         ds = ds.isel(lat=np.arange(ds.lat.size).repeat(r)).coarsen(lat=s).max()
@@ -150,9 +158,7 @@ def regrid(ds, target_resolution, method='extensive'):
             ds = ds / (s * s)  # take average
 
     # set coordinates
-    offset = target_resolution / 2
-    ds['lat'] = np.linspace(90 - offset, -90 + offset, round(180 / target_resolution))
-    ds['lon'] = np.linspace(-180 + offset, 180 - offset, round(360 / target_resolution))
+    ds = set_global_coords(ds, target_resolution)
 
     return ds
 
@@ -183,8 +189,8 @@ def interp_helper(da, target_years=None):
     upper_weights = np.divide(target_years - source_years[lower_idx], source_years[upper_idx] - source_years[lower_idx],
                               where=upper_idx != lower_idx, out=np.zeros_like(target_years, dtype=np.float32))
 
-    lower = da.isel(year=lower_idx).chunk(chunks=dict(year=1)).assign_coords(year=target_years)
-    upper = da.isel(year=upper_idx).chunk(chunks=dict(year=1)).assign_coords(year=target_years)
+    lower = da.isel(year=lower_idx).assign_coords(year=target_years)
+    upper = da.isel(year=upper_idx).assign_coords(year=target_years)
     out = lower * xr.DataArray(lower_weights, dict(year=target_years)) + \
         upper * xr.DataArray(upper_weights, dict(year=target_years))
 
