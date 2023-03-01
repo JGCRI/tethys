@@ -1,9 +1,10 @@
 # Basic example config file for Tethys
 
 # Project level settings
-years: [2010, 2015, 2020]
-resolution: 1
+years: [2010, 2015]
+resolution: 4
 demand_type: withdrawals
+perform_temporal: true
 
 # csv input
 csv: data.csv
@@ -13,6 +14,10 @@ proxy_files:
   population_{year}.tif:
     variables: Population
     years: [2010, 2020]
+    
+temporal_files:
+  tas: tas.nc
+  domr: amplitude.nc
 
 # mapping of inputs sectors to proxies
 downscaling_rules:

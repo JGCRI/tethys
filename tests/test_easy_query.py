@@ -18,7 +18,5 @@ class TestEasyQuery(unittest.TestCase):
         self.assertEqual(query.querystr, TestEasyQuery.COMP_QUERY_STRING)
 
 
-
-
 if __name__ == '__main__':
     unittest.main()

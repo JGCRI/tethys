@@ -61,18 +61,3 @@ def load_region_map(mapfile, masks=False, namefile=None, target_resolution=None,
         da = da == names.to_xarray().chunk(chunks=dict(region=1))
 
     return da
-
-
-def intersection(da1, da2):
-    """Convenience function for producing a map of intersections"""
-    key, array = np.unique(np.stack((np.asarray(da1), np.asarray(da2))).reshape(2, -1), axis=1, return_inverse=True)
-
-    out = da1.copy(data=array.reshape(da1.shape).astype(np.uint16))
-
-    df = pd.DataFrame(key.T)
-    df[0] = df[0].map({int(v): k for k, v in da1.names.items()})
-    df[1] = df[1].map({int(v): k for k, v in da2.names.items()})
-    names = (df[0] + '_' + df[1]).to_dict()
-    out.attrs['names'] = {v: str(k) for k, v in names.items() if k != 0}
-
-    return out
