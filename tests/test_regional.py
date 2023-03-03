@@ -1,5 +1,7 @@
 import unittest
 
+import os
+import pandas as pd
 import tethys.datareader.regional as regional
 
 
@@ -24,6 +26,12 @@ class TestRegional(unittest.TestCase):
         self.assertEqual(regional.elec_sector_rename('comm cooling'), 'Cooling')
         self.assertEqual(regional.elec_sector_rename('other'), 'Other')
 
+    def test_load_region_data(self):
+        gcamdb = os.path.join(os.path.dirname(__file__), 'data/testdb')
+        df = regional.load_region_data(gcamdb, sectors=['municipal water'])
+
+        expected = pd.read_csv(os.path.join(os.path.dirname(__file__), 'data/testdb.csv'))
+        pd.testing.assert_frame_equal(df, expected)
 
 
 if __name__ == '__main__':
