@@ -215,12 +215,12 @@ class Tethys:
                 if not set(self.inputs.region[self.inputs.sector == supersector]).issubset(
                         set(self.inputs.region[self.inputs.sector.isin(downscaled.sector.data)])):
 
-                    inputs = self.inputs[self.inputs.sector == supersector].set_index(
+                    inputs_total = self.inputs[self.inputs.sector == supersector].set_index(
                         ['region', 'sector', 'year'])['value'].to_xarray().fillna(0).astype(np.float32)
 
-                    region_masks = self.region_masks.sel(region=inputs.region)
+                    region_masks_total = self.region_masks.sel(region=inputs_total.region)
 
-                    downscaled = self.downscale(downscaled, inputs, region_masks)
+                    downscaled = self.downscale(downscaled, inputs_total, region_masks_total)
 
             if self.perform_temporal:
                 # calculate the monthly distributions (share of annual) for each year

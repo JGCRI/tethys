@@ -28,6 +28,8 @@ def load_file(filename, target_resolution, years, variables=None, flags=None, re
     # handle an option that lets us use netcdf short_name instead of name (handle "PFT0")
     if 'short_name_as_name' in flags:
         ds = ds.rename({i: ds.get(i).attrs['short_name'] for i in ds.data_vars})
+    if 'long_name_as_name' in flags:
+        ds = ds.rename({i: ds.get(i).attrs['long_name'] for i in ds.data_vars})
 
     # filter to desired variables
     if variables is not None:

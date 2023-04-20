@@ -12,18 +12,22 @@ def load_region_data(gcam_db, sectors, demand_type='withdrawals'):
     :return: pandas dataframe with columns 'region', 'sector', 'year', 'value'
     """
 
-    sectors = [unfriendly_sector_name(i) for i in sectors]
-
     dbpath, dbfile = os.path.split(gcam_db)
     conn = gcamreader.LocalDBConn(dbpath, dbfile)
 
-    df = conn.runQuery(easy_query('demand-physical', sector=sectors, technology='!water_td_*',
-                                  input=[f'*_water {demand_type}', f'water_td_*_{demand_type[0].upper()}']))
+    inputs = {'withdrawals': ['water_td_*_W', '*_water withdrawals', '*_desalinated water'],
+              'consumption': ['water_td_*_C', '*_water consumption']}.get(demand_type)
+
+    df = conn.runQuery(easy_query('demand-physical', technology='!water_td_*', input=inputs))
 
     # add '_BasinName' to region if exists
     df['region'] += df['sector'].apply(extract_basin_name) + df['input'].apply(extract_basin_name)
 
     df['sector'] = df['sector'].apply(friendly_sector_name)
+
+    # handle technology as sector
+    df = df[df.sector.isin(sectors) | df.technology.isin(sectors)]
+    df.loc[~df.sector.isin(sectors), 'sector'] = df.technology[~df.sector.isin(sectors)]
 
     df = df.groupby(['region', 'sector', 'year'])[['value']].sum().reset_index()
 
