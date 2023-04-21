@@ -24,7 +24,21 @@ class Tethys:
     def __init__(self, config_file=None, years=None, resolution=0.125, demand_type='withdrawals',
                  perform_temporal=False, gcam_db=None, csv=None, output_file=None,
                  downscaling_rules=None, proxy_files=None, map_files=None, temporal_files=None, temporal_methods=None):
-        """ # TODO
+        """Parameters can be specified in a YAML file or passed directly, with the config file taking precedence
+
+        :param config_file: path to YAML configuration file containing these parameters
+        :param years: list of years to be included spatial downscaling
+        :param resolution: resolution in degrees for spatial downscaling
+        :param demand_type: choice between “withdrawals” (default) or “consumption”
+        :param perform_temporal: choice between False (default) or True
+        :param gcam_db: relative path to a GCAM database
+        :param csv: relative path to csv file containing inputs
+        :param output_file: name of file to write outputs to
+        :param downscaling_rules: mapping from water demand sectors to proxy variables
+        :param proxy_files: mapping of spatial proxy files to their years/variables
+        :param map_files: list of files containing region maps
+        :param temporal_files: mapping of sector to temporal downscaling method
+        :param temporal_methods: files that will be accessible during temporal downscaling
         """
 
         self.root = None
@@ -243,6 +257,7 @@ class Tethys:
 
 
 def run_model(config_file):
+    """Run a Tethys configuration"""
     config_file = os.path.join(os.getcwd(), config_file)
     result = Tethys(config_file=config_file)
     result.run_model()
