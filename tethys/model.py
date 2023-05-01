@@ -255,6 +255,20 @@ class Tethys:
             encoding = {variable: {'zlib': True, 'complevel': 5} for variable in self.outputs}
             self.outputs.to_netcdf(self.output_file, encoding=encoding)
 
+    def reaggregate(self, region_masks=None):
+        """Reaggregate from grid cells to regions
+
+        :param region_masks: boolean mask of regions, if other than the input regions
+        :return: dataframe with columns region, sector, year, value
+        """
+        if region_masks is None:
+            region_masks = self.region_masks
+
+        da = self.outputs.where(region_masks, 0).sum(dim=('lat', 'lon'))
+        df = da.to_dataframe().drop(columns=['spatial_ref'])
+
+        return df
+
 
 def run_model(config_file):
     """Run a Tethys configuration"""
