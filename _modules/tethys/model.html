@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/tethys.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/getting_started.css" type="text/css" />
@@ -193,7 +193,21 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">years</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.125</span><span class="p">,</span> <span class="n">demand_type</span><span class="o">=</span><span class="s1">&#39;withdrawals&#39;</span><span class="p">,</span>
                  <span class="n">perform_temporal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">gcam_db</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">csv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">downscaling_rules</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">proxy_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">map_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_methods</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; # TODO</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parameters can be specified in a YAML file or passed directly, with the config file taking precedence</span>
+
+<span class="sd">        :param config_file: path to YAML configuration file containing these parameters</span>
+<span class="sd">        :param years: list of years to be included spatial downscaling</span>
+<span class="sd">        :param resolution: resolution in degrees for spatial downscaling</span>
+<span class="sd">        :param demand_type: choice between “withdrawals” (default) or “consumption”</span>
+<span class="sd">        :param perform_temporal: choice between False (default) or True</span>
+<span class="sd">        :param gcam_db: relative path to a GCAM database</span>
+<span class="sd">        :param csv: relative path to csv file containing inputs</span>
+<span class="sd">        :param output_file: name of file to write outputs to</span>
+<span class="sd">        :param downscaling_rules: mapping from water demand sectors to proxy variables</span>
+<span class="sd">        :param proxy_files: mapping of spatial proxy files to their years/variables</span>
+<span class="sd">        :param map_files: list of files containing region maps</span>
+<span class="sd">        :param temporal_files: mapping of sector to temporal downscaling method</span>
+<span class="sd">        :param temporal_methods: files that will be accessible during temporal downscaling</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="kc">None</span>
@@ -384,12 +398,12 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">region</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">sector</span> <span class="o">==</span> <span class="n">supersector</span><span class="p">])</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
                         <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">region</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">sector</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">downscaled</span><span class="o">.</span><span class="n">sector</span><span class="o">.</span><span class="n">data</span><span class="p">)])):</span>
 
-                    <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">sector</span> <span class="o">==</span> <span class="n">supersector</span><span class="p">]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span>
+                    <span class="n">inputs_total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">sector</span> <span class="o">==</span> <span class="n">supersector</span><span class="p">]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span>
                         <span class="p">[</span><span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">])[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
-                    <span class="n">region_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_masks</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">inputs</span><span class="o">.</span><span class="n">region</span><span class="p">)</span>
+                    <span class="n">region_masks_total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_masks</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">inputs_total</span><span class="o">.</span><span class="n">region</span><span class="p">)</span>
 
-                    <span class="n">downscaled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">downscale</span><span class="p">(</span><span class="n">downscaled</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">region_masks</span><span class="p">)</span>
+                    <span class="n">downscaled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">downscale</span><span class="p">(</span><span class="n">downscaled</span><span class="p">,</span> <span class="n">inputs_total</span><span class="p">,</span> <span class="n">region_masks_total</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">perform_temporal</span><span class="p">:</span>
                 <span class="c1"># calculate the monthly distributions (share of annual) for each year</span>
@@ -408,10 +422,25 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Writing Outputs&#39;</span><span class="p">)</span>
             <span class="n">encoding</span> <span class="o">=</span> <span class="p">{</span><span class="n">variable</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;zlib&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;complevel&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span> <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">}</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tethys.reaggregate"><a class="viewcode-back" href="../../tethys.html#tethys.model.Tethys.reaggregate">[docs]</a>    <span class="k">def</span> <span class="nf">reaggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region_masks</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reaggregate from grid cells to regions</span>
+
+<span class="sd">        :param region_masks: boolean mask of regions, if other than the input regions</span>
+<span class="sd">        :return: dataframe with columns region, sector, year, value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">region_masks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">region_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_masks</span>
+
+        <span class="n">da</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">region_masks</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">))</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;spatial_ref&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">df</span></div></div>
 
 
 <div class="viewcode-block" id="run_model"><a class="viewcode-back" href="../../tethys.html#tethys.model.run_model">[docs]</a><span class="k">def</span> <span class="nf">run_model</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run a Tethys configuration&quot;&quot;&quot;</span>
     <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">config_file</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">Tethys</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="n">config_file</span><span class="p">)</span>
     <span class="n">result</span><span class="o">.</span><span class="n">run_model</span><span class="p">()</span>

@@ -61,7 +61,7 @@ Domestic/Municipal
 Temporal downscaling for the domestic/municipal sector follows the formula from `Wada et al. (2011) <https://doi.org/10.1029/2010WR009792>`_, which uses monthly temperature and a regional amplitude coefficient to reproduce summer peaks. For each grid cell,
 
 .. math::
-    \frac{\text{demand}_\text{year}}{12} \times \left(\frac{\text{temp}_\text{month} - \text{temp}_\text{mean}}{\text{temp}_\text{max} - \text{temp}_\text{min}}R_\text{cell} + 1\right)
+    \text{demand}_\text{month} = \frac{\text{demand}_\text{year}}{12} \times \left(\frac{\text{temp}_\text{month} - \text{temp}_\text{mean}}{\text{temp}_\text{max} - \text{temp}_\text{min}}R_\text{cell} + 1\right)
 
 Electricity Generation
 """"""""""""""""""""""
