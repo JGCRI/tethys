@@ -55,7 +55,7 @@ With the example data downloaded, a simple configuration can be run
 .. code-block:: python
 
   # assuming you downloaded to the default location
-  config_file = tethys.__file__.strip('__init__.py') + 'example/config_example.yml'
+  config_file = tethys.default_example_dir + '/example/config_example.yml'
 
   result = tethys.run_model(config_file)
 
@@ -94,7 +94,7 @@ Dashboard
   client.dashboard_link
   
   # run tethys AFTER launching the client
-  config_file = tethys.__file__.strip('__init__.py') + 'example/config_demeter.yml'
+  config_file = tethys.default_example_dir + '/example/config_demeter.yml'
   result = tethys.run_model(config_file)
   
   # this configuration does not write outputs to a file,

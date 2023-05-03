@@ -1,10 +1,11 @@
 import os
 import zipfile
-
 import requests
-
-from pkg_resources import get_distribution
+from importlib.resources import files
+from importlib.metadata import version
 from io import BytesIO as BytesIO
+
+default_example_dir = os.path.join(str(files('tethys')), 'example')
 
 
 class InstallSupplement:
@@ -30,7 +31,7 @@ class InstallSupplement:
         current Tethys distribution."""
 
         # get the current version of tethys that is installed
-        current_version = get_distribution('tethys').version
+        current_version = version('tethys')
 
         try:
             data_link = InstallSupplement.DATA_VERSION_URLS[current_version]
@@ -64,7 +65,7 @@ def get_example_data(example_data_directory=None):
     """
 
     if example_data_directory is None:
-        example_data_directory = os.path.dirname(os.path.dirname(__file__))  # tethys package directory
+        example_data_directory = default_example_dir  # tethys package directory
 
     zen = InstallSupplement(example_data_directory)
 
