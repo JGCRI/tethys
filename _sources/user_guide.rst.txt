@@ -2,10 +2,6 @@ User Guide
 ==========
 This page provides an in-depth guide to **tethys**, covering details of the downscaling methodology and advanced usage.
 
-Version 2 is a major update with increased flexibilty for spatial resolutions and sectoral breakdowns.
-
-.. note:: This page is currently under construction in preparation for version 2
-
 Conceptual Overview
 -------------------
 **tethys** consists of 2 stages: spatial downscaling and (optionally) temporal downscaling.
