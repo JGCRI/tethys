@@ -2,8 +2,6 @@ Getting Started
 ===============
 This page walks you through the steps of installing **tethys** and running an example. But first:
 
-.. note:: This page is currently under construction in preparation for version 2
-
 Motivation
 ----------
 Integrated human-Earth systems models, such as GCAM, can project future water demand at a coarse, regionally-relevant scale by modeling long-term interactions between multiple sectors under a variety of scenarios, while gridded hydrology models simulate physical processes at a much finer spatial and temporal resolution. **tethys** facilitates coupling between these kinds of models by providing finer-scale water demand data while maintaining consistency with coarser-scale global dynamics.
@@ -23,17 +21,17 @@ As a prerequisite, you'll need to have `Python <https://www.python.org/downloads
 
 **tethys** can be installed from GitHub using pip::
 
-  pip install git+https://github.com/JGCRI/tethys@dev
+  pip install git+https://github.com/JGCRI/tethys
 
 This will automatically install the dependencies. In order to avoid package version conflicts, consider using a virtual environment.
 
-Try importing **tethys** to confirm that installation was succesful:
+Try importing **tethys** to confirm that installation was successful:
 
 .. code-block:: python
 
   import tethys
   
-  tethys.__version__  # should print '2.0.0'
+  tethys.__version__  # should print the version number
 
 
 Example Data
@@ -55,7 +53,7 @@ With the example data downloaded, a simple configuration can be run
 .. code-block:: python
 
   # assuming you downloaded to the default location
-  config_file = tethys.default_example_dir + '/example/config_example.yml'
+  config_file = tethys.default_example_dir + '/config_example.yml'
 
   result = tethys.run_model(config_file)
 
@@ -94,7 +92,7 @@ Dashboard
   client.dashboard_link
   
   # run tethys AFTER launching the client
-  config_file = tethys.default_example_dir + '/example/config_demeter.yml'
+  config_file = tethys.default_example_dir + '/config_demeter.yml'
   result = tethys.run_model(config_file)
   
   # this configuration does not write outputs to a file,
