@@ -216,7 +216,7 @@
 <h2>Run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h2>
 <p>With the example data downloaded, a simple configuration can be run</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># assuming you downloaded to the default location</span>
-<span class="n">config_file</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="n">default_example_dir</span> <span class="o">+</span> <span class="s1">&#39;/config_example.yml&#39;</span>
+<span class="n">config_file</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="n">default_download_dir</span> <span class="o">+</span> <span class="s1">&#39;/example/config_example.yml&#39;</span>
 
 <span class="n">result</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="n">run_model</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
 </pre></div>
@@ -253,7 +253,7 @@
 <span class="n">client</span><span class="o">.</span><span class="n">dashboard_link</span>
 
 <span class="c1"># run tethys AFTER launching the client</span>
-<span class="n">config_file</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="n">default_example_dir</span> <span class="o">+</span> <span class="s1">&#39;/config_demeter.yml&#39;</span>
+<span class="n">config_file</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="n">default_download_dir</span> <span class="o">+</span> <span class="s1">&#39;/example/config_demeter.yml&#39;</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">tethys</span><span class="o">.</span><span class="n">run_model</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
 
 <span class="c1"># this configuration does not write outputs to a file,</span>
