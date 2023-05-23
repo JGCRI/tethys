@@ -1,5 +1,5 @@
 ---
-title: 'Tethys: a Spatiotemporal Downscaling Model for Global Water Demand'
+title: 'Tethys: A Spatiotemporal Downscaling Model for Global Water Demand'
 tags:
   - Python
   - water demand
