@@ -17,7 +17,7 @@ While **tethys** is designed to integrate seamlessly with GCAM, it has the abili
 
 Installation
 ------------
-As a prerequisite, you'll need to have `Python <https://www.python.org/downloads/>`_ installed, and if you plan on querying a GCAM database, `Java <https://openjdk.org>`_ must be installed and added to your path.
+As a prerequisite, you'll need to have `Python <https://www.python.org/downloads/>`_ installed (version 3.9 or above), and if you plan on querying a GCAM database, `Java <https://openjdk.org>`_ must be installed and added to your path.
 
 **tethys** can be installed from GitHub using pip::
 
