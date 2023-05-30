@@ -351,8 +351,6 @@
 <span class="sd">        :return: distribution scaled to match inputs in all regions</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">out</span> <span class="o">=</span> <span class="n">distribution</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">region_masks</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
         <span class="c1"># take total of proxy sectors when input condition is for total</span>
         <span class="k">if</span> <span class="n">inputs</span><span class="o">.</span><span class="n">sector</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">)</span>
@@ -360,9 +358,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">)</span>
 
+        <span class="n">out</span> <span class="o">=</span> <span class="n">distribution</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">region_masks</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">sums</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">dims</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># avoid 0/0</span>
-
-        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">inputs</span> <span class="o">/</span> <span class="n">sums</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s1">&#39;region&#39;</span><span class="p">)</span>  <span class="c1"># demand_cell = demand_region * (proxy_cell / proxy_region)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">inputs</span> <span class="o">/</span> <span class="n">sums</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s1">&#39;region&#39;</span><span class="p">)</span>  <span class="c1"># demand_cell = demand_region * (proxy_cell / proxy_region)</span>
 
         <span class="k">return</span> <span class="n">out</span></div>
 
