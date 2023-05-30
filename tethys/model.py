@@ -182,8 +182,6 @@ class Tethys:
         :return: distribution scaled to match inputs in all regions
         """
 
-        out = distribution.where(region_masks, 0)
-
         # take total of proxy sectors when input condition is for total
         if inputs.sector.size == 1:
             dims = ('sector', 'lat', 'lon')
@@ -191,9 +189,9 @@ class Tethys:
         else:
             dims = ('lat', 'lon')
 
+        out = distribution.where(region_masks, 0)
         sums = out.sum(dim=dims).where(lambda x: x != 0, 1)  # avoid 0/0
-
-        out = out.dot(inputs / sums, dims='region')  # demand_cell = demand_region * (proxy_cell / proxy_region)
+        out = xr.dot(out, inputs / sums, dims='region')  # demand_cell = demand_region * (proxy_cell / proxy_region)
 
         return out
 
