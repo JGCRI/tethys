@@ -25,7 +25,7 @@ setup(
     license='BSD2-Simplified',
     author='Isaac Thompson',
     author_email='isaac.thompson@pnnl.gov',
-    python_requires='>=3.9.*, <4',
+    python_requires='>=3.9, <4',
     include_package_data=True,
     install_requires=[
         'PyYAML>=6.0',
