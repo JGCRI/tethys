@@ -1,7 +1,4 @@
 from .model import *
-from .install_supplement import *
-from .config_reader import *
-from .run_disaggregation import *
-from .logger import *
+from .utils.install_supplement import get_example_data, default_download_dir
 
-__version__ = "1.3.1"
+__version__ = "2.0.0"

@@ -22,18 +22,20 @@ setup(
     description='Spatial and Temporal Downscaling of Global Water Demands',
     url='https://github.com/JGCRI/tethys',
     packages=find_packages(),
-    package_data={'tethys': ['reference/*']},
     license='BSD2-Simplified',
-    author='Chris R. Vernon',
-    author_email='chris.vernon@pnnl.gov',
+    author='Isaac Thompson',
+    author_email='isaac.thompson@pnnl.gov',
+    python_requires='>=3.9, <4',
     include_package_data=True,
     install_requires=[
-        'configobj~=5.0.6',
-        'numpy~=1.21',
-        'pandas~=1.2.4',
-        'scipy~=1.6.3',
-        'requests~=2.20.0',
-        'gcamreader>=1.2.5'
+        'PyYAML>=6.0',
+        'gcamreader>=1.2.5',
+        'numpy>=1.22',
+        'pandas>=1.2.4',
+        'netCDF4>=1.6',
+        'dask>=2022.12.1',
+        'xarray>=2022.09.0',
+        'rioxarray>=0.12.4'
     ],
     extras_require={
         'dev': [
