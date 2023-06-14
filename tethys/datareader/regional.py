@@ -15,7 +15,8 @@ def load_region_data(gcam_db, sectors, demand_type='withdrawals'):
     dbpath, dbfile = os.path.split(gcam_db)
     conn = gcamreader.LocalDBConn(dbpath, dbfile)
 
-    search_sectors = [unfriendly_sector_name(i) for i in sectors]
+    # remove subsector and technology if present, convert friendly water demand sector names to internal
+    search_sectors = list(set(unfriendly_sector_name(i.split('/')[0]) for i in sectors))
 
     inputs = {'withdrawals': ['water_td_*_W', '*_water withdrawals', '*_desalinated water'],
               'consumption': ['water_td_*_C', '*_water consumption']}.get(demand_type)
@@ -25,12 +26,16 @@ def load_region_data(gcam_db, sectors, demand_type='withdrawals'):
     # add '_BasinName' to region if exists
     df['region'] += df['sector'].apply(extract_basin_name) + df['input'].apply(extract_basin_name)
 
+    # rename unfriendly sector names
     df['sector'] = df['sector'].apply(friendly_sector_name)
 
-    # handle technology as sector
-    df = df[df.sector.isin(sectors) | df.technology.isin(sectors)]
-    df.loc[df.technology.isin(sectors), 'sector'] = df.technology[df.technology.isin(sectors)]
+    # allow breaking down to the subsector or technology level
+    df['sector'] = df['sector'] + '/' + df['subsector'] + '/' + df['technology']
+    sorted_sectors = sorted(sectors, reverse=True)
+    df['sector'] = df['sector'].map({x: greedy_match(x, sorted_sectors) for x in df['sector'].unique()})
+    df = df[df['sector'].isin(sectors)]
 
+    # aggregate
     df = df.groupby(['region', 'sector', 'year'])[['value']].sum().reset_index()
 
     return df
@@ -69,6 +74,13 @@ def unfriendly_sector_name(x):
     if x in sector_lookup:
         return sector_lookup[x] + '*'
 
+    return x
+
+
+def greedy_match(x, names):
+    for name in names:
+        if x.startswith(name):
+            return name
     return x
 
 
