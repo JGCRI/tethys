@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/tethys.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/getting_started.css" type="text/css" />
@@ -184,7 +184,8 @@
     <span class="n">dbpath</span><span class="p">,</span> <span class="n">dbfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">gcam_db</span><span class="p">)</span>
     <span class="n">conn</span> <span class="o">=</span> <span class="n">gcamreader</span><span class="o">.</span><span class="n">LocalDBConn</span><span class="p">(</span><span class="n">dbpath</span><span class="p">,</span> <span class="n">dbfile</span><span class="p">)</span>
 
-    <span class="n">search_sectors</span> <span class="o">=</span> <span class="p">[</span><span class="n">unfriendly_sector_name</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sectors</span><span class="p">]</span>
+    <span class="c1"># remove subsector and technology if present, convert friendly water demand sector names to internal</span>
+    <span class="n">search_sectors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">unfriendly_sector_name</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sectors</span><span class="p">))</span>
 
     <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;withdrawals&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;water_td_*_W&#39;</span><span class="p">,</span> <span class="s1">&#39;*_water withdrawals&#39;</span><span class="p">,</span> <span class="s1">&#39;*_desalinated water&#39;</span><span class="p">],</span>
               <span class="s1">&#39;consumption&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;water_td_*_C&#39;</span><span class="p">,</span> <span class="s1">&#39;*_water consumption&#39;</span><span class="p">]}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">demand_type</span><span class="p">)</span>
@@ -194,12 +195,16 @@
     <span class="c1"># add &#39;_BasinName&#39; to region if exists</span>
     <span class="n">df</span><span class="p">[</span><span class="s1">&#39;region&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">extract_basin_name</span><span class="p">)</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">extract_basin_name</span><span class="p">)</span>
 
+    <span class="c1"># rename unfriendly sector names</span>
     <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">friendly_sector_name</span><span class="p">)</span>
 
-    <span class="c1"># handle technology as sector</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">sector</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">sectors</span><span class="p">)</span> <span class="o">|</span> <span class="n">df</span><span class="o">.</span><span class="n">technology</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">sectors</span><span class="p">)]</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">technology</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">sectors</span><span class="p">),</span> <span class="s1">&#39;sector&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">technology</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">technology</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">sectors</span><span class="p">)]</span>
+    <span class="c1"># allow breaking down to the subsector or technology level</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;subsector&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;technology&#39;</span><span class="p">]</span>
+    <span class="n">sorted_sectors</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sectors</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="n">x</span><span class="p">:</span> <span class="n">greedy_match</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sorted_sectors</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()})</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">sectors</span><span class="p">)]</span>
 
+    <span class="c1"># aggregate</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">])[[</span><span class="s1">&#39;value&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">df</span></div>
@@ -238,6 +243,13 @@
     <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sector_lookup</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">sector_lookup</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span>
 
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="greedy_match"><a class="viewcode-back" href="../../../tethys.html#tethys.datareader.regional.greedy_match">[docs]</a><span class="k">def</span> <span class="nf">greedy_match</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">name</span>
     <span class="k">return</span> <span class="n">x</span></div>
 
 
