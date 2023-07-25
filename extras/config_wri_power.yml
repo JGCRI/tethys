@@ -1,0 +1,42 @@
+# Basic example config file for Tethys
+
+# Project level settings
+years: [2030]
+resolution: 0.125
+demand_type: withdrawals
+
+# output settings
+output_file: output/example_output_wri_power.nc
+
+# csv input
+# csv: data/example_data.csv
+gcam_db: data/database_GCAM
+
+# dictionary of proxy files and promised variables and years
+proxy_files:
+  C:/Z/models/tethysExampleFolders/global_power_plant_database.nc4:
+    variables: ['Biomass', 'Coal', 'Cogeneration', 'Gas', 'Geothermal', 'Hydro', 'Nuclear', 'Oil', 'Other', 'Petcoke', 'Solar', 'Storage', 'Waste', 'Wave and Tidal', 'Wind']
+    years: [2015]
+
+# mapping of inputs sectors to proxies
+downscaling_rules:
+  Electricity:
+    elec_CSP_storage: Solar
+    elec_Gen_III: Nuclear
+    elec_biomass (IGCC): Biomass
+    elec_biomass (conv): Biomass
+    elec_coal (IGCC): Coal
+    elec_coal (conv pul): Coal
+    elec_gas (CC): Gas
+    elec_gas (steam/CT): Gas
+    elec_geothermal: Geothermal
+    elec_refined liquids (CC): Oil
+    elec_refined liquids (steam/CT): Oil
+    electricity/solar: Solar
+    electricity/hydro: Hydro
+    elec_CSP: Solar
+    elec_Gen_II_LWR: Nuclear
+
+# list of map files
+map_files:
+  - data/maps/regions.tif
