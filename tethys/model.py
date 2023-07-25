@@ -250,6 +250,9 @@ class Tethys:
 
         if self.output_file is not None:
             print('Writing Outputs')
+            # cannot have '/' in netcdf variable name
+            self.outputs.rename({variable: variable.replace('/', '_') for variable in list(self.outputs)})
+            # compression
             encoding = {variable: {'zlib': True, 'complevel': 5} for variable in self.outputs}
             self.outputs.to_netcdf(self.output_file, encoding=encoding)
 
