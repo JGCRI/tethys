@@ -1,25 +1,24 @@
-import os
 import numpy as np
 import pandas as pd
 import xarray as xr
 from tethys.datareader.regional import elec_sector_weights
 from tethys.datareader.gridded import load_file, interp_helper
+from tethys.datareader.maps import load_region_map
 
 
-def temporal_distribution(model):
+def temporal_distribution(years, resolution, hddfile, cddfile, regionfile, gcam_db, hddvar='hdd', cddvar='cdd'):
     """Temporal downscaling of water demand for electricity generation using algorithm from Voisin et al. (2013)"""
-    years = range(model.years[0], model.years[-1] + 1)
-    hdd = load_file(model.temporal_files['hdd'], model.resolution, years, regrid_method='intensive')['hdd']
-    cdd = load_file(model.temporal_files['cdd'], model.resolution, years, regrid_method='intensive')['cdd']
 
-    weights = elec_sector_weights(os.path.join(model.root, model.gcam_db))
-    weights = weights[(weights.region.isin(model.inputs.region[model.inputs.sector == 'Electricity'])) &
-                      (weights.region.isin(model.region_masks.region.data)) &
-                      (weights.year.isin(model.years))].set_index(['region', 'sector', 'year']
-                                                                  )['value'].to_xarray().fillna(0).astype(np.float32)
+    # get weights of heating/cooling/other by location and time
+    regions = load_region_map(regionfile, masks=True, target_resolution=resolution)
+    weights = elec_sector_weights(gcam_db)
+    weights = weights[(weights.region.isin(regions.region.data)) & (weights.year.isin(years))]
+    weights = weights.set_index(['region', 'sector', 'year'])['value'].to_xarray().fillna(0).astype(np.float32)
+    weights = weights.dot(regions.sel(region=weights.region), dims='region')
     weights = interp_helper(weights)
 
-    region_masks = model.region_masks.sel(region=weights.region)
+    hdd = load_file(hddfile, resolution, years, regrid_method='intensive', variables=[hddvar])[hddvar]
+    cdd = load_file(cddfile, resolution, years, regrid_method='intensive', variables=[cddvar])[cddvar]
 
     # this formula is annoying to implement because of the hdd/cdd thresholds and reallocation of weights
     hdd_sums = hdd.sum(dim='month')
@@ -33,19 +32,13 @@ def temporal_distribution(model):
     hdd = xr.where((hdd_sums < 650) & (cdd_sums < 450), 1 / 12, hdd)
     cdd = xr.where((hdd_sums < 650) & (cdd_sums < 450), 1 / 12, cdd)
 
-    # redo sums based on reallocation
-    hdd_sums = hdd.sum(dim='month')
-    cdd_sums = cdd.sum(dim='month')
     # prevent 0/0
-    hdd_sums = xr.where(hdd_sums != 0, hdd_sums, 1)
-    cdd_sums = xr.where(cdd_sums != 0, cdd_sums, 1)
-    hdd /= hdd_sums
-    cdd /= cdd_sums
+    hdd /= hdd.sum(dim='month').where(lambda x: x != 0, 1)
+    cdd /= cdd.sum(dim='month').where(lambda x: x != 0, 1)
 
     distribution = xr.concat([hdd, cdd, xr.full_like(hdd, 1/12)],
                              dim=pd.Series(['Heating', 'Cooling', 'Other'], name='sector'))
 
-    distribution = distribution.where(region_masks, 0)
-    distribution = distribution.dot(weights, dims=('sector', 'region'))
+    distribution = distribution.dot(weights, dims='sector')
 
     return distribution

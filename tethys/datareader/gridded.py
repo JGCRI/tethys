@@ -2,7 +2,7 @@ import numpy as np
 import xarray as xr
 
 
-def load_file(filename, target_resolution, years, variables=None, flags=None, regrid_method='extensive'):
+def load_file(filename, target_resolution, years, variables=None, flags=(), regrid_method='extensive'):
     """Prepare a dataset from single file to be merged into a dataset of all proxies
 
     handles many oddities found in proxies
@@ -16,9 +16,7 @@ def load_file(filename, target_resolution, years, variables=None, flags=None, re
     :return: preprocessed data set
     """
 
-    flags = [] if flags is None else flags
-
-    ds = xr.open_dataset(filename, chunks='auto')
+    ds = xr.open_mfdataset(filename, chunks='auto')
 
     # handle tif (can only handle single band single variable single year currently)
     if 'band' in ds.coords:
@@ -41,11 +39,7 @@ def load_file(filename, target_resolution, years, variables=None, flags=None, re
     else:
         ds = ds.sel(year=years, method='nearest')  # nearest used for temporal files
     ds['year'] = years
-
-    # do the year filtering
-    if years is not None and 'year' in ds.coords:
-        ds = ds.sel(year=years, method='nearest').chunk(chunks=dict(year=1))
-        ds['year'] = years
+    ds = ds.chunk(year=1)
 
     # numeric stuff
     ds = ds.fillna(0).astype(np.float32)
@@ -62,7 +56,7 @@ def load_file(filename, target_resolution, years, variables=None, flags=None, re
 
     ds = ds.chunk(chunks=dict(lat=-1, lon=-1))
     if 'month' in ds.coords:
-        ds = ds.chunk(chunks=dict(month=12))
+        ds = ds.chunk(month=12)
 
     return ds
 
