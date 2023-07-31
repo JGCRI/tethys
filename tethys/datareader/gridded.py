@@ -2,7 +2,7 @@ import numpy as np
 import xarray as xr
 
 
-def load_file(filename, target_resolution, years, variables=None, flags=(), regrid_method='extensive'):
+def load_file(filename, target_resolution, years, variables=None, flags=(), bounds=None, regrid_method='extensive'):
     """Prepare a dataset from single file to be merged into a dataset of all proxies
 
     handles many oddities found in proxies
@@ -53,6 +53,8 @@ def load_file(filename, target_resolution, years, variables=None, flags=(), regr
     # spatial aligning
     ds = pad_global(ds)
     ds = regrid(ds, target_resolution, method=regrid_method)
+    if bounds is not None:
+        ds = crop(ds, bounds)
 
     ds = ds.chunk(chunks=dict(lat=-1, lon=-1))
     if 'month' in ds.coords:
@@ -125,6 +127,11 @@ def pad_global(ds):
     ds = set_global_coords(ds, source_resolution)
 
     return ds
+
+
+def crop(ds, bounds):
+    lat_min, lat_max, lon_min, lon_max = bounds
+    return ds.sel(lon=slice(lon_min, lon_max), lat=slice(lat_max, lat_min))
 
 
 def regrid(ds, target_resolution, method='extensive'):
