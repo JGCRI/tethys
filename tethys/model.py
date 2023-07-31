@@ -28,6 +28,7 @@ class Tethys:
         config_file=None,
         years=None,
         resolution=0.125,
+        bounds=None,
         demand_type='withdrawals',
         gcam_db=None,
         csv=None,
@@ -42,6 +43,7 @@ class Tethys:
         :param config_file: path to YAML configuration file containing these parameters
         :param years: list of years to be included spatial downscaling
         :param resolution: resolution in degrees for spatial downscaling
+        :param bounds: list [lat_min, lat_max, lon_min, lon_max] to crop to
         :param demand_type: choice between “withdrawals” (default) or “consumption”
         :param gcam_db: relative path to a GCAM database
         :param csv: relative path to csv file containing inputs
@@ -56,6 +58,7 @@ class Tethys:
         # project level settings
         self.years = years
         self.resolution = resolution
+        self.bounds = bounds
         self.demand_type = demand_type
 
         # GCAM database info
@@ -143,8 +146,8 @@ class Tethys:
         """Load all proxies from the catalog, regrid to target spatial resolution, and interpolate to target years"""
         print('Loading Proxy Data')
         # align each variable spatially
-        dataarrays = [da for filename, info in self.proxy_files.items() for da in
-                      load_file(os.path.join(self.root, filename), self.resolution, **info).values()]
+        dataarrays = [da for filename, info in self.proxy_files.items() for da in load_file(
+            os.path.join(self.root, filename), self.resolution, bounds=self.bounds, **info).values()]
 
         print('Interpolating Proxies')
         # interpolate each variable, then merge to one array
@@ -153,7 +156,7 @@ class Tethys:
 
     def _load_region_masks(self):
         self.region_masks = xr.concat([load_region_map(os.path.join(self.root, filename), masks=True,
-                                                       target_resolution=self.resolution)
+                                                       target_resolution=self.resolution, bounds=self.bounds)
                                        for filename in self.map_files], dim='region')
 
     def _load_inputs(self):
