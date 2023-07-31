@@ -24,20 +24,18 @@ class Tethys:
     """Model wrapper for Tethys"""
 
     def __init__(
-        self, 
-        config_file=None, 
-        years=None, 
-        resolution=0.125, 
+        self,
+        config_file=None,
+        years=None,
+        resolution=0.125,
         demand_type='withdrawals',
-        perform_temporal=False, 
-        gcam_db=None, 
-        csv=None, 
+        gcam_db=None,
+        csv=None,
         output_file=None,
-        downscaling_rules=None, 
-        proxy_files=None, 
-        map_files=None, 
-        temporal_files=None, 
-        temporal_methods=None
+        downscaling_rules=None,
+        proxy_files=None,
+        map_files=None,
+        temporal_config=None
     ):
         """Parameters can be specified in a YAML file or passed directly, with the config file taking precedence
 
@@ -45,15 +43,13 @@ class Tethys:
         :param years: list of years to be included spatial downscaling
         :param resolution: resolution in degrees for spatial downscaling
         :param demand_type: choice between “withdrawals” (default) or “consumption”
-        :param perform_temporal: choice between False (default) or True
         :param gcam_db: relative path to a GCAM database
         :param csv: relative path to csv file containing inputs
         :param output_file: name of file to write outputs to
         :param downscaling_rules: mapping from water demand sectors to proxy variables
         :param proxy_files: mapping of spatial proxy files to their years/variables
         :param map_files: list of files containing region maps
-        :param temporal_files: mapping of sector to temporal downscaling method
-        :param temporal_methods: files that will be accessible during temporal downscaling
+        :param temporal_config: mapping of sector to temporal downscaling method and arguments
         """
         self.root = None
 
@@ -61,7 +57,6 @@ class Tethys:
         self.years = years
         self.resolution = resolution
         self.demand_type = demand_type
-        self.perform_temporal = perform_temporal
 
         # GCAM database info
         self.gcam_db = gcam_db
@@ -76,9 +71,8 @@ class Tethys:
 
         self.proxy_files = proxy_files
         self.map_files = map_files
-        self.temporal_files = temporal_files
 
-        self.temporal_methods = temporal_methods
+        self.temporal_config = temporal_config
 
         # data we'll load or generate later
         self.region_masks = None
@@ -99,19 +93,6 @@ class Tethys:
             else:
                 self.root = os.getcwd()
 
-        if self.temporal_methods is None:
-            self.temporal_methods = {
-                'domestic': 'domestic',
-                'municipal': 'domestic',
-                'electricity': 'electricity',
-                'irrigation': 'irrigation'
-            }
-        else:
-            self.temporal_methods = {k.lower(): v for k, v in self.temporal_methods.items()}
-
-        if self.temporal_files is not None:
-            self.temporal_files = {k: os.path.join(self.root, v) for k, v in self.temporal_files.items()}
-
         if self.output_file is not None:
             self.output_file = os.path.join(self.root, self.output_file)
 
@@ -121,7 +102,7 @@ class Tethys:
         """Handle several shorthand expressions in the proxy catalog"""
         out = dict()
 
-        # name may be something like "ssp1_[YEAR].tif", which actually refers to multiple files
+        # name may be something like "ssp1_{YEAR}.tif", which actually refers to multiple files
         # such as "ssp1_2010.tif" and "ssp1_2020.tif" when info['years'] == [2010, 2020]
         for name, info in self.proxy_files.items():
             # promote strs to list
@@ -248,14 +229,18 @@ class Tethys:
 
                     downscaled = self.downscale(downscaled, inputs_total, region_masks_total)
 
-            if self.perform_temporal:
+            if self.temporal_config is not None:
                 # calculate the monthly distributions (share of annual) for each year
 
                 # this is how we'll do this for now
-                if supersector.lower() in self.temporal_methods:
-                    module = f'tethys.tdmethods.{self.temporal_methods[supersector.lower()]}'
-                    distribution = getattr(importlib.import_module(module), 'temporal_distribution')(self)
+                if supersector in self.temporal_config:
+                    module = f'tethys.tdmethods.' + self.temporal_config[supersector]['method']
+                    temporal_distribution = getattr(importlib.import_module(module), 'temporal_distribution')
+                    years = range(self.years[0], self.years[-1] + 1)
+                    kwargs = self.temporal_config[supersector]['kwargs']
+                    distribution = temporal_distribution(years=years, resolution=self.resolution, **kwargs)
                 else:
+                    # fall back to uniform distribution
                     distribution = xr.DataArray(np.full(12, 1/12, np.float32), coords=dict(month=range(1, 13)))
 
                 downscaled = interp_helper(downscaled) * distribution
@@ -268,7 +253,8 @@ class Tethys:
             self.outputs = self.outputs.rename({name: name.replace('/', '_') for name in list(self.outputs)})
             # compression
             encoding = {variable: {'zlib': True, 'complevel': 5} for variable in self.outputs}
-            self.outputs.to_netcdf(self.output_file, encoding=encoding)
+            writer = self.outputs.to_netcdf(self.output_file, encoding=encoding, compute=False)
+            writer.compute()
 
     def reaggregate(self, region_masks=None):
         """Reaggregate from grid cells to regions
