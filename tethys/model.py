@@ -32,7 +32,7 @@ class Tethys:
         demand_type='withdrawals',
         gcam_db=None,
         csv=None,
-        output_file=None,
+        output_dir=None,
         downscaling_rules=None,
         proxy_files=None,
         map_files=None,
@@ -47,7 +47,7 @@ class Tethys:
         :param demand_type: choice between “withdrawals” (default) or “consumption”
         :param gcam_db: relative path to a GCAM database
         :param csv: relative path to csv file containing inputs
-        :param output_file: name of file to write outputs to
+        :param output_dir: directory to write outputs to
         :param downscaling_rules: mapping from water demand sectors to proxy variables
         :param proxy_files: mapping of spatial proxy files to their years/variables
         :param map_files: list of files containing region maps
@@ -68,7 +68,7 @@ class Tethys:
         self.csv = csv
 
         # outputs
-        self.output_file = output_file
+        self.output_dir = output_dir
 
         self.downscaling_rules = downscaling_rules
 
@@ -96,8 +96,8 @@ class Tethys:
             else:
                 self.root = os.getcwd()
 
-        if self.output_file is not None:
-            self.output_file = os.path.join(self.root, self.output_file)
+        if self.output_dir is not None:
+            self.output_dir = os.path.join(self.root, self.output_dir)
 
         self._parse_proxy_files()
 
@@ -170,6 +170,8 @@ class Tethys:
         # filter inputs to valid regions and years
         self.inputs = self.inputs[(self.inputs.region.isin(self.region_masks.region.data)) &
                                   (self.inputs.year.isin(self.years))]
+        # replace "/" with "_" because it causes problems with netcdf variable names
+        self.inputs['sector'] = self.inputs.sector.str.replace('/', '_')
 
     def downscale(self, distribution, inputs, region_masks):
         """Actual spatial downscaling happens here
@@ -208,7 +210,8 @@ class Tethys:
                 rules = {supersector: rules}
 
             proxies = xr.Dataset(
-                {sector: self.proxies.sel(variable=proxy if isinstance(proxy, list) else [proxy]).sum('variable')
+                {sector.replace('/', '_'):
+                    self.proxies.sel(variable=proxy if isinstance(proxy, list) else [proxy]).sum('variable')
                  for sector, proxy in rules.items()}
             ).to_array(dim='sector')
 
@@ -232,6 +235,13 @@ class Tethys:
 
                     downscaled = self.downscale(downscaled, inputs_total, region_masks_total)
 
+            # write spatial downscaling outputs
+            if self.output_dir is not None:
+                filename = os.path.join(self.output_dir, f'{supersector}_{self.demand_type}.nc')
+                encoding = {sector: {'zlib': True, 'complevel': 5} for sector in downscaled.sector.data}
+                downscaled.to_dataset(dim='sector').to_netcdf(filename, encoding=encoding)
+                downscaled = xr.open_dataset(filename).to_array(dim='sector')  # hopefully this keeps dask happy
+
             if self.temporal_config is not None:
                 # calculate the monthly distributions (share of annual) for each year
 
@@ -248,16 +258,14 @@ class Tethys:
 
                 downscaled = interp_helper(downscaled) * distribution
 
-            self.outputs.update(downscaled.to_dataset(dim='sector'))
+                # write temporal downscaling outputs
+                if self.output_dir is not None:
+                    filename = os.path.join(self.output_dir, f'{supersector}_{self.demand_type}_monthly.nc')
+                    encoding = {sector: {'zlib': True, 'complevel': 5} for sector in downscaled.sector.data}
+                    downscaled.to_dataset(dim='sector').to_netcdf(filename, encoding=encoding)
+                    downscaled = xr.open_dataset(filename).to_array(dim='sector')  # hopefully this keeps dask happy
 
-        if self.output_file is not None:
-            print('Writing Outputs')
-            # cannot have '/' in netcdf variable name
-            self.outputs = self.outputs.rename({name: name.replace('/', '_') for name in list(self.outputs)})
-            # compression
-            encoding = {variable: {'zlib': True, 'complevel': 5} for variable in self.outputs}
-            writer = self.outputs.to_netcdf(self.output_file, encoding=encoding, compute=False)
-            writer.compute()
+            self.outputs.update(downscaled.to_dataset(dim='sector'))
 
     def reaggregate(self, region_masks=None):
         """Reaggregate from grid cells to regions
