@@ -12,6 +12,7 @@ def load_region_map(mapfile, masks=False, namefile=None, target_resolution=None,
     :param masks: bool whether to convert categorical map to layer of region masks
     :param namefile: optional path to csv with region names
     :param target_resolution: resolution to coerce map to. If None (default), use base resolution
+    :param bounds: list [lat_min, lat_max, lon_min, lon_max] to crop to
     :param nodata: nodata value (like 9999), will be replaced with 0
     :param flip_lat: bool, whether the map is "upside down"
     """
