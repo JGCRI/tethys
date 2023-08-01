@@ -238,7 +238,8 @@ class Tethys:
                     temporal_distribution = getattr(importlib.import_module(module), 'temporal_distribution')
                     years = range(self.years[0], self.years[-1] + 1)
                     kwargs = self.temporal_config[supersector]['kwargs']
-                    distribution = temporal_distribution(years=years, resolution=self.resolution, **kwargs)
+                    distribution = temporal_distribution(years=years, resolution=self.resolution,
+                                                         bounds=self.bounds, **kwargs)
                 else:
                     # fall back to uniform distribution
                     distribution = xr.DataArray(np.full(12, 1/12, np.float32), coords=dict(month=range(1, 13)))

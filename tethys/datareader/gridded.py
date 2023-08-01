@@ -12,6 +12,7 @@ def load_file(filename, target_resolution, years, variables=None, flags=(), boun
     :param years: years to extract from the file
     :param variables: variables to extract from the file
     :param flags: list potentially containing 'cell_area_share' or 'short_name_as_name'
+    :param bounds: list [lat_min, lat_max, lon_min, lon_max] to crop to
     :param regrid_method: passed along to regrid
     :return: preprocessed data set
     """

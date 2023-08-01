@@ -6,19 +6,20 @@ from tethys.datareader.gridded import load_file, interp_helper
 from tethys.datareader.maps import load_region_map
 
 
-def temporal_distribution(years, resolution, hddfile, cddfile, regionfile, gcam_db, hddvar='hdd', cddvar='cdd'):
+def temporal_distribution(years, resolution, hddfile, cddfile, regionfile, gcam_db, hddvar='hdd', cddvar='cdd',
+                          bounds=None):
     """Temporal downscaling of water demand for electricity generation using algorithm from Voisin et al. (2013)"""
 
     # get weights of heating/cooling/other by location and time
-    regions = load_region_map(regionfile, masks=True, target_resolution=resolution)
+    regions = load_region_map(regionfile, masks=True, target_resolution=resolution, bounds=bounds)
     weights = elec_sector_weights(gcam_db)
     weights = weights[(weights.region.isin(regions.region.data)) & (weights.year.isin(years))]
     weights = weights.set_index(['region', 'sector', 'year'])['value'].to_xarray().fillna(0).astype(np.float32)
     weights = weights.dot(regions.sel(region=weights.region), dims='region')
     weights = interp_helper(weights)
 
-    hdd = load_file(hddfile, resolution, years, regrid_method='intensive', variables=[hddvar])[hddvar]
-    cdd = load_file(cddfile, resolution, years, regrid_method='intensive', variables=[cddvar])[cddvar]
+    hdd = load_file(hddfile, resolution, years, bounds=bounds, regrid_method='intensive', variables=[hddvar])[hddvar]
+    cdd = load_file(cddfile, resolution, years, bounds=bounds, regrid_method='intensive', variables=[cddvar])[cddvar]
 
     # this formula is annoying to implement because of the hdd/cdd thresholds and reallocation of weights
     hdd_sums = hdd.sum(dim='month')
