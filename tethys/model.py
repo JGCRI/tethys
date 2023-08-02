@@ -138,7 +138,7 @@ class Tethys:
 
         print('Interpolating Proxies')
         # interpolate each variable, then merge to one array
-        self.proxies = xr.merge(interp_helper(xr.concat([da for da in dataarrays if da.name == variable], 'year'),
+        self.proxies = xr.merge(interp_helper(xr.concat([da for da in dataarrays if da.name == variable], 'year', coords='minimal'),
                                               self.years) for variable in set(da.name for da in dataarrays)).to_array()
 
     def _load_region_masks(self):
