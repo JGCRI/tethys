@@ -32,7 +32,10 @@ def load_file(filename, target_resolution, years, variables=None, flags=(), boun
 
     # filter to desired variables
     if variables is not None:
-        ds = ds[variables]
+        if len(ds) == 1 and len(variables) > 1:  # use single layer for all variables
+            ds[variables] = [ds[variables[0]] for i in variables]
+        else:
+            ds = ds[variables]
 
     # create a year dimension if missing, with the years reported for this file in the catalog
     if 'year' not in ds.coords:
