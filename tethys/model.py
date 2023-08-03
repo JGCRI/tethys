@@ -22,7 +22,7 @@ class Tethys:
     """Model wrapper for Tethys"""
 
     def __init__(self, config_file=None, years=None, resolution=0.125, bounds=None, demand_type='withdrawals',
-                 gcam_db=None, csv=None, output_dir=None,
+                 gcam_db=None, csv=None, output_dir=None, supersector_iterations=0,
                  downscaling_rules=None, proxy_files=None, map_files=None, temporal_config=None):
         """Parameters can be specified in a YAML file or passed directly, with the config file taking precedence
 
@@ -34,6 +34,7 @@ class Tethys:
         :param gcam_db: relative path to a GCAM database
         :param csv: relative path to csv file containing inputs
         :param output_dir: directory to write outputs to
+        :param supersector_iterations: number of times to repeat applying individual and total sector constraints, default 0
         :param downscaling_rules: mapping from water demand sectors to proxy variables
         :param proxy_files: mapping of spatial proxy files to their years/variables
         :param map_files: list of files containing region maps
@@ -58,6 +59,7 @@ class Tethys:
         self.output_dir = output_dir
 
         self.downscaling_rules = downscaling_rules
+        self.supersector_iterations = supersector_iterations
 
         self.proxy_files = proxy_files
         self.map_files = map_files
@@ -220,7 +222,13 @@ class Tethys:
 
                     region_masks_total = self.region_masks.sel(region=inputs_total.region)
 
-                    downscaled = self.downscale(downscaled, inputs_total, region_masks_total)
+                    # alternate between applying total and individual sector constraints so that both are met
+                    for i in range(self.supersector_iterations):
+                        downscaled = self.downscale(downscaled, inputs_total, region_masks_total)
+                        downscaled = self.downscale(downscaled, inputs, region_masks)
+
+                    # in a lot of cases this could be optimized by solving the intersections at region scale first,
+                    # then downscaling once, but harder to implement, especially if differing regions are not subsets
 
             # write spatial downscaling outputs
             if self.output_dir is not None:
