@@ -6,3 +6,4 @@ netCDF4>=1.6
 dask>=2022.12.1
 xarray>=2022.09.0
 rioxarray>=0.12.4
+tqdm>=4.66.2
