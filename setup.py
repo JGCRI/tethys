@@ -47,6 +47,7 @@ setup(
             'sphinx-rtd-theme~=0.5.2',
             'sphinx-mathjax-offline~=0.0.1',
             'twine~=3.4.1'
+            'click-default-group>=1.2.4'
         ]
     }
 )
