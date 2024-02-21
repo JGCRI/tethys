@@ -34,11 +34,11 @@ def easy_query(variable, year_axis=None, **kwargs):
         year_axis = get_year_axis(variable)
 
     # query template
-    querystr = f"""<aQuery><dummyQuery title="">
+    querystr = f"""<dummyQuery title="">
     <axis1 name="axis">axis</axis1>
     <axis2 name="year">{variable}[@{year_axis}]</axis2>
     <xPath>{xpath}</xPath>
-    </dummyQuery></aQuery>"""
+    </dummyQuery>"""
 
     return gcamreader.Query(querystr)
 

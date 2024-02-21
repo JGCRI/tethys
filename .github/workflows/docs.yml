@@ -1,9 +1,13 @@
+---
 name: "docs"
-on:
+
+on:    # yamllint disable-line rule:truthy
   push:
     branches:
-      - dev
-      - main
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
 
 jobs:
   docs:

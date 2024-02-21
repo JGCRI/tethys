@@ -1,5 +1,8 @@
 example.py
 
+# vs code
+.vscode
+
 # OS-specific files
 .DS_Store
 

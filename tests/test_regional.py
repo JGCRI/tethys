@@ -28,6 +28,9 @@ class TestRegional(unittest.TestCase):
 
     def test_load_region_data(self):
         gcamdb = os.path.join(os.path.dirname(__file__), 'data/testdb')
+        print(gcamdb)
+
+
         df = regional.load_region_data(gcamdb, sectors=['municipal water'])
 
         expected = pd.read_csv(os.path.join(os.path.dirname(__file__), 'data/testdb.csv'))

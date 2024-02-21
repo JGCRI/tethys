@@ -21,7 +21,7 @@ As a prerequisite, you'll need to have `Python <https://www.python.org/downloads
 
 **tethys** can be installed from GitHub using pip::
 
-  pip install git+https://github.com/JGCRI/tethys
+  pip install tethys-downscale
 
 This will automatically install the dependencies. In order to avoid package version conflicts, consider using a virtual environment.
 
