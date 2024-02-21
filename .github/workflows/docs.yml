@@ -3,11 +3,11 @@ name: "docs"
 
 on:    # yamllint disable-line rule:truthy
   push:
-    branches-ignore:
-      - 'false'
+    branches:
+      - 'main'
   pull_request:
-    branches-ignore:
-      - 'false'
+    branches:
+      - 'main'
 
 jobs:
   docs:
