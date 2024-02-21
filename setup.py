@@ -22,7 +22,7 @@ setup(
     description='Spatial and Temporal Downscaling of Global Water Demands',
     url='https://github.com/JGCRI/tethys',
     packages=find_packages(),
-    license='BSD2-Simplified',
+    license='BSD-2-Clause',
     author='Isaac Thompson',
     author_email='isaac.thompson@pnnl.gov',
     python_requires='>=3.9, <4',
