@@ -35,7 +35,8 @@ setup(
         'netCDF4>=1.6',
         'dask>=2022.12.1',
         'xarray>=2022.09.0',
-        'rioxarray>=0.12.4'
+        'rioxarray>=0.12.4',
+        'tqdm>=4.66.2',
     ],
     extras_require={
         'dev': [
@@ -47,7 +48,7 @@ setup(
             'sphinx-rtd-theme~=0.5.2',
             'sphinx-mathjax-offline~=0.0.1',
             'twine~=3.4.1',
-            'click-default-group>=1.2.4'
+            'click-default-group>=1.2.4',
         ]
     }
 )
