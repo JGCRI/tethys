@@ -1,10 +1,13 @@
+---
 name: build
 
-on:
+on:    # yamllint disable-line rule:truthy
   push:
-    branches:
-      - dev
-      - main
+    branches-ignore:
+      - 'false'
+  pull_request:
+    branches-ignore:
+      - 'false'
 
 jobs:
   build:
