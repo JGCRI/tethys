@@ -37,6 +37,9 @@ setup(
         'xarray>=2022.09.0',
         'rioxarray>=0.12.4',
         'tqdm>=4.66.2',
+        'matplotlib>=3.8.3',
+        'bokeh!=3.0.*,>=2.4.2',
+        'dask[distributed]>=2024.2.0',
     ],
     extras_require={
         'dev': [
