@@ -1,32 +1,13 @@
-cff-version: "1.2.0"
-message: "To cite Tethys use:"
-type: software
-license: BSD-2-Clause
-title: "Tethys: A Spatiotemporal Downscaling Model for Global Water Demand"
-abstract: "Humans use water for many important tasks, such as drinking, growing food, and cooling power plants. 
-Since future water demands depend on complex global interactions between economic sectors (e.g., demand for wheat 
-in one country causing demand for water to grow that wheat in another country), it is often modeled at coarse 
-spatial and temporal scales as part of models that account for complex, multi-sector system dynamics. 
-However, models that project future water availability typically simulate physical processes at much 
-finer scales. `Tethys` enables integration between these kinds of models by downscaling region-scale water 
-demand projections using sector-specific proxies and formulas."
+cff-version: 1.2.0
+message: "If you use this software in your work, please cite it as below."
 authors:
-- family-names: Thompson
-  given-names: Isaac
-  orcid: https://orcid.org/0000-0001-9594-0043
-  affiliation: "Joint Global Change Research Institute, Pacific Northwest National Laboratory, College Park, MD., USA"
-  equal-contrib: true
-- family-names: Vernon
-  given-names: Chris R.
-  orcid: https://orcid.org/0000-0002-3406-6214
-  affiliation: "Pacific Northwest National Laboratory, Richland, WA., USA"
-  equal-contrib: true
-- family-names: Khan
-  given-names: Zarrar
-  orcid: https://orcid.org/0000-0002-8147-8553
-  affiliation: "Joint Global Change Research Institute, Pacific Northwest National Laboratory, College Park, MD., USA"
-contact:
-- family-names: Vernon
-  given-names: Chris R.
-  orcid: https://orcid.org/0000-0002-3406-6214
-  affiliation: "Pacific Northwest National Laboratory, Richland, WA., USA"
+- family-names: "Thompson"
+  given-names: "Isaac"
+  orcid: "https://orcid.org/0000-0001-9594-0043"
+- family-names: "Vernonv
+  given-names: "Chris R."
+  orcid: "https://orcid.org/0000-0002-3406-6214"
+- family-names: "Khan"
+  given-names: "Zarrar"
+  orcid: "https://orcid.org/0000-0002-8147-8553"
+title: "Tethys: A Spatiotemporal Downscaling Model for Global Water Demand"
