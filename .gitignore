@@ -12,9 +12,6 @@ example.py
 # Emacs backup files
 *~
 
-# python notebooks (probably used for testing)
-*.ipynb
-
 # pycharm
 .idea
 

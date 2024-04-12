@@ -23,8 +23,7 @@ setup(
     url='https://github.com/JGCRI/tethys',
     packages=find_packages(),
     license='BSD-2-Clause',
-    author='Isaac Thompson',
-    author_email='isaac.thompson@pnnl.gov',
+    author='Isaac Thompson, Chris Vernon',
     python_requires='>=3.9, <4',
     include_package_data=True,
     install_requires=[
@@ -33,10 +32,15 @@ setup(
         'numpy>=1.22',
         'pandas>=1.2.4',
         'netCDF4>=1.6',
-        'dask>=2022.12.1',
+        'dask[complete]>=2022.12.1',
+        'dask_geopandas>=0.3.1',
         'xarray>=2022.09.0',
         'rioxarray>=0.12.4',
         'tqdm>=4.66.2',
+        'matplotlib>=3.8.3',
+        'bokeh!=3.0.*,>=2.4.2',
+        'geopandas>=0.14.3',
+        'hvplot>=0.9.2',
     ],
     extras_require={
         'dev': [
