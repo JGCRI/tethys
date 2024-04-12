@@ -17,7 +17,6 @@ Install `tethys` using pip:
 
 `pip install tethys-downscale`
 
-
 ## Contributing to Tethys
 
 Whether you find a typo in the documentation, find a bug, or want to develop functionality that you think will make Tethys more robust, you are welcome to contribute! See the full contribution guidelines in our [online documentation](https://jgcri.github.io/tethys/contributing.html).

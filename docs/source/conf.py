@@ -15,6 +15,9 @@ import sys
 
 import sphinx_rtd_theme
 
+import tethys
+version = str(tethys.__version__)
+
 
 sys.path.insert(0, os.path.abspath('../../'))
 
@@ -26,7 +29,7 @@ copyright = '2021, Battelle Memorial Institute'
 author = 'Chris R. Vernon'
 
 # The full version, including alpha/beta/rc tags
-release = '2.0.0'
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -78,9 +81,6 @@ html_css_files = [
     "css/tethys.css",
     "css/getting_started.css",
 ]
-
-import tethys
-version = str(tethys.__version__)
 
 
 # -- Extension configuration -------------------------------------------------
