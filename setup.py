@@ -47,7 +47,7 @@ setup(
             'build~=0.5.1',
             'nbsphinx~=0.8.6',
             'setuptools~=57.0.0',
-            'sphinx>=5',
+            'sphinx~=4.0.2',
             'sphinx-panels~=0.6.0',
             'sphinx-rtd-theme~=0.5.2',
             'sphinx-mathjax-offline~=0.0.1',
