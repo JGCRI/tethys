@@ -7,17 +7,20 @@ tags:
 authors:
   - name: Isaac Thompson
     orcid: 0000-0001-9594-0043
-    corresponding: true
     affiliation: 1
+    equal-contrib: true
+  - name: Chris Vernon
+    orcid: 0000-0002-3406-6214
+    affiliation: 2
+    corresponding: true
+    equal-contrib: true
   - name: Zarrar Khan
     orcid: 0000-0002-8147-8553
     affiliation: 1
-  - name: Chris Vernon
-    orcid: 0000-0002-3406-6214
-    affiliation: 1
 affiliations:
- - name: Joint Global Change Research Institute, Pacific Northwest National Laboratory, USA
+ - name: Joint Global Change Research Institute, Pacific Northwest National Laboratory, College Park, MD., USA
    index: 1
+ - name: Pacific Northwest National Laboratory, Richland, WA., USA
 date: 16 May 2023
 bibliography: paper.bib
 
