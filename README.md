@@ -1,6 +1,5 @@
 [![build](https://github.com/JGCRI/tethys/actions/workflows/build.yml/badge.svg)](https://github.com/JGCRI/tethys/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/JGCRI/tethys/branch/main/graph/badge.svg)](https://codecov.io/gh/JGCRI/tethys)
-[![docs](https://github.com/JGCRI/tethys/actions/workflows/docs.yml/badge.svg)](https://github.com/JGCRI/tethys/actions/workflows/docs.yml)
 [![DOI](https://zenodo.org/badge/104476654.svg)](https://zenodo.org/badge/latestdoi/104476654)
 
 # Tethys
