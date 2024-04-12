@@ -1,8 +1,5 @@
 ---
-on:    # yamllint disable-line rule:truthy
-  push:
-    branches-ignore:
-      - '**'
+on: [push]
 
 jobs:
   paper:
