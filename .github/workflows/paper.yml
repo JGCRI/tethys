@@ -1,6 +1,4 @@
 ---
-name: "paper"
-
 on:    # yamllint disable-line rule:truthy
   push:
     branches-ignore:
