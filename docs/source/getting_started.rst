@@ -79,7 +79,7 @@ Dashboard
 ---------
 **tethys** uses `Dask <https://docs.dask.org/en/stable/>`_ for parallelization and to lazily compute results. You can launch the dask distributed client in order to view dashboard and monitor the progress of large workflows.
 
-.. note:: viewing the dashboard requires a few other dependencies not automatically installed by **tethys**
+.. note:: Viewing the dashboard requires a few other dependencies not automatically installed by **tethys**.  Please ensure your local Java library has been added to your path.
 
 .. code-block:: python
   

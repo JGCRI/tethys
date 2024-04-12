@@ -17,7 +17,7 @@ def get_requirements():
 version = re.search(r"__version__ = ['\"]([^'\"]*)['\"]", open('tethys/__init__.py').read(), re.M).group(1)
 
 setup(
-    name='tethys',
+    name='tethys-downscaling',
     version=version,
     description='Spatial and Temporal Downscaling of Global Water Demands',
     url='https://github.com/JGCRI/tethys',
@@ -51,7 +51,7 @@ setup(
             'sphinx-panels~=0.6.0',
             'sphinx-rtd-theme~=0.5.2',
             'sphinx-mathjax-offline~=0.0.1',
-            'twine~=3.4.1',
+            'twine>=3.4.1',
             'click-default-group>=1.2.4',
         ]
     }
