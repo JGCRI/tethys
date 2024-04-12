@@ -8,11 +8,13 @@ Copyright (c) 2022, Battelle Memorial Institute
 
 """
 import os
-import yaml
 import importlib
+
+import yaml
 import numpy as np
 import pandas as pd
 import xarray as xr
+
 from tethys.datareader.regional import load_region_data
 from tethys.datareader.gridded import load_file, interp_helper
 from tethys.datareader.maps import load_region_map
@@ -21,9 +23,22 @@ from tethys.datareader.maps import load_region_map
 class Tethys:
     """Model wrapper for Tethys"""
 
-    def __init__(self, config_file=None, years=None, resolution=0.125, demand_type='withdrawals',
-                 perform_temporal=False, gcam_db=None, csv=None, output_file=None,
-                 downscaling_rules=None, proxy_files=None, map_files=None, temporal_files=None, temporal_methods=None):
+    def __init__(
+        self, 
+        config_file=None, 
+        years=None, 
+        resolution=0.125, 
+        demand_type='withdrawals',
+        perform_temporal=False, 
+        gcam_db=None, 
+        csv=None, 
+        output_file=None,
+        downscaling_rules=None, 
+        proxy_files=None, 
+        map_files=None, 
+        temporal_files=None, 
+        temporal_methods=None
+    ):
         """Parameters can be specified in a YAML file or passed directly, with the config file taking precedence
 
         :param config_file: path to YAML configuration file containing these parameters
@@ -40,7 +55,6 @@ class Tethys:
         :param temporal_files: mapping of sector to temporal downscaling method
         :param temporal_methods: files that will be accessible during temporal downscaling
         """
-
         self.root = None
 
         # project level settings
@@ -250,6 +264,9 @@ class Tethys:
 
         if self.output_file is not None:
             print('Writing Outputs')
+            # cannot have '/' in netcdf variable name
+            self.outputs = self.outputs.rename({name: name.replace('/', '_') for name in list(self.outputs)})
+            # compression
             encoding = {variable: {'zlib': True, 'complevel': 5} for variable in self.outputs}
             self.outputs.to_netcdf(self.output_file, encoding=encoding)
 

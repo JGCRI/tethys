@@ -1,3 +1,4 @@
+import difflib
 import unittest
 
 import tethys.datareader.easy_query as easy_query
@@ -12,8 +13,21 @@ class TestEasyQuery(unittest.TestCase):
     </dummyQuery>"""
 
     def test_easy_query(self):
-        query = easy_query.easy_query('demand-physical', sector=['Beef', 'Dairy'], technology='!water_td_*',
-                                      input=['*_water withdrawals', 'water_td_*_W'])
+        query = easy_query.easy_query(
+            'demand-physical', 
+            sector=['Beef', 'Dairy'], 
+            technology='!water_td_*',
+            input=['*_water withdrawals', 'water_td_*_W']
+        )
+
+        # identify error location
+        if query.querystr != TestEasyQuery.COMP_QUERY_STRING:
+            for i,s in enumerate(difflib.ndiff(TestEasyQuery.COMP_QUERY_STRING, query.querystr)):
+                if s[0]==' ': continue
+                elif s[0]=='-':
+                    print(u'Delete "{}" from position {}'.format(s[-1], i))
+                elif s[0]=='+':
+                    print(u'Add "{}" to position {}'.format(s[-1], i)) 
 
         self.assertEqual(query.querystr, TestEasyQuery.COMP_QUERY_STRING)
 

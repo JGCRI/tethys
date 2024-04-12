@@ -1,5 +1,8 @@
 example.py
 
+# vs code
+.vscode
+
 # OS-specific files
 .DS_Store
 
@@ -8,9 +11,6 @@ example.py
 
 # Emacs backup files
 *~
-
-# python notebooks (probably used for testing)
-*.ipynb
 
 # pycharm
 .idea

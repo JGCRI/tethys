@@ -1,10 +1,13 @@
+---
 name: build
 
-on:
+on:    # yamllint disable-line rule:truthy
   push:
-    branches:
-      - dev
-      - main
+    branches-ignore:
+      - 'false'
+  pull_request:
+    branches-ignore:
+      - 'false'
 
 jobs:
   build:
@@ -30,16 +33,11 @@ jobs:
         - name: Install dependencies
           run: |
             python -m pip install --upgrade pip
-            python setup.py install
+            pip install click-default-group
+            pip install .
 
         - name: Test and generate coverage report on Linux
           run: |
             pip install pytest
             pip install pytest-cov
             pytest --cov=./ --cov-report=xml
-
-        - name: Upload coverage to Codecov
-          uses: codecov/codecov-action@v1
-          with:
-            file: ./coverage.xml
-            fail_ci_if_error: true
