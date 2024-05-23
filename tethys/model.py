@@ -24,44 +24,44 @@ class Tethys:
     """Model wrapper for Tethys"""
 
     def __init__(
-        self, 
-        config_file=None, 
-        years=None, 
-        resolution=0.125, 
+        self,
+        config_file=None,
+        years=None,
+        resolution=0.125,
+        bounds=None,
         demand_type='withdrawals',
-        perform_temporal=False, 
-        gcam_db=None, 
-        csv=None, 
-        output_file=None,
-        downscaling_rules=None, 
-        proxy_files=None, 
-        map_files=None, 
-        temporal_files=None, 
-        temporal_methods=None
+        gcam_db=None,
+        csv=None,
+        output_dir=None,
+        supersector_iterations=0,
+        downscaling_rules=None,
+        proxy_files=None,
+        map_files=None,
+        temporal_config=None
     ):
         """Parameters can be specified in a YAML file or passed directly, with the config file taking precedence
 
         :param config_file: path to YAML configuration file containing these parameters
         :param years: list of years to be included spatial downscaling
         :param resolution: resolution in degrees for spatial downscaling
+        :param bounds: list [lat_min, lat_max, lon_min, lon_max] to crop to
         :param demand_type: choice between “withdrawals” (default) or “consumption”
-        :param perform_temporal: choice between False (default) or True
         :param gcam_db: relative path to a GCAM database
         :param csv: relative path to csv file containing inputs
-        :param output_file: name of file to write outputs to
+        :param output_dir: directory to write outputs to
+        :param supersector_iterations: number of times to repeat applying individual and total sector constraints, default 0
         :param downscaling_rules: mapping from water demand sectors to proxy variables
         :param proxy_files: mapping of spatial proxy files to their years/variables
         :param map_files: list of files containing region maps
-        :param temporal_files: mapping of sector to temporal downscaling method
-        :param temporal_methods: files that will be accessible during temporal downscaling
+        :param temporal_config: mapping of sector to temporal downscaling method and arguments
         """
         self.root = None
 
         # project level settings
         self.years = years
         self.resolution = resolution
+        self.bounds = bounds
         self.demand_type = demand_type
-        self.perform_temporal = perform_temporal
 
         # GCAM database info
         self.gcam_db = gcam_db
@@ -70,15 +70,15 @@ class Tethys:
         self.csv = csv
 
         # outputs
-        self.output_file = output_file
+        self.output_dir = output_dir
 
         self.downscaling_rules = downscaling_rules
+        self.supersector_iterations = supersector_iterations
 
         self.proxy_files = proxy_files
         self.map_files = map_files
-        self.temporal_files = temporal_files
 
-        self.temporal_methods = temporal_methods
+        self.temporal_config = temporal_config
 
         # data we'll load or generate later
         self.region_masks = None
@@ -99,21 +99,8 @@ class Tethys:
             else:
                 self.root = os.getcwd()
 
-        if self.temporal_methods is None:
-            self.temporal_methods = {
-                'domestic': 'domestic',
-                'municipal': 'domestic',
-                'electricity': 'electricity',
-                'irrigation': 'irrigation'
-            }
-        else:
-            self.temporal_methods = {k.lower(): v for k, v in self.temporal_methods.items()}
-
-        if self.temporal_files is not None:
-            self.temporal_files = {k: os.path.join(self.root, v) for k, v in self.temporal_files.items()}
-
-        if self.output_file is not None:
-            self.output_file = os.path.join(self.root, self.output_file)
+        if self.output_dir is not None:
+            self.output_dir = os.path.join(self.root, self.output_dir)
 
         self._parse_proxy_files()
 
@@ -121,7 +108,7 @@ class Tethys:
         """Handle several shorthand expressions in the proxy catalog"""
         out = dict()
 
-        # name may be something like "ssp1_[YEAR].tif", which actually refers to multiple files
+        # name may be something like "ssp1_{YEAR}.tif", which actually refers to multiple files
         # such as "ssp1_2010.tif" and "ssp1_2020.tif" when info['years'] == [2010, 2020]
         for name, info in self.proxy_files.items():
             # promote strs to list
@@ -162,17 +149,17 @@ class Tethys:
         """Load all proxies from the catalog, regrid to target spatial resolution, and interpolate to target years"""
         print('Loading Proxy Data')
         # align each variable spatially
-        dataarrays = [da for filename, info in self.proxy_files.items() for da in
-                      load_file(os.path.join(self.root, filename), self.resolution, **info).values()]
+        dataarrays = [da for filename, info in self.proxy_files.items() for da in load_file(
+            os.path.join(self.root, filename), self.resolution, bounds=self.bounds, **info).values()]
 
         print('Interpolating Proxies')
         # interpolate each variable, then merge to one array
-        self.proxies = xr.merge(interp_helper(xr.concat([da for da in dataarrays if da.name == variable], 'year'),
+        self.proxies = xr.merge(interp_helper(xr.concat([da for da in dataarrays if da.name == variable], 'year', coords='minimal'),
                                               self.years) for variable in set(da.name for da in dataarrays)).to_array()
 
     def _load_region_masks(self):
         self.region_masks = xr.concat([load_region_map(os.path.join(self.root, filename), masks=True,
-                                                       target_resolution=self.resolution)
+                                                       target_resolution=self.resolution, bounds=self.bounds)
                                        for filename in self.map_files], dim='region')
 
     def _load_inputs(self):
@@ -186,6 +173,8 @@ class Tethys:
         # filter inputs to valid regions and years
         self.inputs = self.inputs[(self.inputs.region.isin(self.region_masks.region.data)) &
                                   (self.inputs.year.isin(self.years))]
+        # replace "/" with "_" because it causes problems with netcdf variable names
+        self.inputs['sector'] = self.inputs.sector.str.replace('/', '_')
 
     def downscale(self, distribution, inputs, region_masks):
         """Actual spatial downscaling happens here
@@ -224,7 +213,8 @@ class Tethys:
                 rules = {supersector: rules}
 
             proxies = xr.Dataset(
-                {sector: self.proxies.sel(variable=proxy if isinstance(proxy, list) else [proxy]).sum('variable')
+                {sector.replace('/', '_'):
+                    self.proxies.sel(variable=proxy if isinstance(proxy, list) else [proxy]).sum('variable')
                  for sector, proxy in rules.items()}
             ).to_array(dim='sector')
 
@@ -246,29 +236,46 @@ class Tethys:
 
                     region_masks_total = self.region_masks.sel(region=inputs_total.region)
 
-                    downscaled = self.downscale(downscaled, inputs_total, region_masks_total)
+                    # alternate between applying total and individual sector constraints so that both are met
+                    for i in range(self.supersector_iterations):
+                        downscaled = self.downscale(downscaled, inputs_total, region_masks_total)
+                        downscaled = self.downscale(downscaled, inputs, region_masks)
 
-            if self.perform_temporal:
+                    # in a lot of cases this could be optimized by solving the intersections at region scale first,
+                    # then downscaling once, but harder to implement, especially if differing regions are not subsets
+
+            # write spatial downscaling outputs
+            if self.output_dir is not None:
+                filename = os.path.join(self.output_dir, f'{supersector}_{self.demand_type}.nc')
+                encoding = {sector: {'zlib': True, 'complevel': 5} for sector in downscaled.sector.data}
+                downscaled.to_dataset(dim='sector').to_netcdf(filename, encoding=encoding)
+                downscaled = xr.open_dataset(filename).to_array(dim='sector')  # hopefully this keeps dask happy
+
+            if self.temporal_config is not None:
                 # calculate the monthly distributions (share of annual) for each year
 
                 # this is how we'll do this for now
-                if supersector.lower() in self.temporal_methods:
-                    module = f'tethys.tdmethods.{self.temporal_methods[supersector.lower()]}'
-                    distribution = getattr(importlib.import_module(module), 'temporal_distribution')(self)
+                if supersector in self.temporal_config:
+                    module = f'tethys.tdmethods.' + self.temporal_config[supersector]['method']
+                    temporal_distribution = getattr(importlib.import_module(module), 'temporal_distribution')
+                    years = range(self.years[0], self.years[-1] + 1)
+                    kwargs = self.temporal_config[supersector]['kwargs']
+                    distribution = temporal_distribution(years=years, resolution=self.resolution,
+                                                         bounds=self.bounds, **kwargs)
                 else:
+                    # fall back to uniform distribution
                     distribution = xr.DataArray(np.full(12, 1/12, np.float32), coords=dict(month=range(1, 13)))
 
                 downscaled = interp_helper(downscaled) * distribution
 
-            self.outputs.update(downscaled.to_dataset(dim='sector'))
+                # write temporal downscaling outputs
+                if self.output_dir is not None:
+                    filename = os.path.join(self.output_dir, f'{supersector}_{self.demand_type}_monthly.nc')
+                    encoding = {sector: {'zlib': True, 'complevel': 5} for sector in downscaled.sector.data}
+                    downscaled.to_dataset(dim='sector').to_netcdf(filename, encoding=encoding)
+                    downscaled = xr.open_dataset(filename).to_array(dim='sector')  # hopefully this keeps dask happy
 
-        if self.output_file is not None:
-            print('Writing Outputs')
-            # cannot have '/' in netcdf variable name
-            self.outputs = self.outputs.rename({name: name.replace('/', '_') for name in list(self.outputs)})
-            # compression
-            encoding = {variable: {'zlib': True, 'complevel': 5} for variable in self.outputs}
-            self.outputs.to_netcdf(self.output_file, encoding=encoding)
+            self.outputs.update(downscaled.to_dataset(dim='sector'))
 
     def reaggregate(self, region_masks=None):
         """Reaggregate from grid cells to regions
