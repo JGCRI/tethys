@@ -21,6 +21,7 @@ affiliations:
  - name: Joint Global Change Research Institute, Pacific Northwest National Laboratory, College Park, MD., USA
    index: 1
  - name: Pacific Northwest National Laboratory, Richland, WA., USA
+   index: 2
 date: 16 May 2023
 bibliography: paper.bib
 
