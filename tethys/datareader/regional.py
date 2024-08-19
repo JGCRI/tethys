@@ -18,7 +18,7 @@ def load_region_data(gcam_db, sectors, demand_type='withdrawals'):
     # remove subsector and technology if present, convert friendly water demand sector names to internal
     search_sectors = list(set(unfriendly_sector_name(i.split('/')[0]) for i in sectors))
 
-    inputs = {'withdrawals': ['water_td_*_W', '*_water withdrawals', '*_desalinated water'],
+    inputs = {'withdrawals': ['water_td_*_W', '*_water withdrawals'],
               'consumption': ['water_td_*_C', '*_water consumption']}.get(demand_type)
 
     df = conn.runQuery(easy_query('demand-physical', sector=search_sectors, technology='!water_td_*', input=inputs))
