@@ -17,6 +17,7 @@ DATA_VERSION_URLS = {
     '2.0.0': 'https://zenodo.org/record/7569652/files/example.zip?download=1',
     '2.0.1': 'https://zenodo.org/record/7569652/files/example.zip?download=1',
     '2.0.2': 'https://zenodo.org/record/7569652/files/example.zip?download=1',
+    '2.1.0': 'https://zenodo.org/record/7569652/files/example.zip?download=1'
 }
 
 
@@ -47,7 +48,7 @@ def get_example_data(
         example_data_directory = default_download_dir
 
     # get the current version of tethys that is installed
-    current_version = importlib.metadata.version('tethys')
+    current_version = importlib.metadata.version('tethys-downscaling')
 
     try:
         url = DATA_VERSION_URLS[current_version]
