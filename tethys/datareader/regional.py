@@ -41,6 +41,17 @@ def load_region_data(gcam_db, sectors, demand_type='withdrawals'):
     return df
 
 
+def extract_resource_name(x):
+    """Removes '_water withdrawals' or '_water consumption' from GCAM sector or resource name.
+
+    :param x: resource name string.
+    :return: cleaned resource name without suffix.
+    """
+    if '_water withdrawals' in x or '_water consumption' in x:
+        return x.split('_')[0]  # return the part before the underscore e.g., 'basin_water withdrawals' to 'basin'
+    return x
+
+
 def extract_basin_name(x):
     """Maps 'water_td_irr_basin_C' to '_basin', and water_td_elec_C to ''"""
     if x.startswith('water_td_irr_'):
