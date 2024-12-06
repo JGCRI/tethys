@@ -19,6 +19,7 @@ from tethys.datareader.regional import load_region_data
 from tethys.datareader.gridded import load_file, interp_helper
 from tethys.datareader.maps import load_region_map
 
+from tethys.utils.source_disaggregation import get_source_shares
 
 class Tethys:
     """Model wrapper for Tethys"""
@@ -30,6 +31,7 @@ class Tethys:
         resolution=0.125,
         bounds=None,
         demand_type='withdrawals',
+        source_disaggregation=None,
         gcam_db=None,
         csv=None,
         output_dir=None,
@@ -42,10 +44,11 @@ class Tethys:
         """Parameters can be specified in a YAML file or passed directly, with the config file taking precedence
 
         :param config_file: path to YAML configuration file containing these parameters
-        :param years: list of years to be included spatial downscaling
+        :param years: list of years to be included for spatial downscaling
         :param resolution: resolution in degrees for spatial downscaling
         :param bounds: list [lat_min, lat_max, lon_min, lon_max] to crop to
         :param demand_type: choice between “withdrawals” (default) or “consumption”
+        :param source_disaggregation: decide whether to disaggregate water demand by source (runoff, groundwater, desal)
         :param gcam_db: relative path to a GCAM database
         :param csv: relative path to csv file containing inputs
         :param output_dir: directory to write outputs to
@@ -62,6 +65,7 @@ class Tethys:
         self.resolution = resolution
         self.bounds = bounds
         self.demand_type = demand_type
+        self.source_disaggregation = source_disaggregation
 
         # GCAM database info
         self.gcam_db = gcam_db
@@ -85,6 +89,10 @@ class Tethys:
         self.proxies = None
         self.inputs = None
         self.outputs = None
+        self.shares = None
+        self.griddedshares = None
+        self.disaggregated_sw = None
+        self.disaggregated_gw = None
 
         # settings in YAML override settings passed directly to __init__
         if config_file is not None:
@@ -198,8 +206,33 @@ class Tethys:
 
         return out
 
+    def disaggregate_source(self, downscaled):
+        """Disaggregate water demand by source (runoff, groundwater, desal)"""
+
+        print('Disaggregating Source')
+
+        # initialize source shares object
+        get_shares = get_source_shares(gcam_db=self.gcam_db, demand_type=self.demand_type,
+                                     region_masks=self.region_masks, years=self.years)
+
+        # query and calculate shares
+        shares_df = get_shares.calculate_shares()
+
+        # apply shares to the gridded region masks
+        gridded_shares = get_shares.generate_gridded_shares(shares_df)
+
+        # disaggregate water supply source for each downscaled demand in each grid cell
+        downscaled_disaggregated_sw = (downscaled * gridded_shares['runoff']).compute()
+        downscaled_disaggregated_gw = (downscaled * gridded_shares['groundwater']).compute()
+
+        return gridded_shares, downscaled_disaggregated_sw, downscaled_disaggregated_gw
+
+
     def run_model(self):
         self.outputs = xr.Dataset()
+        self.griddedshares = xr.Dataset()
+        self.disaggregated_sw = xr.Dataset()
+        self.disaggregated_gw = xr.Dataset()
 
         self._load_proxies()
         self._load_region_masks()
@@ -250,6 +283,16 @@ class Tethys:
                 encoding = {sector: {'zlib': True, 'complevel': 5} for sector in downscaled.sector.data}
                 downscaled.to_dataset(dim='sector').to_netcdf(filename, encoding=encoding)
                 downscaled = xr.open_dataset(filename).to_array(dim='sector')  # hopefully this keeps dask happy
+
+            # disaggregate water supply source and update the objects
+            if self.source_disaggregation:
+                gshares, sw, gw = self.disaggregate_source(downscaled)
+
+                # store the disaggregated results
+                self.griddedshares = gshares
+                self.disaggregated_sw = sw
+                self.disaggregated_gw = gw
+
 
             if self.temporal_config is not None:
                 # calculate the monthly distributions (share of annual) for each year
