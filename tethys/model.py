@@ -206,7 +206,7 @@ class Tethys:
 
         return out
 
-    def disaggregate_source(self, downscaled):
+    def disaggregate_source(self):
         """Disaggregate water demand by source (runoff, groundwater, desal)"""
 
         print('Disaggregating Source')
@@ -221,11 +221,7 @@ class Tethys:
         # apply shares to the gridded region masks
         gridded_shares = get_shares.generate_gridded_shares(shares_df)
 
-        # disaggregate water supply source for each downscaled demand in each grid cell
-        downscaled_disaggregated_sw = (downscaled * gridded_shares['runoff']).compute()
-        downscaled_disaggregated_gw = (downscaled * gridded_shares['groundwater']).compute()
-
-        return gridded_shares, downscaled_disaggregated_sw, downscaled_disaggregated_gw
+        return gridded_shares
 
 
     def run_model(self):
@@ -237,6 +233,17 @@ class Tethys:
         self._load_proxies()
         self._load_region_masks()
         self._load_inputs()
+
+        # disaggregate water supply source
+        if self.source_disaggregation:
+            gshares = self.disaggregate_source()
+
+            # store the disaggregated results
+            self.griddedshares = gshares
+
+            if self.output_dir is not None:
+                filename = os.path.join(self.output_dir, f'gridded_runoff_shares.nc')
+                gshares['runoff'].to_netcdf(filename)
 
         for supersector, rules in self.downscaling_rules.items():
 
@@ -284,16 +291,6 @@ class Tethys:
                 downscaled.to_dataset(dim='sector').to_netcdf(filename, encoding=encoding)
                 downscaled = xr.open_dataset(filename).to_array(dim='sector')  # hopefully this keeps dask happy
 
-            # disaggregate water supply source and update the objects
-            if self.source_disaggregation:
-                gshares, sw, gw = self.disaggregate_source(downscaled)
-
-                # store the disaggregated results
-                self.griddedshares = gshares
-                self.disaggregated_sw = sw
-                self.disaggregated_gw = gw
-
-
             if self.temporal_config is not None:
                 # calculate the monthly distributions (share of annual) for each year
 
@@ -315,7 +312,7 @@ class Tethys:
                 if self.output_dir is not None:
                     filename = os.path.join(self.output_dir, f'{supersector}_{self.demand_type}_monthly.nc')
                     encoding = {sector: {'zlib': True, 'complevel': 5} for sector in downscaled.sector.data}
-                    downscaled.to_dataset(dim='sector').to_netcdf(filename, encoding=encoding)
+                    downscaled.to_dataset(dim='sector').compute().to_netcdf(filename, encoding=encoding)
                     downscaled = xr.open_dataset(filename).to_array(dim='sector')  # hopefully this keeps dask happy
 
             self.outputs.update(downscaled.to_dataset(dim='sector'))

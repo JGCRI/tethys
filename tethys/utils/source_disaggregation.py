@@ -34,9 +34,9 @@ class get_source_shares:
 
         :return: Processed DataFrame with calculated shares.
         """
-        # query GCAM database for water used by source for the demand type (W or C)
-        query_type = f'*_water {self.demand_type}'
-        shares_df = self.conn.runQuery(easy_query('production', resource=query_type))
+        # query GCAM database for water used by source for the demand type (W only)
+        query_type = f'*_water withdrawals'
+        shares_df = self.conn.runQuery(easy_query('production', replace_filters=True, resource=query_type))
 
         # extract and clean resource names (e.g., remove '_water withdrawals')
         shares_df['resource'] = shares_df['resource'].apply(extract_resource_name)
@@ -53,6 +53,15 @@ class get_source_shares:
         shares_df['share'] = shares_df.groupby(
             ['scenario', 'region', 'region_resourcemap', 'year']
         )['value'].transform(lambda x: x / x.sum() if x.sum() != 0 else 0)
+
+        # capture basins that are mostly belonging to other countries
+        if basin_name_mapping == 'basin_name_mapping_im3':
+            shares_df = shares_df.replace({'region_resourcemap': {
+                'Canada_FraserR': 'USA_FraserR',
+                'Canada_GreatLakes': 'USA_GreatLakes',
+                'Mexico_MexCstNW': 'USA_MexCstNW',
+                'Canada_NelsonR': 'USA_NelsonR',
+            }})
 
         # filter shares based on the region masks from the config file, otherwise all regions would be included
         shares_df = shares_df[shares_df['region_resourcemap'].isin(self.region_masks.region.values)]
