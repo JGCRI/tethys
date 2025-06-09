@@ -244,6 +244,7 @@ class Tethys:
             if self.output_dir is not None:
                 filename = os.path.join(self.output_dir, f'gridded_runoff_shares.nc')
                 gshares['runoff'].to_netcdf(filename)
+            
 
         for supersector, rules in self.downscaling_rules.items():
 

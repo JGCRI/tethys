@@ -55,7 +55,7 @@ class get_source_shares:
         )['value'].transform(lambda x: x / x.sum() if x.sum() != 0 else 0)
 
         # capture basins that are mostly belonging to other countries
-        if basin_name_mapping == 'basin_name_mapping_im3':
+        if self.basin_name_mapping == 'basin_name_mapping_im3':
             shares_df = shares_df.replace({'region_resourcemap': {
                 'Canada_FraserR': 'USA_FraserR',
                 'Canada_GreatLakes': 'USA_GreatLakes',
