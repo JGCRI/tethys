@@ -93,6 +93,7 @@ class Tethys:
         self.griddedshares = None
         self.disaggregated_sw = None
         self.disaggregated_gw = None
+        self.irrigation_conveyance_efficiency = None
 
         # settings in YAML override settings passed directly to __init__
         if config_file is not None:
@@ -245,7 +246,7 @@ class Tethys:
                 filename = os.path.join(self.output_dir, f'gridded_runoff_shares.nc')
                 gshares['runoff'].to_netcdf(filename)
             
-
+        return
         for supersector, rules in self.downscaling_rules.items():
 
             print(f'Downscaling {supersector}')
@@ -284,6 +285,10 @@ class Tethys:
 
                     # in a lot of cases this could be optimized by solving the intersections at region scale first,
                     # then downscaling once, but harder to implement, especially if differing regions are not subsets
+
+            # handle irrigation withdrawal conveyance efficiency if set
+            if (supersector=='Irrigation') and (self.demand_type=='withdrawals') and (self.irrigation_conveyance_efficiency is not None):
+                downscaled = downscaled / self.irrigation_conveyance_efficiency
 
             # write spatial downscaling outputs
             if self.output_dir is not None:

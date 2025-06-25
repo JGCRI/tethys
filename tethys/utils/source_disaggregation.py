@@ -87,7 +87,7 @@ class get_source_shares:
                             (shares_df['year'] == year) &
                             (shares_df['region_resourcemap'] == basin) &
                             (shares_df['subresource'] == subresource)
-                            ].iloc[0].share,
+                        ].iloc[0].share,
                         0 if gridded_shares is None else gridded_shares,
                         keep_attrs=False,
                     )
