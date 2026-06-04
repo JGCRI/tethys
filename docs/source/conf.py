@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 
 project = 'tethys'
 copyright = '2021, Battelle Memorial Institute'
-author = 'Chris R. Vernon'
+author = 'Isaac Thompson, Chris R. Vernon, Hassan Niazi'
 
 # The full version, including alpha/beta/rc tags
 release = version

@@ -21,7 +21,7 @@ As a prerequisite, you'll need to have `Python <https://www.python.org/downloads
 
 **tethys** can be installed from GitHub using pip::
 
-  pip install tethys-downscale
+  pip install tethys-downscaling
 
 This will automatically install the dependencies. In order to avoid package version conflicts, consider using a virtual environment.
 

@@ -1,7 +1,7 @@
 import gcamreader
 
 
-def easy_query(variable, year_axis=None, **kwargs):
+def easy_query(variable, year_axis=None, replace_filters=False, **kwargs):
     """Build a query for a GCAM database
 
     kwargs act as filters on nodes, eg. "sector='Beef'" is converted to the xpath "[@type='sector' and @name='Beef']"
@@ -24,8 +24,11 @@ def easy_query(variable, year_axis=None, **kwargs):
     :return: gcamreader Query object
     """
 
-    filters = dict(sector=None)  # match nodes where @type='sector' by default
-    filters.update(kwargs)  # update the filters with user-provided kwargs
+    if replace_filters:
+        filters = kwargs
+    else:
+        filters = dict(sector=None)  # match nodes where @type='sector' by default
+        filters.update(kwargs)  # update the filters with user-provided kwargs
 
     # filters are separated by "//*" to match any descendant
     xpath = "*" + "//*".join(handle_filter(k, v) for k, v in filters.items()) + f"//{variable}/node()"

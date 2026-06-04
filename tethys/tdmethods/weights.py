@@ -1,9 +1,15 @@
 from tethys.datareader.gridded import load_file
 
 
-def temporal_distribution(years, resolution, weightfile, weightvar='weight', regrid_method='intensive',
+def temporal_distribution(years, resolution=None, weightfile=None, weightvar='weight', regrid_method='intensive',
                           prenormalized=False, bounds=None):
     """Load a monthly distribution from filename"""
+
+    if hasattr(years, 'temporal_config'):
+        model = years
+        cfg = dict((model.temporal_config or {}).get('Weights', {}).get('kwargs', {}) or {})
+        cfg.setdefault('bounds', model.bounds)
+        return temporal_distribution(range(model.years[0], model.years[-1] + 1), model.resolution, **cfg)
 
     distribution = load_file(weightfile, resolution, years, bounds=bounds, regrid_method=regrid_method,
                              variables=[weightvar])[weightvar]
