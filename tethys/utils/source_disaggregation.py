@@ -34,10 +34,11 @@ class get_source_shares:
 
         :return: Processed DataFrame with calculated shares.
         """
-        # query GCAM database for water used by source for the demand type (W only)
-        query_type = f'*_water withdrawals'
+        # query GCAM database for water used by source for the configured demand type
+        if self.demand_type not in ('withdrawals', 'consumption'):
+            raise ValueError(f"Unsupported demand_type: {self.demand_type!r}")
+        query_type = f"*_water {self.demand_type}"
         shares_df = self.conn.runQuery(easy_query('production', replace_filters=True, resource=query_type))
-
         # extract and clean resource names (e.g., remove '_water withdrawals')
         shares_df['resource'] = shares_df['resource'].apply(extract_resource_name)
 
