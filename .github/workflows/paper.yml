@@ -1,5 +1,13 @@
 ---
-on: [push]
+name: paper
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   paper:
