@@ -7,10 +7,9 @@ def temporal_distribution(years, resolution=None, regionfile=None, irrfile=None,
 
     if hasattr(years, 'temporal_config'):
         model = years
-        cfg = (model.temporal_config or {}).get('Irrigation', {}).get('kwargs', {})
-        return temporal_distribution(range(model.years[0], model.years[-1] + 1),
-                                     model.resolution, cfg.get('regionfile'), cfg.get('irrfile'),
-                                     bounds=model.bounds)
+        cfg = dict((model.temporal_config or {}).get('Irrigation', {}).get('kwargs', {}) or {})
+        cfg.setdefault('bounds', model.bounds)
+        return temporal_distribution(range(model.years[0], model.years[-1] + 1), model.resolution, **cfg)
 
     irr = load_file(irrfile, resolution, years, bounds=bounds, regrid_method='label', variables=[irrvar])[irrvar]
 
