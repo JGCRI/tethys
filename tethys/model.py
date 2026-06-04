@@ -121,6 +121,47 @@ class Tethys:
             self.output_dir = os.path.join(self.root, self.output_dir)
 
         self._parse_proxy_files()
+        self._normalize_temporal_config()
+
+    def _resolve_path(self, value):
+        if value is None:
+            return None
+        return value if os.path.isabs(value) else os.path.join(self.root, value)
+
+    # maps method name → {kwarg_name: temporal_files key}
+    _TEMPORAL_FILE_MAP = {
+        'domestic': {'tasfile': 'tas', 'rfile': 'domr'},
+        'electricity': {'hddfile': 'hdd', 'cddfile': 'cdd'},
+        'irrigation': {'irrfile': 'irr'},
+        'weights': {'weightfile': 'weight'},
+    }
+
+    def _normalize_temporal_config(self):
+        if self.temporal_config is not None:
+            for cfg in self.temporal_config.values():
+                cfg['kwargs'] = {k: self._resolve_path(v) if k.endswith('file') or k == 'gcam_db' else v
+                                 for k, v in cfg.get('kwargs', {}).items()}
+            return
+
+        if not self.perform_temporal and not self.temporal_methods and not self.temporal_files:
+            return
+
+        files = self.temporal_files or {}
+        methods = self.temporal_methods or {
+            'Municipal': 'domestic', 'Electricity': 'electricity', 'Irrigation': 'irrigation'}
+
+        config = {}
+        for sector, method in methods.items():
+            kwargs = {k: self._resolve_path(files.get(v))
+                      for k, v in self._TEMPORAL_FILE_MAP.get(method, {}).items()}
+            if method in ('electricity', 'irrigation') and self.map_files:
+                kwargs['regionfile'] = self._resolve_path(self.map_files[0])
+            if method == 'electricity':
+                kwargs['gcam_db'] = self._resolve_path(self.gcam_db)
+            config[sector] = {'method': method,
+                              'kwargs': {k: v for k, v in kwargs.items() if v is not None}}
+
+        self.temporal_config = config or None
 
     def _parse_proxy_files(self):
         """Handle several shorthand expressions in the proxy catalog"""
@@ -315,7 +356,7 @@ class Tethys:
                     years = range(self.years[0], self.years[-1] + 1)
                     kwargs = self.temporal_config[supersector]['kwargs']
                     distribution = temporal_distribution(years=years, resolution=self.resolution,
-                                                         bounds=self.bounds, **kwargs)
+                                                        bounds=self.bounds, **kwargs)
                 else:
                     # fall back to uniform distribution
                     distribution = xr.DataArray(np.full(12, 1/12, np.float32), coords=dict(month=range(1, 13)))
