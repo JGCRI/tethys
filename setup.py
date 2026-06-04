@@ -23,7 +23,7 @@ setup(
     url='https://github.com/JGCRI/tethys',
     packages=find_packages(),
     license='BSD-2-Clause',
-    author='Isaac Thompson, Chris Vernon',
+    author='Isaac Thompson, Chris Vernon, Hassan Niazi',
     python_requires='>=3.9, <4',
     include_package_data=True,
     install_requires=[

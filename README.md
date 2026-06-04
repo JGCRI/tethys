@@ -14,7 +14,7 @@ Details on methodology and advanced usage are available on the [User Guide](http
 
 Install `tethys` using pip:
 
-`pip install tethys-downscale`
+`pip install tethys-downscaling`
 
 ## Contributing to Tethys
 
