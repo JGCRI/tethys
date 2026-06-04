@@ -39,7 +39,10 @@ class Tethys:
         downscaling_rules=None,
         proxy_files=None,
         map_files=None,
-        temporal_config=None
+        temporal_config=None,
+        perform_temporal=False,
+        temporal_methods=None,
+        temporal_files=None,
     ):
         """Parameters can be specified in a YAML file or passed directly, with the config file taking precedence
 
@@ -56,6 +59,9 @@ class Tethys:
         :param downscaling_rules: mapping from water demand sectors to proxy variables
         :param proxy_files: mapping of spatial proxy files to their years/variables
         :param map_files: list of files containing region maps
+        :param perform_temporal: if True, apply temporal downscaling
+        :param temporal_methods: legacy mapping of sector to method names in tethys.tdmethods
+        :param temporal_files: legacy mapping of file aliases used by temporal methods
         :param temporal_config: mapping of sector to temporal downscaling method and arguments
         """
         self.root = None
@@ -82,6 +88,9 @@ class Tethys:
         self.proxy_files = proxy_files
         self.map_files = map_files
 
+        self.perform_temporal = perform_temporal
+        self.temporal_methods = temporal_methods
+        self.temporal_files = temporal_files
         self.temporal_config = temporal_config
 
         # data we'll load or generate later
