@@ -47,8 +47,10 @@ def extract_resource_name(x):
     :param x: resource name string.
     :return: cleaned resource name without suffix.
     """
-    if '_water withdrawals' in x or '_water consumption' in x:
-        return x.split('_')[0]  # return the part before the underscore e.g., 'basin_water withdrawals' to 'basin'
+    if x.endswith('_water withdrawals'):
+        return x.removesuffix('_water withdrawals')
+    if x.endswith('_water consumption'):
+        return x.removesuffix('_water consumption')
     return x
 
 
