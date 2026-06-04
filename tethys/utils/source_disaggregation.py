@@ -20,12 +20,17 @@ class get_source_shares:
         :param region_masks: xarray DataArray containing region masks.
         :param years: List of years to be included in the shares.
         """
+        if region_masks is None:
+            raise ValueError("region_masks is required to compute gridded shares")
+        if years is None:
+            raise ValueError("years is required to compute gridded shares")
+
         dbpath, dbfile = os.path.split(gcam_db)
         self.conn = gcamreader.LocalDBConn(dbpath, dbfile)
         self.basin_name_mapping = basin_name_mapping
         self.demand_type = demand_type
         self.region_masks = region_masks
-        self.years = years
+        self.years = list(years)
 
     def calculate_shares(self):
         """
