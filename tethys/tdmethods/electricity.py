@@ -12,10 +12,9 @@ def temporal_distribution(years, resolution=None, hddfile=None, cddfile=None, re
 
     if hasattr(years, 'temporal_config'):
         model = years
-        cfg = (model.temporal_config or {}).get('Electricity', {}).get('kwargs', {})
-        return temporal_distribution(range(model.years[0], model.years[-1] + 1),
-                                     model.resolution, cfg.get('hddfile'), cfg.get('cddfile'),
-                                     cfg.get('regionfile'), cfg.get('gcam_db'), bounds=model.bounds)
+        cfg = dict((model.temporal_config or {}).get('Electricity', {}).get('kwargs', {}) or {})
+        cfg.setdefault('bounds', model.bounds)
+        return temporal_distribution(range(model.years[0], model.years[-1] + 1), model.resolution, **cfg)
 
     # get weights of heating/cooling/other by location and time
     regions = load_region_map(regionfile, masks=True, target_resolution=resolution, bounds=bounds)
