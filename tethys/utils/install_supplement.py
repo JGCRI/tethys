@@ -17,7 +17,8 @@ DATA_VERSION_URLS = {
     '2.0.0': 'https://zenodo.org/record/7569652/files/example.zip?download=1',
     '2.0.1': 'https://zenodo.org/record/7569652/files/example.zip?download=1',
     '2.0.2': 'https://zenodo.org/record/7569652/files/example.zip?download=1',
-    '2.1.0': 'https://zenodo.org/record/7569652/files/example.zip?download=1'
+    '2.1.0': 'https://zenodo.org/record/7569652/files/example.zip?download=1',
+    '2.2.0': 'https://zenodo.org/record/7569652/files/example.zip?download=1'
 }
 
 
