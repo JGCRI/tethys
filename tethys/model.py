@@ -286,12 +286,12 @@ class Tethys:
         self._load_inputs()
 
         # disaggregate water supply source
+        # disaggregate water supply source
         if self.source_disaggregation:
-            gshares = self.disaggregate_source()
+            gshares = xr.Dataset(self.disaggregate_source())
 
             # store the disaggregated results
             self.griddedshares = gshares
-
             if self.output_dir is not None:
                 filename = os.path.join(self.output_dir, f'gridded_runoff_shares.nc')
                 gshares['runoff'].to_netcdf(filename)
