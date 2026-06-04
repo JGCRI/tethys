@@ -87,13 +87,15 @@ class get_source_shares:
             for year in self.years:
                 gridded_shares = None
                 for basin in shares_df.region_resourcemap.unique():
+                    sel = shares_df[
+                        (shares_df['year'] == year) &
+                        (shares_df['region_resourcemap'] == basin) &
+                        (shares_df['subresource'] == subresource)
+                    ]
+                    share_val = 0.0 if sel.empty else float(sel.iloc[0].share)
                     gridded_shares = xr.where(
                         self.region_masks.sel(region=basin).load(),
-                        shares_df[
-                            (shares_df['year'] == year) &
-                            (shares_df['region_resourcemap'] == basin) &
-                            (shares_df['subresource'] == subresource)
-                        ].iloc[0].share,
+                        share_val,
                         0 if gridded_shares is None else gridded_shares,
                         keep_attrs=False,
                     )
