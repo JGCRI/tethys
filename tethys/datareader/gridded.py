@@ -2,7 +2,7 @@ import numpy as np
 import xarray as xr
 
 
-def load_file(filename, target_resolution, years, variables=None, flags=None, regrid_method='extensive'):
+def load_file(filename, target_resolution, years, variables=None, flags=(), bounds=None, regrid_method='extensive'):
     """Prepare a dataset from single file to be merged into a dataset of all proxies
 
     handles many oddities found in proxies
@@ -12,13 +12,12 @@ def load_file(filename, target_resolution, years, variables=None, flags=None, re
     :param years: years to extract from the file
     :param variables: variables to extract from the file
     :param flags: list potentially containing 'cell_area_share' or 'short_name_as_name'
+    :param bounds: list [lat_min, lat_max, lon_min, lon_max] to crop to
     :param regrid_method: passed along to regrid
     :return: preprocessed data set
     """
 
-    flags = [] if flags is None else flags
-
-    ds = xr.open_dataset(filename, chunks='auto')
+    ds = xr.open_mfdataset(filename, chunks='auto')
 
     # handle tif (can only handle single band single variable single year currently)
     if 'band' in ds.coords:
@@ -33,7 +32,10 @@ def load_file(filename, target_resolution, years, variables=None, flags=None, re
 
     # filter to desired variables
     if variables is not None:
-        ds = ds[variables]
+        if len(ds) == 1 and len(variables) > 1:  # use single layer for all variables
+            ds[variables] = [ds[variables[0]] for i in variables]
+        else:
+            ds = ds[variables]
 
     # create a year dimension if missing, with the years reported for this file in the catalog
     if 'year' not in ds.coords:
@@ -41,11 +43,7 @@ def load_file(filename, target_resolution, years, variables=None, flags=None, re
     else:
         ds = ds.sel(year=years, method='nearest')  # nearest used for temporal files
     ds['year'] = years
-
-    # do the year filtering
-    if years is not None and 'year' in ds.coords:
-        ds = ds.sel(year=years, method='nearest').chunk(chunks=dict(year=1))
-        ds['year'] = years
+    ds = ds.chunk(year=1)
 
     # numeric stuff
     ds = ds.fillna(0).astype(np.float32)
@@ -59,10 +57,12 @@ def load_file(filename, target_resolution, years, variables=None, flags=None, re
     # spatial aligning
     ds = pad_global(ds)
     ds = regrid(ds, target_resolution, method=regrid_method)
+    if bounds is not None:
+        ds = crop(ds, bounds)
 
     ds = ds.chunk(chunks=dict(lat=-1, lon=-1))
     if 'month' in ds.coords:
-        ds = ds.chunk(chunks=dict(month=12))
+        ds = ds.chunk(month=12)
 
     return ds
 
@@ -131,6 +131,11 @@ def pad_global(ds):
     ds = set_global_coords(ds, source_resolution)
 
     return ds
+
+
+def crop(ds, bounds):
+    lat_min, lat_max, lon_min, lon_max = bounds
+    return ds.sel(lon=slice(lon_min, lon_max), lat=slice(lat_max, lat_min))
 
 
 def regrid(ds, target_resolution, method='extensive'):

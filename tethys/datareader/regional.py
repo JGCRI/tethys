@@ -18,7 +18,7 @@ def load_region_data(gcam_db, sectors, demand_type='withdrawals'):
     # remove subsector and technology if present, convert friendly water demand sector names to internal
     search_sectors = list(set(unfriendly_sector_name(i.split('/')[0]) for i in sectors))
 
-    inputs = {'withdrawals': ['water_td_*_W', '*_water withdrawals', '*_desalinated water'],
+    inputs = {'withdrawals': ['water_td_*_W', '*_water withdrawals'],
               'consumption': ['water_td_*_C', '*_water consumption']}.get(demand_type)
 
     df = conn.runQuery(easy_query('demand-physical', sector=search_sectors, technology='!water_td_*', input=inputs))
@@ -39,6 +39,19 @@ def load_region_data(gcam_db, sectors, demand_type='withdrawals'):
     df = df.groupby(['region', 'sector', 'year'])[['value']].sum().reset_index()
 
     return df
+
+
+def extract_resource_name(x):
+    """Removes '_water withdrawals' or '_water consumption' from GCAM sector or resource name.
+
+    :param x: resource name string.
+    :return: cleaned resource name without suffix.
+    """
+    if x.endswith('_water withdrawals'):
+        return x.removesuffix('_water withdrawals')
+    if x.endswith('_water consumption'):
+        return x.removesuffix('_water consumption')
+    return x
 
 
 def extract_basin_name(x):

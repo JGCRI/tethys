@@ -2,16 +2,17 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from tethys.datareader.gridded import regrid
+from tethys.datareader.gridded import regrid, pad_global, crop
 
 
-def load_region_map(mapfile, masks=False, namefile=None, target_resolution=None, nodata=None, flip_lat=False):
+def load_region_map(mapfile, masks=False, namefile=None, target_resolution=None, bounds=None, nodata=None, flip_lat=False):
     """ Load region map.
 
     :param mapfile: path to map file
     :param masks: bool whether to convert categorical map to layer of region masks
     :param namefile: optional path to csv with region names
     :param target_resolution: resolution to coerce map to. If None (default), use base resolution
+    :param bounds: list [lat_min, lat_max, lon_min, lon_max] to crop to
     :param nodata: nodata value (like 9999), will be replaced with 0
     :param flip_lat: bool, whether the map is "upside down"
     """
@@ -41,8 +42,12 @@ def load_region_map(mapfile, masks=False, namefile=None, target_resolution=None,
         da = da.squeeze('band').drop_vars('band')
 
     if target_resolution is not None:
+        da = pad_global(da)
         da = regrid(da, target_resolution, method='label')
         da = da.chunk(chunks=dict(lat=-1, lon=-1))
+
+    if bounds is not None:
+        da = crop(da, bounds)
 
     # use region names provided in CSV namefile, otherwise check metadata for a names dict
     if namefile is not None:

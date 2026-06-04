@@ -102,22 +102,24 @@ Configuration File
 ------------------
 **tethys** uses a `YAML <https://yaml.org/spec/1.2.2/>`_ configuration file. The options in this file correspond to the arguments passed to the :ref:`Tethys class <tethys.model>`. Options not present in the config file will use the default. An overview is provided in the following table, with more details and examples below.
 
-======================== =========================================================
-Option                   Description
-======================== =========================================================
-:ref:`years`             list of years to be included spatial downscaling
-:ref:`resolution`        resolution in degrees for spatial downscaling
-:ref:`demand_type`       choice between "withdrawals" (default) or "consumption"
-:ref:`perform_temporal`  choice between "false" (default) or "true"
-:ref:`gcam_db`           relative path to a GCAM database
-:ref:`csv`               relative path to csv file containing inputs
-:ref:`output_file`       name of file to write outputs to
-:ref:`downscaling_rules` mapping from water demand sectors to proxy variables
-:ref:`proxy_files`       mapping of spatial proxy files to their years/variables
-:ref:`map_files`         list of files containing region maps
-:ref:`temporal_methods`  mapping of sector to temporal downscaling method
-:ref:`temporal_files`    files that will be accessible during temporal downscaling
-======================== =========================================================
+======================================= =============================================================================
+Option                                  Description
+======================================= =============================================================================
+:ref:`years`                            list of years to be included spatial downscaling
+:ref:`resolution`                       resolution in degrees for spatial downscaling
+:ref:`demand_type`                      choice between "withdrawals" (default) or "consumption"
+:ref:`perform_temporal`                 choice between "false" (default) or "true"
+:ref:`gcam_db`                          relative path to a GCAM database
+:ref:`csv`                              relative path to csv file containing inputs
+:ref:`output_file`                      name of file to write outputs to
+:ref:`downscaling_rules`                mapping from water demand sectors to proxy variables
+:ref:`proxy_files`                      mapping of spatial proxy files to their years/variables
+:ref:`map_files`                        list of files containing region maps
+:ref:`temporal_methods`                 mapping of sector to temporal downscaling method
+:ref:`temporal_files`                   files that will be accessible during temporal downscaling
+:ref:`source_disaggregation`            if true, share of surface water vs groundwater withdrawal will be written out
+:ref:`irrigation_conveyance_efficiency` if set, irrigation withdrawal will be divided by this number
+======================================= =============================================================================
 
 
 years
@@ -270,6 +272,23 @@ Mapping of files that will be accessible to temporal downscaling methods.
   temporal_files:
     HDD: data/temporal/HDD_monthly.nc
     CDD: data/temporal/CDD_monthly.nc
+
+
+source_disaggregation
+^^^^^^^^^^^^^^^^^^^^
+If true, share of surface water vs groundwater withdrawal will be written out to a file called gridded_runoff_shares.nc
+.. code-block:: yaml
+
+  source_disaggregation: true
+
+
+irrigation_conveyance_efficiency
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If set, irrigation withdrawal will be divided by this number, representing GCAM's irrigation conveyance efficiency
+
+.. code-block:: yaml
+
+  irrigation_conveyance_efficiency: 0.829937
 
 
 Generalization
