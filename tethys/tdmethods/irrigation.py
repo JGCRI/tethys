@@ -2,8 +2,15 @@ from tethys.datareader.gridded import load_file
 from tethys.datareader.maps import load_region_map
 
 
-def temporal_distribution(years, resolution, regionfile, irrfile, irrvar='pirrww', bounds=None):
+def temporal_distribution(years, resolution=None, regionfile=None, irrfile=None, irrvar='pirrww', bounds=None):
     """Temporal downscaling of irrigation water demand"""
+
+    if hasattr(years, 'temporal_config'):
+        model = years
+        cfg = (model.temporal_config or {}).get('Irrigation', {}).get('kwargs', {})
+        return temporal_distribution(range(model.years[0], model.years[-1] + 1),
+                                     model.resolution, cfg.get('regionfile'), cfg.get('irrfile'),
+                                     bounds=model.bounds)
 
     irr = load_file(irrfile, resolution, years, bounds=bounds, regrid_method='label', variables=[irrvar])[irrvar]
 

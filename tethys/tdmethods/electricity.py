@@ -6,9 +6,16 @@ from tethys.datareader.gridded import load_file, interp_helper
 from tethys.datareader.maps import load_region_map
 
 
-def temporal_distribution(years, resolution, hddfile, cddfile, regionfile, gcam_db, hddvar='hdd', cddvar='cdd',
-                          bounds=None):
+def temporal_distribution(years, resolution=None, hddfile=None, cddfile=None, regionfile=None, gcam_db=None,
+                          hddvar='hdd', cddvar='cdd', bounds=None):
     """Temporal downscaling of water demand for electricity generation using algorithm from Voisin et al. (2013)"""
+
+    if hasattr(years, 'temporal_config'):
+        model = years
+        cfg = (model.temporal_config or {}).get('Electricity', {}).get('kwargs', {})
+        return temporal_distribution(range(model.years[0], model.years[-1] + 1),
+                                     model.resolution, cfg.get('hddfile'), cfg.get('cddfile'),
+                                     cfg.get('regionfile'), cfg.get('gcam_db'), bounds=model.bounds)
 
     # get weights of heating/cooling/other by location and time
     regions = load_region_map(regionfile, masks=True, target_resolution=resolution, bounds=bounds)
