@@ -275,9 +275,8 @@ Mapping of files that will be accessible to temporal downscaling methods.
 
 
 source_disaggregation
-^^^^^^^^^^^^^^^^^^^^^
-If true, share of surface water vs groundwater withdrawal will be written out to a file called gridded_runnoff_shares.nc
-
+^^^^^^^^^^^^^^^^^^^^
+If true, share of surface water vs groundwater withdrawal will be written out to a file called gridded_runoff_shares.nc
 .. code-block:: yaml
 
   source_disaggregation: true
