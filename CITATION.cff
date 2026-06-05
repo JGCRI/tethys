@@ -1,0 +1,60 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+type: software
+title: "tethys"
+abstract: >-
+  A spatiotemporal downscaling model for global water demand.
+  tethys facilitates coupling between integrated human-Earth systems models
+  (e.g., GCAM) and gridded hydrology models by downscaling coarse
+  region-scale water demand projections to high-resolution monthly grids
+  using sector-specific proxies and formulas.
+authors:
+  - family-names: Niazi
+    given-names: Hassan
+    orcid: "https://orcid.org/0000-0001-6556-2854"
+  - family-names: Thompson
+    given-names: Isaac
+    orcid: "https://orcid.org/0000-0001-9594-0043"
+  - family-names: Vernon
+    given-names: Chris R.
+    orcid: "https://orcid.org/0000-0002-3406-6214"
+  - family-names: Thurber
+    given-names: Travis
+    orcid: "https://orcid.org/0000-0002-4370-9971"
+  - family-names: Khan
+    given-names: Zarrar
+    orcid: "https://orcid.org/0000-0002-8147-8553"
+repository-code: "https://github.com/JGCRI/tethys"
+url: "https://jgcri.github.io/tethys"
+license: BSD-2-Clause
+doi: 10.5281/zenodo.1300872
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.1300872
+    description: "Zenodo software archive"
+keywords:
+  - global water use
+  - sectoral water demand
+  - spatiotemporal downscaling
+  - hydrology and water resources
+  - GCAM
+preferred-citation:
+  type: article
+  title: "Tethys: A Spatiotemporal Downscaling Model for Global Water Demand"
+  authors:
+    - family-names: Thompson
+      given-names: Isaac
+      orcid: "https://orcid.org/0000-0001-9594-0043"
+    - family-names: Vernon
+      given-names: Chris R.
+      orcid: "https://orcid.org/0000-0002-3406-6214"
+    - family-names: Khan
+      given-names: Zarrar
+      orcid: "https://orcid.org/0000-0002-8147-8553"
+  journal: "Journal of Open Source Software"
+  volume: 9
+  issue: 97
+  pages: "5855"
+  year: 2024
+  doi: 10.21105/joss.05855
+  url: "https://doi.org/10.21105/joss.05855"
