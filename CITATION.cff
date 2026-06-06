@@ -44,25 +44,22 @@ keywords:
   - hydrology and water resources
   - GCAM
 preferred-citation:
-  type: software
-  title: "Tethys: A Spatiotemporal Downscaling Model for Global Water Demand and Source Attribution"
+  type: article
+  title: "Tethys: A Spatiotemporal Downscaling Model for Global Water Demand"
   authors:
-    - family-names: Niazi
-      given-names: Hassan
-      orcid: "https://orcid.org/0000-0001-6556-2854"
     - family-names: Thompson
       given-names: Isaac
       orcid: "https://orcid.org/0000-0001-9594-0043"
     - family-names: Vernon
       given-names: Chris R.
       orcid: "https://orcid.org/0000-0002-3406-6214"
-    - family-names: Thurber
-      given-names: Travis
-      orcid: "https://orcid.org/0000-0002-4370-9971"
     - family-names: Khan
       given-names: Zarrar
       orcid: "https://orcid.org/0000-0002-8147-8553"
   journal: "Journal of Open Source Software"
-  year: 2026
-  doi: 10.5281/zenodo.1300872
-  url: "https://doi.org/10.5281/zenodo.1300872"
+  volume: 9
+  issue: 97
+  pages: "5855"
+  year: 2024
+  doi: 10.21105/joss.05855
+  url: "https://doi.org/10.21105/joss.05855"
