@@ -35,6 +35,7 @@ class Tethys:
         gcam_db=None,
         csv=None,
         output_dir=None,
+        output_file=None,
         supersector_iterations=0,
         downscaling_rules=None,
         proxy_files=None,
@@ -81,6 +82,7 @@ class Tethys:
 
         # outputs
         self.output_dir = output_dir
+        self.output_file = output_file
 
         self.downscaling_rules = downscaling_rules
         self.supersector_iterations = supersector_iterations
@@ -119,6 +121,11 @@ class Tethys:
 
         if self.output_dir is not None:
             self.output_dir = os.path.join(self.root, self.output_dir)
+            os.makedirs(self.output_dir, exist_ok=True)
+
+        if self.output_file is not None:
+            self.output_file = os.path.join(self.root, self.output_file)
+            os.makedirs(os.path.dirname(self.output_file), exist_ok=True)
 
         self._parse_proxy_files()
         self._normalize_temporal_config()
@@ -263,7 +270,7 @@ class Tethys:
         print('Disaggregating Source')
 
         # initialize source shares object
-        get_shares = get_source_shares(gcam_db=self.gcam_db, demand_type=self.demand_type,
+        get_shares = get_source_shares(gcam_db=os.path.join(self.root, self.gcam_db), demand_type=self.demand_type,
                                      region_masks=self.region_masks, years=self.years)
 
         # query and calculate shares
@@ -371,6 +378,10 @@ class Tethys:
                     downscaled = xr.open_dataset(filename).to_array(dim='sector')  # hopefully this keeps dask happy
 
             self.outputs.update(downscaled.to_dataset(dim='sector'))
+
+        if self.output_file is not None:
+            encoding = {var: {'zlib': True, 'complevel': 5} for var in self.outputs.data_vars}
+            self.outputs.to_netcdf(self.output_file, encoding=encoding)
 
     def reaggregate(self, region_masks=None):
         """Reaggregate from grid cells to regions
